@@ -1,5 +1,5 @@
 /**
- * 
+ * Proyecto Fin de Grado
  */
 /**
  * @author Silverio Manuel Rosales Santana
