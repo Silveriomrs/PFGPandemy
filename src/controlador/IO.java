@@ -23,6 +23,7 @@ import java.io.FileReader;
 
 
 /**
+ * Clase de Entrada y salida de datos.
  * @author Silverio Manuel Rosales Santana
  * @date 
  * @version 1.0

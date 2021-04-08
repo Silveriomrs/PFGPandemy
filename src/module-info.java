@@ -8,4 +8,5 @@
  *
  */
 module pfgPandemy {
+	requires java.desktop;  //Necesario para poder usar AWT y Swing
 }
