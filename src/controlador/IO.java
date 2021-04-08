@@ -22,12 +22,17 @@ import java.io.FileReader;
 
 
 
+/**
+ * @author Silverio Manuel Rosales Santana
+ * @date 
+ * @version 1.0
+ *
+ */
 public class IO
 {   
     private int contadorO;
     private int contadorR;
     private int contadorS;
-    private int contadorNodos; //Contabiliza el numero de nodos pasados en el archivo.
     private int filas, columnas, cuenta;
     private boolean ejecucionCorrecta;
     private int lectura[];
@@ -44,7 +49,6 @@ public class IO
         filas = 0;
         columnas = 0;
         cuenta = 0;
-        contadorNodos = 0;
         ejecucionCorrecta = true;
         ayuda = new Ayuda();
     }
@@ -69,7 +73,7 @@ public class IO
     
     /**
      * Comprueba la posición pasada como parametro V, está en una posición de la periferia de la Matriz.
-     * @param posición como valor int.
+     * @param posicion posición como valor int.
      * @return TRUE si pertenece a la periferia, FALSE en caso contrario
      */
     private boolean esPeriferia(int posicion){
@@ -193,8 +197,8 @@ public class IO
      * Tratamiento especial para los valores de nodos R, S y Obstaculos.
      * Ademas en el caso de S comprueba que sea periferico, en caso de que no lo sea, activara el flag correspondiente a FALSE,
      * para su tratamiento posterior al final de la lectura del archivo.
-     * @param el nodo a tratar.
-     * @return El valor correspondiente, en caso de error devuelve -9.
+     * @param cad Nodo a tratar.
+     * @return resultado El valor correspondiente, en caso de error devuelve -9.
      */
     private int tratarRSO(String cad)
     {
