@@ -3,6 +3,8 @@
  */
 package modelo;
 
+import vista.Principal;
+
 /**
  * @author Silverio Manuel Rosales Santana
  * @date
@@ -16,7 +18,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		Principal ventana = new Principal();
+		ventana.setVisible(true);
 	}
 
 }
