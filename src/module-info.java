@@ -10,5 +10,4 @@
 module pfgPandemy {
 	requires java.desktop;
 	requires opencsv;														//Necesario para poder usar AWT y Swing
-//	requires opencsv;  
 }

@@ -8,21 +8,22 @@
  * @author (Silverio Manuel Rosales Santana) 
  * @version (2017.10.15.0212)
  */
-package controlador;
+package modelo;
 
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.opencsv.CSVReader;
+//import com.opencsv.CSVReader;
+
 
 
 /**
@@ -33,16 +34,15 @@ import com.opencsv.CSVReader;
  *
  */
 public class IO{
-    private Ayuda ayuda;
     private final String SEPARADOR =",";
-    private CSVReader lector = null;
+//    private CSVReader lector;
     
     /**
      * Constructor de la clase IO
      */
     public IO()
     {    
-        ayuda = new Ayuda();
+
     }
     
 
@@ -52,12 +52,14 @@ public class IO{
 	 * Unicamente una 'R', unicamente una 'S' y en la periferia, al menos un caracter 'O'. Todo caracter en mayuscula.
 	 * No admite numeros negativos. Almacena el resultado en el campo lectura.
 	 * @param ext extensión del archivo.
+	 * @return tabla de datos en formato ArrayList de ArrayList (ColumnasxFilas)
 	 */
-	public void abrirArchivo(String ext) {
+	public DCVS abrirArchivo(String ext) {
 		File f;
 		Scanner scn = null;
 		JFileChooser sf = new JFileChooser(".");	
-		FileNameExtensionFilter filtro = new FileNameExtensionFilter(ext,"CVS");
+		FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs","CVS");
+		DCVS bd = new DCVS();
 		int resultado;		
 		
 		sf.setFileFilter(filtro);
@@ -72,48 +74,56 @@ public class IO{
 			}else {			
 				try {
 					scn = new Scanner(f);
-					while (scn.hasNextLine()) {
+					while (scn.hasNextLine()) {				 
 						 //jtaContenido.insert(scn.nextLine() + "\n", jtaContenido.getText().length());
 						String l = scn.nextLine();
-						System.out.println(l);
-						String[] campos = l.split(SEPARADOR); 
-						System.out.println(Arrays.toString(campos));
+						ArrayList<String> lista = trataLinea(l);
+						bd.addFila(lista);
 					}
 					scn.close();
 				}
 				catch (FileNotFoundException e1) {e1.printStackTrace();}
 			}
 		}
+		return bd;
 	}
 	    
 	/**
 	 * Metodo para almacenar en un archivo una cadena de texto.
 	 * @param nombreArchivo , nombre del archivo donde se almacenara el texto.
 	 * @param datos los datos a guardar.
+	 * @param ext Extensión del archivo a guardar.
+	 * @return TRUE en caso de operación realizada, false en otro caso.
 	 */
-	public void grabarArchivo(String nombreArchivo, String datos) { 
-		//Creamos el objeto JFileChooser
-		JFileChooser sf=new JFileChooser();
-		 
-		//Abrimos la ventana, guardamos la opcion seleccionada por el usuario
-		int seleccion=sf.showSaveDialog(null);
-		 
-		//Si el usuario, pincha en aceptar
-		if(seleccion==JFileChooser.APPROVE_OPTION){		 
-		    //Seleccionamos el fichero
-		    File fichero=sf.getSelectedFile();
-		 
-		    try(FileWriter fw=new FileWriter(fichero)){
-		 
-		        //Escribimos el texto en el fichero
-		   //     fw.write(textArea.getText());
-		    	fw.close();
-		 
-		    } catch (IOException e1) {
-		        e1.printStackTrace();
-		    }
-		 
+	public boolean grabarArchivo(String datos, String ext) {
+		boolean ok = false;
+		JFileChooser sf=new JFileChooser();										//Creamos el objeto JFileChooser
+	//	FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs");
+		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	//	sf.setFileFilter(filtro);
+		int seleccion=sf.showSaveDialog(null);									//Abrimos la ventana, guardamos la opcion seleccionada por el usuario		
+		if(seleccion==JFileChooser.APPROVE_OPTION){		 						//Si el usuario, selecciona aceptar
+		    File fichero=sf.getSelectedFile();									//Seleccionamos el fichero							
+		    try(FileWriter fw=new FileWriter(fichero)){	        
+		    	fw.write(datos);												//Escribimos el texto en el fichero.
+		    	fw.close();	 													//Cierre del escritor de fichero.
+		    	ok = true;
+		    } catch (IOException e1) {e1.printStackTrace();return ok;}
 		}
+		return ok;
 	}
-	    
+	
+	/**
+	 * Función que convierte una línea leída del archivo en disco
+	 * en un array de cadenas (campos) en formato texto. Elimina los separadores
+	 * y también elimina los espacios en blanco innecesarios.
+	 * @param linea a formatear.
+	 * @return la lista de valores.
+	 */
+	private ArrayList<String> trataLinea(String linea) {
+		ArrayList<String> lista = new ArrayList<String>();
+		String[] campos = linea.trim().split(SEPARADOR);
+		for(int i=0; i<campos.length; i++) {lista.add(campos[i]);}
+		return lista;
+	}
 }

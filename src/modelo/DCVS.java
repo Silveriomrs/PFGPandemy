@@ -6,41 +6,45 @@
 package modelo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 2021.04.12
- * @version 1.0
+ * @version 1.2
  *
  */
 public class DCVS {
-
-	private List<List<String>> tabla = new ArrayList<List<String>>();
-	private List<String> fila = new ArrayList<String>();
+	private ArrayList<String> fila;
+	private ArrayList<ArrayList<String>> tabla; 
+	
+	private int filas,columnas;
 
 	/**
 	 * Genera una tabla de n Filas por m Columnas, cabecera inclusive.
 	 */
-	public DCVS() {super();}
+	public DCVS() {
+		super();
+		tabla = new ArrayList<ArrayList<String>>();
+		fila = new ArrayList<String>();
+		filas = 0;
+	}
 
 	/**
 	 * Devuelve el número de filas de la tabla
 	 * @return devuelve filas
 	 */
-	public int getFilas() {return tabla.get(0).size();}
+	public int getFilas() {return tabla.size();}
 
 	/**
+	 * @param f 
 	 * @return devuelve columnas
 	 */
-	public int getColumnas() {return tabla.size();}
+	public int getColumnas(int f) {return tabla.get(f).size();}
 
 	/**
 	 * @return devuelve cabecera
 	 */
-	public List<List<String>> getTabla() {
-		System.out.println(Arrays.deepToString(tabla.toArray()));
+	public ArrayList<ArrayList<String>> getTabla() {
 		return tabla;
 	}
 
@@ -69,12 +73,29 @@ public class DCVS {
 	 * @param f fila a leer.
 	 * @return devuelve fila
 	 */
-	public List<String> getFila(int f) {return tabla.get(f);}
+	public ArrayList<String> getFila(int f) {return tabla.get(f);}
 
 	/**
 	 * Añade una fila a la tabla.
 	 * @param fila Fila a añadir
 	 */
-	public void addFila(List<String> fila) {tabla.add(fila);}
+	public void addFila(ArrayList<String> fila) {
+		tabla.add(fila);
+		filas++;	
+	}
+	
+	@Override
+	public String toString() {
+		String texto = "";
+		for(int i=0; i<filas;i++) {
+			ArrayList<String> f = getFila(i);
+			for(int k=0; k<getColumnas(i) ;k++) {
+				texto += f.get(k);
+				if(k < getColumnas(i) -1) {texto += ",";}
+				else {texto += "\n";}
+			}		
+		}
+		return texto;
+	}
 	
 }
