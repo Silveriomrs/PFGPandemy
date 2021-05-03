@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
@@ -58,7 +57,7 @@ public class IO{
 		File f;
 		Scanner scn = null;
 		JFileChooser sf = new JFileChooser(".");	
-		FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs","CVS");
+		FileNameExtensionFilter filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
 		DCVS bd = new DCVS();
 		int resultado;		
 		
@@ -74,11 +73,9 @@ public class IO{
 			}else {			
 				try {
 					scn = new Scanner(f);
-					while (scn.hasNextLine()) {				 
-						 //jtaContenido.insert(scn.nextLine() + "\n", jtaContenido.getText().length());
+					while (scn.hasNextLine()) {
 						String l = scn.nextLine();
-						ArrayList<String> lista = trataLinea(l);
-						bd.addFila(lista);
+						bd.addFila(trataLinea(l));
 					}
 					scn.close();
 				}
@@ -91,21 +88,21 @@ public class IO{
 	/**
 	 * Metodo para almacenar en un archivo una cadena de texto.
 	 * @param nombreArchivo , nombre del archivo donde se almacenara el texto.
-	 * @param datos los datos a guardar.
+	 * @param bd los datos a guardar.
 	 * @param ext Extensión del archivo a guardar.
 	 * @return TRUE en caso de operación realizada, false en otro caso.
 	 */
-	public boolean grabarArchivo(String datos, String ext) {
+	public boolean grabarArchivo(String bd, String ext) {
 		boolean ok = false;
-		JFileChooser sf=new JFileChooser();										//Creamos el objeto JFileChooser
-	//	FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs");
+		JFileChooser sf=new JFileChooser(".");									//Creamos el objeto JFileChooser
+		FileNameExtensionFilter filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	//	sf.setFileFilter(filtro);
+		sf.setFileFilter(filtro);
 		int seleccion=sf.showSaveDialog(null);									//Abrimos la ventana, guardamos la opcion seleccionada por el usuario		
 		if(seleccion==JFileChooser.APPROVE_OPTION){		 						//Si el usuario, selecciona aceptar
 		    File fichero=sf.getSelectedFile();									//Seleccionamos el fichero							
 		    try(FileWriter fw=new FileWriter(fichero)){	        
-		    	fw.write(datos);												//Escribimos el texto en el fichero.
+		    	fw.write(bd);												//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
 		    	ok = true;
 		    } catch (IOException e1) {e1.printStackTrace();return ok;}
@@ -120,10 +117,11 @@ public class IO{
 	 * @param linea a formatear.
 	 * @return la lista de valores.
 	 */
-	private ArrayList<String> trataLinea(String linea) {
-		ArrayList<String> lista = new ArrayList<String>();
-		String[] campos = linea.trim().split(SEPARADOR);
-		for(int i=0; i<campos.length; i++) {lista.add(campos[i]);}
+	private Object[] trataLinea(String linea) {							
+		String[] campos = linea.trim().split(SEPARADOR);						//Limpieza de los campos.
+		int nc = campos.length;													//Obtención del número de datos.
+		Object[] lista = new Object[nc];										//Lista donde almacenar los datos de la línea de entrada
+		for(int i=0; i<nc; i++) {lista[i] = campos[i];}							//Creación de la lista (fila) con los datos obtenidos.
 		return lista;
 	}
 }

@@ -5,8 +5,8 @@
  */
 package controlador;
 
-import java.awt.TextArea;
-
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import modelo.DCVS;
 import modelo.IO;
 
@@ -18,29 +18,40 @@ import modelo.IO;
  */
 public class ControladorDatosIO {
 	private IO io;
+	private DCVS bd;
 
 	/**
-	 * 
+	 * Constructor principal de la clase.
 	 */
 	public ControladorDatosIO() {
+		super();
 		this.io = new IO();
+		this.bd = new DCVS();
 	}
 
 	
 	/**
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
-	 * @param textArea 
+	 * @return Jtable tabla con los datos del archivo abierto.
 	 */
-	public void abrirArchivo(TextArea textArea) {
-		DCVS bd = io.abrirArchivo("cvs,CVS");
-		textArea.setText(bd.toString());
+	public JTable abrirArchivo() {
+		bd = new DCVS();
+		bd = io.abrirArchivo("cvs");											//Abrir archivo CVS
+		
+		return new JTable(bd.getModelo());
 	}
 	
+
+
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
-	 * @param datos para ser almacenados.
+	 * @param tabla para ser almacenados.
 	 * @return True si la operación ha tenido éxito, FALSE en otro caso.
 	 */
-	public boolean guardarArchivo(String datos) {return io.grabarArchivo(datos,"cvs,CVS");}
-	
+	public boolean guardarArchivo(JTable tabla) {
+		bd = new DCVS();
+		//Realizar conversión y extracción de datos.		
+		return io.grabarArchivo(bd.toString(),"cvs");
+	}
+
 }
