@@ -80,7 +80,7 @@ public class DCVS {
 	public DefaultTableModel getModelo() {return modelo;}
 	
 	/**
-	 * @return
+	 * @return True en caso de realizar la conversión, False en otro caso
 	 */
 	public boolean setModelo() {
 		this.modelo = convToModelo();

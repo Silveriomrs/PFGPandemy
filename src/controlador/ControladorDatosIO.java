@@ -6,7 +6,6 @@
 package controlador;
 
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import modelo.DCVS;
 import modelo.IO;
 
@@ -37,11 +36,10 @@ public class ControladorDatosIO {
 	public JTable abrirArchivo() {
 		bd = new DCVS();
 		bd = io.abrirArchivo("cvs");											//Abrir archivo CVS
-		
+		/* No está implementado en DCVS la buena generación del modelo */
 		return new JTable(bd.getModelo());
 	}
 	
-
 
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
@@ -50,7 +48,10 @@ public class ControladorDatosIO {
 	 */
 	public boolean guardarArchivo(JTable tabla) {
 		bd = new DCVS();
-		//Realizar conversión y extracción de datos.		
+		//Realizar conversión y extracción de datos.
+		
+		//Falta que me guarde la tabla.Esta pasando un String con la tabla.
+		
 		return io.grabarArchivo(bd.toString(),"cvs");
 	}
 
