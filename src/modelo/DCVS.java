@@ -5,7 +5,9 @@
  */
 package modelo;
 
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -13,44 +15,17 @@ import javax.swing.table.DefaultTableModel;
  * @version 2.1
  *
  */
-public class DCVS {
+public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
+	private Class[] clases;
+	private Object[] nombresColumnas;
+	private Object[] columaTipos;
+	private Object datos[][];
 
 	/**
 	 * Genera una tabla de n Filas por m Columnas, cabecera inclusive.
 	 */
-	public DCVS() {
-		modelo = new DefaultTableModel();
-	}
-	
-	//public DCVS() {}
-
-	/**
-	 * Devuelve el número de filas de la tabla.
-	 * @return devuelve filas
-	 */
-	public int getNFilas() {return modelo.getRowCount();}
-
-	/**
-	 * @return devuelve el número de columnas del modelo
-	 */
-	public int getNColumnas() {return modelo.getColumnCount();}
-
-	/**
-	 * Función para obtener el dato de una celda.
-	 * @param f fila de la tabla
-	 * @param c columna de la tabla
-	 * @return Object devuelve dato en formato texto.
-	 */
-	public Object getDato(int f, int c) {return modelo.getValueAt(f, c);}
-
-	/**
-	 * Establece el valor de una celda por un nuevo valor tipo String.
-	 * @param f fila de la tabla
-	 * @param c columna de la tabla
-	 * @param dato el dato a establecer
-	 */
-	public void setDato(int f, int c, String dato) {this.modelo.setValueAt(dato, f, c);}
+	public DCVS() {modelo = new DefaultTableModel();}
 
 	/**
 	 * Devuelve la fila referenciada.
@@ -58,7 +33,7 @@ public class DCVS {
 	 * @return devuelve un array Object[] con los datos de una fila
 	 */
 	public Object[] getFila(int f) {
-		int columnas = getNColumnas();
+		int columnas = getColumnCount();
 		Object[] fila = new Object[columnas];
 		for(int i = 0; i<columnas;i++) {
 			fila[i] = modelo.getValueAt(f, i);
@@ -80,27 +55,41 @@ public class DCVS {
 	public DefaultTableModel getModelo() {return modelo;}
 	
 	/**
+	 * @param tableModel 
 	 * @return True en caso de realizar la conversión, False en otro caso
 	 */
-	public boolean setModelo() {
-		this.modelo = convToModelo();
+	public boolean setModelo(TableModel tableModel) {
+		this.modelo = (DefaultTableModel) tableModel;
 		return true;
 	}
 	
-	private DefaultTableModel convToModelo() {
-		DefaultTableModel m = new DefaultTableModel();
-		int columnas = getNColumnas();
-		int filas = getNFilas();
-		Object[] fila = new Object[columnas];
+	private DefaultTableModel crearModelo() {
+		DefaultTableModel m;
+		int columnas = getColumnCount();
+		int filas = getRowCount();
+		
+		Object[][] datos = new Object[columnas][columnas];
 		//portar datos	
 		 if(columnas > 0) {
 		     for(int i=0; i< filas; i++) {
 		         for(int j = 0; j < columnas; j++) {
-		             fila[j] = getDato(i, j);
+		             datos[i][j] = getValueAt(i, j);
 		         }
-		         m.addRow(fila);												//Agrega la fila al TableModel de la tabla de destino
 		     }
 		 }
+		 this.datos = datos;
+		 //Falta la cabecera.
+		 
+		 //Falta el tipo de datos.
+		 
+		 
+		/**Refinar **/ 
+		m = new DefaultTableModel(datos,nombresColumnas) {
+			private static final long serialVersionUID = 5615251971828569240L;
+			Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
+			public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
+		};
+		
 		return m;
 	}
 	
@@ -110,8 +99,8 @@ public class DCVS {
 	 */
 	@Override
 	public String toString() {
-		int filas = getNFilas();
-		int columnas = getNColumnas();
+		int filas = getRowCount();
+		int columnas = getColumnCount();
 		String texto = "";
 		
 		for(int i=0; i<filas;i++) {
@@ -124,5 +113,32 @@ public class DCVS {
 		System.out.println(texto);
 		return texto;
 	}
+
+	@Override
+	public void addTableModelListener(TableModelListener arg0) {modelo.addTableModelListener(arg0);}
+
+	@Override
+	public Class<?> getColumnClass(int arg0) {return modelo.getColumnClass(arg0);}
+
+	@Override
+	public int getColumnCount() {return modelo.getColumnCount();}
+
+	@Override
+	public String getColumnName(int arg0) {return modelo.getColumnName(arg0);}
+
+	@Override
+	public int getRowCount() {return modelo.getRowCount();}
+
+	@Override
+	public Object getValueAt(int arg0, int arg1) {return modelo.getValueAt(arg0, arg1);}
+
+	@Override
+	public boolean isCellEditable(int arg0, int arg1) {return modelo.isCellEditable(arg0, arg1);}
+
+	@Override
+	public void removeTableModelListener(TableModelListener arg0) { modelo.removeTableModelListener(arg0);}
+
+	@Override
+	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
 	
 }

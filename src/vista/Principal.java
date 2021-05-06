@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import controlador.ControladorDatosIO;
+import modelo.DCVS;
+
 import javax.swing.JScrollPane;
 
 import javax.swing.JTable;
@@ -35,6 +37,7 @@ public class Principal extends JFrame implements ActionListener{
 	private JScrollPane scrollPane;
 	private JTable tabla;
 	private JButton btnImprimir;
+	private DefaultTableModel modelo;
 
 	/**
 	 * Crea la aplicación.
@@ -53,6 +56,7 @@ public class Principal extends JFrame implements ActionListener{
 		setBounds(100, 100, 694, 543);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		//Cuerpo de datos
 		Object[][] datos = new Object[][]{
 				{"AN", null, null, null, null},
 				{"AR", null, null, null, null},
@@ -70,7 +74,9 @@ public class Principal extends JFrame implements ActionListener{
 				{"MU", null, null, null, null},
 				{"NV", null, null, null, null},
 				{"PV", null, null, null, null},
-				{"VL", null, null, null, null},};		
+				{"VL", null, null, null, null},};
+		
+		//Cabecera de datos.		
 		String[] cabecera = new String[]{"CCAA", "Valor1", "valor2", "valor3", "valor4"};
 		
 		
@@ -139,7 +145,6 @@ public class Principal extends JFrame implements ActionListener{
 		});
 		//Establezco un ancho especial para la columna 0.
 		tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
-		
 		scrollPane.setViewportView(tabla);
 		getContentPane().setLayout(groupLayout);
 		
@@ -155,11 +160,24 @@ public class Principal extends JFrame implements ActionListener{
 			JOptionPane.showMessageDialog(null, "Archivo Cargado");
 		}
 		else if(e.getSource()==btnGuardarArchivo) {
-			cio.guardarArchivo(this.tabla);
+			cio.guardarArchivo(this.tabla.getModel());
 			JOptionPane.showMessageDialog(null, "Archivo guardado");
 		}else if(e.getSource()==btnImprimir) {
+			DCVS d = new DCVS();
+			d.setModelo(modelo);
+			System.out.println(d.toString());
 			try {tabla.print();}
 			catch (PrinterException e1) {e1.printStackTrace();}
 		}
 	}
+
+	/**
+	 * @return devuelve modelo
+	 */
+	public DefaultTableModel getModelo() {return modelo;}
+
+	/**
+	 * @param modelo el modelo a establecer
+	 */
+	public void setModelo(DefaultTableModel modelo) {this.modelo = modelo;}
 }

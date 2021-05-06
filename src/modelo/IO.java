@@ -102,7 +102,7 @@ public class IO{
 		if(seleccion==JFileChooser.APPROVE_OPTION){		 						//Si el usuario, selecciona aceptar
 		    File fichero=sf.getSelectedFile();									//Seleccionamos el fichero							
 		    try(FileWriter fw=new FileWriter(fichero)){	        
-		    	fw.write(bd);												//Escribimos el texto en el fichero.
+		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
 		    	ok = true;
 		    } catch (IOException e1) {e1.printStackTrace();return ok;}
