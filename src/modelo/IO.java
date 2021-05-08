@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
@@ -29,11 +30,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * Clase de Entrada y salida de datos.
  * @author Silverio Manuel Rosales Santana
  * @date 
- * @version 2.0
+ * @version 2.2
  *
  */
 public class IO{
     private final String SEPARADOR =",";
+    private final FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs","CVS");
 //    private CSVReader lector;
     
     /**
@@ -53,13 +55,13 @@ public class IO{
 	 * @param ext extensión del archivo.
 	 * @return tabla de datos en formato ArrayList de ArrayList (ColumnasxFilas)
 	 */
-	public DCVS abrirArchivo(String ext) {
+	public DCVS abrirArchivo() {
 		File f;
 		Scanner scn = null;
 		JFileChooser sf = new JFileChooser(".");	
-		FileNameExtensionFilter filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
 		DCVS bd = new DCVS();
-		int resultado;		
+		int resultado;
+		ArrayList<Object[]> listado = new ArrayList<Object[]>();
 		
 		sf.setFileFilter(filtro);
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);		
@@ -73,11 +75,15 @@ public class IO{
 			}else {			
 				try {
 					scn = new Scanner(f);
+					String l = scn.nextLine();
+					bd.addCabecera(trataLinea(l));
 					while (scn.hasNextLine()) {
-						String l = scn.nextLine();
-						bd.addFila(trataLinea(l));
+						l = scn.nextLine();
+						listado.add(trataLinea(l));
 					}
-					scn.close();
+					scn.close();												//Cierre del Scanner.
+					bd.setDatos(formarDatos(listado));							//Asignamos los datos en el formato adecuado.
+					bd.setModelo(null);											//Accionamos un trigger dentro de BD para conformar el modelo.
 				}
 				catch (FileNotFoundException e1) {e1.printStackTrace();}
 			}
@@ -87,15 +93,12 @@ public class IO{
 	    
 	/**
 	 * Metodo para almacenar en un archivo una cadena de texto.
-	 * @param nombreArchivo , nombre del archivo donde se almacenara el texto.
 	 * @param bd los datos a guardar.
-	 * @param ext Extensión del archivo a guardar.
 	 * @return TRUE en caso de operación realizada, false en otro caso.
 	 */
-	public boolean grabarArchivo(String bd, String ext) {
+	public boolean grabarArchivo(String bd) {
 		boolean ok = false;
 		JFileChooser sf=new JFileChooser(".");									//Creamos el objeto JFileChooser
-		FileNameExtensionFilter filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		sf.setFileFilter(filtro);
 		int seleccion=sf.showSaveDialog(null);									//Abrimos la ventana, guardamos la opcion seleccionada por el usuario		
@@ -121,7 +124,32 @@ public class IO{
 		String[] campos = linea.trim().split(SEPARADOR);						//Limpieza de los campos.
 		int nc = campos.length;													//Obtención del número de datos.
 		Object[] lista = new Object[nc];										//Lista donde almacenar los datos de la línea de entrada
-		for(int i=0; i<nc; i++) {lista[i] = campos[i];}							//Creación de la lista (fila) con los datos obtenidos.
+		for(int i=0; i<nc; i++) {
+			if(campos[i] == null) {												//Si el valor es null escribe ""
+				lista[i] = "a";
+			}else{
+				lista[i] = campos[i];											//Valor leído.
+			}	
+		}
 		return lista;
+	}
+	
+	/**
+	 * Función auxiliar para conformar la matriz de datos a devolver desde
+	 * un ArrayList de objetos de nColumnas x nFilas.
+	 * @param listado Filas de datos que conforman cada línea.
+	 * @return array bidimensional de objetos conformados.
+	 */
+	private Object[][] formarDatos(ArrayList<Object[]> listado){
+		int ncols = listado.size();
+		int nfils = listado.get(0).length;
+		Object[][] datos = new Object[nfils][ncols];
+		//Bucle para recorrer los datos y dar la nueva asignación.
+		for(int i = 0; i<nfils; i++) {
+			for(int j = 0; j<ncols; j++) {
+				datos[i][j] = listado.get(i)[j];
+			}
+		}		
+		return datos;
 	}
 }

@@ -17,13 +17,11 @@ import javax.swing.table.TableModel;
  */
 public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
-	private Class[] clases;
-	private Object[] nombresColumnas;
-	private Object[] columaTipos;
+	private Object[] cabecera;
 	private Object datos[][];
 
 	/**
-	 * Genera una tabla de n Filas por m Columnas, cabecera inclusive.
+	 * Constructor de la clase.
 	 */
 	public DCVS() {modelo = new DefaultTableModel();}
 
@@ -49,48 +47,51 @@ public class DCVS implements TableModel{
 	public void addFila(Object[] f) {modelo.addRow(f);}
 	
 	/**
+	 * @param c
+	 */
+	public void addCabecera(Object[] c) {this.cabecera = c;}
+	
+	/**
 	 * Devuelve la el modelo da la JTable
 	 * @return  DefaultTableModel modelo con los datos de la tabla.
 	 */
 	public DefaultTableModel getModelo() {return modelo;}
 	
 	/**
-	 * @param tableModel 
-	 * @return True en caso de realizar la conversión, False en otro caso
+	 * @param datos
 	 */
-	public boolean setModelo(TableModel tableModel) {
-		this.modelo = (DefaultTableModel) tableModel;
-		return true;
+	public void setDatos(Object[][] datos) {this.datos = datos;}
+	
+	/**
+	 * @param tableModel 
+	 */
+	public void setModelo(TableModel tableModel) {
+		if(tableModel != null) {
+			this.modelo = (DefaultTableModel) tableModel;
+			int ncols = modelo.getColumnCount();
+			this.cabecera = new Object[ncols];
+			for(int i=0;i<ncols;i++) {
+				this.cabecera[i] = modelo.getColumnName(i);
+			}	
+		}
+		else {this.modelo = crearModelo();}
+
 	}
 	
+	/**
+	 * Función especial cuyo propósito es crear y devolver un modelo básico del tipo
+	 * DefaultTableModel para ser usado por un JTable.
+	 * @return instancia de DefaultTableModel básica con los datos importantes.
+	 */
 	private DefaultTableModel crearModelo() {
-		DefaultTableModel m;
-		int columnas = getColumnCount();
-		int filas = getRowCount();
-		
-		Object[][] datos = new Object[columnas][columnas];
-		//portar datos	
-		 if(columnas > 0) {
-		     for(int i=0; i< filas; i++) {
-		         for(int j = 0; j < columnas; j++) {
-		             datos[i][j] = getValueAt(i, j);
-		         }
-		     }
-		 }
-		 this.datos = datos;
-		 //Falta la cabecera.
-		 
-		 //Falta el tipo de datos.
-		 
-		 
-		/**Refinar **/ 
-		m = new DefaultTableModel(datos,nombresColumnas) {
+		this.modelo = new DefaultTableModel(datos,cabecera) {
 			private static final long serialVersionUID = 5615251971828569240L;
+			@SuppressWarnings("rawtypes")
 			Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
 			public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
 		};
 		
-		return m;
+		return modelo;
 	}
 	
 	/**
@@ -102,7 +103,13 @@ public class DCVS implements TableModel{
 		int filas = getRowCount();
 		int columnas = getColumnCount();
 		String texto = "";
-		
+		//lectura cabecera
+		for(int k=0; k<columnas ;k++) {
+			texto += cabecera[k];
+			if(k < columnas -1) {texto += ",";}
+		}
+		texto +="\n";
+		//Lectura filas.
 		for(int i=0; i<filas;i++) {
 			for(int k=0; k<columnas ;k++) {
 				texto += modelo.getValueAt(i,k);

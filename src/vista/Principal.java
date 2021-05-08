@@ -12,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import controlador.ControladorDatosIO;
-import modelo.DCVS;
-
 import javax.swing.JScrollPane;
 
 import javax.swing.JTable;
@@ -77,8 +75,10 @@ public class Principal extends JFrame implements ActionListener{
 				{"VL", null, null, null, null},};
 		
 		//Cabecera de datos.		
-		String[] cabecera = new String[]{"CCAA", "Valor1", "valor2", "valor3", "valor4"};
-		
+		String[] cabecera = new String[] {"CCAA", "Valor1", "valor2", "valor3", "valor4"};
+		//Tipos de columna.
+		@SuppressWarnings("rawtypes")
+		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
 		
 		btnTest = new JButton("Test");
 		btnTest.addActionListener(this);
@@ -138,11 +138,13 @@ public class Principal extends JFrame implements ActionListener{
 		);
 		
 		tabla = new JTable();
-		tabla.setModel(new DefaultTableModel(datos,cabecera) {
+		modelo = new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
-			Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
 			public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
-		});
+		};
+	//	modelo.setColumnIdentifiers(columnTypes);
+		
+		tabla.setModel(modelo);
 		//Establezco un ancho especial para la columna 0.
 		tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
 		scrollPane.setViewportView(tabla);
@@ -152,32 +154,24 @@ public class Principal extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
+		/*
+		 * String opcion,bt, ba, bg, bi; opcion = e.getSource().toString(); bt =
+		 * btnTest.toString(); ba = btnAbrirArchivo.toString(); bg =
+		 * btnGuardarArchivo.toString(); bi = btnImprimir.toString(); switch(opcion){
+		 * case (bt): break; }
+		 */
+	
 		if(e.getSource()==btnTest) {JOptionPane.showMessageDialog(null, "Test OK");}
 		else if(e.getSource()==btnAbrirArchivo) {
-			this.tabla = cio.abrirArchivo();
-			scrollPane.setViewportView(tabla);
-			JOptionPane.showMessageDialog(null, "Archivo Cargado");
+			modelo = cio.abrirArchivo();
+			tabla.setModel(modelo);
+			if(modelo != null) {JOptionPane.showMessageDialog(null, "Archivo Cargado");}
 		}
 		else if(e.getSource()==btnGuardarArchivo) {
-			cio.guardarArchivo(this.tabla.getModel());
-			JOptionPane.showMessageDialog(null, "Archivo guardado");
+			if(cio.guardarArchivo(this.tabla.getModel())) {JOptionPane.showMessageDialog(null, "Archivo guardado");}
 		}else if(e.getSource()==btnImprimir) {
-			DCVS d = new DCVS();
-			d.setModelo(modelo);
-			System.out.println(d.toString());
 			try {tabla.print();}
 			catch (PrinterException e1) {e1.printStackTrace();}
 		}
 	}
-
-	/**
-	 * @return devuelve modelo
-	 */
-	public DefaultTableModel getModelo() {return modelo;}
-
-	/**
-	 * @param modelo el modelo a establecer
-	 */
-	public void setModelo(DefaultTableModel modelo) {this.modelo = modelo;}
 }

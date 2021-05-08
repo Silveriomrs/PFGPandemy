@@ -5,7 +5,7 @@
  */
 package controlador;
 
-import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import modelo.DCVS;
@@ -14,7 +14,7 @@ import modelo.IO;
 /**
  * @author Silverio Manuel Rosales Santana
  * @date	20210413
- * @version 1.0
+ * @version 1.1
  *
  */
 public class ControladorDatosIO {
@@ -35,11 +35,10 @@ public class ControladorDatosIO {
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
 	 * @return Jtable tabla con los datos del archivo abierto.
 	 */
-	public JTable abrirArchivo() {
+	public DefaultTableModel abrirArchivo() {
 		bd = new DCVS();
-		bd = io.abrirArchivo("cvs");											//Abrir archivo CVS
-		/* No está implementado en DCVS la buena generación del modelo */
-		return new JTable(bd.getModelo());
+		bd = io.abrirArchivo();													//Abrir archivo CVS
+		return bd.getModelo();
 	}
 	
 
@@ -52,9 +51,8 @@ public class ControladorDatosIO {
 		bd = new DCVS();
 		//Realizar conversión y extracción de datos.
 		bd.setModelo(tableModel);
-		//Falta que me guarde la tabla.Esta pasando un String con la tabla.
-		
-		return io.grabarArchivo(bd.toString(),"cvs");
+//		System.out.println(tableModel.toString());
+		return io.grabarArchivo(bd.toString());
 	}
 
 }
