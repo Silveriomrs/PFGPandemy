@@ -22,7 +22,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-//import com.opencsv.CSVReader;
+import com.opencsv.CSVReader;
 
 
 
@@ -36,15 +36,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class IO{
     private final String SEPARADOR =",";
     private final FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs","CVS");
-//    private CSVReader lector;
+    private CSVReader lector;
     
     /**
      * Constructor de la clase IO
      */
-    public IO()
-    {    
-
-    }
+    public IO(){ }
     
 
 	/**
@@ -59,23 +56,24 @@ public class IO{
 		File f;
 		Scanner scn = null;
 		JFileChooser sf = new JFileChooser(".");	
-		DCVS bd = new DCVS();
+		DCVS bd = null;
 		int resultado;
 		ArrayList<Object[]> listado = new ArrayList<Object[]>();
 		
 		sf.setFileFilter(filtro);
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);		
 		resultado = sf.showOpenDialog(null);									// indica cual fue la accion de usuario sobre el jfilechooser
+/* APLICAR lector DE LA CLASE CVS Reader */
 		
 		if(resultado == JFileChooser.APPROVE_OPTION) {
-			f = sf.getSelectedFile();											// obtiene el archivo seleccionado
-			// muestra error si es inválido
-			if ((f == null) || (f.getName().equals("")) || !f.isFile()) {
+			f = sf.getSelectedFile();											// obtiene el archivo seleccionado	
+			if ((f == null) || (f.getName().equals("")) || !f.isFile()) {		// muestra error si es inválido
 				JOptionPane.showMessageDialog(null, "Nombre de archivo inválido", "Nombre de archivo inválido", JOptionPane.ERROR_MESSAGE);
 			}else {			
 				try {
 					scn = new Scanner(f);
 					String l = scn.nextLine();
+					bd = new DCVS();
 					bd.addCabecera(trataLinea(l));
 					while (scn.hasNextLine()) {
 						l = scn.nextLine();
@@ -125,11 +123,8 @@ public class IO{
 		int nc = campos.length;													//Obtención del número de datos.
 		Object[] lista = new Object[nc];										//Lista donde almacenar los datos de la línea de entrada
 		for(int i=0; i<nc; i++) {
-			if(campos[i] == null) {												//Si el valor es null escribe ""
-				lista[i] = "a";
-			}else{
-				lista[i] = campos[i];											//Valor leído.
-			}	
+			if(campos[i] == null) {	lista[i] = "a";}							//Si el valor es null escribe ""
+			else{lista[i] = campos[i];}											//Valor leído.
 		}
 		return lista;
 	}

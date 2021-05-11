@@ -36,9 +36,9 @@ public class ControladorDatosIO {
 	 * @return Jtable tabla con los datos del archivo abierto.
 	 */
 	public DefaultTableModel abrirArchivo() {
-		bd = new DCVS();
 		bd = io.abrirArchivo();													//Abrir archivo CVS
-		return bd.getModelo();
+		if(bd != null) return bd.getModelo();
+		else return null;
 	}
 	
 
@@ -51,7 +51,6 @@ public class ControladorDatosIO {
 		bd = new DCVS();
 		//Realizar conversión y extracción de datos.
 		bd.setModelo(tableModel);
-//		System.out.println(tableModel.toString());
 		return io.grabarArchivo(bd.toString());
 	}
 

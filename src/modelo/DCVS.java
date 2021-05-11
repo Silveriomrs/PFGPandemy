@@ -44,10 +44,32 @@ public class DCVS implements TableModel{
 	 * Añade una fila a la tabla.
 	 * @param f Fila a añadir
 	 */
-	public void addFila(Object[] f) {modelo.addRow(f);}
+	public void addFila(Object[] f) {
+		if(f != null) modelo.addRow(f);
+		else {
+			Object[] o = new Object[modelo.getColumnCount()];
+			modelo.addRow(o);
+		}
+	}
 	
 	/**
-	 * @param c
+	 * Añade una columna nueva al modelo. Tanto al array de la cabecera
+	 * como al modelo.
+	 * @param nombre nombre de la columna.
+	 */
+	public void addColumna(String nombre) {
+		//Hay que añadirlo al array de la cabecera.
+		int n = cabecera.length;												//Obtenemos la longitud actual.
+		Object[] c = new Object[n+1];											//Instancia para el nuevo tamaño.
+		for(int i=0;i<n;i++) { c[i] = cabecera[i];}								//Copia de los datos.
+		cabecera[n+1] = nombre;													//Añade el nuevo nombre al array cabecera.
+		modelo.addColumn(nombre);												//Añade la nueva columna al modelo.
+		cabecera = c;															//Actualiza la nueva cabecera.
+	}
+	
+	/**
+	 * Añade una nueva cabecera completa.
+	 * @param c array de objetos que van a sustituir a la cabecera actual.
 	 */
 	public void addCabecera(Object[] c) {this.cabecera = c;}
 	
@@ -89,8 +111,7 @@ public class DCVS implements TableModel{
 			@SuppressWarnings("rawtypes")
 			Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
 			public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
-		};
-		
+		};		
 		return modelo;
 	}
 	
@@ -114,7 +135,7 @@ public class DCVS implements TableModel{
 			for(int k=0; k<columnas ;k++) {
 				texto += modelo.getValueAt(i,k);
 				if(k < columnas -1) {texto += ",";}
-				else {texto += "\n";}
+				else if(i<(filas-1)){texto += "\n";}
 			}
 		}
 		System.out.println(texto);

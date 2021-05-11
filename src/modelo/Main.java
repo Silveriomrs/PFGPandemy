@@ -8,7 +8,7 @@ import vista.Principal;
 /**
  * @author Silverio Manuel Rosales Santana
  * @date
- * @version
+ * @version 1.0
  *
  */
 public class Main {
