@@ -5,6 +5,8 @@
  */
 package modelo;
 
+import java.util.List;
+
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -12,7 +14,7 @@ import javax.swing.table.TableModel;
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 2021.04.12
- * @version 2.1
+ * @version 2.7
  *
  */
 public class DCVS implements TableModel{
@@ -21,9 +23,12 @@ public class DCVS implements TableModel{
 	private Object datos[][];
 
 	/**
-	 * Constructor de la clase.
+	 * Constructor de la clase. Recepciona un objeto de la clase DefaultTable Model
+	 * y lo establece como su modelo por defecto. En caso de recepcionar 'null'
+	 * establece este como modelo.
+	 * @param modelo Objeto DefaultTableModel a establecer o null.
 	 */
-	public DCVS() {modelo = new DefaultTableModel();}
+	public DCVS(DefaultTableModel modelo) {this.modelo = modelo;}
 
 	/**
 	 * Devuelve la fila referenciada.
@@ -41,15 +46,16 @@ public class DCVS implements TableModel{
 
 	/**
 	 * Añade una nueva fila a la tabla.
-	 * Añade una fila a la tabla.
-	 * @param f Fila a añadir
+	 * @param f Fila a añadir al modelo.
+	 * @return TRUE si ha tenido exito la operación, FALSE en otro caso.
 	 */
-	public void addFila(Object[] f) {
-		if(f != null) modelo.addRow(f);
-		else {
-			Object[] o = new Object[modelo.getColumnCount()];
-			modelo.addRow(o);
+	public boolean addFila(Object[] f) {
+		boolean ok = false;
+		if(modelo != null && f != null) {
+			modelo.addRow(f);
+			ok = true;
 		}
+		return ok;
 	}
 	
 	/**
@@ -80,44 +86,49 @@ public class DCVS implements TableModel{
 	public DefaultTableModel getModelo() {return modelo;}
 	
 	/**
-	 * @param datos
+	 * Establece una matriz de objetos como la matriz de datos de la instancia
+	 * DCVS. Recibirá un array bidimensional de objetos.
+	 * @param datos Array Bidimensional de datos.
 	 */
 	public void setDatos(Object[][] datos) {this.datos = datos;}
 	
 	/**
-	 * @param tableModel 
+	 * Establece el modelo del TableModel.
+	 * @param tableModel modelo de la tabla a establecer en el TableModel.
 	 */
 	public void setModelo(TableModel tableModel) {
-		if(tableModel != null) {
-			this.modelo = (DefaultTableModel) tableModel;
-			int ncols = modelo.getColumnCount();
-			this.cabecera = new Object[ncols];
-			for(int i=0;i<ncols;i++) {
-				this.cabecera[i] = modelo.getColumnName(i);
-			}	
-		}
-		else {this.modelo = crearModelo();}
-
+		if(tableModel != null) {this.modelo = (DefaultTableModel) tableModel;}
 	}
 	
 	/**
-	 * Función especial cuyo propósito es crear y devolver un modelo básico del tipo
-	 * DefaultTableModel para ser usado por un JTable.
+	 * Función de propósito,crear y devolver un modelo básico del tipo
+	 * DefaultTableModel para ser usado por un JTable con los datos obtenidos
+	 * mediante parámetro.
+	 * @param lista Una lista de arrays de tipo String, List<String[]>.
 	 * @return instancia de DefaultTableModel básica con los datos importantes.
+	 * 		null en otro caso.
 	 */
-	private DefaultTableModel crearModelo() {
-		this.modelo = new DefaultTableModel(datos,cabecera) {
-			private static final long serialVersionUID = 5615251971828569240L;
-			@SuppressWarnings("rawtypes")
-			Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-			public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
-		};		
+	public DefaultTableModel crearModelo(List<String[]> lista) {	
+		if(lista != null) {
+			int nfilas = lista.size();
+			cabecera = lista.get(0);			
+			datos = new Object[nfilas-1][cabecera.length];						//obtener número columnas.
+			for(int i = 1; i<nfilas; i++) {	datos[i-1] = lista.get(i);}			//Componer tabla de datos.
+			//Conformar modelo
+			this.modelo = new DefaultTableModel(datos,cabecera) {		
+				private static final long serialVersionUID = 5615251971828569240L;
+				//será añadido cuando se concrete los tipos de datos de cada columna de la tabla
+		//		@SuppressWarnings("rawtypes")
+		//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
+		//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
+			};
+		}
 		return modelo;
 	}
 	
 	/**
-	 * Método sobreescrito, da el formato correcto a la información contenida
-	 * en la tabla.
+	 * Convierte los datos almenceados en el modelo al formato CVS, de esta
+	 * forma estará lista para almacenar en un archivo en disco o imprimir.
 	 */
 	@Override
 	public String toString() {
@@ -126,7 +137,8 @@ public class DCVS implements TableModel{
 		String texto = "";
 		//lectura cabecera
 		for(int k=0; k<columnas ;k++) {
-			texto += cabecera[k];
+			//texto += cabecera[k];
+			texto += modelo.getColumnName(k);
 			if(k < columnas -1) {texto += ",";}
 		}
 		texto +="\n";
@@ -138,7 +150,6 @@ public class DCVS implements TableModel{
 				else if(i<(filas-1)){texto += "\n";}
 			}
 		}
-		System.out.println(texto);
 		return texto;
 	}
 

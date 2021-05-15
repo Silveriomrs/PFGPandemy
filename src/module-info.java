@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 02042021
@@ -9,5 +7,5 @@
  */
 module pfgPandemy {
 	requires java.desktop;
-	requires opencsv;														//Necesario para poder usar AWT y Swing
+	requires opencsv;					//Necesario para poder usar AWT y Swing
 }

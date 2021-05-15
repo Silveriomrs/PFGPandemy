@@ -30,6 +30,10 @@ import java.awt.event.MouseEvent;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.SwingConstants;
+import java.awt.Panel;
+import java.awt.GridLayout;
+import java.awt.Component;
+import javax.swing.JLayeredPane;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -48,25 +52,29 @@ public class Principal extends JFrame implements ActionListener{
 
 	private DefaultTableModel modelo;
 	private FondoPanel fondo = new FondoPanel();
+	private final Panel panel = new Panel();
+	private JLayeredPane layeredPane;
 
 	/**
 	 * Crea la aplicación.
 	 */
 	public Principal() {
-		setResizable(false);
-		setTitle("Simulador de Pandemias");
 		cio = new ControladorDatosIO();
+		panel.setLayout(new GridLayout(1, 0, 0, 0));	
+		setResizable(false);
+		setTitle("Simulador de Pandemias");	
 		getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);
 		setVisible(true);	
 		initialize();
+		this.setLocationRelativeTo(null);
 	}
 
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
 	private void initialize() {
-		setBounds(100, 100, 900, 600);
+		setBounds(0, 0, 914, 610);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		//Cuerpo de datos
@@ -91,10 +99,7 @@ public class Principal extends JFrame implements ActionListener{
 		
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {"CCAA", "Valor1", "valor2", "valor3", "valor4"};
-		//Tipos de columna.
-		@SuppressWarnings("rawtypes")
-		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-		
+
 		btnAbout = new JButton("");
 		btnAbout.addMouseListener(new BtnAboutMouseListener());
 		btnAbout.setForeground(Color.GRAY);
@@ -107,90 +112,94 @@ public class Principal extends JFrame implements ActionListener{
 		scrollPane.setName("scrollTabla");
 		scrollPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		
+		layeredPane = new JLayeredPane();
+		
+		GroupLayout gl_fondo = new GroupLayout(getContentPane());
+		gl_fondo.setHorizontalGroup(
+			gl_fondo.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_fondo.createSequentialGroup()
+					.addGap(18)
+					.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
+					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+							.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+							.addGap(23))
+						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+							.addGap(42))))
+		);
+		gl_fondo.setVerticalGroup(
+			gl_fondo.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+					.addGap(24)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 348, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 123, Short.MAX_VALUE)
+					.addComponent(btnAbout)
+					.addGap(23))
+				.addGroup(gl_fondo.createSequentialGroup()
+					.addGap(50)
+					.addComponent(layeredPane)
+					.addGap(250))
+		);
+		
 		btnAddRow = new JButton("Nueva fila");
+		btnAddRow.setBounds(14, 12, 104, 25);
 		btnAddRow.addMouseListener(new BtnAddRowMouseListener());
 		btnAddRow.addActionListener(this);
-		btnAddCol = new JButton("Añadir columna");
-		btnAddCol.addMouseListener(new BtnAddColMouseListener());
-		btnAddCol.addActionListener(this);
 		
 		btnBorrarFila = new JButton("Borrar fila");
+		btnBorrarFila.setBounds(14, 74, 105, 25);
 		btnBorrarFila.addMouseListener(new BtnBorrarFilaMouseListener());
 		btnBorrarFila.setBackground(Color.ORANGE);
-		
-		btnBorrarColumna = new JButton("Borrar columna");
-		btnBorrarColumna.addMouseListener(new BtnBorrarColumnaMouseListener());
-		btnBorrarColumna.setBackground(Color.ORANGE);
-		btnAbrirArchivo = new JButton("Cargar tabla");
-		btnAbrirArchivo.addMouseListener(new BtnAbrirArchivoMouseListener());
-		btnAbrirArchivo.addActionListener(this);
+		layeredPane.setLayout(null);
+		layeredPane.add(btnAddRow);
+		btnAddCol = new JButton("Añadir columna");
+		btnAddCol.setBounds(14, 39, 143, 25);
+		btnAddCol.addMouseListener(new BtnAddColMouseListener());
+		btnAddCol.addActionListener(this);
+		layeredPane.add(btnAddCol);
+		layeredPane.add(btnBorrarFila);
 		
 		btnImprimir = new JButton("Imprimir");
+		btnImprimir.setBounds(14, 236, 91, 25);
 		btnImprimir.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnImprimir.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImprimir.addMouseListener(new BtnImprimirMouseListener());
 		btnImprimir.addActionListener(this);
 		
+		btnBorrarColumna = new JButton("Borrar columna");
+		btnBorrarColumna.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnBorrarColumna.setBounds(14, 100, 142, 25);
+		btnBorrarColumna.addMouseListener(new BtnBorrarColumnaMouseListener());
+		btnBorrarColumna.setBackground(Color.ORANGE);
+		layeredPane.add(btnBorrarColumna);
+		
 		btnGuardarArchivo = new JButton("Guardar tabla");
+		btnGuardarArchivo.setBounds(14, 148, 133, 25);
+		layeredPane.add(btnGuardarArchivo);
 		btnGuardarArchivo.addMouseListener(new BtnGuardarArchivoMouseListener());
 		btnGuardarArchivo.addActionListener(this);
-		
-		GroupLayout gl_fondo = new GroupLayout(getContentPane());
-		gl_fondo.setHorizontalGroup(
-			gl_fondo.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(46)
-					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnAddCol)
-						.addComponent(btnBorrarFila)
-						.addComponent(btnBorrarColumna)
-						.addComponent(btnAbrirArchivo)
-						.addComponent(btnGuardarArchivo)
-						.addComponent(btnAddRow)
-						.addComponent(btnImprimir))
-					.addGap(43)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 596, GroupLayout.PREFERRED_SIZE)
-					.addGap(72))
-				.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
-					.addContainerGap(747, Short.MAX_VALUE)
-					.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
-					.addGap(39))
-		);
-		gl_fondo.setVerticalGroup(
-			gl_fondo.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 423, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-					.addComponent(btnAbout)
-					.addGap(24))
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(68)
-					.addComponent(btnAddRow)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnAddCol)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnBorrarFila)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnBorrarColumna)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnAbrirArchivo)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnGuardarArchivo)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnImprimir)
-					.addContainerGap(282, Short.MAX_VALUE))
-		);
+		btnAbrirArchivo = new JButton("Cargar tabla");
+		btnAbrirArchivo.setBounds(14, 175, 123, 25);
+		layeredPane.add(btnAbrirArchivo);
+		btnAbrirArchivo.addMouseListener(new BtnAbrirArchivoMouseListener());
+		btnAbrirArchivo.addActionListener(this);
+		layeredPane.add(btnImprimir);
+		gl_fondo.setAutoCreateContainerGaps(true);
+		gl_fondo.setAutoCreateGaps(true);
 		
 		tabla = new JTable();
-		//tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
+		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
 		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tabla.setCellSelectionEnabled(true);
 		tabla.setColumnSelectionAllowed(true);
 		tabla.setBackground(new Color(224, 255, 255));
 		modelo = new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
-		//	public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
+	//		@SuppressWarnings("rawtypes")
+	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
+	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
 		};
 		
 		tabla.setModel(modelo);
@@ -208,11 +217,33 @@ public class Principal extends JFrame implements ActionListener{
 	}
 	
 	/**
-	 * Función auxiliara para mostrar cuadros de mensajes.
-	 * @param txt texto a mostrar.
+	 * Función auxiliara para mostrar cuadros de mensajes. Los cuadros de mensajes
+	 * no están enlazados con un hilo padre (null). Un número no definido se 
+	 * mostrará como información.
+	 * 
+	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un 
+	 * mensaje tipo 1. 
+	 * @param txt Texto a mostrar.
+	 * @param titulo Texto a mostrar en la barra del cuadro de mensaje.
+	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
+	 *  0 JOptionPane.ERROR_MESSAGE
+	 *  1 JOptionPane.INFORMATION_MESSAGE
+	 *  2 JOptionPane.WARNING_MESSAGE
+	 *  3 JOptionPane.QUESTION_MESSAGE  
+	 *  4 JOptionPane.PLAIN_MESSAGE
 	 */
-	private void mostrar(String txt) {
-		JOptionPane.showMessageDialog(null, txt);
+	private void mostrar(String txt, int tipo ) {
+		String titulo = "";
+		switch(tipo) {
+		case 0: titulo = "Error";break;
+		case 1: titulo = "Información"; break;
+		case 2: titulo = "¡Antención!"; break;
+		case 3: titulo = "Consulta"; break;
+		case 4: titulo = "Acerca de..."; tipo = 1; break;
+		default:
+			titulo = "";
+		}
+		JOptionPane.showMessageDialog(null, txt, titulo, tipo);
 	}
 	
 	private class BtnImprimirMouseListener extends MouseAdapter {
@@ -225,10 +256,11 @@ public class Principal extends JFrame implements ActionListener{
 	
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void mouseClicked(MouseEvent e) {	
 			modelo.addColumn("test");
-			modelo.setColumnCount(modelo.getColumnCount() + 1);
+		//	modelo.setColumnCount(modelo.getColumnCount() + 1);
 			tabla.setModel(modelo);
+			tabla.getColumnModel().getColumn(modelo.getColumnCount() -1).setPreferredWidth(70);
 		}
 	}
 	
@@ -237,7 +269,7 @@ public class Principal extends JFrame implements ActionListener{
 		public void mouseClicked(MouseEvent e) {
 			Object[] o = new Object[modelo.getColumnCount()];
 			modelo.addRow(o);
-			tabla.setModel(modelo);	
+			tabla.setModel(modelo);
 		}
 	}
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
@@ -246,21 +278,23 @@ public class Principal extends JFrame implements ActionListener{
 			modelo = cio.abrirArchivo();			
 			if(modelo != null) {
 				tabla.setModel(modelo);
-				mostrar("Archivo Cargado");
-			}
+				mostrar("Archivo Cargado", 1);
+			}else {mostrar("Nombre de archivo inválido", 0);}
 		}
 	}
 	private class BtnAboutMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			mostrar("Acerca de...");
+			mostrar("Este proyecto ha sido...", 4);
 		}
 	}
 	
 	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(cio.guardarArchivo(tabla.getModel())) {mostrar("Archivo guardado");}
+			if(cio.guardarArchivo(tabla.getModel())) {
+				mostrar("Archivo guardado", 1);
+			}
 		}
 	}
 	private class BtnBorrarFilaMouseListener extends MouseAdapter {

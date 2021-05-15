@@ -27,30 +27,25 @@ public class ControladorDatosIO {
 	public ControladorDatosIO() {
 		super();
 		this.io = new IO();
-		this.bd = new DCVS();
+		this.bd = null;
 	}
-
 	
 	/**
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
-	 * @return Jtable tabla con los datos del archivo abierto.
+	 * @return DefaultTableModel modelo con los datos del archivo abierto.
 	 */
 	public DefaultTableModel abrirArchivo() {
-		bd = io.abrirArchivo();													//Abrir archivo CVS
-		if(bd != null) return bd.getModelo();
-		else return null;
+		return (new DCVS(null)).crearModelo(io.abrirArchivo());
+		
 	}
 	
-
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
 	 * @param tableModel para ser almacenados.
 	 * @return True si la operación ha tenido éxito, FALSE en otro caso.
 	 */
 	public boolean guardarArchivo(TableModel tableModel) {
-		bd = new DCVS();
-		//Realizar conversión y extracción de datos.
-		bd.setModelo(tableModel);
+		bd = new DCVS((DefaultTableModel) tableModel);
 		return io.grabarArchivo(bd.toString());
 	}
 
