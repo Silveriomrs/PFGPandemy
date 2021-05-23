@@ -34,6 +34,7 @@ import java.awt.Panel;
 import java.awt.GridLayout;
 import java.awt.Component;
 import javax.swing.JLayeredPane;
+import javax.swing.ScrollPaneConstants;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -79,23 +80,23 @@ public class Principal extends JFrame implements ActionListener{
 		
 		//Cuerpo de datos
 		Object[][] datos = new Object[][]{
-				{"AN", null, null, null, null},
-				{"AR", null, null, null, null},
-				{"PA", null, null, null, null},
-				{"BA", null, null, null, null},
-				{"CN", null, null, null, null},
-				{"CB", null, null, null, null},
-				{"CM", null, null, null, null},
-				{"CL", null, null, null, null},
-				{"CA", null, null, null, null},
-				{"EX", null, null, null, null},
-				{"GA", null, null, null, null},
-				{"RJ", null, null, null, null},
-				{"MD", null, null, null, null},
-				{"MU", null, null, null, null},
-				{"NV", null, null, null, null},
-				{"PV", null, null, null, null},
-				{"VL", null, null, null, null},};
+				{"AN", 1, null, null, null},
+				{"AR", 2, null, null, null},
+				{"PA", 3, null, null, null},
+				{"BA", 4, null, null, null},
+				{"CN", 5, null, null, null},
+				{"CB", 6, null, null, null},
+				{"CM", 7, null, null, null},
+				{"CL", 8, null, null, null},
+				{"CA", 9, null, null, null},
+				{"EX", 10, null, null, null},
+				{"GA", 11, null, null, null},
+				{"RJ", 12, null, null, null},
+				{"MD", 13, null, null, null},
+				{"MU", 14, null, null, null},
+				{"NV", 15, null, null, null},
+				{"PV", 16, null, null, null},
+				{"VL", 17, null, null, null},};
 		
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {"CCAA", "Valor1", "valor2", "valor3", "valor4"};
@@ -108,6 +109,8 @@ public class Principal extends JFrame implements ActionListener{
 		btnAbout.addActionListener(this);
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		//scrollPane.setBounds(5, 10, 350, 150);
 		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
 		scrollPane.setName("scrollTabla");
 		scrollPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -190,10 +193,12 @@ public class Principal extends JFrame implements ActionListener{
 		gl_fondo.setAutoCreateGaps(true);
 		
 		tabla = new JTable();
+		tabla.setFillsViewportHeight(true);
 		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
 		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tabla.setCellSelectionEnabled(true);
-		tabla.setColumnSelectionAllowed(true);
+		tabla.setCellSelectionEnabled(false);
+		tabla.setRowSelectionAllowed(true);
+		tabla.setColumnSelectionAllowed(false);
 		tabla.setBackground(new Color(224, 255, 255));
 		modelo = new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
@@ -202,8 +207,11 @@ public class Principal extends JFrame implements ActionListener{
 	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
 		};
 		
-		tabla.setModel(modelo);
+		tabla.setModel(new DefaultTableModel(datos,cabecera));
+		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		tabla.getTableHeader().setReorderingAllowed(false);
 		tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
+	//	tabla.getColumnModel().getColumn(3).setMinWidth(105);
 		scrollPane.setViewportView(tabla);
 		fondo.setLayout(gl_fondo);
 		
@@ -217,7 +225,7 @@ public class Principal extends JFrame implements ActionListener{
 	}
 	
 	/**
-	 * Función auxiliara para mostrar cuadros de mensajes. Los cuadros de mensajes
+	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
 	 * no están enlazados con un hilo padre (null). Un número no definido se 
 	 * mostrará como información.
 	 * 
@@ -257,10 +265,9 @@ public class Principal extends JFrame implements ActionListener{
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {	
-			modelo.addColumn("test");
-		//	modelo.setColumnCount(modelo.getColumnCount() + 1);
+			modelo.addColumn("Nueva");
 			tabla.setModel(modelo);
-			tabla.getColumnModel().getColumn(modelo.getColumnCount() -1).setPreferredWidth(70);
+	//		tabla.getColumnModel().getColumn(modelo.getColumnCount() -1).setPreferredWidth(70);
 		}
 	}
 	
@@ -272,6 +279,7 @@ public class Principal extends JFrame implements ActionListener{
 			tabla.setModel(modelo);
 		}
 	}
+	
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -297,16 +305,31 @@ public class Principal extends JFrame implements ActionListener{
 			}
 		}
 	}
+	
 	private class BtnBorrarFilaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			System.out.println("Pulsado borrar fila");
+			int[] filas = tabla.getSelectedRows();
+			int nfilas = filas.length;
+			if (nfilas > 0) {
+				for(int i = (nfilas-1); i >= 0; i--) {
+					modelo.removeRow(filas[i]);
+				}
+				tabla.setModel(modelo);
+			}
 		}
 	}
+	
 	private class BtnBorrarColumnaMouseListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			System.out.println("Pulsado borrar columna");
+		public void mouseClicked(MouseEvent e) {		
+			int[] col = tabla.getSelectedColumns();
+			int ncols = col.length;
+			System.out.println("Pulsado borrar columnas(" + ncols + ")");
+			if (ncols > 0) {
+				for(int i = (ncols-1); i>=0; i--) System.out.println(col[i]);
+			//	tabla.setModel(modelo);
+			}
 		}
 	}
 }
