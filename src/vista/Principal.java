@@ -37,7 +37,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.ScrollPaneConstants;
 
 /**
- * @author Silverio Manuel Rosales Santana
+ * @author Silverio Manuel Rosales Santana.
  * @date
  * @version 1.5
  *
