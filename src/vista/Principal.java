@@ -3,42 +3,44 @@
  */
 package vista;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.print.PrinterException;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.print.PrinterException;
 
-import controlador.ControladorDatosIO;
-import javax.swing.JScrollPane;
-
-import javax.swing.JTable;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.SwingConstants;
-import java.awt.Panel;
-import java.awt.GridLayout;
-import java.awt.Component;
-import javax.swing.JLayeredPane;
-import javax.swing.ScrollPaneConstants;
+import controlador.ControladorDatosIO;
+import modelo.DCVS;
 
 /**
+ * Clase de la vista principal donde se modelan las tablas
+ * que sean necesarias.
  * @author Silverio Manuel Rosales Santana.
- * @date
+ * @date 2021/04/10
  * @version 1.5
  *
  */
@@ -267,7 +269,6 @@ public class Principal extends JFrame implements ActionListener{
 		public void mouseClicked(MouseEvent e) {	
 			modelo.addColumn("Nueva");
 			tabla.setModel(modelo);
-	//		tabla.getColumnModel().getColumn(modelo.getColumnCount() -1).setPreferredWidth(70);
 		}
 	}
 	
@@ -283,13 +284,15 @@ public class Principal extends JFrame implements ActionListener{
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			modelo = cio.abrirArchivo();			
-			if(modelo != null) {
+			DefaultTableModel m = cio.abrirArchivo();			
+			if(m != null) {
+				modelo = m;
 				tabla.setModel(modelo);
 				mostrar("Archivo Cargado", 1);
 			}else {mostrar("Nombre de archivo inválido", 0);}
 		}
 	}
+	
 	private class BtnAboutMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -309,27 +312,18 @@ public class Principal extends JFrame implements ActionListener{
 	private class BtnBorrarFilaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			int[] filas = tabla.getSelectedRows();
-			int nfilas = filas.length;
-			if (nfilas > 0) {
-				for(int i = (nfilas-1); i >= 0; i--) {
-					modelo.removeRow(filas[i]);
-				}
-				tabla.setModel(modelo);
-			}
+			DCVS dcvs = new DCVS(modelo);
+			dcvs.delFilas(tabla.getSelectedRows());
+			tabla.setModel(modelo);
 		}
 	}
 	
 	private class BtnBorrarColumnaMouseListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e) {		
-			int[] col = tabla.getSelectedColumns();
-			int ncols = col.length;
-			System.out.println("Pulsado borrar columnas(" + ncols + ")");
-			if (ncols > 0) {
-				for(int i = (ncols-1); i>=0; i--) System.out.println(col[i]);
-			//	tabla.setModel(modelo);
-			}
+		public void mouseClicked(MouseEvent e) {	
+			int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
+			modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
+			tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
 		}
 	}
 }

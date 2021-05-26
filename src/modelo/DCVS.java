@@ -80,6 +80,67 @@ public class DCVS implements TableModel{
 	public void addCabecera(Object[] c) {this.cabecera = c;}
 	
 	/**
+	 * Función que elimina las filas indicadas en un arreglo de números indice.
+	 * @param filas arreglo de los indeces de filas a eliminar.
+	 * @return done TRUE si se ha realizado con exito la operación,
+	 * false en otro caso.
+	 */
+	public boolean delFilas(int[] filas) {
+		int nfilas = filas.length;
+		boolean done = false;
+		if (nfilas > 0) {
+			for(int i = (nfilas-1); i >= 0; i--) {
+				modelo.removeRow(filas[i]);
+			}
+			done = true;
+		}
+		return done;
+	}
+	
+	/**
+	 * Elimina las columnas indicadas en un arreglo con los indices de las
+	 * columnas a eliminar del modelo.
+	 * @param cols arreglo de los indices de comlumnas a eliminar.
+	 * @return modelo resultante de eliminar las columnas indicadas.
+	 */
+	public DefaultTableModel delColumnas(int[] cols) {
+		int ncols = cols.length;												//Número de columnas a borrar.
+		int ncols2 = modelo.getColumnCount();									//Número de columnas en origen.
+		int nfilas = getRowCount();
+		Object datos[][] = new Object[nfilas][ncols2 - ncols];
+		Object cabecera[] = new Object[ncols2 - ncols];
+		int contCols = 0;
+		if (ncols > 0) {	
+			for(int j = 0; j<ncols2; j++) {
+				if(!isListed(cols,j)) {
+					//Copiar cabecera.
+					cabecera[contCols] = modelo.getColumnName(j);
+					//Copiar los datos.
+					for(int i=0; i<nfilas;i++) {
+						datos[i][contCols] = modelo.getValueAt(i,j);	
+					}
+					contCols++;
+				}
+			}
+			this.cabecera = cabecera;
+			this.datos = datos;
+			modelo = new DefaultTableModel(datos,cabecera);
+		}
+		return modelo;
+	}
+	
+	private boolean isListed(int[] lista, int num) {
+		boolean encontrado = false;
+		int cont = 0;
+		while(!encontrado && cont<lista.length) {
+			if(lista[cont] == num) {encontrado = true;}
+			else {cont++;}
+		}
+		return encontrado;
+	}
+	
+	
+	/**
 	 * Devuelve la el modelo da la JTable
 	 * @return  DefaultTableModel modelo con los datos de la tabla.
 	 */
@@ -113,15 +174,8 @@ public class DCVS implements TableModel{
 			int nfilas = lista.size();
 			cabecera = lista.get(0);			
 			datos = new Object[nfilas-1][cabecera.length];						//obtener número columnas.
-			for(int i = 1; i<nfilas; i++) {	datos[i-1] = lista.get(i);}			//Componer tabla de datos.
-			//Conformar modelo
-			this.modelo = new DefaultTableModel(datos,cabecera) {		
-				private static final long serialVersionUID = 5615251971828569240L;
-				//será añadido cuando se concrete los tipos de datos de cada columna de la tabla
-		//		@SuppressWarnings("rawtypes")
-		//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-		//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}
-			};
+			for(int i = 1; i<nfilas; i++) {	datos[i-1] = lista.get(i);}			//Componer tabla de datos.		
+			this.modelo = new DefaultTableModel(datos,cabecera);				//Conformar modelo
 		}
 		return modelo;
 	}

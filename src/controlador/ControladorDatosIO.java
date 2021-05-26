@@ -35,7 +35,9 @@ public class ControladorDatosIO {
 	 * @return DefaultTableModel modelo con los datos del archivo abierto.
 	 */
 	public DefaultTableModel abrirArchivo() {
-		return (new DCVS(null)).crearModelo(io.abrirArchivo());
+		DefaultTableModel modelo = null;
+		modelo =  (new DCVS(null)).crearModelo(io.abrirArchivo());
+		return modelo;
 		
 	}
 	

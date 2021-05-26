@@ -14,7 +14,8 @@ import vista.Principal;
 public class Main {
 
 	/**
-	 * @param args
+	 * Método main de la clase.
+	 * @param args no usado.
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
