@@ -129,6 +129,13 @@ public class DCVS implements TableModel{
 		return modelo;
 	}
 	
+	/**
+	 * Busca un número dado dentro de un arreglo de números tipo int. Devolviendo
+	 * el resultado de la operación de búsqueda como un boolean.
+	 * @param lista Arreglo de los datos.
+	 * @param num Número que debe ser encontrado dentro del arreglo.
+	 * @return True en caso de contener el número, false en otro caso.
+	 */
 	private boolean isListed(int[] lista, int num) {
 		boolean encontrado = false;
 		int cont = 0;
@@ -174,11 +181,12 @@ public class DCVS implements TableModel{
 			int nfilas = lista.size();
 			cabecera = lista.get(0);			
 			datos = new Object[nfilas-1][cabecera.length];						//obtener número columnas.
-			for(int i = 1; i<nfilas; i++) {	datos[i-1] = lista.get(i);}			//Componer tabla de datos.		
+			for(int i = 1; i<nfilas; i++) {datos[i-1] = lista.get(i);}			//Componer tabla de datos.	
 			this.modelo = new DefaultTableModel(datos,cabecera);				//Conformar modelo
 		}
 		return modelo;
 	}
+	
 	
 	/**
 	 * Convierte los datos almenceados en el modelo al formato CVS, de esta
@@ -199,9 +207,11 @@ public class DCVS implements TableModel{
 		//Lectura filas.
 		for(int i=0; i<filas;i++) {
 			for(int k=0; k<columnas ;k++) {
-				texto += modelo.getValueAt(i,k);
-				if(k < columnas -1) {texto += ",";}
-				else if(i<(filas-1)){texto += "\n";}
+				String valor = "" + modelo.getValueAt(i,k);						//Obtención del valor convertido a texto
+				if(!valor.equalsIgnoreCase("null")) {texto += valor;}			//Comparación si el texto almacenado es null.
+				else {valor = "";}												//En tal caso sustituye por cadena vacia.
+				if(k < columnas -1) {texto += ",";}								//Separador de campos.
+				else if(i<(filas-1)){texto += "\n";}							//Salta a la siguiente fila de datos.
 			}
 		}
 		return texto;

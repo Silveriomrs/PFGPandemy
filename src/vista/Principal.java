@@ -35,6 +35,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import controlador.ControladorDatosIO;
 import modelo.DCVS;
+import javax.swing.JLabel;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.Font;
 
 /**
  * Clase de la vista principal donde se modelan las tablas
@@ -57,6 +61,10 @@ public class Principal extends JFrame implements ActionListener{
 	private FondoPanel fondo = new FondoPanel();
 	private final Panel panel = new Panel();
 	private JLayeredPane layeredPane;
+	private JLabel lblAsignarTablaA;
+	private JComboBox<String> comboBox;
+	private JButton btnAplicarTabla;
+	private JLayeredPane boxAsignacion;
 
 	/**
 	 * Crea la aplicación.
@@ -111,7 +119,6 @@ public class Principal extends JFrame implements ActionListener{
 		btnAbout.addActionListener(this);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		//scrollPane.setBounds(5, 10, 350, 150);
 		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
 		scrollPane.setName("scrollTabla");
@@ -119,34 +126,85 @@ public class Principal extends JFrame implements ActionListener{
 		
 		layeredPane = new JLayeredPane();
 		
+		boxAsignacion = new JLayeredPane();
+		boxAsignacion.setBorder(new LineBorder(new Color(0, 0, 0)));
+		boxAsignacion.setBackground(Color.WHITE);
+		
 		GroupLayout gl_fondo = new GroupLayout(getContentPane());
 		gl_fondo.setHorizontalGroup(
 			gl_fondo.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_fondo.createSequentialGroup()
 					.addGap(18)
-					.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
-					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
-							.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
-							.addGap(23))
-						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+					.addComponent(layeredPane, GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+					.addGap(160)
+					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_fondo.createSequentialGroup()
 							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
-							.addGap(42))))
+							.addGap(42))
+						.addGroup(gl_fondo.createSequentialGroup()
+							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
+							.addGap(165))))
+				.addGroup(gl_fondo.createSequentialGroup()
+					.addContainerGap(777, Short.MAX_VALUE)
+					.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+					.addGap(23))
 		);
 		gl_fondo.setVerticalGroup(
-			gl_fondo.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+			gl_fondo.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_fondo.createSequentialGroup()
 					.addGap(24)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 348, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 123, Short.MAX_VALUE)
+					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_fondo.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 348, GroupLayout.PREFERRED_SIZE)
+							.addGap(44)
+							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED))
+						.addGroup(gl_fondo.createSequentialGroup()
+							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 337, GroupLayout.PREFERRED_SIZE)
+							.addGap(34)))
+					.addPreferredGap(ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
 					.addComponent(btnAbout)
 					.addGap(23))
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(50)
-					.addComponent(layeredPane)
-					.addGap(250))
 		);
+		
+		comboBox = new JComboBox<String>();
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Cálculo", "Diversidad", "Otro"}));
+		
+		btnAplicarTabla = new JButton("Aplicar tabla");
+		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
+		
+		lblAsignarTablaA = new JLabel("Asignar la tabla al módulo");
+		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
+		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
+		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		lblAsignarTablaA.setBackground(Color.WHITE);
+		GroupLayout gl_boxAsignacion = new GroupLayout(boxAsignacion);
+		gl_boxAsignacion.setHorizontalGroup(
+			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_boxAsignacion.createSequentialGroup()
+					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(Alignment.LEADING, gl_boxAsignacion.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblAsignarTablaA, 0, 0, Short.MAX_VALUE))
+						.addGroup(Alignment.LEADING, gl_boxAsignacion.createSequentialGroup()
+							.addGap(6)
+							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnAplicarTabla)))
+					.addContainerGap(6, Short.MAX_VALUE))
+		);
+		gl_boxAsignacion.setVerticalGroup(
+			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_boxAsignacion.createSequentialGroup()
+					.addGap(6)
+					.addComponent(lblAsignarTablaA)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.BASELINE)
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnAplicarTabla))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		boxAsignacion.setLayout(gl_boxAsignacion);
 		
 		btnAddRow = new JButton("Nueva fila");
 		btnAddRow.setBounds(14, 12, 104, 25);
@@ -195,7 +253,6 @@ public class Principal extends JFrame implements ActionListener{
 		gl_fondo.setAutoCreateGaps(true);
 		
 		tabla = new JTable();
-		tabla.setFillsViewportHeight(true);
 		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
 		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tabla.setCellSelectionEnabled(false);
@@ -212,7 +269,7 @@ public class Principal extends JFrame implements ActionListener{
 		tabla.setModel(new DefaultTableModel(datos,cabecera));
 		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tabla.getTableHeader().setReorderingAllowed(false);
-		tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
+	//	tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
 	//	tabla.getColumnModel().getColumn(3).setMinWidth(105);
 		scrollPane.setViewportView(tabla);
 		fondo.setLayout(gl_fondo);
@@ -266,8 +323,10 @@ public class Principal extends JFrame implements ActionListener{
 	
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e) {	
-			modelo.addColumn("Nueva");
+		public void mouseClicked(MouseEvent e) {
+		//	JOptionPane.showMessageDialog(null, txt, titulo, tipo);ç
+			String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
+			modelo.addColumn(txt);
 			tabla.setModel(modelo);
 		}
 	}
@@ -324,6 +383,18 @@ public class Principal extends JFrame implements ActionListener{
 			int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
 			modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
 			tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
+		}
+	}
+	
+	private class BtnAplicarTablaMouseListener extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			//Obtener selección
+			String seleccion = (String) comboBox.getSelectedItem();
+			//Si se ha seleccionado módulo ->
+			System.out.println(seleccion);
+			//enviar modelo al módulo elegido.
+			
 		}
 	}
 }
