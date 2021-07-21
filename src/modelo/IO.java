@@ -20,6 +20,8 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
@@ -33,7 +35,7 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
-    private final FileNameExtensionFilter filtro = new FileNameExtensionFilter("cvs","CVS");
+    private final FileNameExtensionFilter filtro = new FileNameExtensionFilter("csv","CSV");
     
     /**
      * Constructor de la clase IO
@@ -61,9 +63,12 @@ public class IO{
 			f = sf.getSelectedFile();											// obtiene el archivo seleccionado	
 			if ((f != null) && f.exists() && f.isFile() ) {						// muestra error si es inválido			
 				try {
-					lectorCSV = new CSVReader(new FileReader(f));					//Abrir el archivo.
+			//		CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
+					lectorCSV =  new CSVReader(new FileReader(f));					//Abrir el archivo.
+			//		lectorCSV =  new CSVReader(new FileReader(f)).withCSVParser(parser).build();
 					datos = lectorCSV.readAll();
 					lectorCSV.close();
+					
 				}
 				catch (IOException e) {e.printStackTrace();}
 				catch (CsvException e) {e.printStackTrace();}

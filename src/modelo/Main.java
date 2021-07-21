@@ -3,7 +3,9 @@
  */
 package modelo;
 
+import controlador.ControladorMapa;
 import vista.Principal;
+
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -13,14 +15,16 @@ import vista.Principal;
  */
 public class Main {
 
+	
 	/**
 	 * Método main de la clase.
 	 * @param args no usado.
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Principal ventana = new Principal();
-		ventana.setVisible(true);
+		ventana.setVisible(true);	
+		//Mapa mapa = new Mapa();
+		ControladorMapa cmapa = new ControladorMapa();
 	}
 
 }

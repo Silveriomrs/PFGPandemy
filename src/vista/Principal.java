@@ -28,7 +28,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
@@ -119,6 +118,7 @@ public class Principal extends JFrame implements ActionListener{
 		btnAbout.addActionListener(this);
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setAutoscrolls(true);
 		//scrollPane.setBounds(5, 10, 350, 150);
 		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
 		scrollPane.setName("scrollTabla");
@@ -134,37 +134,34 @@ public class Principal extends JFrame implements ActionListener{
 		gl_fondo.setHorizontalGroup(
 			gl_fondo.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(18)
-					.addComponent(layeredPane, GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
-					.addGap(160)
 					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_fondo.createSequentialGroup()
+							.addGap(31)
+							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 677, Short.MAX_VALUE))
 						.addGroup(gl_fondo.createSequentialGroup()
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
-							.addGap(42))
-						.addGroup(gl_fondo.createSequentialGroup()
+							.addContainerGap(433, Short.MAX_VALUE)
 							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
-							.addGap(165))))
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addContainerGap(777, Short.MAX_VALUE)
-					.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+							.addGap(87)
+							.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)))
 					.addGap(23))
 		);
 		gl_fondo.setVerticalGroup(
-			gl_fondo.createParallelGroup(Alignment.TRAILING)
+			gl_fondo.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_fondo.createSequentialGroup()
 					.addGap(24)
-					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_fondo.createSequentialGroup()
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 348, GroupLayout.PREFERRED_SIZE)
-							.addGap(44)
-							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(gl_fondo.createSequentialGroup()
-							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 337, GroupLayout.PREFERRED_SIZE)
-							.addGap(34)))
-					.addPreferredGap(ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
-					.addComponent(btnAbout)
-					.addGap(23))
+							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+								.addComponent(btnAbout)
+								.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
+							.addGap(23))))
 		);
 		
 		comboBox = new JComboBox<String>();
@@ -207,44 +204,46 @@ public class Principal extends JFrame implements ActionListener{
 		boxAsignacion.setLayout(gl_boxAsignacion);
 		
 		btnAddRow = new JButton("Nueva fila");
-		btnAddRow.setBounds(14, 12, 104, 25);
+		btnAddRow.setBounds(0, 12, 104, 25);
 		btnAddRow.addMouseListener(new BtnAddRowMouseListener());
 		btnAddRow.addActionListener(this);
 		
-		btnBorrarFila = new JButton("Borrar fila");
-		btnBorrarFila.setBounds(14, 74, 105, 25);
+		btnBorrarFila = new JButton("Borrar fila/s");
+		btnBorrarFila.setBounds(0, 74, 120, 25);
 		btnBorrarFila.addMouseListener(new BtnBorrarFilaMouseListener());
 		btnBorrarFila.setBackground(Color.ORANGE);
 		layeredPane.setLayout(null);
 		layeredPane.add(btnAddRow);
 		btnAddCol = new JButton("Añadir columna");
-		btnAddCol.setBounds(14, 39, 143, 25);
+		btnAddCol.setBounds(0, 37, 143, 25);
 		btnAddCol.addMouseListener(new BtnAddColMouseListener());
 		btnAddCol.addActionListener(this);
 		layeredPane.add(btnAddCol);
 		layeredPane.add(btnBorrarFila);
 		
 		btnImprimir = new JButton("Imprimir");
-		btnImprimir.setBounds(14, 236, 91, 25);
+		btnImprimir.setBounds(0, 236, 91, 25);
 		btnImprimir.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnImprimir.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImprimir.addMouseListener(new BtnImprimirMouseListener());
 		btnImprimir.addActionListener(this);
 		
-		btnBorrarColumna = new JButton("Borrar columna");
+		btnBorrarColumna = new JButton("Borrar columna/s");
+		btnBorrarColumna.setHorizontalTextPosition(SwingConstants.LEFT);
+		btnBorrarColumna.setHorizontalAlignment(SwingConstants.LEFT);
 		btnBorrarColumna.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnBorrarColumna.setBounds(14, 100, 142, 25);
+		btnBorrarColumna.setBounds(0, 100, 160, 25);
 		btnBorrarColumna.addMouseListener(new BtnBorrarColumnaMouseListener());
 		btnBorrarColumna.setBackground(Color.ORANGE);
 		layeredPane.add(btnBorrarColumna);
 		
 		btnGuardarArchivo = new JButton("Guardar tabla");
-		btnGuardarArchivo.setBounds(14, 148, 133, 25);
+		btnGuardarArchivo.setBounds(0, 148, 140, 25);
 		layeredPane.add(btnGuardarArchivo);
 		btnGuardarArchivo.addMouseListener(new BtnGuardarArchivoMouseListener());
 		btnGuardarArchivo.addActionListener(this);
 		btnAbrirArchivo = new JButton("Cargar tabla");
-		btnAbrirArchivo.setBounds(14, 175, 123, 25);
+		btnAbrirArchivo.setBounds(0, 175, 123, 25);
 		layeredPane.add(btnAbrirArchivo);
 		btnAbrirArchivo.addMouseListener(new BtnAbrirArchivoMouseListener());
 		btnAbrirArchivo.addActionListener(this);
@@ -253,6 +252,8 @@ public class Principal extends JFrame implements ActionListener{
 		gl_fondo.setAutoCreateGaps(true);
 		
 		tabla = new JTable();
+		tabla.setAutoCreateRowSorter(true);
+		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
 		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tabla.setCellSelectionEnabled(false);
@@ -267,7 +268,6 @@ public class Principal extends JFrame implements ActionListener{
 		};
 		
 		tabla.setModel(new DefaultTableModel(datos,cabecera));
-		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tabla.getTableHeader().setReorderingAllowed(false);
 	//	tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
 	//	tabla.getColumnModel().getColumn(3).setMinWidth(105);
