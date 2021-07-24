@@ -36,7 +36,7 @@ public class ControladorDatosIO {
 	 */
 	public DefaultTableModel abrirArchivo() {
 		DefaultTableModel modelo = null;
-		modelo =  (new DCVS(null)).crearModelo(io.abrirArchivo());
+		modelo =  (new DCVS(null)).crearModelo(io.abrirArchivo("csv"));
 		return modelo;
 		
 	}
@@ -48,7 +48,7 @@ public class ControladorDatosIO {
 	 */
 	public boolean guardarArchivo(TableModel tableModel) {
 		bd = new DCVS((DefaultTableModel) tableModel);
-		return io.grabarArchivo(bd.toString());
+		return io.grabarArchivo(bd.toString(),"csv");
 	}
 
 }

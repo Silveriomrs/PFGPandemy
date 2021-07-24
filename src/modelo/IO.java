@@ -11,17 +11,18 @@
 package modelo;
 
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
@@ -35,7 +36,7 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
-    private final FileNameExtensionFilter filtro = new FileNameExtensionFilter("csv","CSV");
+    private FileNameExtensionFilter filtro;
     
     /**
      * Constructor de la clase IO
@@ -51,28 +52,19 @@ public class IO{
 	 * @return tabla de datos en formato ArrayList de ArrayList (ColumnasxFilas),
 	 *  null en otro caso.
 	 */
-	public List<String[]> abrirArchivo() {
-		File f;
-		JFileChooser sf = new JFileChooser(".");	
+	public List<String[]> abrirArchivo(String ext) {
 		List<String[]> datos = null;
-		sf.setFileFilter(filtro);
-		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		CSVReader lectorCSV;
-		
-		if(sf.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			f = sf.getSelectedFile();											// obtiene el archivo seleccionado	
-			if ((f != null) && f.exists() && f.isFile() ) {						// muestra error si es inválido			
-				try {
-			//		CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
-					lectorCSV =  new CSVReader(new FileReader(f));					//Abrir el archivo.
-			//		lectorCSV =  new CSVReader(new FileReader(f)).withCSVParser(parser).build();
-					datos = lectorCSV.readAll();
-					lectorCSV.close();
-					
-				}
-				catch (IOException e) {e.printStackTrace();}
-				catch (CsvException e) {e.printStackTrace();}
+		File f = selFile(1,ext);													// Obtención del archivo.							
+		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
+			try {
+				lectorCSV =  new CSVReader(new FileReader(f));					//Abrir el archivo.
+				datos = lectorCSV.readAll();
+				lectorCSV.close();
+				
 			}
+			catch (IOException e) {e.printStackTrace();}
+			catch (CsvException e) {e.printStackTrace();}
 		}
 		return datos;
 	}
@@ -80,16 +72,13 @@ public class IO{
 	/**
 	 * Metodo para almacenar en un archivo una cadena de texto.
 	 * @param bd los datos a guardar.
+	 * @param ext extensión del archivo.
 	 * @return TRUE en caso de operación realizada, false en otro caso.
 	 */
-	public boolean grabarArchivo(String bd) {
+	public boolean grabarArchivo(String bd, String ext) {
 		boolean ok = false;
-		JFileChooser sf=new JFileChooser(".");									//Creamos el objeto JFileChooser
-		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		sf.setFileFilter(filtro);
-		int seleccion=sf.showSaveDialog(null);									//Abrimos la ventana, guardamos la opcion seleccionada por el usuario		
-		if(seleccion==JFileChooser.APPROVE_OPTION){		 						//Si el usuario, selecciona aceptar
-		    File fichero=sf.getSelectedFile();									//Seleccionamos el fichero							
+		File fichero = selFile(2,ext);	
+		if(fichero != null){		 												    																
 		    try(FileWriter fw=new FileWriter(fichero)){	        
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
@@ -97,5 +86,46 @@ public class IO{
 		    } catch (IOException e1) {e1.printStackTrace();return ok;}
 		}
 		return ok;
+	}
+	
+	
+	/**
+	 * Selecciona un archivo del disco, o establece su nombre. Puede recibir un
+	 * por parámetro un filtro para aplicar a los ficheros de extensión válidos
+	 * para selección.
+	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
+	 * @param ext extensión del archivo a modo de filtro.
+	 * @return File del archivo seleccionado, null en otro caso.
+	 */
+	private File selFile(int sel, String ext) {
+		File f = null;
+		filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
+		JFileChooser sf=new JFileChooser(".");									//Directorio local.
+		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
+		sf.setFileFilter(filtro);												//Establecimiento del filtro
+		int seleccion;
+		//Apertura del dialogo de selección.
+		if(sel==1) seleccion = sf.showOpenDialog(null);
+		else seleccion=sf.showSaveDialog(null);								
+	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
+	        f = sf.getSelectedFile();											//Obtenemos el archivo.
+	    }
+		return f;
+	}
+	
+	
+	/**
+	 * Carga una imagen desde un dispositivo físico (disco duro, etc).
+	 * @param nombre ruta y nombre de la imagen.
+	 * @return imagen leído desde el dispostivo. Null en otro caso
+	 */
+	public Image abrirImagen(String nombre) {
+		BufferedImage image = null;
+		try {                
+	         image = ImageIO.read(new File(nombre));
+	       } catch (IOException ex) {
+	    	    ex.printStackTrace();
+	       }
+		return image;
 	}
 }

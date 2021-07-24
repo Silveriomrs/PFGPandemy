@@ -35,11 +35,11 @@ public class DCVS implements TableModel{
 	 * @param f fila a leer.
 	 * @return devuelve un array Object[] con los datos de una fila
 	 */
-	public Object[] getFila(int f) {
+	public String[] getFila(int f) {
 		int columnas = getColumnCount();
-		Object[] fila = new Object[columnas];
+		String[] fila = new String[columnas];
 		for(int i = 0; i<columnas;i++) {
-			fila[i] = modelo.getValueAt(f, i);
+			fila[i] = (String) modelo.getValueAt(f, i);
 		}
 		return fila;	
 	}

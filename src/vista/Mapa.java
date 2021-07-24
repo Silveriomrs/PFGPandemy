@@ -6,15 +6,14 @@ package vista;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Polygon;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import java.awt.BorderLayout;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+
+import modelo.FondoPanel;
+import modelo.Zona;
 
 /**
  * Clase para la representación en modo de mapa de los datos de un núcleo
@@ -28,69 +27,85 @@ public class Mapa extends JPanel {
 
 	private static final long serialVersionUID = 6251836932416777274L;
 	private JFrame frame;
-	private HashMap<String,Polygon> zonas;
-	private HashMap<String,Color> zonasColor;
-	
+	private FondoPanel fondo;
+	private HashMap<String,Zona> zonas;
+	private ArrayList<Color> paleta;
 	
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
 	 * @param height ancho del mapa.
 	 * @param width altura del mapa.
+	 * @param paleta Colores representantes de los grados de contagio.
 	 */
-	public Mapa(int width, int height) {
+	public Mapa(int width, int height, ArrayList<Color> paleta) {
 		super();
+		this.paleta = paleta;
 		setBorder(new LineBorder(new Color(0, 0, 0)));
-		zonas = new HashMap<String, Polygon>();
-		zonasColor = new HashMap<String, Color>();
+		zonas = new HashMap<String, Zona>();
 		setBackground(Color.LIGHT_GRAY);
 		setLayout(new FlowLayout());
+		
 		frame = new JFrame();
 		frame.getContentPane().add(this);
 		frame.setTitle("Mapa");
-		frame.setSize(width,height);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(825,590);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
+        repaint();
+	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");	
 	}
 	
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		zonas.forEach((n,p) -> {
-			g.setColor(zonasColor.get(n));
-			//g.fillPolygon(p);
-			g.drawPolygon(p);
+		zonas.forEach((n,z) -> {
+			g.setColor(paleta.get(z.getNivel()));
+			g.fillPolygon(z.getZona());
+	//		g.drawPolygon(z.getZona());
 		});
 	}
 	
 	/**
-	 * Devuelve el poligono que representa una zona del mapa.
-	 * @param nombre de la zona.
-	 * @return devuelve el poligono que representa la zona.
+	 * Carga una imagen de fondo para el panel.
+	 * @param nombre nombre de la imagen y su ruta.
 	 */
-	public Polygon getZona(String nombre) {return zonas.get(nombre);}
+	public void setFondo(String nombre) {
+		fondo = new FondoPanel(nombre);
+		frame.setContentPane(fondo);	
+	}
+	
+	/**
+	 * Devuelve el poligono que representa una zona del mapa.
+	 * @param id Identificador de la zona.
+	 * @return devuelve zona del mapa.
+	 */
+	public Zona getZona(String id) {return zonas.get(id);}
 
 	/**
 	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
 	 * nombre, no añadirá la última.
-	 * @param nombre De la zona que representa el poligono.
-	 * @param p Poligono de la zona.
+	 * @param z Zona que representa el poligono.
 	 */
-	public void addZona(String nombre, Polygon p) {zonas.putIfAbsent(nombre, p);}
+	public void addZona(Zona z) {zonas.putIfAbsent(z.getID(), z);}
 
 	/**
-	 * Devuelve el color de una zona o null si esta no existe.
-	 * @param z Nombre de la zona.
-	 * @return Color asignado a una zona, null si dicha zona no existe.
+	 * Devuelve el grado de contagio de una zona o null si esta no existe.
+	 * @param id ID de la zona.
+	 * @return Nivel asignado a una zona, null si dicha zona no existe.
 	 */
-	public Color getZonaColor(String z) {return zonasColor.get(z);}
+	public int getZonaNivel(String id) {return zonas.get(id).getNivel();}
 
 	/**
-	 * Establece el color de una zona almacenandola.
-	 * @param z Nombre de la zona.
-	 * @param c Color de asignación.
+	 * Establece el grado de contagio de una zona.
+	 * @param id ID de la zona.
+	 * @param n Nivel de asignación.
 	 */
-	public void setZonaColor(String z, Color c) {zonasColor.put(z, c);}
+	public void setZonaNivel(String id, int n) {
+		if(zonas.containsKey(id)) {												//Comprobación de que existe.
+			zonas.get(id).setNivel(n);
+		}
+	}
 	
 
 	/**

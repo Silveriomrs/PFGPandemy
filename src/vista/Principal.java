@@ -6,9 +6,7 @@ package vista;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,7 +21,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -33,11 +30,13 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import controlador.ControladorDatosIO;
+import controlador.ControladorMapa;
 import modelo.DCVS;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.Font;
+import modelo.FondoPanel;
 
 /**
  * Clase de la vista principal donde se modelan las tablas
@@ -57,7 +56,7 @@ public class Principal extends JFrame implements ActionListener{
 	private JTable tabla;
 
 	private DefaultTableModel modelo;
-	private FondoPanel fondo = new FondoPanel();
+	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
 	private final Panel panel = new Panel();
 	private JLayeredPane layeredPane;
 	private JLabel lblAsignarTablaA;
@@ -86,29 +85,6 @@ public class Principal extends JFrame implements ActionListener{
 	private void initialize() {
 		setBounds(0, 0, 914, 610);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		//Cuerpo de datos
-		Object[][] datos = new Object[][]{
-				{"AN", 1, null, null, null},
-				{"AR", 2, null, null, null},
-				{"PA", 3, null, null, null},
-				{"BA", 4, null, null, null},
-				{"CN", 5, null, null, null},
-				{"CB", 6, null, null, null},
-				{"CM", 7, null, null, null},
-				{"CL", 8, null, null, null},
-				{"CA", 9, null, null, null},
-				{"EX", 10, null, null, null},
-				{"GA", 11, null, null, null},
-				{"RJ", 12, null, null, null},
-				{"MD", 13, null, null, null},
-				{"MU", 14, null, null, null},
-				{"NV", 15, null, null, null},
-				{"PV", 16, null, null, null},
-				{"VL", 17, null, null, null},};
-		
-		//Cabecera de datos.		
-		String[] cabecera = new String[] {"CCAA", "Valor1", "valor2", "valor3", "valor4"};
 
 		btnAbout = new JButton("");
 		btnAbout.addMouseListener(new BtnAboutMouseListener());
@@ -260,6 +236,10 @@ public class Principal extends JFrame implements ActionListener{
 		tabla.setRowSelectionAllowed(true);
 		tabla.setColumnSelectionAllowed(false);
 		tabla.setBackground(new Color(224, 255, 255));
+		//Cuerpo de datos
+		Object[][] datos = new Object[][]{};	
+		//Cabecera de datos.		
+		String[] cabecera = new String[] {};
 		modelo = new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
 	//		@SuppressWarnings("rawtypes")
@@ -324,19 +304,24 @@ public class Principal extends JFrame implements ActionListener{
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		//	JOptionPane.showMessageDialog(null, txt, titulo, tipo);ç
+		//	JOptionPane.showMessageDialog(null, txt, titulo, tipo);
 			String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-			modelo.addColumn(txt);
-			tabla.setModel(modelo);
+				if(txt != "" || txt != null){
+				modelo.addColumn(txt);
+				tabla.setModel(modelo);
+			}
 		}
 	}
 	
 	private class BtnAddRowMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			Object[] o = new Object[modelo.getColumnCount()];
-			modelo.addRow(o);
-			tabla.setModel(modelo);
+			int ncols = modelo.getColumnCount();								//Obtención del número de columnas.
+			if(ncols > 0) {														//Comprobación de que existe al menos una columna.
+				Object[] o = new Object[ncols];
+				modelo.addRow(o);
+				tabla.setModel(modelo);
+			}
 		}
 	}
 	
@@ -393,34 +378,10 @@ public class Principal extends JFrame implements ActionListener{
 			String seleccion = (String) comboBox.getSelectedItem();
 			//Si se ha seleccionado módulo ->
 			System.out.println(seleccion);
+			if(seleccion.equals("Mapas")) new ControladorMapa(modelo);
 			//enviar modelo al módulo elegido.
 			
 		}
-	}
-}
-
-
-
-/**
- * Esta subclase establece una imagen de fondo al panel.
- * @author Silverio Manuel Rosales Santana
- * @date 10/05/2021
- * @version 1.0
- *
- */
-class FondoPanel extends JPanel{
-	/**
-	 * Serialización de la clase.
-	 */
-	private static final long serialVersionUID = -6096941937803410903L;
-	private Image imagen;
-	
-	@Override
-	public void paint(Graphics g) {
-		imagen = new ImageIcon(getClass().getResource("/vista/imagenes/imagen4.jpg")).getImage();
-		g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
-		setOpaque(false);
-		super.paint(g);
 	}
 }
 

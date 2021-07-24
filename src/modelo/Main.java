@@ -3,7 +3,6 @@
  */
 package modelo;
 
-import controlador.ControladorMapa;
 import vista.Principal;
 
 
@@ -23,8 +22,6 @@ public class Main {
 	public static void main(String[] args) {
 		Principal ventana = new Principal();
 		ventana.setVisible(true);	
-		//Mapa mapa = new Mapa();
-		ControladorMapa cmapa = new ControladorMapa();
 	}
 
 }
