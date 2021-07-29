@@ -49,7 +49,7 @@ import modelo.FondoPanel;
 public class Principal extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = -1830456885294124447L;
-	private JButton btnAbout,btnAbrirArchivo,btnGuardarArchivo,btnImprimir;
+	private JButton btnAbout,btnAbrirArchivo,btnGuardarArchivo,btnBorrarTabla,btnImprimir;
 	private JButton btnAddRow,btnAddCol,btnBorrarFila,btnBorrarColumna;
 	private ControladorDatosIO cio;
 	private JScrollPane scrollPane;
@@ -91,11 +91,9 @@ public class Principal extends JFrame implements ActionListener{
 		btnAbout.setForeground(Color.GRAY);
 		btnAbout.setBackground(Color.GRAY);
 		btnAbout.setIcon(new ImageIcon(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
-		btnAbout.addActionListener(this);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setAutoscrolls(true);
-		//scrollPane.setBounds(5, 10, 350, 150);
 		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
 		scrollPane.setName("scrollTabla");
 		scrollPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -179,50 +177,61 @@ public class Principal extends JFrame implements ActionListener{
 		);
 		boxAsignacion.setLayout(gl_boxAsignacion);
 		
-		btnAddRow = new JButton("Nueva fila");
-		btnAddRow.setBounds(0, 12, 104, 25);
+		btnAddRow = new JButton("Crear fila");
+		btnAddRow.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAddRow.setBounds(0, 10, 140, 25);
 		btnAddRow.addMouseListener(new BtnAddRowMouseListener());
-		btnAddRow.addActionListener(this);
 		
-		btnBorrarFila = new JButton("Borrar fila/s");
-		btnBorrarFila.setBounds(0, 74, 120, 25);
+		btnBorrarFila = new JButton("Del fila/s");
+		btnBorrarFila.setHorizontalAlignment(SwingConstants.LEFT);
+		btnBorrarFila.setBounds(0, 70, 140, 25);
 		btnBorrarFila.addMouseListener(new BtnBorrarFilaMouseListener());
 		btnBorrarFila.setBackground(Color.ORANGE);
 		layeredPane.setLayout(null);
 		layeredPane.add(btnAddRow);
-		btnAddCol = new JButton("Añadir columna");
-		btnAddCol.setBounds(0, 37, 143, 25);
+		btnAddCol = new JButton("Crear columna");
+		btnAddCol.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAddCol.setBounds(0, 35, 140, 25);
 		btnAddCol.addMouseListener(new BtnAddColMouseListener());
-		btnAddCol.addActionListener(this);
+
 		layeredPane.add(btnAddCol);
 		layeredPane.add(btnBorrarFila);
 		
 		btnImprimir = new JButton("Imprimir");
-		btnImprimir.setBounds(0, 236, 91, 25);
+		btnImprimir.setBounds(0, 236, 140, 25);
 		btnImprimir.setVerticalAlignment(SwingConstants.BOTTOM);
 		btnImprimir.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImprimir.addMouseListener(new BtnImprimirMouseListener());
-		btnImprimir.addActionListener(this);
 		
-		btnBorrarColumna = new JButton("Borrar columna/s");
+		btnBorrarColumna = new JButton("Del columna/s");
 		btnBorrarColumna.setHorizontalTextPosition(SwingConstants.LEFT);
 		btnBorrarColumna.setHorizontalAlignment(SwingConstants.LEFT);
 		btnBorrarColumna.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnBorrarColumna.setBounds(0, 100, 160, 25);
+		btnBorrarColumna.setBounds(0, 95, 140, 25);
 		btnBorrarColumna.addMouseListener(new BtnBorrarColumnaMouseListener());
 		btnBorrarColumna.setBackground(Color.ORANGE);
 		layeredPane.add(btnBorrarColumna);
 		
 		btnGuardarArchivo = new JButton("Guardar tabla");
-		btnGuardarArchivo.setBounds(0, 148, 140, 25);
+		btnGuardarArchivo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnGuardarArchivo.setBounds(0, 130, 140, 25);
 		layeredPane.add(btnGuardarArchivo);
 		btnGuardarArchivo.addMouseListener(new BtnGuardarArchivoMouseListener());
 		btnGuardarArchivo.addActionListener(this);
 		btnAbrirArchivo = new JButton("Cargar tabla");
-		btnAbrirArchivo.setBounds(0, 175, 123, 25);
+		btnAbrirArchivo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAbrirArchivo.setBounds(0, 155, 140, 25);
 		layeredPane.add(btnAbrirArchivo);
 		btnAbrirArchivo.addMouseListener(new BtnAbrirArchivoMouseListener());
-		btnAbrirArchivo.addActionListener(this);
+
+		
+		btnBorrarTabla = new JButton("Borrar tabla");
+		btnBorrarTabla.addMouseListener(new BtnBorrarTablaMouseListener());
+		btnBorrarTabla.setBackground(Color.ORANGE);
+		btnBorrarTabla.setHorizontalAlignment(SwingConstants.LEFT);
+		btnBorrarTabla.setBounds(0, 198, 140, 25);
+
+		layeredPane.add(btnBorrarTabla);
 		layeredPane.add(btnImprimir);
 		gl_fondo.setAutoCreateContainerGaps(true);
 		gl_fondo.setAutoCreateGaps(true);
@@ -271,7 +280,6 @@ public class Principal extends JFrame implements ActionListener{
 	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un 
 	 * mensaje tipo 1. 
 	 * @param txt Texto a mostrar.
-	 * @param titulo Texto a mostrar en la barra del cuadro de mensaje.
 	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
 	 *  0 JOptionPane.ERROR_MESSAGE
 	 *  1 JOptionPane.INFORMATION_MESSAGE
@@ -333,7 +341,7 @@ public class Principal extends JFrame implements ActionListener{
 				modelo = m;
 				tabla.setModel(modelo);
 				mostrar("Archivo Cargado", 1);
-			}else {mostrar("Nombre de archivo inválido", 0);}
+			}
 		}
 	}
 	
@@ -383,5 +391,23 @@ public class Principal extends JFrame implements ActionListener{
 			
 		}
 	}
+	
+	private class BtnBorrarTablaMouseListener extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			//Mostrar dialogo de confirmación
+			int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla y sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
+			//Caso afirmativo borrar el modelo y crear uno nuevo.
+			if(opt == JOptionPane.YES_OPTION) {
+				//Cuerpo de datos
+				Object[][] datos = new Object[][]{};	
+				//Cabecera de datos.		
+				String[] cabecera = new String[] {};
+				modelo = new DefaultTableModel(datos,cabecera){	private static final long serialVersionUID = 5615251971828569240L;};
+				tabla.setModel(modelo);
+			}
+		}
+	}
+
 }
 

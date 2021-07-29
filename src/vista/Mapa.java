@@ -4,9 +4,9 @@
 package vista;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -14,6 +14,8 @@ import javax.swing.border.LineBorder;
 
 import modelo.FondoPanel;
 import modelo.Zona;
+import java.awt.CardLayout;
+import javax.swing.BoxLayout;
 
 /**
  * Clase para la representación en modo de mapa de los datos de un núcleo
@@ -23,34 +25,39 @@ import modelo.Zona;
  * @version 1.0
  *
  */
-public class Mapa extends JPanel {
+public class Mapa extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 6251836932416777274L;
+	/** frame Marco para dibujado del mapa en modo flotante*/  
 	private JFrame frame;
+	/** fondo Imagen de fondo establecida*/  
 	private FondoPanel fondo;
+	/** zonas Conjunto con las zonas que contiene el mapa.*/  
 	private HashMap<String,Zona> zonas;
-	private ArrayList<Color> paleta;
+	/** leyenda Leyenda del mapa.*/  
+	private Leyenda leyenda;
 	
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
 	 * @param height ancho del mapa.
 	 * @param width altura del mapa.
-	 * @param paleta Colores representantes de los grados de contagio.
+	 * @param leyenda Leyenda con los colores y sus valores.
 	 */
-	public Mapa(int width, int height, ArrayList<Color> paleta) {
-		super();
-		this.paleta = paleta;
+	public Mapa(int width, int height, Leyenda leyenda) {
+		super();	
 		setBorder(new LineBorder(new Color(0, 0, 0)));
 		zonas = new HashMap<String, Zona>();
 		setBackground(Color.LIGHT_GRAY);
-		setLayout(new FlowLayout());
-		
+		this.leyenda = leyenda;
 		frame = new JFrame();
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
+		setLayout(new CardLayout(0, 0));
 		frame.setTitle("Mapa");
 		frame.setSize(825,590);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
+		//frame.add(leyenda.getPanelPaleta());
         repaint();
 	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");	
 	}
@@ -60,9 +67,8 @@ public class Mapa extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		zonas.forEach((n,z) -> {
-			g.setColor(paleta.get(z.getNivel()));
+			g.setColor(leyenda.getColor(z.getNivel()));
 			g.fillPolygon(z.getZona());
-	//		g.drawPolygon(z.getZona());
 		});
 	}
 	
@@ -106,13 +112,18 @@ public class Mapa extends JPanel {
 			zonas.get(id).setNivel(n);
 		}
 	}
-	
 
 	/**
 	 * Devuelve el número de zonas que contiene el mapa.
 	 * @return número de zonas que contiene el mapa.
 	 */
 	public int getNumZones() {return zonas.size();}
-	
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

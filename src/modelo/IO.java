@@ -36,6 +36,7 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
+    /** filtro Instancia del filtro*/  
     private FileNameExtensionFilter filtro;
     
     /**

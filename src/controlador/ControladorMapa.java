@@ -13,6 +13,7 @@ import modelo.DCVS;
 import modelo.ParserPoly;
 import modelo.ParserSVG;
 import modelo.Zona;
+import vista.Leyenda;
 import vista.Mapa;
 
 /**
@@ -23,10 +24,14 @@ import vista.Mapa;
  */
 public class ControladorMapa {
 
-	private ArrayList<Color> paleta;
+	/** mapa Instancia de un mapa*/  
 	private Mapa mapa;
+	/** parserPoly Parser para datos en formato coordenadas de poligonos*/  
 	private ParserPoly parserPoly;
+	/** datos Almacen de datos*/  
 	private DCVS datos;
+	/** leyenda Leyenda del mapa.*/  
+	private Leyenda leyenda;
 	
 	/**
 	 * Constructor de la clase.
@@ -34,11 +39,11 @@ public class ControladorMapa {
 	 */
 	public ControladorMapa(DefaultTableModel modelo) {
 		datos = new DCVS(modelo);
-		paleta = new ArrayList<Color>();
-		mapa = new Mapa(850,600, paleta);
+		leyenda = new Leyenda(100, 185, false);
+		mapa = new Mapa(850,600, leyenda);
+		
 		new ParserSVG();
 		parserPoly = new ParserPoly();
-		paletaBase();															//Carga la paleta básica por defecto.
 		pinta();
 	}
 	
@@ -53,7 +58,7 @@ public class ControladorMapa {
 			parser(datos.getFila(i));
 		}
 		//Prueba de color.
-		mapa.setZonaNivel("xd", 0);	//White   //test de error de ID incorrecto.
+		mapa.setZonaNivel("10", 0);	//Green
 		mapa.setZonaNivel("1", 1);	//Green
 		mapa.setZonaNivel("2", 2);	//Grey
 		mapa.setZonaNivel("3", 3);	//Dark gray
@@ -61,8 +66,8 @@ public class ControladorMapa {
 		mapa.setZonaNivel("5", 5);	//Yellow
 		mapa.setZonaNivel("6", 6);	//Pink
 		mapa.setZonaNivel("7", 7);	//Orange
-		mapa.setZonaNivel("18", 8);	//Red
-		mapa.setZonaNivel("19", 9);  //Black
+		mapa.setZonaNivel("8", 8);	//Red
+		mapa.setZonaNivel("9", 9);  //Black
 	}
 	
 	/**
@@ -79,42 +84,10 @@ public class ControladorMapa {
 	 */
 	public void setPaleta(ArrayList<Color> paleta) {
 		if(paleta != null && paleta.size()==10) {
-			this.paleta = paleta;
+			leyenda.setPaleta(paleta);
 		}
 	}
-	
-
-	/**
-	 * Establece la paleta de colores correspondiente a cada nivel por defecto.
-	 */
-	private void paletaBase() {
-		paleta.add(new Color( 82, 190, 128 ));
-		paleta.add(new Color( 40, 180, 99 ));
-		paleta.add(new Color( 174, 214, 241 ));
-		paleta.add(new Color( 46, 134, 193 ));
-		paleta.add(new Color( 247, 220, 111 ));
-		paleta.add(new Color( 243, 156, 18 ));
-		paleta.add(new Color( 210, 180, 222 ));
-		paleta.add(new Color( 118, 68, 138 ));
-		paleta.add(new Color( 230, 126, 34 ));
-		paleta.add(new Color( 231, 76, 60 ));
-		paleta.add(new Color( 178, 186, 187 ));
-//		paleta.add(Color.WHITE);		//Nivel 0
-//		paleta.add(Color.GREEN);
-//		paleta.add(Color.GRAY);
-//		paleta.add(Color.DARK_GRAY);
-//		paleta.add(Color.CYAN);
-//		paleta.add(Color.YELLOW);
-//		paleta.add(Color.PINK);
-//		paleta.add(Color.ORANGE);
-//		paleta.add(Color.RED);
-//		paleta.add(Color.BLACK);		//Nivel 9
-
-		//Paleta alternativa:
-		//rgb(241, 196, 15) rgb(40, 180, 99) rgb(52, 152, 219) rgb(244, 208, 63)
-		//rgb(236, 112, 99) rgb(203, 67, 53)
-	}
-		
+			
 	/**
 	 * Realiza la conversión de datos de texto a un poligono cerrado. En el array
 	 * de datos debe estar conforme a ID, Nombre, Px;y... donde Px;y son las
@@ -125,7 +98,7 @@ public class ControladorMapa {
 	 * las siguientes posiciones representan cada uno de los puntos que conforman
 	 * el poligono.
 	 */
-	private void parser(String[] puntos) {		
+	private void parser(String[] puntos) {	
 		String nombre = puntos[1];
 		String id = puntos[0];
 		mapa.addZona(new Zona(id,nombre,parserPoly.parser(puntos)));

@@ -18,7 +18,9 @@ import modelo.IO;
  *
  */
 public class ControladorDatosIO {
+	/** io Instancia de entrada y salida de datos hacia un dispositivo de almacenamiento*/  
 	private IO io;
+	/** bd Instancia de almacen de datos.*/  
 	private DCVS bd;
 
 	/**

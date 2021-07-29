@@ -45,6 +45,7 @@ public class ParserSVG {
 		for(int i=0; i<size;i++) {
 			//Separación coordenadas.
 			String[] raw3= raw2[i].split(",");
+			comandos(raw3);
 			//Obtener coordenadas convertidas a int.
 			polX[i] = Integer.valueOf(raw3[0])/escala;
 			polY[i] = Integer.valueOf(raw3[1])/escala;
@@ -53,6 +54,13 @@ public class ParserSVG {
 		return new Polygon(polX, polY, size);
 	}
 	
+	
+	/**
+	 * <p>Title: comandos</p>  
+	 * <p>Description: Realiza la conversión de los parámetros que componen
+	 * el gráfico SVG y sus valores</p> 
+	 * @param cadena Arreglo de los parámetros y sus valores.
+	 */
 	private void comandos(String[] cadena) {
 		
 	}

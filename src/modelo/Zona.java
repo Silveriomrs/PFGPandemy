@@ -15,9 +15,13 @@ import java.awt.Polygon;
  *
  */
 public class Zona {
+	/** name Nombre de la zona*/  
 	private String name;
+	/** ID ID de la zona*/  
 	private String ID;
+	/** zona Poligono que representa gráficamente una zona*/  
 	private Polygon zona;
+	/** nivel Nivel de contagio de una zona [0-9]*/  
 	private int nivel;	
 	
 	/**
@@ -36,31 +40,33 @@ public class Zona {
 	}
 
 	/**
-	 * @return devuelve name
+	 * @return devuelve el nombre de la zona.
 	 */
 	public String getName() {return name;}
 
 
 	/**
-	 * @return devuelve iD
+	 * @return devuelve ID de la zona
 	 */
 	public String getID() {return ID;}
 
 
 	/**
-	 * @return devuelve zona
+	 * @return devuelve el poligono que representa la zona
 	 */
 	public Polygon getZona() {return zona;}
 
 
 	/**
-	 * @return devuelve nivel
+	 * @return devuelve nivel desde 0 hasta 9.
 	 */
 	public int getNivel() {	return nivel;}
 
 
 	/**
-	 * @param nivel el nivel a establecer
+	 * Establecimiento del nivel de la zona. Su valor debe estar entre 0 y 9,
+	 *  ambos inclusive. 
+	 * @param nivel Nivel a establecer.
 	 */
 	public void setNivel(int nivel) {this.nivel = nivel;}
 	
