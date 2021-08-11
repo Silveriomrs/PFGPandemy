@@ -5,8 +5,6 @@ package vista;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -25,7 +23,7 @@ import javax.swing.BoxLayout;
  * @version 1.0
  *
  */
-public class Mapa extends JPanel implements ActionListener{
+public class Mapa extends JPanel{
 
 	private static final long serialVersionUID = 6251836932416777274L;
 	/** frame Marco para dibujado del mapa en modo flotante*/  
@@ -33,7 +31,7 @@ public class Mapa extends JPanel implements ActionListener{
 	/** fondo Imagen de fondo establecida*/  
 	private FondoPanel fondo;
 	/** zonas Conjunto con las zonas que contiene el mapa.*/  
-	private HashMap<String,Zona> zonas;
+	private HashMap<Integer,Zona> zonas;
 	/** leyenda Leyenda del mapa.*/  
 	private Leyenda leyenda;
 	
@@ -44,11 +42,24 @@ public class Mapa extends JPanel implements ActionListener{
 	 * @param leyenda Leyenda con los colores y sus valores.
 	 */
 	public Mapa(int width, int height, Leyenda leyenda) {
-		super();	
-		setBorder(new LineBorder(new Color(0, 0, 0)));
-		zonas = new HashMap<String, Zona>();
-		setBackground(Color.LIGHT_GRAY);
+		super();
 		this.leyenda = leyenda;
+		zonas = new HashMap<Integer, Zona>();
+		
+		setBorder(new LineBorder(new Color(0, 0, 0)));	
+		setBackground(Color.LIGHT_GRAY);
+		setOpaque(false);
+	
+	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");
+		configuracion();	
+		
+	}
+	
+	/**
+	 * <p>Title: configuracion</p>  
+	 * <p>Description: Aunar códigos de las propiedades del frame.</p>
+	 */
+	private void configuracion(){
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
@@ -56,12 +67,10 @@ public class Mapa extends JPanel implements ActionListener{
 		frame.setTitle("Mapa");
 		frame.setSize(825,590);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
-		//frame.add(leyenda.getPanelPaleta());
-        repaint();
-	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");	
 	}
 	
+	@Override
+	public void setVisible(boolean ver) {frame.setVisible(ver);}
 	
 	@Override
 	public void paintComponent(Graphics g) {
@@ -70,7 +79,9 @@ public class Mapa extends JPanel implements ActionListener{
 			g.setColor(leyenda.getColor(z.getNivel()));
 			g.fillPolygon(z.getZona());
 		});
+		this.updateUI();														//Redibujado y actualización del panel.
 	}
+	
 	
 	/**
 	 * Carga una imagen de fondo para el panel.
@@ -78,15 +89,15 @@ public class Mapa extends JPanel implements ActionListener{
 	 */
 	public void setFondo(String nombre) {
 		fondo = new FondoPanel(nombre);
-		frame.setContentPane(fondo);	
+		frame.setContentPane(fondo);
 	}
-	
+
 	/**
 	 * Devuelve el poligono que representa una zona del mapa.
 	 * @param id Identificador de la zona.
 	 * @return devuelve zona del mapa.
 	 */
-	public Zona getZona(String id) {return zonas.get(id);}
+	public Zona getZona(int id) {return zonas.get(id);}
 
 	/**
 	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
@@ -100,14 +111,14 @@ public class Mapa extends JPanel implements ActionListener{
 	 * @param id ID de la zona.
 	 * @return Nivel asignado a una zona, null si dicha zona no existe.
 	 */
-	public int getZonaNivel(String id) {return zonas.get(id).getNivel();}
+	public int getZonaNivel(int id) {return zonas.get(id).getNivel();}
 
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
 	 * @param n Nivel de asignación.
 	 */
-	public void setZonaNivel(String id, int n) {
+	public void setZonaNivel(int id, int n) {
 		if(zonas.containsKey(id)) {												//Comprobación de que existe.
 			zonas.get(id).setNivel(n);
 		}
@@ -118,12 +129,4 @@ public class Mapa extends JPanel implements ActionListener{
 	 * @return número de zonas que contiene el mapa.
 	 */
 	public int getNumZones() {return zonas.size();}
-
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

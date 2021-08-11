@@ -8,8 +8,6 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.GridLayout;
 import java.awt.Panel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
@@ -46,7 +44,7 @@ import modelo.FondoPanel;
  * @version 1.5
  *
  */
-public class Principal extends JFrame implements ActionListener{
+public class Principal extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
 	private JButton btnAbout,btnAbrirArchivo,btnGuardarArchivo,btnBorrarTabla,btnImprimir;
@@ -63,12 +61,14 @@ public class Principal extends JFrame implements ActionListener{
 	private JComboBox<String> comboBox;
 	private JButton btnAplicarTabla;
 	private JLayeredPane boxAsignacion;
+	private ControladorMapa cMap;
 
 	/**
 	 * Crea la aplicación.
 	 */
 	public Principal() {
 		cio = new ControladorDatosIO();
+		cMap = new ControladorMapa();
 		panel.setLayout(new GridLayout(1, 0, 0, 0));	
 		setResizable(false);
 		setTitle("Simulador de Pandemias");	
@@ -108,38 +108,38 @@ public class Principal extends JFrame implements ActionListener{
 		gl_fondo.setHorizontalGroup(
 			gl_fondo.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_fondo.createSequentialGroup()
+					.addGap(12)
 					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_fondo.createSequentialGroup()
-							.addGap(31)
-							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 677, Short.MAX_VALUE))
 						.addGroup(gl_fondo.createSequentialGroup()
-							.addContainerGap(433, Short.MAX_VALUE)
-							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
-							.addGap(87)
+							.addGap(22)
+							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
+							.addGap(33)
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE))
+						.addGroup(gl_fondo.createSequentialGroup()
+							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(76)
 							.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)))
 					.addGap(23))
 		);
 		gl_fondo.setVerticalGroup(
 			gl_fondo.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(24)
 					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_fondo.createSequentialGroup()
-							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(Alignment.TRAILING, gl_fondo.createSequentialGroup()
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
-								.addComponent(btnAbout)
-								.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-							.addGap(23))))
+							.addGap(24)
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE))
+						.addGroup(gl_fondo.createSequentialGroup()
+							.addGap(37)
+							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)))
+					.addGap(18)
+					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnAbout)
+						.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
+					.addGap(23))
 		);
 		
 		comboBox = new JComboBox<String>();
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Cálculo", "Diversidad", "Otro"}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Cálculo", "Reproducción resultados", "Historico"}));
 		
 		btnAplicarTabla = new JButton("Aplicar tabla");
 		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
@@ -153,16 +153,16 @@ public class Principal extends JFrame implements ActionListener{
 		gl_boxAsignacion.setHorizontalGroup(
 			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_boxAsignacion.createSequentialGroup()
-					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(Alignment.LEADING, gl_boxAsignacion.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblAsignarTablaA, 0, 0, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_boxAsignacion.createSequentialGroup()
+					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_boxAsignacion.createSequentialGroup()
 							.addGap(6)
 							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnAplicarTabla)))
-					.addContainerGap(6, Short.MAX_VALUE))
+							.addComponent(btnAplicarTabla))
+						.addGroup(gl_boxAsignacion.createSequentialGroup()
+							.addGap(58)
+							.addComponent(lblAsignarTablaA, GroupLayout.PREFERRED_SIZE, 235, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_boxAsignacion.setVerticalGroup(
 			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
@@ -217,7 +217,6 @@ public class Principal extends JFrame implements ActionListener{
 		btnGuardarArchivo.setBounds(0, 130, 140, 25);
 		layeredPane.add(btnGuardarArchivo);
 		btnGuardarArchivo.addMouseListener(new BtnGuardarArchivoMouseListener());
-		btnGuardarArchivo.addActionListener(this);
 		btnAbrirArchivo = new JButton("Cargar tabla");
 		btnAbrirArchivo.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAbrirArchivo.setBounds(0, 155, 140, 25);
@@ -264,12 +263,18 @@ public class Principal extends JFrame implements ActionListener{
 		fondo.setLayout(gl_fondo);
 		
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		//if(e.getSource()==btnGuardarArchivo) {
-			//
-		//}
+	
+	/**
+	 * <p>Title: nuevaTabla</p>  
+	 * <p>Description: Crea una nueva tabla sin columnas ni filas..</p>
+	 */
+	private void nuevaTabla() {
+		//Cuerpo de datos
+		Object[][] datos = new Object[][]{};	
+		//Cabecera de datos.		
+		String[] cabecera = new String[] {};
+		modelo = new DefaultTableModel(datos,cabecera){	private static final long serialVersionUID = 5615251971828569240L;};
+		tabla.setModel(modelo);
 	}
 	
 	/**
@@ -348,7 +353,7 @@ public class Principal extends JFrame implements ActionListener{
 	private class BtnAboutMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			mostrar("Este proyecto ha sido...", 4);
+			new About();
 		}
 	}
 	
@@ -379,6 +384,14 @@ public class Principal extends JFrame implements ActionListener{
 		}
 	}
 	
+	/**
+	 * <p>Title: BtnAplicarTablaMouseListener</p>  
+	 * <p>Description: Clase dedicada al establecimiento de los datos en los
+	 * apartados o módulos oportunos.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 10 ago. 2021
+	 * @version versión
+	 */
 	private class BtnAplicarTablaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -386,8 +399,19 @@ public class Principal extends JFrame implements ActionListener{
 			String seleccion = (String) comboBox.getSelectedItem();
 			//Si se ha seleccionado módulo ->
 			System.out.println(seleccion);
-			if(seleccion.equals("Mapas")) new ControladorMapa(modelo);
-			//enviar modelo al módulo elegido.
+			
+			switch(seleccion){
+				case "Mapas": 
+					cMap.setPoligonos(modelo);
+					mostrar("Mapa cargado en el módulo", 1);
+					nuevaTabla();
+					break;
+				case "Historico": 
+					cMap.setHistorico(modelo);
+					cMap.play();
+					break;
+					
+			}
 			
 		}
 	}
@@ -398,14 +422,7 @@ public class Principal extends JFrame implements ActionListener{
 			//Mostrar dialogo de confirmación
 			int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla y sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
 			//Caso afirmativo borrar el modelo y crear uno nuevo.
-			if(opt == JOptionPane.YES_OPTION) {
-				//Cuerpo de datos
-				Object[][] datos = new Object[][]{};	
-				//Cabecera de datos.		
-				String[] cabecera = new String[] {};
-				modelo = new DefaultTableModel(datos,cabecera){	private static final long serialVersionUID = 5615251971828569240L;};
-				tabla.setModel(modelo);
-			}
+			if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
 		}
 	}
 

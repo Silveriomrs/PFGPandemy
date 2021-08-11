@@ -15,6 +15,7 @@ import modelo.ParserSVG;
 import modelo.Zona;
 import vista.Leyenda;
 import vista.Mapa;
+import vista.Player;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -32,50 +33,75 @@ public class ControladorMapa {
 	private DCVS datos;
 	/** leyenda Leyenda del mapa.*/  
 	private Leyenda leyenda;
+	/** Player para la reproducción de una simulación */
+	private Player player;
+	private DefaultTableModel historico;
 	
 	/**
 	 * Constructor de la clase.
-	 * @param modelo base con los datos de las figuras.
 	 */
-	public ControladorMapa(DefaultTableModel modelo) {
-		datos = new DCVS(modelo);
-		leyenda = new Leyenda(100, 185, false);
+	public ControladorMapa() {
+		leyenda = new Leyenda(100, 205, false);
 		mapa = new Mapa(850,600, leyenda);
-		
+		player = new Player(400, 400, true);
 		new ParserSVG();
 		parserPoly = new ParserPoly();
-		pinta();
+	}
+	
+
+	/**
+	 * <p>Title: setPoligonos</p>  
+	 * <p>Description: Establece la representación gráfica de cada zona. Una fila
+	 * por zona.</p> 
+	 * @param modelo con los datos especificados de cada zona.
+	 */
+	public void setPoligonos(DefaultTableModel modelo) {
+		datos = new DCVS(modelo);
+		int filas = datos.getRowCount();										//Número de poligonos a procesar.	
+		//Llamar función parser.
+		for(int i = 0; i<filas;i++) {parser(datos.getFila(i));}
 	}
 	
 	/**
-	 * Clase privada con los datos de una configuración de mapa básica por
-	 * CCAA de España.
+	 * <p>Title: verMapa</p>  
+	 * <p>Description: Activa o desactiva la visualización del mapa</p> 
+	 * @param ver True para activarla, false en otro caso.
 	 */
-	private void pinta() {	
-		int filas = datos.getRowCount();										//Número de poligonos a procesar.	
-		//Llamar función parser.
-		for(int i = 0; i<filas;i++) {			
-			parser(datos.getFila(i));
-		}
-		//Prueba de color.
-		mapa.setZonaNivel("10", 0);	//Green
-		mapa.setZonaNivel("1", 1);	//Green
-		mapa.setZonaNivel("2", 2);	//Grey
-		mapa.setZonaNivel("3", 3);	//Dark gray
-		mapa.setZonaNivel("4", 4);	//Cyan
-		mapa.setZonaNivel("5", 5);	//Yellow
-		mapa.setZonaNivel("6", 6);	//Pink
-		mapa.setZonaNivel("7", 7);	//Orange
-		mapa.setZonaNivel("8", 8);	//Red
-		mapa.setZonaNivel("9", 9);  //Black
+	public void verMapa(boolean ver) {mapa.setVisible(ver);}
+	
+	/**
+	 * <p>Title: play</p>  
+	 * <p>Description: Ejecuta la reproducción de un historico mostrando gráficamente
+	 * la evolución grabada. </p>
+	 * La representación gráfica corresponde a las zonas creadas. Para poder
+	 * usarse esta función deben haber sido almacezandos previamente los datos
+	 * de los poligonos y los de la leyenda.
+	 * 
+	 *  @also setPoligonos.
+	 *  @also setPaleta.
+	 */
+	public void play() {
+		if(mapa.getNumZones() > 0) {
+			player.setPlay(mapa,leyenda,new DCVS(historico));
+			player.setVisible(true);
+		}else {System.out.println("No hay cargadas zonas en la representación");}
 	}
+	
+	/**
+	 * <p>Title: setHistorico</p>  
+	 * <p>Description: Actualiza el historico de un cálculo realizado, permitiendo
+	 * su reproducción.</p> 
+	 * @param historico historico con los datos de la evolución calculada.
+	 */
+	public void setHistorico(DefaultTableModel historico) {	this.historico = historico;	}
+	
 	
 	/**
 	 * Establece el nivel de contagio de una zona.
 	 * @param id Nombre de la zona.
 	 * @param n nivel de color para asignación.
 	 */
-	public void setNivel(String id, int n) {mapa.setZonaNivel(id, n);}
+	public void setNivel(int id, int n) {mapa.setZonaNivel(id, n);}
 	
 	/**
 	 * Establece una nueva paleta de colores representativos de los grados de
@@ -100,7 +126,7 @@ public class ControladorMapa {
 	 */
 	private void parser(String[] puntos) {	
 		String nombre = puntos[1];
-		String id = puntos[0];
+		int id = Integer.parseInt(puntos[0]);
 		mapa.addZona(new Zona(id,nombre,parserPoly.parser(puntos)));
 	}
 	

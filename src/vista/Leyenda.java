@@ -5,10 +5,13 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -26,7 +29,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	/**
 	 * Frame de la leyenda para soportar modo de visualización flotante.
 	 */
-	private JFrame frmLeyenda;
+	private JFrame frame;
 	/**
 	 * Paleta de colores con equivalencia a los diferentes niveles de contagio.
 	 */
@@ -46,23 +49,29 @@ public class Leyenda extends JPanel implements ActionListener{
 		paleta = new ArrayList<Color>();
 		setBorder(new LineBorder(new Color(0, 0, 0)));
 		setBackground(Color.LIGHT_GRAY);
-		
-		frmLeyenda = new JFrame();
-		frmLeyenda.getContentPane().setLayout(new BoxLayout(frmLeyenda.getContentPane(), BoxLayout.X_AXIS));
-		frmLeyenda.getContentPane().add(this);
+		TitledBorder tb = BorderFactory.createTitledBorder("Leyenda");
+		this.setBorder(tb);
+		frame = new JFrame();
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+		frame.getContentPane().add(this);
 		setLayout(null);
 		
-		paletaBase();
-		creaEtiquetas(50,0,50,20);
-		creaBotones(0,0,50,20,editable);
+		paletaBase();															//Carga la paleta base.
+		creaEtiquetas(50,20,50,20);												//Crea y dibuja las etiquetas.
+		creaBotones(0,20,50,20,editable);										//Crea y dibuja los botones.
 			
-		frmLeyenda.setTitle("Leyenda");
-		frmLeyenda.setSize(width,height);
-		frmLeyenda.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frmLeyenda.setVisible(true);
+//		frmLeyenda.setTitle("Leyenda");											//Establecimiento del título.
+		frame.setSize(width,height);											//Establecimiento de las dimensiones.
+		frame.setResizable(false); 												//Dimesiones fijas.
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
+		frame.setAlwaysOnTop(true);
         repaint();
-	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");	
 	}
+	
+	
+	@Override
+	public void setVisible(boolean ver) {frame.setVisible(ver);}
+
 	
 	/**
 	 * Dibuja las etiquetas en la leyenda en las coordenadas indicadas por 
@@ -179,11 +188,30 @@ public class Leyenda extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//Obtención del botón pulsado
-		JButton boton = (JButton)e.getSource();									
+		JButton boton = (JButton)e.getSource();
+		//Obtención de su posición
+		int pos = Integer.parseInt(boton.getName());
 		//Obtención de un color desde el selector.
 		Color color = JColorChooser.showDialog(null, "Seleccione nuevo color", null);
 		//Establece color si no es nulo.
-		if(color != null) {boton.setBackground(color);}							
+		if(color != null) {
+			boton.setBackground(color);
+			this.setVisible(true);
+			//Añadir nuevo color a la paleta en sustitución del anterior.
+			paleta.set(pos, color);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		String txt = "";
+		String nivel = "Nivel";
+		for(int i=0;i<10;i++) {
+			txt += nivel + i + "," + paleta.get(i).getRed() + "," + paleta.get(i).getGreen() +
+					"," +  paleta.get(i).getBlue();
+			if(i<9) {txt += "\n";}
+		}
+		return txt;
 	}
 	
 }

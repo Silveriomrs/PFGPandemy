@@ -18,7 +18,7 @@ public class Zona {
 	/** name Nombre de la zona*/  
 	private String name;
 	/** ID ID de la zona*/  
-	private String ID;
+	private int ID;
 	/** zona Poligono que representa gráficamente una zona*/  
 	private Polygon zona;
 	/** nivel Nivel de contagio de una zona [0-9]*/  
@@ -32,7 +32,7 @@ public class Zona {
 	 * @param name nombre completo de la zona representada.
 	 * @param zona poligono cerrado que contiene la representación gráfica de la zona.
 	 */
-	public Zona(String ID, String name, Polygon zona) {
+	public Zona(int ID, String name, Polygon zona) {
 		setNivel(0);
 		this.name = name;
 		this.ID = ID;
@@ -48,7 +48,7 @@ public class Zona {
 	/**
 	 * @return devuelve ID de la zona
 	 */
-	public String getID() {return ID;}
+	public int getID() {return ID;}
 
 
 	/**
