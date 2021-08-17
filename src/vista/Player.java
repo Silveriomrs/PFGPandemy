@@ -32,7 +32,10 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.border.EtchedBorder;
@@ -184,12 +187,21 @@ public class Player extends JPanel implements ActionListener{
 		ultima = this.historico.getRowCount() -1;
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(ultima);
+		//Configuración del rango de fechas.
+		Date d1 = stringToDate((String) historico.getValueAt(0, 0));			//Obtener primera fecha.
+		Date d2 = stringToDate((String) historico.getValueAt(ultima, 0));		//Obtener segunda fecha.
+		dateChooser.setSelectableDateRange(d1, d2);								//Establece rango de fechas.
+		dateChooser.setDate(d1);												//Establece la primera fecha.
 		
 	}
 	
 	private void play(int linea) {
 		String fila[] = historico.getFila(linea);								//Obtener fila.
 		int columnas = historico.getColumnCount();
+		//Actualizar fecha
+		String f = (String) historico.getValueAt(linea, 0);
+		dateChooser.setDate(stringToDate(f));
+		
 		for(int j = 1; j < columnas; j++) {		
 			int id = getID(historico.getColumnName(j));							//Obtener ID columna
 			int nivel = getValor(fila[j]);										//Obtener valor			
@@ -208,6 +220,18 @@ public class Player extends JPanel implements ActionListener{
 		
 	}
 	
+	
+	private Date stringToDate(String fecha){
+		 String[] fechahora = fecha.split(" ");									//Separación de la fecha de la hora.
+		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");			//Formato de la fecha.
+
+		 Date date = null;
+		 try { date = formato.parse(fechahora[0]);								//Conversión tipo de datos.
+		 } 
+		 catch (ParseException ex) { ex.printStackTrace(); }
+		 finally {return date;} 
+	}
+
 	
 	private int getID(String s) {
 		int id = -1;
