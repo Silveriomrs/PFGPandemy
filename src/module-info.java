@@ -6,7 +6,7 @@
  *
  */
 module pfgPandemy {
-	requires java.desktop;														//Necesario para poder usar AWT y Swing
-	requires opencsv;															//Clase especializada en archivos CSV
-	requires jcalendar;															//Conjunto de librerías JSwing enfocadas en calendario.
+	requires java.desktop;
+	requires com.opencsv;
+	requires jcalendar;
 }

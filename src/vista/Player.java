@@ -32,14 +32,16 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.border.EtchedBorder;
 import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JTextFieldDateEditor;
 
 import modelo.DCVS;
 import modelo.FondoPanel;
@@ -71,6 +73,7 @@ public class Player extends JPanel implements ActionListener{
 	private Mapa mapa;
 	private Leyenda leyenda;
 	private DCVS historico;
+	private boolean activo;														//Establece si el reproducctor esta activo o pausado.
 	
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 1L;
@@ -86,7 +89,8 @@ public class Player extends JPanel implements ActionListener{
 	 * false en otro caso.
 	 */
 	public Player(int width, int height, boolean editable) {
-		super();	
+		super();
+		activo = false;
 		//Border: configuración de estilo
 		setOpaque(false);
 		setBackground(Color.LIGHT_GRAY);
@@ -134,16 +138,22 @@ public class Player extends JPanel implements ActionListener{
 		slider.setFont(new Font("Liberation Sans", Font.ITALIC, 10));
 		slider.setPreferredSize(new Dimension(200, 14));
 		slider.addChangeListener(new SliderListener());
+		//Desactivar la edición de fechas.
+		JTextFieldDateEditor editor = (JTextFieldDateEditor) dateChooser.getDateEditor();
+		editor.setEditable(false);
+		dateChooser.addPropertyChangeListener(new DateChooserListener());
+		
 
 		//Establecimiento de los textos tooltips
 		btnPlayPause.setToolTipText("Reproduce o Pausa la animación.");
+		dateChooser.setToolTipText("Fecha representada");
+		dateChooser.getCalendarButton().setToolTipText("Introducción de fecha concreta");
 		slider.setToolTipText("Escala de tiempo en horas/segundo");	
 		progressBar.setToolTipText("Porcentaje de progreso de la reproducción del registro.");
 		lblFecha.setToolTipText("Ir a una fecha concreta");		
-		lblHora.setToolTipText("Ir a una hora concreta");
+		lblHora.setToolTipText("Hora de la representación");
 		frmtdtxtfldHoraMinuto.setToolTipText("Saltar a una hora concreta");
 		frmtdtxtfldHoraMinuto.setText("Hora Minuto");	
-		dateChooser.getCalendarButton().setToolTipText("Introducción de fecha concreta");
 		
 		//Establecimiento de los Layouts
 		setLO();
@@ -190,55 +200,112 @@ public class Player extends JPanel implements ActionListener{
 		//Configuración del rango de fechas.
 		Date d1 = stringToDate((String) historico.getValueAt(0, 0));			//Obtener primera fecha.
 		Date d2 = stringToDate((String) historico.getValueAt(ultima, 0));		//Obtener segunda fecha.
+		activo = true;															//Activación temporal del player para evitar activación erronéa del búscador.
 		dateChooser.setSelectableDateRange(d1, d2);								//Establece rango de fechas.
-		dateChooser.setDate(d1);												//Establece la primera fecha.
-		
+		dateChooser.setDate(d1);												//Establece la fecha de comienzo.
+		activo = !activo;														//Vuelta al estado desactivado del reproductor.
 	}
 	
 	private void play(int linea) {
 		String fila[] = historico.getFila(linea);								//Obtener fila.
 		int columnas = historico.getColumnCount();
 		//Actualizar fecha
-		String f = (String) historico.getValueAt(linea, 0);
-		dateChooser.setDate(stringToDate(f));
+		String f = (String) historico.getValueAt(linea, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
+		Date d = stringToDate(f);		
+		frmtdtxtfldHoraMinuto.setText(d.getHours() + ":" + d.getMinutes());		//Establece la hora de la línea leída en el cuadro de texto.
+		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
 		
 		for(int j = 1; j < columnas; j++) {		
 			int id = getID(historico.getColumnName(j));							//Obtener ID columna
-			int nivel = getValor(fila[j]);										//Obtener valor			
-			mapa.setZonaNivel(id,nivel);										//Otorgar nivel al mapa
+			int nivel = getValor(fila[j]);										//Obtener valor									
+			mapa.addZonaNivel(id, d, nivel);									//Otorgar nivel al mapa/zona
 			this.updateUI();
 		}
 		//Si es la última línea -> parar reproducción.
 		if(linea == ultima) {
 			timer.stop();
 			btnPlayPause.setText("Repetir");
-			System.out.println("Final");
+			activo = !activo;
+			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
 		}
 		
-		progressBar.setValue(linea);
-		System.out.println("Linea " + linea + "/" + ultima);
+		progressBar.setValue(linea);											//Actualización del la barra de progreso.
+		System.out.println("Linea: " + linea + "/" + ultima);
 		
 	}
 	
+	/**
+	 * <p>Title: getLineaDate</p>  
+	 * <p>Description: Realiza una búsqueda de una fecha concreta</p>
+	 * Realiza la búsqueda utilizando el algoritmo  
+	 * @param d Date contenedora de la fecha seleccionada.
+	 * @return número de línea del historico de fechas que contiene dicha fecha, 
+	 * la fecha inferior más cercana en otro caso.
+	 */
+	private int getLineaDate(Date d) {		
+		int linea = 0;															//Línea candidata
+		int inferior = 0;														//Límete inferior de búsqueda
+		int superior = this.ultima;												//Límite superior de búsqueda
+		int aux = superior/2;													//Punto medio de búsqueda.
+		Date dAux;
+		boolean encontrado = false;
+		if(d != null) {
+			while(!encontrado) {
+				String f = (String) historico.getValueAt(aux, 0);				//Obtención de la fecha almacenada en la posición 0 de la línea.
+				dAux = stringToDate(f);
+				int resultado = dAux.compareTo(d);
+				if(resultado < 0) {												//Si Aux es anterior a la fecha búscada
+					inferior = linea = aux;										//Ajuste de margenes inferiores de la búsqueda.
+					aux += (superior -aux)/2;									//Nuevo punto de búsqueda.
+					if(aux == inferior) {encontrado = true;}					//Caso de no encontrado pero se tiene la mayor aproximación inferior. 
+				}else if(resultado > 0) {										//Caso de ser posterior.
+					superior = aux;												//Auste margen superior.
+					aux = superior/2;
+				}else if (resultado == 0){										//Caso fecha búscada.
+					encontrado = true;
+					linea = aux;
+				}
+			}		
+		}
+		return linea;
+	}
 	
+	/**
+	 * <p>Title: stringToDate</p>  
+	 * <p>Description: Convierte una cadena de texto que contiene una fecha
+	 * en un objeto Date</p> 
+	 * @param fecha Grupo fecha/hora en formato: "dd/MM/yyyy hh:mm"
+	 * @return Date con los valores leidos almacenados.
+	 */
+	@SuppressWarnings("finally")
 	private Date stringToDate(String fecha){
-		 String[] fechahora = fecha.split(" ");									//Separación de la fecha de la hora.
-		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");			//Formato de la fecha.
-
+		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
 		 Date date = null;
-		 try { date = formato.parse(fechahora[0]);								//Conversión tipo de datos.
-		 } 
+		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
 		 catch (ParseException ex) { ex.printStackTrace(); }
 		 finally {return date;} 
 	}
 
-	
+	/**
+	 * <p>Title: getID</p>  
+	 * <p>Description: Devuelve el valor entero almacenado como texto.</p> 
+	 * @param s Cadena de texto que representa al número entero.
+	 * @return valor del número entero. -1 en otro caso.
+	 */
 	private int getID(String s) {
 		int id = -1;
 		if(s != null) id = Integer.parseInt(s.split(" ")[0]);	
 		return id;
 	}
 	
+	/**
+	 * <p>Title: getValor</p>  
+	 * <p>Description: Convierte una cadena de texto, la cual contiene un valor
+	 * númerico en un entero. </p>
+	 * El número representado debe usar como separador decimales la coma ','. 
+	 * @param v Valor a convertir de formato texto a int.
+	 * @return el valor de la conversión. 0 en otro caso.
+	 */
 	private int getValor(String v) {
 		int nivel = 0;
 		Double vd = Double.parseDouble(v.replace(",", "."));					//Cambio de símbolo decimal y conversion a Double.
@@ -256,21 +323,48 @@ public class Player extends JPanel implements ActionListener{
 	public JPanel getFrame() {return this;}
 	
 	private class BtnPlay extends MouseAdapter {
-		private boolean activo;
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(!activo) {														//Estado pausado --> reproducir
-				btnPlayPause.setText("Pausar");
-				activo = true;
-				timer.start();
-			}else if(activo && btnPlayPause.getText().equals("Repetir")){		//Estado reproduciendo y en final.	--> repetir.
-				contador = 0;
-				btnPlayPause.setText("Pausar");
-				timer.restart();
-			}else {																//Estado reproduciendo. --> parar
-				btnPlayPause.setText("Reproducir");
-				activo = false;
-				timer.stop();
+			String estado = btnPlayPause.getText();
+			switch(estado){
+				case ("Reproducir"):											//Estado pausado, muestra 'Reproducir'
+					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.
+					timer.start();
+					break;
+				case ("Repetir"):												//Estado parado en final muestra y etiqueta 'Repetir'.
+					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.				
+					contador = 0;
+					timer.restart();
+					break;
+				default:														//Estado pausado/parado, muestra 'Reproducir'
+					btnPlayPause.setText("Reproducir");							//Estado siguiente: Parado.
+					timer.stop();						
+			}
+			
+			activo = !activo;
+			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
+			
+		}
+	}
+	
+	private class DateChooserListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+			int linea = contador;
+			if(!activo && arg0.getPropertyName().equals("date") ) {
+				Date f = dateChooser.getDate();									//Obtención del valor establecido.				
+				linea = getLineaDate(f);
+				
+				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
+				Date d = stringToDate(s);
+				
+				System.out.println("Fecha búscada  : " + f.getDay() + "/" + f.getMonth() + "/" + f.getYear());		
+				System.out.println("Fecha propuesta: " + d.getDay() + "/" + d.getMonth() + "/" + d.getYear());
+				System.out.println("Línea calculada: " + linea);
+	
+				progressBar.setValue(linea);									//Actualización del la barra de progreso.
+				contador = linea;												//Actualizar contador
+				if(d.compareTo(f) < 0) {dateChooser.setDate(d);	}				//Caso tener la fecha, actualiza con la más cercana inferior..	
 			}
 		}
 	}

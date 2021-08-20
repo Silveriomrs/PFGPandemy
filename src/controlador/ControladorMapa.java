@@ -81,10 +81,12 @@ public class ControladorMapa {
 	 *  @also setPaleta.
 	 */
 	public void play() {
-		if(mapa.getNumZones() > 0) {
-			player.setPlay(mapa,leyenda,new DCVS(historico));
-			player.setVisible(true);
-		}else {System.out.println("No hay cargadas zonas en la representación");}
+		if(historico != null && historico.getRowCount()>0) {
+			if(mapa.getNumZones() > 0) {
+				player.setPlay(mapa,leyenda,new DCVS(historico));
+				player.setVisible(true);
+			}else {System.out.println("No hay cargadas zonas en la representación");}
+		}else {System.out.println("No hay cargado un historico");}
 	}
 	
 	/**
@@ -95,13 +97,6 @@ public class ControladorMapa {
 	 */
 	public void setHistorico(DefaultTableModel historico) {	this.historico = historico;	}
 	
-	
-	/**
-	 * Establece el nivel de contagio de una zona.
-	 * @param id Nombre de la zona.
-	 * @param n nivel de color para asignación.
-	 */
-	public void setNivel(int id, int n) {mapa.setZonaNivel(id, n);}
 	
 	/**
 	 * Establece una nueva paleta de colores representativos de los grados de

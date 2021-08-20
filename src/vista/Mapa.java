@@ -5,6 +5,7 @@ package vista;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -112,15 +113,16 @@ public class Mapa extends JPanel{
 	 * @return Nivel asignado a una zona, null si dicha zona no existe.
 	 */
 	public int getZonaNivel(int id) {return zonas.get(id).getNivel();}
-
+	
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
+	 * @param d Fecha asociada al nivel almacenado.
 	 * @param n Nivel de asignación.
 	 */
-	public void setZonaNivel(int id, int n) {
+	public void addZonaNivel(int id, Date d, int n) {
 		if(zonas.containsKey(id)) {												//Comprobación de que existe.
-			zonas.get(id).setNivel(n);
+			zonas.get(id).addNivel(d, n);
 		}
 	}
 
