@@ -38,40 +38,37 @@ public class Mapa extends JPanel{
 	
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
-	 * @param height ancho del mapa.
-	 * @param width altura del mapa.
+	 * @param width ancho del mapa.
+	 * @param height altura del mapa.
 	 * @param leyenda Leyenda con los colores y sus valores.
 	 */
 	public Mapa(int width, int height, Leyenda leyenda) {
 		super();
 		this.leyenda = leyenda;
 		zonas = new HashMap<Integer, Zona>();
-		
+		frame = new JFrame();
 		setBorder(new LineBorder(new Color(0, 0, 0)));	
 		setBackground(Color.LIGHT_GRAY);
 		setOpaque(false);
-	
+		setLayout(new CardLayout(0, 0));
 	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");
-		configuracion();	
 		
-	}
+	}	
 	
 	/**
-	 * <p>Title: configuracion</p>  
+	 * <p>Title: verFrame</p>  
 	 * <p>Description: Aunar códigos de las propiedades del frame.</p>
+	 * @param w Ancho del marco.
+	 * @param h Alto del marco.
 	 */
-	private void configuracion(){
-		frame = new JFrame();
+	public void verFrame(int w, int h){	
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-		frame.getContentPane().add(this);
-		setLayout(new CardLayout(0, 0));
+		frame.getContentPane().add(this);	
 		frame.setTitle("Mapa");
-		frame.setSize(825,590);
+		frame.setSize(w,h);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setVisible(true);
 	}
-	
-	@Override
-	public void setVisible(boolean ver) {frame.setVisible(ver);}
 	
 	@Override
 	public void paintComponent(Graphics g) {
@@ -82,6 +79,13 @@ public class Mapa extends JPanel{
 		});
 		this.updateUI();														//Redibujado y actualización del panel.
 	}
+	
+	/**
+	 * <p>Title: getPanel</p>  
+	 * <p>Description: Obtiene el JPanel contenedor del mapa </p> 
+	 * @return Mapa embebido dentro de un JPanel.
+	 */
+	public JPanel getPanel() {return this;}
 	
 	
 	/**

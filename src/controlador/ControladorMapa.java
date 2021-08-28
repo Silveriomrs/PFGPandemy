@@ -6,10 +6,13 @@ package controlador;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 import modelo.DCVS;
+import modelo.IO;
 import modelo.ParserPoly;
 import modelo.ParserSVG;
 import modelo.Zona;
@@ -39,10 +42,12 @@ public class ControladorMapa {
 	
 	/**
 	 * Constructor de la clase.
+	 * @param w Ancho del mapa.
+	 * @param h Alto del mapa.
 	 */
-	public ControladorMapa() {
+	public ControladorMapa(int w, int h) {
 		leyenda = new Leyenda(100, 205, false);
-		mapa = new Mapa(850,600, leyenda);
+		mapa = new Mapa(w,h, leyenda);
 		player = new Player(400, 400, true);
 		new ParserSVG();
 		parserPoly = new ParserPoly();
@@ -97,17 +102,6 @@ public class ControladorMapa {
 	 */
 	public void setHistorico(DefaultTableModel historico) {	this.historico = historico;	}
 	
-	
-	/**
-	 * Establece una nueva paleta de colores representativos de los grados de
-	 * contagio. Hasta 10 niveles desde 0 a 9.
-	 * @param paleta Colores representativos en formato sRGB(r,g,b).
-	 */
-	public void setPaleta(ArrayList<Color> paleta) {
-		if(paleta != null && paleta.size()==10) {
-			leyenda.setPaleta(paleta);
-		}
-	}
 			
 	/**
 	 * Realiza la conversión de datos de texto a un poligono cerrado. En el array
@@ -119,10 +113,94 @@ public class ControladorMapa {
 	 * las siguientes posiciones representan cada uno de los puntos que conforman
 	 * el poligono.
 	 */
-	private void parser(String[] puntos) {	
+	private void parser(String[] puntos) {
 		String nombre = puntos[1];
 		int id = Integer.parseInt(puntos[0]);
 		mapa.addZona(new Zona(id,nombre,parserPoly.parser(puntos)));
+	}
+
+	/**
+	 * <p>Title: crearPaleta</p>  
+	 * <p>Description: </p> 
+	 * @param modelo Modelo con los datos de la nueva paleta.
+	 */
+	public void setPaleta(DefaultTableModel modelo) {
+		int filas = modelo.getRowCount();
+		ArrayList<Color> colores = new ArrayList<Color>();
+		//Leer colores.
+		for(int i = 0; i<filas; i++) {
+			//Lectura de valores.
+			int r = Integer.parseInt((String) modelo.getValueAt(i, 0));
+			int g = Integer.parseInt((String) modelo.getValueAt(i, 1));
+			int b = Integer.parseInt((String) modelo.getValueAt(i, 2));
+			Color c = new Color(r,g,b);
+			//establecimiento de la paleta	
+			colores.add(c);
+			//leyenda.setColor(i, c);
+		}
+		//leyenda.setPaleta(leyenda.getPaleta());
+		leyenda.setPaleta(colores);
+	}
+	
+	/**
+	 * <p>Title: getMapa</p>  
+	 * <p>Description: Obtención de panel contendor del mapa</p> 
+	 * @return Panel contenedor del mapa.
+	 */
+	public JPanel getMapa() {return mapa.getPanel();}
+
+
+	/**
+	 * <p>Title: setModulos</p>  
+	 * <p>Description: </p> 
+	 * @param mapaModulos
+	 */
+	public void setModulos(HashMap<String, DCVS> mapaModulos) {
+		// TODO Auto-generated method stub
+		mapaModulos.forEach((tipo,modulo) -> {
+			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
+				switch(tipo) {
+				case(IO.HST):
+					setHistorico( modulo.getModelo());
+					break;
+				case(IO.PAL):
+					setPaleta(modulo.getModelo());
+					break;
+				case(IO.MAP):
+					setPoligonos(modulo.getModelo());
+					break;
+				}
+				
+			}
+		});
+	}
+	
+	/**
+	 * Establece una nueva palera de colores a partir de los componentes RGB.
+	 *  Debe contener al menos 10 elementos.
+	 * @param dcvs Nueva paleta de colores encapsulada en tipo de datos DCVS..
+	 */
+	private void setPaletaRGB(DCVS dcvs) {
+		ArrayList<Color> paleta = new ArrayList<Color>();
+		Color c = null;
+		int r,g,b;
+		r = g = b = 0;
+		int nc = dcvs.getRowCount();
+		
+		if(nc == 10) {
+			for(int i = 0; i<10; i++) {
+				for(String linea : dcvs.getFila(i)) {
+					String[] rgb = linea.split(",");
+					r = Integer.parseInt(rgb[0]);
+					g = Integer.parseInt(rgb[1]);
+					b = Integer.parseInt(rgb[2]);
+					c = new Color(r,g,b);
+					paleta.add(c);
+				}
+			}	
+		}
+		
+		leyenda.setPaleta(paleta);
 	}
 	
 }

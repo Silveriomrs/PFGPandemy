@@ -4,7 +4,6 @@
 package vista;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.GridLayout;
 import java.awt.Panel;
@@ -12,12 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -31,10 +27,19 @@ import controlador.ControladorDatosIO;
 import controlador.ControladorMapa;
 import modelo.DCVS;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+
 import java.awt.Font;
 import modelo.FondoPanel;
+import modelo.IO;
+import java.awt.BorderLayout;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
 /**
  * Clase de la vista principal donde se modelan las tablas
@@ -52,25 +57,31 @@ public class Principal extends JFrame {
 	private ControladorDatosIO cio;
 	private JScrollPane scrollPane;
 	private JTable tabla;
+	private Archivos archivos;
+	private About about;
 
 	private DefaultTableModel modelo;
 	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
 	private final Panel panel = new Panel();
-	private JLayeredPane layeredPane;
 	private JLabel lblAsignarTablaA;
 	private JComboBox<String> comboBox;
 	private JButton btnAplicarTabla;
-	private JLayeredPane boxAsignacion;
 	private ControladorMapa cMap;
+	private JLayeredPane layeredPane;
+	private JLayeredPane boxAsignacion;
+	private final int panelCentralW = 665;
+	private final int panelCentralH = 456;
 
 	/**
 	 * Crea la aplicación.
 	 */
 	public Principal() {
-		cio = new ControladorDatosIO();
-		cMap = new ControladorMapa();
-		panel.setLayout(new GridLayout(1, 0, 0, 0));	
 		setResizable(false);
+		cio = new ControladorDatosIO();
+		cMap = new ControladorMapa(panelCentralW,panelCentralH);
+		panel.setLayout(new GridLayout(1, 0, 0, 0));
+		about = new About();
+		archivos = new Archivos(cio);
 		setTitle("Simulador de Pandemias");	
 		getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);
@@ -114,7 +125,7 @@ public class Principal extends JFrame {
 							.addGap(22)
 							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
 							.addGap(33)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE))
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, panelCentralW, Short.MAX_VALUE))
 						.addGroup(gl_fondo.createSequentialGroup()
 							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addGap(76)
@@ -127,7 +138,7 @@ public class Principal extends JFrame {
 					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_fondo.createSequentialGroup()
 							.addGap(24)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE))
+							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, panelCentralH, Short.MAX_VALUE))
 						.addGroup(gl_fondo.createSequentialGroup()
 							.addGap(37)
 							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)))
@@ -138,8 +149,18 @@ public class Principal extends JFrame {
 					.addGap(23))
 		);
 		
+		addBotonLayerPane(btnAddRow, "Crear Fila",new BtnAddRowMouseListener(),null,10);
+		addBotonLayerPane(btnAddCol, "Crear Columna",new BtnAddColMouseListener(),null,35);
+		addBotonLayerPane(btnBorrarFila, "Del fila/s",new BtnBorrarFilaMouseListener(),Color.ORANGE,70);
+		addBotonLayerPane(btnBorrarColumna, "Del columna/s",new BtnBorrarColumnaMouseListener(),Color.ORANGE,95);
+		addBotonLayerPane(btnGuardarArchivo, "Guardar tabla",new BtnGuardarArchivoMouseListener(),null,130);
+		addBotonLayerPane(btnAbrirArchivo, "Cargar tabla",new BtnAbrirArchivoMouseListener(),null,155);
+		addBotonLayerPane(btnBorrarTabla, "Borrar tabla",new BtnBorrarTablaMouseListener(),Color.ORANGE,198);
+		addBotonLayerPane(btnImprimir, "Imprimir",new BtnImprimirMouseListener(),null,236);
+		
 		comboBox = new JComboBox<String>();
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Cálculo", "Reproducción resultados", "Historico"}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Ver Tabla", 
+				"Ver Mapa", "Ver Archivos","Abrir Reproductor"}));
 		
 		btnAplicarTabla = new JButton("Aplicar tabla");
 		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
@@ -149,6 +170,7 @@ public class Principal extends JFrame {
 		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
 		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		lblAsignarTablaA.setBackground(Color.WHITE);
+		
 		GroupLayout gl_boxAsignacion = new GroupLayout(boxAsignacion);
 		gl_boxAsignacion.setHorizontalGroup(
 			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
@@ -175,66 +197,12 @@ public class Principal extends JFrame {
 						.addComponent(btnAplicarTabla))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
+		
 		boxAsignacion.setLayout(gl_boxAsignacion);
 		
-		btnAddRow = new JButton("Crear fila");
-		btnAddRow.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAddRow.setBounds(0, 10, 140, 25);
-		btnAddRow.addMouseListener(new BtnAddRowMouseListener());
-		
-		btnBorrarFila = new JButton("Del fila/s");
-		btnBorrarFila.setHorizontalAlignment(SwingConstants.LEFT);
-		btnBorrarFila.setBounds(0, 70, 140, 25);
-		btnBorrarFila.addMouseListener(new BtnBorrarFilaMouseListener());
-		btnBorrarFila.setBackground(Color.ORANGE);
-		layeredPane.setLayout(null);
-		layeredPane.add(btnAddRow);
-		btnAddCol = new JButton("Crear columna");
-		btnAddCol.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAddCol.setBounds(0, 35, 140, 25);
-		btnAddCol.addMouseListener(new BtnAddColMouseListener());
-
-		layeredPane.add(btnAddCol);
-		layeredPane.add(btnBorrarFila);
-		
-		btnImprimir = new JButton("Imprimir");
-		btnImprimir.setBounds(0, 236, 140, 25);
-		btnImprimir.setVerticalAlignment(SwingConstants.BOTTOM);
-		btnImprimir.setHorizontalAlignment(SwingConstants.LEFT);
-		btnImprimir.addMouseListener(new BtnImprimirMouseListener());
-		
-		btnBorrarColumna = new JButton("Del columna/s");
-		btnBorrarColumna.setHorizontalTextPosition(SwingConstants.LEFT);
-		btnBorrarColumna.setHorizontalAlignment(SwingConstants.LEFT);
-		btnBorrarColumna.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnBorrarColumna.setBounds(0, 95, 140, 25);
-		btnBorrarColumna.addMouseListener(new BtnBorrarColumnaMouseListener());
-		btnBorrarColumna.setBackground(Color.ORANGE);
-		layeredPane.add(btnBorrarColumna);
-		
-		btnGuardarArchivo = new JButton("Guardar tabla");
-		btnGuardarArchivo.setHorizontalAlignment(SwingConstants.LEFT);
-		btnGuardarArchivo.setBounds(0, 130, 140, 25);
-		layeredPane.add(btnGuardarArchivo);
-		btnGuardarArchivo.addMouseListener(new BtnGuardarArchivoMouseListener());
-		btnAbrirArchivo = new JButton("Cargar tabla");
-		btnAbrirArchivo.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAbrirArchivo.setBounds(0, 155, 140, 25);
-		layeredPane.add(btnAbrirArchivo);
-		btnAbrirArchivo.addMouseListener(new BtnAbrirArchivoMouseListener());
-
-		
-		btnBorrarTabla = new JButton("Borrar tabla");
-		btnBorrarTabla.addMouseListener(new BtnBorrarTablaMouseListener());
-		btnBorrarTabla.setBackground(Color.ORANGE);
-		btnBorrarTabla.setHorizontalAlignment(SwingConstants.LEFT);
-		btnBorrarTabla.setBounds(0, 198, 140, 25);
-
-		layeredPane.add(btnBorrarTabla);
-		layeredPane.add(btnImprimir);
 		gl_fondo.setAutoCreateContainerGaps(true);
 		gl_fondo.setAutoCreateGaps(true);
-		
+		//Creación tabla principal.
 		tabla = new JTable();
 		tabla.setAutoCreateRowSorter(true);
 		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -244,24 +212,56 @@ public class Principal extends JFrame {
 		tabla.setRowSelectionAllowed(true);
 		tabla.setColumnSelectionAllowed(false);
 		tabla.setBackground(new Color(224, 255, 255));
-		//Cuerpo de datos
-		Object[][] datos = new Object[][]{};	
-		//Cabecera de datos.		
-		String[] cabecera = new String[] {};
-		modelo = new DefaultTableModel(datos,cabecera){
-			private static final long serialVersionUID = 5615251971828569240L;
-	//		@SuppressWarnings("rawtypes")
-	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
-		};
-		
-		tabla.setModel(new DefaultTableModel(datos,cabecera));
 		tabla.getTableHeader().setReorderingAllowed(false);
-	//	tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
-	//	tabla.getColumnModel().getColumn(3).setMinWidth(105);
+		//Genera el cuerpo de datos y establace.
+		nuevaTabla();
 		scrollPane.setViewportView(tabla);
-		fondo.setLayout(gl_fondo);
 		
+		//Barra de menus.
+		JMenuBar menuBar = new JMenuBar();
+		this.add(menuBar, BorderLayout.NORTH);
+		
+//		fondo.add(scrollPane, BorderLayout.EAST);
+//		fondo.add(layeredPane, BorderLayout.WEST);
+//		fondo.add(lblAsignarTablaA,BorderLayout.SOUTH);
+//		fondo.add(btnAbout,BorderLayout.SOUTH);
+
+		JMenu mnArchivo = new JMenu("Archivo");
+		JMenu mnVer = new JMenu("Ver");
+
+		JMenuItem mntmAbrirProyecto = new JMenuItem("Abrir Proyecto");
+		JMenuItem mntmGuardarProj = new JMenuItem("Guardar Proyecto");
+		JMenuItem mntmtest = new JMenuItem("test");
+
+		mnArchivo.add(mntmGuardarProj);
+		mnArchivo.add(mntmAbrirProyecto);
+		mnVer.add(mntmtest);
+		menuBar.add(mnArchivo);
+		menuBar.add(mnVer);
+		
+		fondo.setLayout(gl_fondo);
+	
+	}
+	
+	/**
+	 * <p>Title: addBotonLayerPane</p>  
+	 * <p>Description: Añade los controles al LayerPane que los contendrá</p>
+	 * Los añade con el formato correcto y una separación costante, además,
+	 * permite que los botones puedan tener colores personalizados.
+	 * @param btn Botón a ser añadido.
+	 * @param nombre Texto del botón.
+	 * @param ml El observador o listener adjunto al botón.
+	 * @param c Color para el botón, null en otro caso.
+	 * @param yPos Posición vertical dentro del LayerPane
+	 */
+	private void addBotonLayerPane(JButton btn, String nombre, MouseAdapter ml, Color c, int yPos) {
+		btn = new JButton(nombre);
+		btn.addMouseListener(ml);
+		if(c != null) btn.setBackground(c);
+		btn.setHorizontalAlignment(SwingConstants.LEFT);
+		int yPos2  = layeredPane.getComponentCount()*30;
+		btn.setBounds(0, yPos2, 140, 25);
+		layeredPane.add(btn);
 	}
 	
 	/**
@@ -273,7 +273,12 @@ public class Principal extends JFrame {
 		Object[][] datos = new Object[][]{};	
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {};
-		modelo = new DefaultTableModel(datos,cabecera){	private static final long serialVersionUID = 5615251971828569240L;};
+		modelo = new DefaultTableModel(datos,cabecera){
+			private static final long serialVersionUID = 5615251971828569240L;
+	//		@SuppressWarnings("rawtypes")
+	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
+	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
+		};
 		tabla.setModel(modelo);
 	}
 	
@@ -341,7 +346,7 @@ public class Principal extends JFrame {
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DefaultTableModel m = cio.abrirArchivo();			
+			DefaultTableModel m = cio.abrirArchivo(null,IO.CSV).getModelo();			
 			if(m != null) {
 				modelo = m;
 				tabla.setModel(modelo);
@@ -353,14 +358,16 @@ public class Principal extends JFrame {
 	private class BtnAboutMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			new About();
+			about.setVisible();
 		}
 	}
 	
 	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(cio.guardarArchivo(tabla.getModel())) {
+			DCVS bd = new DCVS( (DefaultTableModel)tabla.getModel());
+			bd.setTipo(IO.CSV);
+			if(!cio.guardarArchivo(bd).equals(null)) {
 				mostrar("Archivo guardado", 1);
 			}
 		}
@@ -404,15 +411,30 @@ public class Principal extends JFrame {
 				case "Mapas": 
 					cMap.setPoligonos(modelo);
 					mostrar("Mapa cargado en el módulo", 1);
-					nuevaTabla();
+					nuevaTabla();				
 					break;
 				case "Historico": 
 					cMap.setHistorico(modelo);
+					nuevaTabla();
+					break;
+				case "Leyenda":
+					cMap.setPaleta(modelo);
+					mostrar("Nueva paleta asignada", 1);
+					nuevaTabla();
+				case "Abrir Reproductor":
+					//Pasar mapa de módulos al controlar de mapa.
+					cMap.setModulos(archivos.getMapaModulos());
 					cMap.play();
 					break;
-					
-			}
-			
+				case "Ver Mapa":
+					scrollPane.setViewportView(cMap.getMapa());
+					break;
+				case "Ver Tabla":
+					scrollPane.setViewportView(tabla);
+					break;
+				case "Ver Archivos":
+					scrollPane.setViewportView(archivos.getPanel());
+			}	
 		}
 	}
 	
@@ -425,6 +447,5 @@ public class Principal extends JFrame {
 			if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
 		}
 	}
-
 }
 

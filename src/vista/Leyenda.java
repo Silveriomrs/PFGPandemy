@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -34,6 +35,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * Paleta de colores con equivalencia a los diferentes niveles de contagio.
 	 */
 	private ArrayList<Color> paleta;
+	private HashMap<String,JButton> mapaBotones;
 	private static final long serialVersionUID = 3521309276542156368L;
 
 	/**
@@ -46,7 +48,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	 */
 	public Leyenda(int width, int height, boolean editable) {
 		super();
-		paleta = new ArrayList<Color>();
+		mapaBotones = new HashMap<String, JButton>();
 		setBorder(new LineBorder(new Color(0, 0, 0)));
 		setBackground(Color.LIGHT_GRAY);
 		TitledBorder tb = BorderFactory.createTitledBorder("Leyenda");
@@ -64,7 +66,7 @@ public class Leyenda extends JPanel implements ActionListener{
 		frame.setSize(width,height);											//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
-		frame.setAlwaysOnTop(true);
+		frame.setAlwaysOnTop(false);
         repaint();
 	}
 	
@@ -110,13 +112,15 @@ public class Leyenda extends JPanel implements ActionListener{
 		int y = y0;
 		for(int i=0; i<10; i++) {
 			JButton button = new JButton("");
+			String name = String.valueOf(i);
 			button.setBounds(x, y, h, w);
 			button.setBackground(paleta.get(i));
-			button.setName(""+i);
+			button.setName(name);
 			button.setEnabled(editable);
 			button.setEnabled(true);
 			button.addActionListener(this);
-			this.add(button);
+			mapaBotones.put(name, button);
+			this.add(mapaBotones.get(name));
 			y += separacion;
 		}
 	}
@@ -131,7 +135,8 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * Establece la paleta por defecto de 10 colores correspondiente a cada nivel
 	 * desde el 0 al 9 ambos inclusive.
 	 */
-	private void paletaBase() {
+	public void paletaBase() {
+		paleta = new ArrayList<Color>();
 		paleta.add(new Color( 82, 190, 128 ));									//Color Nivel 0.
 		paleta.add(new Color( 40, 180, 99 ));									//Color Nivel 1.
 		paleta.add(new Color( 174, 214, 241 ));									//Color Nivel 2.
@@ -142,6 +147,7 @@ public class Leyenda extends JPanel implements ActionListener{
 		paleta.add(new Color( 118, 68, 138 ));									//Color Nivel 7.
 		paleta.add(new Color( 230, 126, 34 ));									//Color Nivel 8.
 		paleta.add(new Color( 231, 76, 60 ));									//Color Nivel 9.
+		repaint();
 	}
 	
 	/**
@@ -170,7 +176,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * @param i Indice del color a sustituir [0,9].
 	 * @param c Color a establecer.
 	 */
-	public void setColor(int i, Color c) {paleta.set(i,c);}
+	private void setColor(int i, Color c) {paleta.set(i,c);}
 	
 	/**
 	 * Devuelve la paleta de colores actual, dentro de un ArrayList<Color>.
@@ -183,7 +189,16 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * 10 elementos.
 	 * @param paleta Nueva paleta de colores.
 	 */
-	public void setPaleta(ArrayList<Color> paleta) {this.paleta = paleta;}
+	public void setPaleta(ArrayList<Color> paleta) {
+		this.paleta = paleta;
+		//Repintar los botones.
+		for(int i=0; i<10; i++) {
+			String name = String.valueOf(i);
+			if(mapaBotones.containsKey(name)) {
+				mapaBotones.get(name).setBackground(paleta.get(i));
+			}
+		}	
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -198,7 +213,7 @@ public class Leyenda extends JPanel implements ActionListener{
 			boton.setBackground(color);
 			this.setVisible(true);
 			//Añadir nuevo color a la paleta en sustitución del anterior.
-			paleta.set(pos, color);
+			setColor(pos, color);
 		}
 	}
 	
@@ -213,5 +228,5 @@ public class Leyenda extends JPanel implements ActionListener{
 		}
 		return txt;
 	}
-	
+
 }

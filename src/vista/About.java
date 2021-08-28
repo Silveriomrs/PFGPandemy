@@ -74,8 +74,7 @@ public class About extends JPanel {
 	
 		frame.setTitle("Acerca de...");
 		frame.setSize(459,579);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	}
 	
 	/**
@@ -112,5 +111,15 @@ public class About extends JPanel {
 	private class BotonListener extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {frame.dispose();}
+	}
+	
+	/**
+	 * <p>Title: setVisible</p>  
+	 * <p>Description: Cambia la propiedad de visibilidad del frame</p>
+	 * Esta función actua como un interruptor de visibilidad, cambiando de visible
+	 * a oculto cada vez que se le llama. 
+	 */
+	public void setVisible() {
+		frame.setVisible(!frame.isVisible());									//Creamos una función toggle de visibilidad.
 	}
 }

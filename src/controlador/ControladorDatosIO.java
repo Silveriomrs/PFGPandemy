@@ -5,9 +5,6 @@
  */
 package controlador;
 
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
 import modelo.DCVS;
 import modelo.IO;
 
@@ -20,8 +17,6 @@ import modelo.IO;
 public class ControladorDatosIO {
 	/** io Instancia de entrada y salida de datos hacia un dispositivo de almacenamiento*/  
 	private IO io;
-	/** bd Instancia de almacen de datos.*/  
-	private DCVS bd;
 
 	/**
 	 * Constructor principal de la clase.
@@ -29,28 +24,27 @@ public class ControladorDatosIO {
 	public ControladorDatosIO() {
 		super();
 		this.io = new IO();
-		this.bd = null;
 	}
 	
 	/**
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
+	 * @param ruta Ruta y nombre completo del archivo.
+	 * @param ext Extensión del archivo.
 	 * @return DefaultTableModel modelo con los datos del archivo abierto.
 	 */
-	public DefaultTableModel abrirArchivo() {
-		DefaultTableModel modelo = null;
-		modelo =  (new DCVS(null)).crearModelo(io.abrirArchivo("csv"));
-		return modelo;
-		
+	public DCVS abrirArchivo(String ruta, String ext) {
+		DCVS dcvs =  io.abrirArchivo(ruta,ext);	
+		return dcvs;
 	}
 	
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
-	 * @param tableModel para ser almacenados.
-	 * @return True si la operación ha tenido éxito, FALSE en otro caso.
+	 * @param modulo Modulo a guardar en el disco.
+	 * @return La ruta al archivo guardado. Null en otro caso.
 	 */
-	public boolean guardarArchivo(TableModel tableModel) {
-		bd = new DCVS((DefaultTableModel) tableModel);
-		return io.grabarArchivo(bd.toString(),"csv");
+	public String guardarArchivo(DCVS modulo) {
+		return io.grabarArchivo(modulo.toString(),modulo.getRuta(),modulo.getTipo());
 	}
+	
 
 }

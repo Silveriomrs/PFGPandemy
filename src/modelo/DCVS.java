@@ -19,6 +19,8 @@ import javax.swing.table.TableModel;
  */
 public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
+	private String ruta;
+	private String tipo;
 	private Object[] cabecera;
 	private Object datos[][];
 
@@ -28,7 +30,22 @@ public class DCVS implements TableModel{
 	 * establece este como modelo.
 	 * @param modelo Objeto DefaultTableModel a establecer o null.
 	 */
-	public DCVS(DefaultTableModel modelo) {this.modelo = modelo;}
+	public DCVS(DefaultTableModel modelo) {
+		this.modelo = modelo;
+		ruta = null;
+		tipo = "";
+	}
+	
+	/**
+	 * <p>Title: Constructor básico</p>  
+	 * <p>Description: crea un nuevo modelo sin filas ni columnas</p>
+	 * Su ruta es null y su tipo de datos vacio.  
+	 */
+	public DCVS() {
+		ruta = null;
+		tipo = "";
+		nuevoModelo();
+	}
 
 	/**
 	 * Devuelve la fila referenciada.
@@ -77,7 +94,10 @@ public class DCVS implements TableModel{
 	 * Añade una nueva cabecera completa.
 	 * @param c array de objetos que van a sustituir a la cabecera actual.
 	 */
-	public void addCabecera(Object[] c) {this.cabecera = c;}
+	public void addCabecera(Object[] c) {
+		this.cabecera = c;
+		modelo.setColumnIdentifiers(c);
+	}
 	
 	/**
 	 * Función que elimina las filas indicadas en un arreglo de números indice.
@@ -189,6 +209,34 @@ public class DCVS implements TableModel{
 	
 	
 	/**
+	 * <p>Title: crearModelo</p>  
+	 * <p>Description: Crea un modelo con los datos almacenados en la instancia</p> 
+	 * @return Modelo conformado.
+	 */
+	public DefaultTableModel crearModelo() {
+		this.modelo = new DefaultTableModel(datos,cabecera);				//Conformar modelo
+		return modelo;
+	}
+	
+	/**
+	 * <p>Title: nuevoModelo</p>  
+	 * <p>Description: Crea una nueva tabla/modelo vacia.</p> 
+	 */
+	public void nuevoModelo() {
+		//Cuerpo de datos
+		Object[][] datos = new Object[][]{};	
+		//Cabecera de datos.		
+		String[] cabecera = new String[] {};
+		this.modelo = new DefaultTableModel(datos,cabecera){
+			/** serialVersionUID*/  
+			private static final long serialVersionUID = -2383558100131841835L;
+		};
+		
+	}
+	
+	
+	
+	/**
 	 * Convierte los datos almenceados en el modelo al formato CVS, de esta
 	 * forma estará lista para almacenar en un archivo en disco o imprimir.
 	 */
@@ -243,5 +291,25 @@ public class DCVS implements TableModel{
 
 	@Override
 	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
+
+	/**
+	 * @return El/la ruta
+	 */
+	public String getRuta() {return ruta;}
+
+	/**
+	 * @param ruta El/la ruta a establecer
+	 */
+	public void setRuta(String ruta) {this.ruta = ruta;	}
+
+	/**
+	 * @return El/la tipo
+	 */
+	public String getTipo() {return tipo;}
+
+	/**
+	 * @param tipo El/la tipo a establecer
+	 */
+	public void setTipo(String tipo) {	this.tipo = tipo;}
 	
 }

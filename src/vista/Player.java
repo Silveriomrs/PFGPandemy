@@ -364,6 +364,7 @@ public class Player extends JPanel implements ActionListener{
 	
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador
+				play(contador);
 				if(d.compareTo(f) < 0) {dateChooser.setDate(d);	}				//Caso tener la fecha, actualiza con la más cercana inferior..	
 			}
 		}
