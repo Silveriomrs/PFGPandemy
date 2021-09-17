@@ -52,7 +52,7 @@ public class Mapa extends JPanel{
 		setOpaque(false);
 		setLayout(new CardLayout(0, 0));
 	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");
-		
+	//	verFrame(width,height);
 	}	
 	
 	/**
@@ -73,9 +73,13 @@ public class Mapa extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		//frame.setContentPane(fondo.getFodo());
+
 		zonas.forEach((n,z) -> {
 			g.setColor(leyenda.getColor(z.getNivel()));
 			g.fillPolygon(z.getZona());
+			g.setColor(Color.BLACK);
+			g.drawPolygon(z.getZona());
 		});
 		this.updateUI();														//Redibujado y actualización del panel.
 	}
@@ -94,7 +98,7 @@ public class Mapa extends JPanel{
 	 */
 	public void setFondo(String nombre) {
 		fondo = new FondoPanel(nombre);
-		frame.setContentPane(fondo);
+		frame.setContentPane(fondo.getFodo());
 	}
 
 	/**
@@ -106,10 +110,10 @@ public class Mapa extends JPanel{
 
 	/**
 	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
-	 * nombre, no añadirá la última.
+	 * nombre, sobreescribirá la anterior.
 	 * @param z Zona que representa el poligono.
 	 */
-	public void addZona(Zona z) {zonas.putIfAbsent(z.getID(), z);}
+	public void addZona(Zona z) {zonas.put(z.getID(), z);}
 
 	/**
 	 * Devuelve el grado de contagio de una zona o null si esta no existe.

@@ -8,5 +8,6 @@
 module pfgPandemy {
 	requires java.desktop;
 	requires com.opencsv;
+	requires org.jfree.jfreechart;
 	requires jcalendar;
 }

@@ -13,7 +13,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorDatosIO;
 import modelo.DCVS;
-import modelo.FondoPanel;
 import modelo.IO;
 
 import java.awt.Color;
@@ -64,7 +63,7 @@ public class Archivos extends JPanel {
 	private JFrame frame;
 	private JPanel panel;
 	private ControladorDatosIO cIO;
-	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/histograma2.png");
+//	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/histograma2.png");
 	private HashMap<String,JButton> mapaBotonesAbrir;
 	private HashMap<String,JButton> mapaBotonesGuardar;
 	private HashMap<String,JTextField> mapaFields;
@@ -321,8 +320,7 @@ public class Archivos extends JPanel {
 		mapaFields.put(IO.PAL, textFieldLeyenda);
 		mapaFields.put(IO.HST, textFieldHistorico);
 	}
-	
-	
+		
 	
 	/**
 	 * <p>Title: abrirProyecto</p>  
@@ -375,11 +373,14 @@ public class Archivos extends JPanel {
 		mapaBotonesGuardar.get(IO.PRJ).setEnabled(false);
 		//Guardado del fichero:
 		String ruta = cIO.guardarArchivo(dcvs);
-		//Configuración de la ruta
-		dcvs.setRuta(ruta);
-		//Mostrar ruta en Field.
-		mapaFields.get(IO.PRJ).setText(ruta);
-		mapaModulos.put(IO.PRJ, dcvs);
+		if(ruta != null) {
+			//Configuración de la ruta
+			dcvs.setRuta(ruta);
+			//Mostrar ruta en Field.
+			mapaFields.get(IO.PRJ).setText(ruta);
+			mapaModulos.put(IO.PRJ, dcvs);
+		}
+
 	}
 	
 	/**

@@ -68,11 +68,11 @@ public class ControladorMapa {
 	}
 	
 	/**
-	 * <p>Title: verMapa</p>  
+	 * <p>Title: setVisibleMapa</p>  
 	 * <p>Description: Activa o desactiva la visualización del mapa</p> 
 	 * @param ver True para activarla, false en otro caso.
 	 */
-	public void verMapa(boolean ver) {mapa.setVisible(ver);}
+	public void setVisibleMapa(boolean ver) {mapa.setVisible(ver);}
 	
 	/**
 	 * <p>Title: play</p>  
@@ -81,17 +81,22 @@ public class ControladorMapa {
 	 * La representación gráfica corresponde a las zonas creadas. Para poder
 	 * usarse esta función deben haber sido almacezandos previamente los datos
 	 * de los poligonos y los de la leyenda.
-	 * 
+	 * @return Retorna True si se complen las condiciones para su apertura y reproducción,
+	 * false en otro caso. 
 	 *  @also setPoligonos.
 	 *  @also setPaleta.
 	 */
-	public void play() {
+	public boolean play() {
+		boolean OK = false;
 		if(historico != null && historico.getRowCount()>0) {
 			if(mapa.getNumZones() > 0) {
 				player.setPlay(mapa,leyenda,new DCVS(historico));
 				player.setVisible(true);
+				OK = true;
 			}else {System.out.println("No hay cargadas zonas en la representación");}
 		}else {System.out.println("No hay cargado un historico");}
+		
+		return OK;
 	}
 	
 	/**
@@ -152,11 +157,10 @@ public class ControladorMapa {
 
 	/**
 	 * <p>Title: setModulos</p>  
-	 * <p>Description: </p> 
-	 * @param mapaModulos
+	 * <p>Description: Establece los módulos que conforman un proyecto.</p> 
+	 * @param mapaModulos HasMap con los módulos del proyecto.
 	 */
 	public void setModulos(HashMap<String, DCVS> mapaModulos) {
-		// TODO Auto-generated method stub
 		mapaModulos.forEach((tipo,modulo) -> {
 			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
 				switch(tipo) {
@@ -168,39 +172,12 @@ public class ControladorMapa {
 					break;
 				case(IO.MAP):
 					setPoligonos(modulo.getModelo());
+				
 					break;
 				}
 				
 			}
 		});
-	}
-	
-	/**
-	 * Establece una nueva palera de colores a partir de los componentes RGB.
-	 *  Debe contener al menos 10 elementos.
-	 * @param dcvs Nueva paleta de colores encapsulada en tipo de datos DCVS..
-	 */
-	private void setPaletaRGB(DCVS dcvs) {
-		ArrayList<Color> paleta = new ArrayList<Color>();
-		Color c = null;
-		int r,g,b;
-		r = g = b = 0;
-		int nc = dcvs.getRowCount();
-		
-		if(nc == 10) {
-			for(int i = 0; i<10; i++) {
-				for(String linea : dcvs.getFila(i)) {
-					String[] rgb = linea.split(",");
-					r = Integer.parseInt(rgb[0]);
-					g = Integer.parseInt(rgb[1]);
-					b = Integer.parseInt(rgb[2]);
-					c = new Color(r,g,b);
-					paleta.add(c);
-				}
-			}	
-		}
-		
-		leyenda.setPaleta(paleta);
 	}
 	
 }

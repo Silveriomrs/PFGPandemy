@@ -40,4 +40,8 @@ public class FondoPanel extends JPanel{
 			super.paint(g);
 		}
 	}
+	
+	public JPanel getFodo() {
+		return this;
+	}
 }

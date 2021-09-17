@@ -346,9 +346,9 @@ public class Principal extends JFrame {
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DefaultTableModel m = cio.abrirArchivo(null,IO.CSV).getModelo();			
-			if(m != null) {
-				modelo = m;
+			 DCVS dcvs = cio.abrirArchivo(null,IO.CSV);			
+			if(dcvs != null) {
+				DefaultTableModel modelo = dcvs.getModelo();
 				tabla.setModel(modelo);
 				mostrar("Archivo Cargado", 1);
 			}
@@ -424,9 +424,10 @@ public class Principal extends JFrame {
 				case "Abrir Reproductor":
 					//Pasar mapa de módulos al controlar de mapa.
 					cMap.setModulos(archivos.getMapaModulos());
-					cMap.play();
+					if(cMap.play()) scrollPane.setViewportView(cMap.getMapa());
 					break;
 				case "Ver Mapa":
+					cMap.setModulos(archivos.getMapaModulos());
 					scrollPane.setViewportView(cMap.getMapa());
 					break;
 				case "Ver Tabla":

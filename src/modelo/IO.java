@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -35,8 +36,8 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
-    /** filtro Instancia del filtro*/  
-    private FileNameExtensionFilter filtro;
+	
+	private HashMap<String,String> tipos;
     
     /** Archivos generales formato CSV*/  
     public final static String CSV = "csv";
@@ -54,7 +55,19 @@ public class IO{
     /**
      * Constructor de la clase IO
      */
-    public IO(){ }
+    public IO(){
+    	configurar();
+    }
+    
+    private void configurar() {
+    	tipos = new HashMap<String,String>();
+    	tipos.put(PAL,"Paleta de colores");
+    	tipos.put(CSV, "Archivo general");
+    	tipos.put(HST, "Archivo historico");
+    	tipos.put(MAP, "Archivo de mapa");
+    	tipos.put(PRJ, "Archivo de proyecto");
+    	tipos.put(REL, "Archivo de relaciones");
+    }
     
 
 	/**
@@ -69,9 +82,7 @@ public class IO{
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
 		DCVS dcvs = null;
-		File f = null;
-		if(ruta == null) f = selFile(1,ext);									// Obtención del archivo.
-		else f= new File(ruta);
+		File f = getFile(1,ruta,ext);
 		
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
@@ -87,7 +98,6 @@ public class IO{
 			catch (IOException e) {e.printStackTrace();}
 			catch (CsvException e) {e.printStackTrace();}
 		}
-
 		return dcvs;
 	}
 	    
@@ -100,19 +110,25 @@ public class IO{
 	 * @return TRUE en caso de operación realizada, false en otro caso.
 	 */
 	public String grabarArchivo(String bd, String ruta, String ext) {
-		File fichero = null;
-		if(ruta == null || ruta == "") {
-			fichero = selFile(2,ext);
-			ruta = fichero.getPath();
-		}else fichero = new File(ruta);
+		File f = getFile(2,ruta,ext);
 		
-		if(fichero != null){
-		    try(FileWriter fw=new FileWriter(fichero)){	        
+		if(f != null){
+		    try(FileWriter fw=new FileWriter(f)){	 
+		    	ruta = f.getPath();
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
 		    } catch (IOException e1) {e1.printStackTrace();}
 		}
 		return ruta;
+	}
+	
+	
+	private File getFile(int sel, String path,String ext) {
+		File f = null;
+		String ruta = path;
+		if(ruta == null || ruta == "") {ruta = selFile(1,ext);	}				// Obtención del archivo.	
+		if(ruta != null) f= new File(ruta);
+		return f;
 	}
 	
 	
@@ -123,11 +139,11 @@ public class IO{
 	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
 	 * desea que muestre dialogo de selección.
 	 * @param ext extensión del archivo a modo de filtro.
-	 * @return File del archivo seleccionado, null en otro caso.
+	 * @return Ruta del archivo seleccionado, null en otro caso.
 	 */
-	private File selFile(int sel, String ext) {
-		File f = null;
-		filtro = new FileNameExtensionFilter(ext.toLowerCase(),ext.toUpperCase());
+	public String selFile(int sel, String ext) {
+		String ruta  = null;
+		FileNameExtensionFilter filtro = new FileNameExtensionFilter(tipos.get(ext),ext);
 		JFileChooser sf=new JFileChooser(".");									//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
 		sf.setFileFilter(filtro);												//Establecimiento del filtro
@@ -137,17 +153,14 @@ public class IO{
 		else seleccion=sf.showSaveDialog(null);		
 		//Elección del archivo.
 	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
-	        f = sf.getSelectedFile();											//Obtenemos el archivo.
-	        //Comprobación de elección de archivo correcta.
-			String nombre = f.getName();
-			String extension = nombre.substring(nombre.length() -3).toLowerCase();
-			if(!ext.equals(extension)) {
-				f = null;
+	        File f = sf.getSelectedFile();											//Obtenemos el archivo.
+			ruta = f.getPath();													//Obtención de la ruta del archivo.
+			String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
+			if(!ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
 				System.out.println("Tipo de fichero incorrecto");
 			}
 	    }
-
-		return f;
+		return ruta;
 	}
 	
 	

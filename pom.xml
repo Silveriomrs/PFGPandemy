@@ -4,11 +4,30 @@
   <artifactId>PFGPandemy</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <description>Proyecto Final de Grado</description>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
   <dependencies>
+	<dependency>
+	    <groupId>com.toedter</groupId>
+	    <artifactId>jcalendar</artifactId>
+	    <version>1.4</version>
+	</dependency>
 	<dependency>
 	  <groupId>com.opencsv</groupId>
 	  <artifactId>opencsv</artifactId>
 	  <version>5.5.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.jfree</groupId>
+	    <artifactId>jfreechart</artifactId>
+	    <version>1.5.3</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.jfree</groupId>
+	    <artifactId>jcommon</artifactId>
+	    <version>1.0.23</version>
 	</dependency>
   </dependencies>
   <build>
