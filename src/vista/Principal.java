@@ -104,6 +104,7 @@ public class Principal extends JFrame {
 		btnAbout.setIcon(new ImageIcon(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setOpaque(false);
 		scrollPane.setAutoscrolls(true);
 		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
 		scrollPane.setName("scrollTabla");
@@ -204,6 +205,7 @@ public class Principal extends JFrame {
 		gl_fondo.setAutoCreateGaps(true);
 		//Creación tabla principal.
 		tabla = new JTable();
+		tabla.setOpaque(false);
 		tabla.setAutoCreateRowSorter(true);
 		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
@@ -219,7 +221,7 @@ public class Principal extends JFrame {
 		
 		//Barra de menus.
 		JMenuBar menuBar = new JMenuBar();
-		this.add(menuBar, BorderLayout.NORTH);
+		getContentPane().add(menuBar, BorderLayout.NORTH);
 		
 //		fondo.add(scrollPane, BorderLayout.EAST);
 //		fondo.add(layeredPane, BorderLayout.WEST);

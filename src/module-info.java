@@ -10,4 +10,5 @@ module pfgPandemy {
 	requires com.opencsv;
 	requires org.jfree.jfreechart;
 	requires jcalendar;
+	requires AbsoluteLayout.RELEASE125;
 }

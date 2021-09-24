@@ -7,7 +7,7 @@ import java.awt.Polygon;
 import java.util.Date;
 import java.util.HashMap;
 
-import vista.Grafica;
+import vista.GraficasChart;
 
 /**
  * Clase inicial que almacena los datos significativos de una zona representada
@@ -27,8 +27,11 @@ public class Zona {
 	private Polygon zona;
 	/** nivel Nivel de contagio de una zona [0-9]*/  
 	private int nivel;
+	private final String sn = "Nivel";
+	private int contadorN;
 	/** historico de la zona */
 	private HashMap<Date,Integer> historico;
+	private GraficasChart chart;
 	
 	/**
 	 * Constructor de las instancias de zonas.
@@ -44,6 +47,11 @@ public class Zona {
 		this.name = name;
 		this.ID = ID;
 		this.zona = zona;
+		this.chart = new GraficasChart("Tiempo (días)",
+				"Nivel","Zona: " + name,
+				"Evolución pandemica." + " ID: " + ID);
+		this.contadorN = 0;														//Serie de niveles.
+		chart.nuevaSerie(sn);
 	}
 
 	/**
@@ -59,6 +67,7 @@ public class Zona {
 
 
 	/**
+	 * Devuelve el Poligono que representa la zona.
 	 * @return devuelve el poligono que representa la zona
 	 */
 	public Polygon getZona() {return zona;}
@@ -99,7 +108,9 @@ public class Zona {
 	 * @param n Nivel a añadir debe estar entre 0 y 9.
 	 */
 	public void addNivel(Date d, int n) {
-		if(d != null && !historico.containsKey(d)) {historico.put(d,n); }
+		if(d != null && !historico.containsKey(d)) { historico.put(d,n); }
+		chart.addPunto(sn, contadorN, n);
+		contadorN++;
 		setNivel(n);
 	}
 
@@ -116,14 +127,19 @@ public class Zona {
 	 * @param d Fecha (Date) hasta la cual se debe representar el histograma.
 	 * @return El/la grafica
 	 */
-	public Grafica getGrafica(Date d) {
-		Grafica grafica = new Grafica(3);
-		//Lectura de cada valor
+	public GraficasChart getGrafica(Date d) {
+		//Obtener datos ordenados por fecha.
 		
-		//Añadir nuevo valor a la gráfica
+		//Ir añadiendo datos a la serie.
 		
-		//Obtención del poligono.
-		return grafica;
-		
+		//Retorno
+		return this.chart;
 	}
+
+	/**
+	 * <p>Title: setPoligono</p>  
+	 * <p>Description: Establece un Poligono como zona representativa gráfica</p> 
+	 * @param poligono Figura geometrica.
+	 */
+	public void setPoligono(Polygon poligono) {this.zona = poligono;}
 }

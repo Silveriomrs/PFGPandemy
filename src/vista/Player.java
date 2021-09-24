@@ -116,7 +116,6 @@ public class Player extends JPanel implements ActionListener{
 		configuracion();
         repaint();
 	}
-	
 
 	/**
 	 * <p>Title: configuracion</p>  
@@ -175,8 +174,7 @@ public class Player extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		//Obtención del botón pulsado
-		
+		//Obtención del botón pulsado	
 	}
 	
 	/**
@@ -206,6 +204,11 @@ public class Player extends JPanel implements ActionListener{
 		activo = !activo;														//Vuelta al estado desactivado del reproductor.
 	}
 	
+	/**
+	 * <p>Title: play</p>  
+	 * <p>Description: Reproduce los datos almacenados en una línea de datos</p> 
+	 * @param linea Número de línea a leer de la entrada de datos.
+	 */
 	private void play(int linea) {
 		String fila[] = historico.getFila(linea);								//Obtener fila.
 		int columnas = historico.getColumnCount();
@@ -230,7 +233,7 @@ public class Player extends JPanel implements ActionListener{
 		}
 		
 		progressBar.setValue(linea);											//Actualización del la barra de progreso.
-		System.out.println("Linea: " + linea + "/" + ultima);
+		//System.out.println("Linea: " + linea + "/" + ultima);
 		
 	}
 	
@@ -339,8 +342,7 @@ public class Player extends JPanel implements ActionListener{
 				default:														//Estado pausado/parado, muestra 'Reproducir'
 					btnPlayPause.setText("Reproducir");							//Estado siguiente: Parado.
 					timer.stop();						
-			}
-			
+			}		
 			activo = !activo;
 			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
 			

@@ -203,7 +203,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: addIcon</p>  
+	 * <p>Title: addIconL</p>  
 	 * <p>Description: Añade un icono a una etiqueta</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
@@ -212,14 +212,14 @@ public class Archivos extends JPanel {
 	 * @param w Ancho a escalar de la imagen original.
 	 * @param h Alto a escalar de la imagen original.
 	 */
-	private void addIcon(JLabel componente, String ruta, int w, int h) {
+	private void addIconL(JLabel componente, String ruta, int w, int h) {
 		componente.setIconTextGap(5);
 		componente.setIcon(getIcon(ruta,w,h));	
 	}
 	
 	
 	/**
-	 * <p>Title: addIcon</p>  
+	 * <p>Title: addIconB</p>  
 	 * <p>Description: Añade un icono a una botón</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
@@ -228,7 +228,7 @@ public class Archivos extends JPanel {
 	 * @param w Ancho a escalar de la imagen original.
 	 * @param h Alto a escalar de la imagen original.
 	 */
-	private void addIcon(JButton componente, String ruta, int w, int h) {
+	private void addIconB(JButton componente, String ruta, int w, int h) {
 		componente.setIconTextGap(0);
 		componente.setIcon(getIcon(ruta,w,h));	
 	}
@@ -248,7 +248,7 @@ public class Archivos extends JPanel {
 		int w = 105;
 		int posX = 12;
 		jl = new JLabel(nombre);
-		addIcon(jl,ruta,wi,hi);
+		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
 		panel.add(jl);
 	}
@@ -289,7 +289,7 @@ public class Archivos extends JPanel {
 		boton = new JButton(nombre);
 		boton.addMouseListener(new ArchivoML());
 		boton.setToolTipText(tt);
-		addIcon(boton,ruta,wi,hi);
+		addIconB(boton,ruta,wi,hi);
 		boton.setBounds(posX, posY, 27, hi);
 		boton.setEnabled(activado);
 		boton.setBorder(null);

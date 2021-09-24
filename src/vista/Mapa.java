@@ -5,8 +5,13 @@ package vista;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.border.LineBorder;
@@ -47,6 +52,7 @@ public class Mapa extends JPanel{
 		this.leyenda = leyenda;
 		zonas = new HashMap<Integer, Zona>();
 		frame = new JFrame();
+		this.addMouseListener(new SelectorPoligono());
 		setBorder(new LineBorder(new Color(0, 0, 0)));	
 		setBackground(Color.LIGHT_GRAY);
 		setOpaque(false);
@@ -89,8 +95,7 @@ public class Mapa extends JPanel{
 	 * <p>Description: Obtiene el JPanel contenedor del mapa </p> 
 	 * @return Mapa embebido dentro de un JPanel.
 	 */
-	public JPanel getPanel() {return this;}
-	
+	public JPanel getPanel() {return this;}	
 	
 	/**
 	 * Carga una imagen de fondo para el panel.
@@ -139,4 +144,25 @@ public class Mapa extends JPanel{
 	 * @return número de zonas que contiene el mapa.
 	 */
 	public int getNumZones() {return zonas.size();}
+	
+	class SelectorPoligono extends MouseAdapter	{
+	    @Override
+		public void mousePressed(MouseEvent e)  {
+	    	boolean encontrado = false;
+	    	//Obtención del punto del mapa que ha recibido la pulsación.
+	        Point p = e.getPoint();
+	        //Busqueda del poligono que contiene dicha coordenada.
+	        Iterator<Map.Entry<Integer, Zona>> it = zonas.entrySet().iterator();
+	        while (it.hasNext() && !encontrado) {
+	            Map.Entry<Integer, Zona> z = it.next();
+	            //Si se ha encontrado se genera su gráfica y se muestra.
+	            if(z.getValue().getZona().contains(p)) {
+	        		GraficasChart chart = z.getValue().getGrafica(null);
+	        		chart.genera();
+	        		chart.setVisible(true);
+	        		encontrado = true;											//Detenemos la búsqueda para ahorrar recursos.
+	            }
+	        }
+	    }
+	}
 }
