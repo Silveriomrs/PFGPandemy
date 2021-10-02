@@ -46,5 +46,18 @@ public class ControladorDatosIO {
 		return io.grabarArchivo(modulo.toString(),modulo.getRuta(),modulo.getTipo());
 	}
 	
+	/**
+	 * Selecciona un archivo del disco, o establece su nombre. Puede recibir un
+	 * por parámetro un filtro para aplicar a los ficheros de extensión válidos
+	 * para selección.
+	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
+	 * desea que muestre dialogo de selección.
+	 * @param ext extensión del archivo a modo de filtro.
+	 * @return Ruta del archivo seleccionado, null en otro caso.
+	 */
+	public String selFile(int sel, String ext) {
+		return io.selFile(sel, ext);
+	}
+	
 
 }

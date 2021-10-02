@@ -72,6 +72,12 @@ public class Zona {
 	 */
 	public Polygon getZona() {return zona;}
 
+	/**
+	 * <p>Title: setPoligono</p>  
+	 * <p>Description: Establece un Poligono como zona representativa gráfica</p> 
+	 * @param poligono Figura geometrica.
+	 */
+	public void setPoligono(Polygon poligono) {this.zona = poligono;}
 
 	/**
 	 * @return devuelve nivel desde 0 hasta 9.
@@ -136,10 +142,4 @@ public class Zona {
 		return this.chart;
 	}
 
-	/**
-	 * <p>Title: setPoligono</p>  
-	 * <p>Description: Establece un Poligono como zona representativa gráfica</p> 
-	 * @param poligono Figura geometrica.
-	 */
-	public void setPoligono(Polygon poligono) {this.zona = poligono;}
 }

@@ -114,12 +114,12 @@ public class About extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: setVisible</p>  
+	 * <p>Title: toggleVisible</p>  
 	 * <p>Description: Cambia la propiedad de visibilidad del frame</p>
 	 * Esta función actua como un interruptor de visibilidad, cambiando de visible
 	 * a oculto cada vez que se le llama. 
 	 */
-	public void setVisible() {
+	public void toggleVisible() {
 		frame.setVisible(!frame.isVisible());									//Creamos una función toggle de visibilidad.
 	}
 }

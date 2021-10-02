@@ -12,7 +12,6 @@ package modelo;
 
 
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -20,11 +19,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+
+import vista.Archivos;
 
 
 
@@ -51,7 +52,14 @@ public class IO{
     public final static String MAP = "map";
     /** Archivo definición Relaciones entre zonas */
     public final static String REL = "rel";
-    
+    /** Archivo de Imagenes PNG */
+    public final static String PNG = "png";
+    /** Archivo de Imagenes JPG */
+    public final static String JPG = "jpg";
+    /** Archivo de Imagenes GIF */
+    public final static String GIF= "gif";
+    /** Archivo de Imagenes PNG, JPG p GIF */
+    public final static String IMG = "imagen";
     /**
      * Constructor de la clase IO
      */
@@ -67,6 +75,10 @@ public class IO{
     	tipos.put(MAP, "Archivo de mapa");
     	tipos.put(PRJ, "Archivo de proyecto");
     	tipos.put(REL, "Archivo de relaciones");
+    	tipos.put(PNG, "Archivos de imagen PNG");
+    	tipos.put(JPG, "Archivos de imagen JPG");
+    	tipos.put(GIF, "Archivos de imagen GIF");
+    	tipos.put(IMG, "Archivos de imagen PNG. JPG o GIF");
     }
     
 
@@ -126,7 +138,7 @@ public class IO{
 	private File getFile(int sel, String path,String ext) {
 		File f = null;
 		String ruta = path;
-		if(ruta == null || ruta == "") {ruta = selFile(1,ext);	}				// Obtención del archivo.	
+		if(ruta == null || ruta == "") {ruta = selFile(sel,ext);	}			// Obtención del archivo.	
 		if(ruta != null) f= new File(ruta);
 		return f;
 	}
@@ -153,26 +165,46 @@ public class IO{
 		else seleccion=sf.showSaveDialog(null);		
 		//Elección del archivo.
 	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
-	        File f = sf.getSelectedFile();											//Obtenemos el archivo.
+	        File f = sf.getSelectedFile();										//Obtenemos el archivo.
 			ruta = f.getPath();													//Obtención de la ruta del archivo.
-			String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
-			if(!ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
-				System.out.println("Tipo de fichero incorrecto");
+			if(!checkExt(ruta,ext)) {											//Comprobación de elección de archivo correcta.
+				ruta = null;
 			}
 	    }
 		return ruta;
 	}
 	
+	/**
+	 * <p>Title: checkExt</p>  
+	 * <p>Descripción: Comprobación de la extensión sea de los tipos aceptados
+	 * y además para los tipos de archivos imagen, comprobar los tres formatos
+	 * admitidos.</p> 
+	 * @param ruta Nombre del archivo con su ruta completa.
+	 * @param ext Extensión con la que comparar.
+	 * @return True si las extensiones coinciden, False en otro caso.
+	 */
+	private boolean checkExt(String ruta, String ext) {
+		boolean ok = true;
+		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
+		// Comprobar que la extensión pueda ser JPG,PNG o GIF
+		if(ext.equals(IMG) && !(ext.equals(JPG) || ext.equals(PNG) || ext.equals(GIF))) {
+			System.out.println("Tipo de fichero incorrecto");
+			ok = false;
+		}else if(!ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
+			System.out.println("Tipo de fichero incorrecto");
+			ok = false;
+		}	
+		return ok;
+	}
 	
 	/**
 	 * Carga una imagen desde un dispositivo físico (disco duro, etc).
-	 * @param nombre ruta y nombre de la imagen.
+	 * @param ruta Ruta completa con el nombre de la imagen.
 	 * @return imagen leído desde el dispostivo. Null en otro caso
 	 */
-	public Image abrirImagen(String nombre) {
-		BufferedImage image = null;
-		try { image = ImageIO.read(new File(nombre)); }
-		catch (IOException ex) { ex.printStackTrace(); }
-		return image;
+	public Image abrirImagen(String ruta) {
+		//System.out.println(ruta);
+		Image img = new ImageIcon(Archivos.class.getResource(ruta)).getImage();
+		return img;
 	}
 }

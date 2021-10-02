@@ -6,14 +6,14 @@
 * @date 22 sept. 2021
 * @version 1.0
 */
-package Pruebas;
+package vista;
 
 /**
  * <p>Title: Pizarra</p>
  * <p>Description: </p>
  * @author Silverio Manuel Rosales Santana
  * @date 22 sept. 2021
- * @version versión 1.0
+ * @version versión 2.0
  */
 
 import java.awt.Canvas;
@@ -21,28 +21,31 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+
+import controlador.ControladorMapa;
+
 import java.awt.event.MouseAdapter;
-import javax.swing.JLabel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import javax.swing.SwingConstants;
-
 import modelo.IO;
 import modelo.Zona;
-import vista.Archivos;
 
 /**
  * <p>Title: Pizarra</p>
@@ -61,24 +64,24 @@ public class Pizarra extends JPanel {
 	private Polygon poligono;
 	private ArrayList<Point> listaPuntos;
 	private JPanel panelCanvas;
-	private JLabel lblFondo;
 	private JComboBox<String> comboBoxAsignar;
 	private JComboBox<String> comboBoxAsignados;
-	private HashMap<String,Zona> zonas;
-
-
+	private HashMap<Integer,Zona> zonas;
+	private ControladorMapa cMap;
+	
 	/**
 	 * <p>Title: Pizarra de dibujo</p>
 	 * <p>Description: Pizarra donde poder crear los poligonos que representarán
 	 * a cada zona</p>
-	 * @param zonas Conjunto zonas pertenecientes al mapa al que crear y asignar
-	 * los poligonos representativos.
+	 * @param cMap Módulo controlador del mapa.
 	 */
-	public Pizarra(HashMap<String,Zona> zonas) {
+	public Pizarra(ControladorMapa cMap) {
 		setOpaque(false);
 		this.dimX = 700;
 		this.dimY = 600;
-		this.zonas = zonas;
+		this.cMap = cMap;
+		if(cMap.getZonas() != null) {this.zonas = cMap.getZonas();}
+		else this.zonas = new HashMap<Integer,Zona>();
 		this.listaPuntos = new ArrayList<Point>();
 		setPreferredSize(new Dimension(700, 600));
 	    setBackground(Color.white);
@@ -86,20 +89,48 @@ public class Pizarra extends JPanel {
 	    configura();
 	}
 	
+	public void setZonas(HashMap<Integer,Zona> zonas) {
+		this.zonas = zonas;
+    	zonasToCombo();
+        reinicioBotones();
+	}
+	
+	public HashMap<Integer,Zona> getZonas() {return this.zonas;}
+	
+	public void abrirFrame() {
+	    JFrame frame = new JFrame("Diseño de figuras");
+	    Dimension m = getPreferredSize();
+	    int x = (int)m.getWidth();
+	    int y = (int)m.getHeight()+15;
+	    frame.setPreferredSize(new Dimension(x, y));
+	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    frame.getContentPane().add(this);
+		frame.pack();
+        frame.setVisible(true);
+	}
+	
 	private void dibujaPoligono(Polygon poligono) {
-		Graphics g = c.getGraphics();
-		g.setColor(Color.BLUE);
-		g.drawPolygon(poligono);
+		if(poligono != null) {
+			Graphics g = c.getGraphics();
+			if(g == null) {
+				System.out.println("G es nulo");
+				iniciarPizarra();
+				g = c.getGraphics();
+			}
+			g.setColor(Color.BLUE);
+			g.drawPolygon(poligono);
+		}else {System.out.println("Poligono nulo");}
 	}
 	
 	private void dibujarZonas() {
 		//Lectura de las zonas y dibujado si procede.
-	//	c.repaint();
 		zonas.forEach((k,z)->{
 			if(z.getZona() != null) {
+				System.out.println("Zona ID: " + z.getID());
 				dibujaPoligono(z.getZona());		
 			}
 		});
+		//this.updateUI();
 	}	
 
 	private void configura() {      
@@ -116,10 +147,6 @@ public class Pizarra extends JPanel {
 	    panelCanvas.add(c);
 	    add(panelCanvas, BorderLayout.CENTER);
 	    
-	    lblFondo = new JLabel("New label");
-	    lblFondo.setHorizontalAlignment(SwingConstants.CENTER);
-	    lblFondo.setBounds(74, 69, 441, 358);
-	    panelCanvas.add(lblFondo);
 	    //Añadir Observadores.
 	    bLimpiar.addActionListener(new LimpiarListener());
 	    bCerrarPoligono.addActionListener(new CierreListener());
@@ -169,8 +196,10 @@ public class Pizarra extends JPanel {
 	 * @return Icono escalado de la imagen.
 	 */
 	private ImageIcon getIcon(String ruta, int w, int h) {
-		Image img= new ImageIcon(Archivos.class.getResource(ruta)).getImage();
-		ImageIcon icon=new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
+		ImageIcon icon = null;
+		IO io = new IO();
+		Image img = io.abrirImagen(ruta);
+		icon = new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
 		return icon;
 	}
 
@@ -203,7 +232,6 @@ public class Pizarra extends JPanel {
 	    c.setName("pizarra");
 	    c.setBackground(Color.yellow);
 	    c.addMouseListener(new SelectPointListener());
-	    //c.addMouseMotionListener( new SelectPointListener() );
 	}
 	
 	private void iniciarBotones() {
@@ -228,16 +256,23 @@ public class Pizarra extends JPanel {
 	
 	private String getMaxItem() {
 		int maxLargo = 0;
-		String item = "";
+		String item = "Zona: XX";												//Longitud mínima a comparar
 		//Selección de la clave más larga.
-		for (String clave:zonas.keySet()) {
-			int l = clave.length();
+		for (Zona zona:zonas.values()) {
+			int l = zona.getName().length();
 			if(maxLargo < l) {
 				maxLargo = l;
-				item = clave;
+				item = zona.getName();
 			}
 		}
 		return item;
+	}
+	
+	private void zonasToCombo() {
+		zonas.forEach((k,v)->{
+			if(v.getZona() == null) {comboBoxAsignar.addItem(v.getName());}
+			else { comboBoxAsignados.addItem(v.getName());}
+		});
 	}
 	
 	private void iniciarCombos() {		
@@ -257,10 +292,7 @@ public class Pizarra extends JPanel {
 		comboBoxAsignar.setPrototypeDisplayValue(itemMax);
 		comboBoxAsignar.setPrototypeDisplayValue(itemMax);
 		//Lectura de las zonas y asignación a cada comboBox.
-		zonas.forEach((k,v)->{
-			if(v.getZona() == null) {comboBoxAsignar.addItem(k);}
-			else { comboBoxAsignados.addItem(k);}
-		});
+		zonasToCombo();
 	}
 	
 	private void reinicioBotones() {  
@@ -289,7 +321,7 @@ public class Pizarra extends JPanel {
 	
 	/* Zona clases internas */
 	
-    class CierreListener implements ActionListener{
+    private class CierreListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
             poligono = generaPoligono();
@@ -309,7 +341,7 @@ public class Pizarra extends JPanel {
         }
     }
 
-    class AsignarBoxListener implements ActionListener{
+    private class AsignarBoxListener implements ActionListener{
 	
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -323,17 +355,27 @@ public class Pizarra extends JPanel {
 		}
 		
 		private void cambiarBox(String item, int index, JComboBox<String> combo1, JComboBox<String> combo2, Polygon p) {
+			boolean encontrado = false;											//Bandera para salir del bucle al encontrar lo buscado.
 			combo1.setSelectedIndex(0);
-			if(index != 0 && zonas.containsKey(item)) {
-				combo1.removeItemAt(index);										// Borrado del item excepto si es el primero (0)			
-				combo2.addItem(item);											// Añadir Item al otro comboBox
-				zonas.get(item).setPoligono(p);				  					// Asignar Poligono a la zona correspondiente al item.
-				poligono = null;
-			}	
+			//Búsqueda de la zona con el nombre igual al item del checkBox.
+			Iterator<Entry<Integer, Zona>> iterator = zonas.entrySet().iterator();
+			while (!encontrado && iterator.hasNext()) {
+			    Entry<Integer, Zona> entry = iterator.next();
+			    String nombre = entry.getValue().getName();						// Obtención del nombre de la zona.
+			    Integer ID = entry.getKey();
+			    if(item.equals(nombre)) {
+					combo1.removeItemAt(index);									// Borrado del item excepto si es el primero (0)			
+					combo2.addItem(item);										// Añadir Item al otro comboBox
+					zonas.get(ID).setPoligono(p);			  					// Asignar Poligono a la zona correspondiente al item.
+					cMap.setZonas(zonas);
+					poligono = null;											// Iniciado del poligono a null.
+					encontrado = true;											
+			    }
+			}
 		}
     }
 
-    class LimpiarListener implements ActionListener{
+    private class LimpiarListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
             Graphics g = c.getGraphics();
@@ -355,7 +397,7 @@ public class Pizarra extends JPanel {
      * @date 23 sept. 2021
      * @version versión
      */
-    class SelectPointListener extends MouseAdapter{
+    private class SelectPointListener extends MouseAdapter{
     	private Point a;														// Punto inicial y final de una recta a dibujar.
     	private int contador = 0;
     	private Graphics g;
@@ -414,41 +456,38 @@ public class Pizarra extends JPanel {
     	}
     }
 
-    class AbrirListener extends MouseAdapter {
+    private class AbrirListener extends MouseAdapter {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		IO io = new IO();
     		String ruta = io.selFile(1, "png");
-    		System.out.println("Ruta imagen: " + ruta);
-    		if(ruta != null || ruta != "") {
-    			lblFondo.setIcon(getIcon(ruta,dimX - 20,dimY- 20));
+    		if(ruta != null && ruta != "") {
     		}    
     	}
     }
 
     
-    /* MAIN */
+    /* Función única para pruebas */
     
-    @SuppressWarnings({ "javadoc" })
-	public static void main(String[] args) {
+	/**
+	 * <p>Title: testModulo</p>  
+	 * <p>Description: Funcion cuyo proposito es realizar pruebas de funcionamiento
+	 * propio del módulo.</p> 
+	 * @param zonas HashMap con las zonas como posible parámetro, null para 
+	 * zonas creadas internas por esta propia función. 
+	 */
+	public void testModulo(HashMap<Integer, Zona> zonas) {
     	//Creación de mapa y zona de prueba.
-    	HashMap<String, Zona> mapaTest = new HashMap<String,Zona>();
+		HashMap<Integer, Zona> zonas2;
+		zonas2 = (zonas == null)? new HashMap<Integer, Zona>() : zonas;
     	Zona z1,z2,z3;
     	z1 = new Zona(1, "Zona 1", null);
     	z2 = new Zona(2, "Zona 2", null);
     	z3 = new Zona(3, "Zona 3", null);
-    	mapaTest.put(z1.getName(), z1);
-    	mapaTest.put(z2.getName(), z2);
-    	mapaTest.put(z3.getName(), z3);
-    	Pizarra p1 = new Pizarra(mapaTest);
-	    JFrame frame = new JFrame("Diseño de figuras");
-	    Dimension m = p1.getPreferredSize();
-	    int x = (int)m.getWidth();
-	    int y = (int)m.getHeight()+15;
-	    frame.setPreferredSize(new Dimension(x, y));
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    frame.getContentPane().add(p1.getPanel());
-		frame.pack();
-        frame.setVisible(true);
+    	zonas2.put(z1.getID(), z1);
+    	zonas2.put(z2.getID(), z2);
+    	zonas2.put(z3.getID(), z3);
+    	setZonas(zonas2);
+    	abrirFrame();
     }
 }

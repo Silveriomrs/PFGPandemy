@@ -38,7 +38,7 @@ public class Mapa extends JPanel{
 	private FondoPanel fondo;
 	/** zonas Conjunto con las zonas que contiene el mapa.*/  
 	private HashMap<Integer,Zona> zonas;
-	/** leyenda Leyenda del mapa.*/  
+	/** leyenda Leyenda del mapa.*/
 	private Leyenda leyenda;
 	
 	/**
@@ -82,10 +82,12 @@ public class Mapa extends JPanel{
 		//frame.setContentPane(fondo.getFodo());
 
 		zonas.forEach((n,z) -> {
-			g.setColor(leyenda.getColor(z.getNivel()));
-			g.fillPolygon(z.getZona());
-			g.setColor(Color.BLACK);
-			g.drawPolygon(z.getZona());
+				if(z.getZona() != null) {
+				g.setColor(leyenda.getColor(z.getNivel()));
+				g.fillPolygon(z.getZona());
+				g.setColor(Color.BLACK);
+				g.drawPolygon(z.getZona());
+			}
 		});
 		this.updateUI();														//Redibujado y actualización del panel.
 	}
@@ -103,7 +105,7 @@ public class Mapa extends JPanel{
 	 */
 	public void setFondo(String nombre) {
 		fondo = new FondoPanel(nombre);
-		frame.setContentPane(fondo.getFodo());
+		frame.setContentPane(fondo.getFondo());
 	}
 
 	/**
@@ -118,7 +120,7 @@ public class Mapa extends JPanel{
 	 * nombre, sobreescribirá la anterior.
 	 * @param z Zona que representa el poligono.
 	 */
-	public void addZona(Zona z) {zonas.put(z.getID(), z);}
+	public void addZona(Zona z) {if(z != null) zonas.put(z.getID(), z);}
 
 	/**
 	 * Devuelve el grado de contagio de una zona o null si esta no existe.
@@ -145,7 +147,22 @@ public class Mapa extends JPanel{
 	 */
 	public int getNumZones() {return zonas.size();}
 	
-	class SelectorPoligono extends MouseAdapter	{
+	/**
+	 * <p>Title: getZonas</p>  
+	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya 
+	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p> 
+	 * @return El conjunto de zonas.
+	 */
+	public HashMap<Integer,Zona> getZonas(){return this.zonas;}
+	
+	/**
+	 * <p>Title: setZonas</p>  
+	 * <p>Description: Establece el conjunto de zonas</p> 
+	 * @param zonas2 Mapa cuya clave es la ID de cada zona y valor la zona.
+	 */
+	public void setZonas(HashMap<Integer, Zona> zonas2) { this.zonas = zonas2;}
+	
+	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
 		public void mousePressed(MouseEvent e)  {
 	    	boolean encontrado = false;

@@ -52,7 +52,6 @@ public class ControladorMapa {
 		new ParserSVG();
 		parserPoly = new ParserPoly();
 	}
-	
 
 	/**
 	 * <p>Title: setPoligonos</p>  
@@ -63,8 +62,11 @@ public class ControladorMapa {
 	public void setPoligonos(DefaultTableModel modelo) {
 		datos = new DCVS(modelo);
 		int filas = datos.getRowCount();										//Número de poligonos a procesar.	
-		//Llamar función parser.
-		for(int i = 0; i<filas;i++) {parser(datos.getFila(i));}
+		
+		for(int i = 0; i<filas;i++) {
+			Zona z= parser(datos.getFila(i));									//Llamar función parser.
+			mapa.addZona(z);													//Añadido al resto de zonas del mapa.
+		}
 	}
 	
 	/**
@@ -117,16 +119,18 @@ public class ControladorMapa {
 	 * decir, la posición 0 reservada al ID, la posición 1 reservada al nombre,
 	 * las siguientes posiciones representan cada uno de los puntos que conforman
 	 * el poligono.
+	 * @return Devuelve la zona creada para dicho poligono.
 	 */
-	private void parser(String[] puntos) {
+	private Zona parser(String[] puntos) {
 		String nombre = puntos[1];
 		int id = Integer.parseInt(puntos[0]);
-		mapa.addZona(new Zona(id,nombre,parserPoly.parser(puntos)));
+		return new Zona(id,nombre,parserPoly.parser(puntos));
 	}
 
 	/**
 	 * <p>Title: crearPaleta</p>  
-	 * <p>Description: </p> 
+	 * <p>Description: Lee los datos pasados por un TableModel y los almacena en
+	 * la lista de colores en formato Color.</p> 
 	 * @param modelo Modelo con los datos de la nueva paleta.
 	 */
 	public void setPaleta(DefaultTableModel modelo) {
@@ -148,13 +152,43 @@ public class ControladorMapa {
 	}
 	
 	/**
-	 * <p>Title: getMapa</p>  
+	 * <p>Title: getPaleta</p>  
+	 * <p>Description: Devuelve la paleta de colores que este configurada 
+	 * en el entorno actualmente</p> 
+	 * @return Paleta de colores.
+	 */
+	public Leyenda getPaleta() {return leyenda;}
+	
+	/**
+	 * <p>Title: getJMapa</p>  
 	 * <p>Description: Obtención de panel contendor del mapa</p> 
 	 * @return Panel contenedor del mapa.
 	 */
-	public JPanel getMapa() {return mapa.getPanel();}
+	public JPanel getJMapa() {return mapa.getPanel();}
+	
+	/**
+	 * <p>Title: getMapa</p>  
+	 * <p>Description: Devuelve una instacia de la clase Mapa con la configuración
+	 * con la que está almacenada</p> 
+	 * @return Mapa 
+	 */
+	public Mapa getMapa() {return mapa;}
+	
+	/**
+	 * <p>Title: getZonas</p>  
+	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya 
+	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p> 
+	 * @return El conjunto de zonas.
+	 */
+	public HashMap<Integer,Zona> getZonas() {return mapa.getZonas();}
 
-
+	/**
+	 * <p>Title: setZonas</p>  
+	 * <p>Description: Establece el conjunto de zonas</p> 
+	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
+	 */
+	public void setZonas(HashMap<Integer,Zona> zonas) {mapa.setZonas(zonas);}
+	
 	/**
 	 * <p>Title: setModulos</p>  
 	 * <p>Description: Establece los módulos que conforman un proyecto.</p> 
@@ -172,10 +206,8 @@ public class ControladorMapa {
 					break;
 				case(IO.MAP):
 					setPoligonos(modulo.getModelo());
-				
 					break;
 				}
-				
 			}
 		});
 	}

@@ -12,7 +12,7 @@ import vista.Principal;
  * @version 1.0
  *
  */
-public class Main {
+public class PFGMain {
 
 	
 	/**

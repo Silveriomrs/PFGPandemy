@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorDatosIO;
+import controlador.ControladorMapa;
 import modelo.DCVS;
 import modelo.IO;
 
@@ -63,6 +64,7 @@ public class Archivos extends JPanel {
 	private JFrame frame;
 	private JPanel panel;
 	private ControladorDatosIO cIO;
+	private ControladorMapa cMap;
 //	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/histograma2.png");
 	private HashMap<String,JButton> mapaBotonesAbrir;
 	private HashMap<String,JButton> mapaBotonesGuardar;
@@ -73,15 +75,34 @@ public class Archivos extends JPanel {
 	/**
 	 * Create the panel.
 	 * @param cIO Controlador de Entrada y salidas de datos.
+	 * @param cMap Controlador datos de mapeados.
 	 */
-	public Archivos(ControladorDatosIO cIO) {
+	public Archivos(ControladorDatosIO cIO, ControladorMapa cMap) {
 		this.cIO = cIO;
+		this.cMap = cMap;
 		mapaBotonesAbrir = new HashMap<String,JButton>();
 		mapaBotonesGuardar = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
 		mapaModulos = new HashMap<String,DCVS>();
+		panel = new JPanel();
 		
 		hi = wi =  20;
+		configuraFrame();	
+		configuracion();
+		
+		/* Configuración flotante */
+		JToolBar toolBar = new JToolBar();
+		toolBar.add(this);
+		frame.getContentPane().add(toolBar, BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null);
+		frame.getContentPane().add(this);
+        
+        /* Configuración del fondo. */
+	//	frame.setContentPane(fondo);
+		frame.setVisible(false);
+	}
+	
+	private void configuraFrame() {
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Archivos.class.getResource("/vista/imagenes/Iconos/archivo_64px.png")));
@@ -93,20 +114,6 @@ public class Archivos extends JPanel {
 		frame.setTitle("Módulos cargados.");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
 		frame.pack();
-		panel = new JPanel();
-
-		configuracion();
-		/* Configuración flotante */
-		JToolBar toolBar = new JToolBar();
-		toolBar.add(this);
-		frame.getContentPane().add(toolBar, BorderLayout.CENTER);
-        frame.setLocationRelativeTo(null);
-	//	JMenuItem item = new JMenuItem();	
-	//	frame.getContentPane().add(this);
-        
-        /* Configuración del fondo. */
-	//	frame.setContentPane(fondo);
-		frame.setVisible(false);
 	}
 	
 	/**
@@ -148,8 +155,7 @@ public class Archivos extends JPanel {
 		setMaximumSize(new Dimension(665, 456));
 		setBorder(new EtchedBorder(EtchedBorder.RAISED, Color.BLACK, Color.GRAY));
 		setAutoscrolls(true);
-		setLayout(new BorderLayout(0, 0));
-		
+		setLayout(new BorderLayout(0, 0));	
 		
 		panel.setToolTipText("Selección archivos asignados a los módulos.");
 		add(panel, BorderLayout.CENTER);
@@ -186,6 +192,104 @@ public class Archivos extends JPanel {
 		labelLogo.setBounds(12, 12, 70, 75);
 		panel.add(labelLogo);
 	}
+	
+	/**
+	 * <p>Title: abrirProyecto</p>  
+	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
+	 * correspondientes.</p>
+	 * @param mp Archivo de proyecto con los datos del resto de módulos.
+	 */
+	private void abrirProyecto(DCVS mp) {
+		DCVS mPrj = null;
+		if(mp != null) mPrj = mp;
+		else mPrj = mapaModulos.get(IO.PRJ);
+		int nm = mPrj.getRowCount();	
+		
+		for(int i= 0;  i < nm; i++) {
+			String[] m = mPrj.getFila(i);
+			String ruta = m[1];
+			String tipo = m[0];
+			if(!tipo.equals(IO.PRJ)) {											//Nos asegurarmos que no cargue por error un PRJ.
+				DCVS mAux = cIO.abrirArchivo(ruta,tipo);						//Carga el módulo desde el sistema de archivos.
+				establecerDatos(mAux);											//Establecer el módulo.
+			}
+		}
+		
+		mapaBotonesGuardar.get(IO.PRJ).setEnabled(false);
+	}
+	
+	
+	private void guardarModulo(DCVS dcvs) {
+		String tipo = dcvs.getTipo();
+		mapaBotonesGuardar.get(tipo).setEnabled(false);							//Desactivar su botón.
+		cIO.guardarArchivo(dcvs);												//Guardar los datos en el disco.
+	}
+	
+	/**
+	 * <p>Title: guardarProyecto</p>  
+	 * <p>Description: Guarda la configuración del proyecto</p>
+	 */
+	private void guardarProyecto() {	
+		DCVS dcvs = new DCVS();
+		dcvs.nuevoModelo();
+		dcvs.setTipo(IO.PRJ);
+		dcvs.addCabecera(new Object[] {"Tipo","Ruta"});
+		//Bucle para cada módulo
+		mapaModulos.forEach((tipo,modulo) -> {
+			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
+				dcvs.addFila(new Object[] {tipo, modulo.getRuta()});			
+//				guardarModulo(tipo);											//Guardar cada módulo.
+//				mapaBotonesGuardar.get(tipo).setEnabled(false);
+			}
+		});
+		
+		//Desactivación del botón de guardado de proyecto.
+		mapaBotonesGuardar.get(IO.PRJ).setEnabled(false);
+		//Guardado del fichero:
+		String ruta = cIO.guardarArchivo(dcvs);
+		if(ruta != null) {
+			//Configuración de la ruta
+			dcvs.setRuta(ruta);
+			//Mostrar ruta en Field.
+			mapaFields.get(IO.PRJ).setText(ruta);
+			mapaModulos.put(IO.PRJ, dcvs);
+		}
+
+	}
+	
+	/**
+	 * <p>Title: establecerDatos</p>  
+	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
+	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
+	 * @param datos Conjunto de datos y cabecera encapsulados.
+	 */
+	public void establecerDatos(DCVS datos) {
+		//Asociar a su textfield.
+		String tipo = datos.getTipo();
+		JTextField tf = null;
+		//Actualizar el campo con la ruta del archivo.
+		if(mapaFields.containsKey(tipo)) {
+			tf = mapaFields.get(tipo);
+			tf.setText(datos.getRuta());
+		}
+		
+		//Guardar los datos del módulo.
+		mapaModulos.put(tipo, datos);
+
+		switch(tipo) {
+			case (IO.PRJ):
+				abrirProyecto(null);
+				break;
+			case (IO.MAP):
+				cMap.setPoligonos(datos.getModelo());
+				break;
+			default:
+				mapaBotonesGuardar.get(IO.PRJ).setEnabled(true);
+		}
+		
+	}
+	
+	/* Métodos privados */
 	
 	/**
 	 * <p>Title: getIcon</p>  
@@ -321,96 +425,7 @@ public class Archivos extends JPanel {
 		mapaFields.put(IO.HST, textFieldHistorico);
 	}
 		
-	
-	/**
-	 * <p>Title: abrirProyecto</p>  
-	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
-	 * correspondientes.</p>
-	 */
-	private void abrirProyecto() {
-		DCVS mPrj = mapaModulos.get(IO.PRJ);
-		int nm = mPrj.getRowCount();	
-		
-		for(int i= 0;  i < nm; i++) {
-			String[] m = mPrj.getFila(i);
-			String ruta = m[1];
-			String tipo = m[0];
-			if(!tipo.equals(IO.PRJ)) {											//Nos asegurarmos que no cargue por error un PRJ.
-				DCVS mAux = cIO.abrirArchivo(ruta,tipo);						//Carga el módulo desde el sistema de archivos.
-				establecerDatos(mAux);											//Establecer el módulo.
-			}
-		}
-		
-		mapaBotonesGuardar.get(IO.PRJ).setEnabled(false);
-	}
-	
-	
-	private void guardarModulo(DCVS dcvs) {
-		String tipo = dcvs.getTipo();
-		mapaBotonesGuardar.get(tipo).setEnabled(false);							//Desactivar su botón.
-		cIO.guardarArchivo(dcvs);												//Guardar los datos en el disco.
-	}
-	
-	/**
-	 * <p>Title: guardarProyecto</p>  
-	 * <p>Description: Guarda la configuración del proyecto</p>
-	 */
-	private void guardarProyecto() {	
-		DCVS dcvs = new DCVS();
-		dcvs.nuevoModelo();
-		dcvs.setTipo(IO.PRJ);
-		dcvs.addCabecera(new Object[] {"Tipo","Ruta"});
-		//Bucle para cada módulo
-		mapaModulos.forEach((tipo,modulo) -> {
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				dcvs.addFila(new Object[] {tipo, modulo.getRuta()});			
-//				guardarModulo(tipo);											//Guardar cada módulo.
-//				mapaBotonesGuardar.get(tipo).setEnabled(false);
-			}
-		});
-		
-		//Desactivación del botón de guardado de proyecto.
-		mapaBotonesGuardar.get(IO.PRJ).setEnabled(false);
-		//Guardado del fichero:
-		String ruta = cIO.guardarArchivo(dcvs);
-		if(ruta != null) {
-			//Configuración de la ruta
-			dcvs.setRuta(ruta);
-			//Mostrar ruta en Field.
-			mapaFields.get(IO.PRJ).setText(ruta);
-			mapaModulos.put(IO.PRJ, dcvs);
-		}
-
-	}
-	
-	/**
-	 * <p>Title: establecerDatos</p>  
-	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
-	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
-	 * @param datos Conjunto de datos y cabecera encapsulados.
-	 */
-	private void establecerDatos(DCVS datos) {
-		//Asociar a su textfield.
-		String tipo = datos.getTipo();
-		JTextField tf = null;
-		//Actualizar el campo con la ruta del archivo.
-		if(mapaFields.containsKey(tipo)) {
-			tf = mapaFields.get(tipo);
-			tf.setText(datos.getRuta());
-		}
-		
-		//Guardar los datos del módulo.
-		mapaModulos.put(tipo, datos);
-
-		switch(tipo) {
-			case (IO.PRJ):
-				abrirProyecto();
-				break;
-			default:
-				mapaBotonesGuardar.get(IO.PRJ).setEnabled(true);
-		}
-		
-	}
+	/* Clases privadas */
 	
 	private class ArchivoML extends MouseAdapter {
 		@Override
@@ -422,7 +437,7 @@ public class Archivos extends JPanel {
 			
 			//Carga de módulo.
 			if(op.equals("Abrir")) {											
-				dcvs = cIO.abrirArchivo(null,ext);			
+				dcvs = cIO.abrirArchivo(null,ext);
 				if(dcvs != null) {establecerDatos(dcvs);}
 			//Guarga de módulo.
 			}else if(btn.isEnabled()){											//Comprobación de guardado activado.		
@@ -433,8 +448,11 @@ public class Archivos extends JPanel {
 				default:
 					guardarModulo(mapaModulos.get(ext));
 				}
-
 			}
 		}
 	}
+	
+	
+	
+	
 }

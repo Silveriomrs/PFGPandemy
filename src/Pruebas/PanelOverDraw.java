@@ -19,60 +19,67 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.Image;
  
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
  
-@SuppressWarnings({ "serial", "javadoc" })
-public class Test extends JFrame {
-	private Graphics2D pint;
-	private BufferedImage img = null;
-	
-	public static void main(String... args) {new Test();}
- 
-	public Test() {
-		//Configuración FRAME
-		super("Dibujo sobre imagen");
-		this.add(new PanelOverDraw());
-		this.setSize(484,519);
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
-	}
- 
-	public class PanelOverDraw extends JPanel {
-  
-		
+
+	class PanelOverDraw extends JPanel {
+		/** serialVersionUID*/  
+		private static final long serialVersionUID = -4339205143748112115L;
+		private Graphics2D pint;
+		private BufferedImage img = null;
+		int ancho, alto;
 		
 		/**
 		 * <p>Title: Constructor de la clase</p>  
-		 * <p>Description: Tiene la configuración del fondo y demás.</p>
+		 * <p>Description: Tiene la configuración del fondo y dimensiones de la
+		 * pizarra..</p>
+		 * @param ancho ancho del panel.
+		 * @param alto alto del panel.
 		 */
-		public PanelOverDraw() {
+		public PanelOverDraw(int ancho, int alto) {
+			this.setPreferredSize(new Dimension(ancho,alto));
+			this.setSize(ancho,alto);
+			this.addMouseListener(new SelectPointListener());
 			//Carga imagen
 			File imageFile = new File("/vista/imagenes/mapa-mudo-CCAA.jpg"); 					// guarda la imagen en un archivo
 			try {img = ImageIO.read(getClass().getResourceAsStream(imageFile.toString())); }	// la carga en una BufferedReader
 			catch (IOException e) {	e.printStackTrace();}
-			//Configuración PANEL
-			this.setPreferredSize(new Dimension(484,409));
-			addMouseListener(new SelectPointListener());
- 
+			img = resize(img);
+			//Configuración PANEL			
+			this.ancho = img.getWidth();
+			this.alto = img.getHeight();
 			// creamos una instancia graphics desde la imagen para pintar sobre ella
 			pint = img.createGraphics();
-			//Se crea el poligono a dibujar con sus atributos.
-	        pint.setColor(Color.GREEN);
-	        pint.fillRect(200,200,100,100);
 	        pint.dispose();
 		}
  
 		@Override
 		public void paintComponent(Graphics g){
 			super.paintComponent(g);
-			g.drawImage(img,0,0,null); // dibuja la imagen al iniciar la aplicacion
+			g.drawImage(img,0,0,ancho,alto,null); 											// dibuja la imagen al iniciar la aplicacion
+			g.dispose();
 		}
- 
-	}
-	
+		
+		private void refrescar() {
+			this.updateUI();
+		}
+
+		public BufferedImage resize(BufferedImage img) { 
+			this.ancho = getWidth();
+			this.alto = getHeight();
+			Image tmp = img.getScaledInstance(ancho,alto, Image.SCALE_SMOOTH);
+		    BufferedImage dimg = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_ARGB);
+		    Graphics2D g2d = dimg.createGraphics();
+		    g2d.drawImage(tmp, 0, 0, null);
+		    g2d.dispose();
+		    return dimg;
+		}  
+		
+		
 	   /**
      * <p>Title: SelectPointListener</p>  
      * <p>Description: Realiza un seguimiento de los puntos que son seleccionados para
@@ -84,7 +91,7 @@ public class Test extends JFrame {
      * @date 23 sept. 2021
      * @version versión
      */
-    class SelectPointListener extends MouseAdapter{
+    private class SelectPointListener extends MouseAdapter{
     	private Point a;														// Punto inicial y final de una recta a dibujar.
     	boolean primero = true;
     	
@@ -105,18 +112,32 @@ public class Test extends JFrame {
             pint.setColor(Color.RED);
             pint.fillOval(posX -2,posY -2,4,4);									// Punto central
             pint.drawLine(posX -5,posY, posX +5, posY);							// Línea horizontal
-            pint.drawLine(posX, posY -5, posX, posY +5);							// Línea vertical
+            pint.drawLine(posX, posY -5, posX, posY +5);						// Línea vertical
             //Unión gráfica de dos puntos consecutivos.
             if(!primero) {
-            	pint.drawLine(														// Dibujado de la línea entre punto anterior y actual.
+            	pint.drawLine(													// Dibujado de la línea entre punto anterior y actual.
             			(int)a.getX(),
             			(int)a.getY(),
             			posX,posY);
             }
             a = p;																// Establece el punto actual como el anterior para la siguiente línea.   
-            System.out.println(primero + " " + "(" + posX + "," + posY + ")");
+            System.out.println("P(" + posX + "," + posY + ")");
             primero = false;
             pint.dispose();
+            refrescar();
         }
     }
+    
+	public static void main(String... args) {
+		JFrame frame = new JFrame("Dibujo sobre imagen");
+		int ancho = 800;
+		int alto = 600;
+		//Configuración FRAME
+		frame.add(new PanelOverDraw(ancho - 1,alto -25));
+		frame.setSize(ancho,alto);
+		frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setVisible(true);
+	}
+	
 }

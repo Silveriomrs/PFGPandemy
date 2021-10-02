@@ -10,7 +10,6 @@ import java.awt.Panel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -81,7 +80,7 @@ public class Principal extends JFrame {
 		cMap = new ControladorMapa(panelCentralW,panelCentralH);
 		panel.setLayout(new GridLayout(1, 0, 0, 0));
 		about = new About();
-		archivos = new Archivos(cio);
+		archivos = new Archivos(cio,cMap);
 		setTitle("Simulador de Pandemias");	
 		getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);
@@ -161,7 +160,7 @@ public class Principal extends JFrame {
 		
 		comboBox = new JComboBox<String>();
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Ver Tabla", 
-				"Ver Mapa", "Ver Archivos","Abrir Reproductor"}));
+				"Ver Mapa", "Ver Archivos","Abrir Reproductor","Abrir editor Gráfico"}));
 		
 		btnAplicarTabla = new JButton("Aplicar tabla");
 		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
@@ -360,7 +359,7 @@ public class Principal extends JFrame {
 	private class BtnAboutMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			about.setVisible();
+			about.toggleVisible();
 		}
 	}
 	
@@ -410,10 +409,12 @@ public class Principal extends JFrame {
 			System.out.println(seleccion);
 			
 			switch(seleccion){
-				case "Mapas": 
-					cMap.setPoligonos(modelo);
-					mostrar("Mapa cargado en el módulo", 1);
-					nuevaTabla();				
+				case "Mapas":
+					if(modelo != null && modelo.getRowCount() > 0) {
+						cMap.setPoligonos(modelo);
+						mostrar("Mapa cargado en el módulo", 1);
+						nuevaTabla();
+					}
 					break;
 				case "Historico": 
 					cMap.setHistorico(modelo);
@@ -426,7 +427,17 @@ public class Principal extends JFrame {
 				case "Abrir Reproductor":
 					//Pasar mapa de módulos al controlar de mapa.
 					cMap.setModulos(archivos.getMapaModulos());
-					if(cMap.play()) scrollPane.setViewportView(cMap.getMapa());
+					if(cMap.play()) scrollPane.setViewportView(cMap.getJMapa());
+					break;
+				case "Abrir editor Gráfico":
+					cMap.setModulos(archivos.getMapaModulos());
+				//	if(cMap.getMapa() != null && cMap.getMapa().getNumZones() > 0) {					
+						//
+						Pizarra pizarra =new Pizarra(cMap);
+					//	pizarra.setZonas(cMap.getZonas());
+					//	pizarra.abrirFrame();
+						pizarra.testModulo(null);
+				//	}
 					break;
 				case "Ver Mapa":
 					cMap.setModulos(archivos.getMapaModulos());

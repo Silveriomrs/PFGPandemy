@@ -41,7 +41,10 @@ public class FondoPanel extends JPanel{
 		}
 	}
 	
-	public JPanel getFodo() {
-		return this;
-	}
+	/**
+	 * <p>Title: getFondo</p>  
+	 * <p>Description: Devuelve el JPanel con su imagen de fondo.</p> 
+	 * @return La imagen incrustada en el panel.
+	 */
+	public JPanel getFondo() {return this;}
 }
