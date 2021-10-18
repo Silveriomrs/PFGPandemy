@@ -4,10 +4,8 @@
 package vista;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import controlador.ControladorDatosIO;
 import controlador.ControladorMapa;
@@ -53,7 +51,6 @@ public class Principal2 extends JFrame {
 	 * Crea la aplicación.
 	 */
 	public Principal2() {
-		setResizable(false);
 		cio = new ControladorDatosIO();
 		cMap = new ControladorMapa(panelCentralW,panelCentralH);
 		archivos = new Archivos(cio,cMap);
@@ -63,9 +60,10 @@ public class Principal2 extends JFrame {
 		this.setTitle("Simulador de Pandemias");	
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
-		setBounds(0, 0, 934, 662);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setBounds(0, 0, 934, 662);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
+		this.setResizable(false);
 		initialize();
 		this.setVisible(true);
 	}
@@ -83,16 +81,15 @@ public class Principal2 extends JFrame {
 		panelCentral.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);	
 		panelCentral.setLayout(new BorderLayout(0, 0));
 		
-		//Ocultar JPanels no primarios.
+		//Ocultar JPanels no primarios y mostrar el panel por defecto.
 		mostrarPanel("Archivos");
-		//Añadir paneles de los módulos.	
+		//Añadir paneles de los módulos.
 		panelCentral.add(tablaEditor, null);
-		
 		panelCentral.add(archivos, null);
 		panelCentral.add(cMap.getJMapa(), null);
 		//Añadir elementos al JPanel principal.
 		fondo.add(menuBar, BorderLayout.NORTH);
-		fondo.add(panelCentral, BorderLayout.CENTER);		
+		fondo.add(panelCentral, BorderLayout.CENTER);
 	}
 	
 	/**
@@ -103,7 +100,7 @@ public class Principal2 extends JFrame {
 	private void iniciarMenuBar() {
 		//Barra de menus.
 		menuBar = new JMenuBar();
-		getContentPane().add(menuBar, BorderLayout.NORTH);	
+		getContentPane().add(menuBar, BorderLayout.NORTH);
 
 		//Menu Archivo
 		JMenu mnArchivo = new JMenu("Archivo");
@@ -131,13 +128,12 @@ public class Principal2 extends JFrame {
 		menuBar.add(mnArchivo);
 		menuBar.add(mnVer);
 		menuBar.add(mnEjecutar);
-		menuBar.add(mnAyuda);
-		
+		menuBar.add(mnAyuda);	
 	}
 
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
 		JMenuItem item = new JMenuItem(new VerMenuListener(nombre));
-		if(rutaIcon != null)  item.setIcon(getIcon(rutaIcon,20,20));
+		if(rutaIcon != null)  item.setIcon(IO.getIcon(rutaIcon,20,20));
 		padre.add(item);
 	}
 	
@@ -173,8 +169,7 @@ public class Principal2 extends JFrame {
 				case "Editor Gráfico":				
 				//	pizarra.setZonas(cMap.getZonas());
 					cMap.getMapa().setVisible(true);
-					pizarra.abrirFrame();
-				//	pizarra.testModulo(null);
+					pizarra.testModulo(null);
 					break;
 				case "Paleta":
 					Leyenda paleta = cMap.getPaleta();
@@ -188,7 +183,6 @@ public class Principal2 extends JFrame {
 				case "Abrir Proyecto":
 					DCVS prj = cio.abrirArchivo(null,IO.PRJ);
 					if(prj != null) {
-						System.out.println(prj.toString());
 						archivos.establecerDatos(prj);				
 					}
 					break;
@@ -234,21 +228,6 @@ public class Principal2 extends JFrame {
 		}
 		panelCentral.updateUI();
 		fondo.updateUI();
-	}
-	
-	/**
-	 * <p>Title: getIcon</p>  
-	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
-	 * por parámetros, de la imagen fuente..</p> 
-	 * @param ruta Ruta del archivo de imagen.
-	 * @param w Ancho del escalado de la imagen.
-	 * @param h Alto del escalado de la imagen.
-	 * @return Icono escalado de la imagen.
-	 */
-	private ImageIcon getIcon(String ruta, int w, int h) {
-		Image img= new ImageIcon(Archivos.class.getResource(ruta)).getImage();
-		ImageIcon icon=new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
-		return icon;
 	}
 	
 	/**

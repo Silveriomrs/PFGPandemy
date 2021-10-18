@@ -25,8 +25,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
-import vista.Archivos;
-
 
 
 /**
@@ -38,7 +36,7 @@ import vista.Archivos;
  */
 public class IO{
 	
-	private HashMap<String,String> tipos;
+	private static HashMap<String,String> tipos;
     
     /** Archivos generales formato CSV*/  
     public final static String CSV = "csv";
@@ -56,6 +54,8 @@ public class IO{
     public final static String PNG = "png";
     /** Archivo de Imagenes JPG */
     public final static String JPG = "jpg";
+    /** Archivo de Imagenes JPEG */
+    public final static String JPEG = "jpeg";
     /** Archivo de Imagenes GIF */
     public final static String GIF= "gif";
     /** Archivo de Imagenes PNG, JPG p GIF */
@@ -77,8 +77,9 @@ public class IO{
     	tipos.put(REL, "Archivo de relaciones");
     	tipos.put(PNG, "Archivos de imagen PNG");
     	tipos.put(JPG, "Archivos de imagen JPG");
+    	tipos.put(JPEG,"Archivos de imagen JPEG");
     	tipos.put(GIF, "Archivos de imagen GIF");
-    	tipos.put(IMG, "Archivos de imagen PNG. JPG o GIF");
+    	tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
     }
     
 
@@ -149,13 +150,19 @@ public class IO{
 	 * por parámetro un filtro para aplicar a los ficheros de extensión válidos
 	 * para selección.
 	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
-	 * desea que muestre dialogo de selección.
-	 * @param ext extensión del archivo a modo de filtro.
+	 * @param ext Extensión del archivo.
 	 * @return Ruta del archivo seleccionado, null en otro caso.
 	 */
 	public String selFile(int sel, String ext) {
 		String ruta  = null;
-		FileNameExtensionFilter filtro = new FileNameExtensionFilter(tipos.get(ext),ext);
+		FileNameExtensionFilter filtro = null;
+		//Comprobación de filtro para imagenes soportadas u otros tipos.
+		if(!ext.equals(IMG)) {
+			filtro = new FileNameExtensionFilter(tipos.get(ext),ext);
+		}else {
+			filtro = new FileNameExtensionFilter(tipos.get(ext), PNG, JPG, JPEG, GIF);
+		}
+		
 		JFileChooser sf=new JFileChooser(".");									//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
 		sf.setFileFilter(filtro);												//Establecimiento del filtro
@@ -183,28 +190,62 @@ public class IO{
 	 * @param ext Extensión con la que comparar.
 	 * @return True si las extensiones coinciden, False en otro caso.
 	 */
-	private boolean checkExt(String ruta, String ext) {
+	private static boolean checkExt(String ruta, String ext) {
 		boolean ok = true;
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
-		// Comprobar que la extensión pueda ser JPG,PNG o GIF
-		if(ext.equals(IMG) && !(ext.equals(JPG) || ext.equals(PNG) || ext.equals(GIF))) {
-			System.out.println("Tipo de fichero incorrecto");
+		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
+		if(ext.equals(IMG) && !(ext2.equals(JPG) || ext2.equals(PNG) || ext2.equals(JPEG) || ext2.equals(GIF))) {
+			System.out.println("Tipo de imagen incorrecto: " + ext2);
 			ok = false;
-		}else if(!ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
-			System.out.println("Tipo de fichero incorrecto");
+		}else if(!ext.equals(IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
+			System.out.println("Tipo de fichero incorrecto: " + ext2);
 			ok = false;
 		}	
 		return ok;
 	}
 	
 	/**
-	 * Carga una imagen desde un dispositivo físico (disco duro, etc).
+	 * Carga una imagen desde un dispositivo físico (disco duro, etc) y realiza
+	 * un escalado si se desea.
 	 * @param ruta Ruta completa con el nombre de la imagen.
-	 * @return imagen leído desde el dispostivo. Null en otro caso
+	 * @param escalado True realiza un escalado de la imagen. False en otro caso.
+	 * @param w Ancho del escalado de la imagen. Ignorado si escalado es false.
+	 * @param h Alto del escalado de la imagen. Ignorado si escalado es false.
+	 * @return imagen leído desde el dispostivo. Null en otro caso.
 	 */
-	public Image abrirImagen(String ruta) {
+	public static Image getImagen(String ruta, boolean escalado, int w, int h) {
 		//System.out.println(ruta);
-		Image img = new ImageIcon(Archivos.class.getResource(ruta)).getImage();
+		Image img = null;
+		try {
+			img = new ImageIcon(IO.class.getResource(ruta)).getImage();
+			if(escalado) img = img.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+		}catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Imagen no cargada");
+			return img;
+		}
 		return img;
 	}
+	
+	/**
+	 * <p>Title: getIcon</p>  
+	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
+	 * por parámetros, de la imagen fuente..</p> 
+	 * @param ruta Ruta del archivo de imagen.
+	 * @param w Ancho del escalado de la imagen.
+	 * @param h Alto del escalado de la imagen.
+	 * @return Icono escalado de la imagen. Null en otro caso,
+	 */
+	public static ImageIcon getIcon(String ruta, int w, int h) {
+		ImageIcon icon = null;
+		Image img = getImagen(ruta,false,w,h);
+		if(img != null) {
+			icon = new ImageIcon(img);
+			icon.setImage(icon.getImage().getScaledInstance(w,h, java.awt.Image.SCALE_DEFAULT));
+		}
+		
+		return icon;
+	}
+	
+	
 }

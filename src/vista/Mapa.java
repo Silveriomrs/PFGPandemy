@@ -57,8 +57,6 @@ public class Mapa extends JPanel{
 		setBackground(Color.LIGHT_GRAY);
 		setOpaque(false);
 		setLayout(new CardLayout(0, 0));
-	//	setFondo("/vista/imagenes/mapa-mudo-CCAA.jpg");
-	//	verFrame(width,height);
 	}	
 	
 	/**

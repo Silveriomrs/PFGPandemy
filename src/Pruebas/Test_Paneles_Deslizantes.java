@@ -74,7 +74,7 @@ public class Test_Paneles_Deslizantes {
 		   }else if(direccion == 0) {
 			   panel1.setLocation(panel1.getX() + 1, 0);
 			   panel2.setLocation(panel2.getX() + 1, 0);
-			   if (panel1.getX()  == 400) {
+			   if (panel1.getX()  == 0) {
 		              ((Timer) e.getSource()).stop();
 		              System.out.println("Deslizamiento derecha terminado en PosX: " + panel1.getX());
 		       }
@@ -89,7 +89,7 @@ public class Test_Paneles_Deslizantes {
 	   public void actionPerformed(ActionEvent e) {
 	           JButton btn = ((JButton) e.getSource());
 	           JPanel jp = getPanel(btn.getText());
-	           timer = new Timer(1, new TimerListener(jp,0));
+	           timer = new Timer(1, new TimerListener(jp,getDireccion(btn.getText())));
 	           timer.start();
 	           System.out.println(btn.getName());
 	   }
@@ -105,6 +105,13 @@ public class Test_Paneles_Deslizantes {
 		   }
 		   System.out.println(btnName);
 		   return jp;
+	   }
+	   
+	   private int getDireccion(String btn) {
+		   int dir = 0;
+		   if(btn.equals("Click 2")) dir = 0;
+		   else dir = 1;		   
+		   return dir;
 	   }
    }
 

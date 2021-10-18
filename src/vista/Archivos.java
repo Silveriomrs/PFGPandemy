@@ -18,17 +18,12 @@ import modelo.IO;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.SwingConstants;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -61,7 +56,6 @@ public class Archivos extends JPanel {
 	private final String IGuardarA = "/vista/imagenes/Iconos/disquete_64px.png";
 	private int lineaBase = 100;												//Primera línea a partir de la cual se dibujan todos los elementos.
 	private int contador = 0;													//Contador de elementos que se han adjuntado de un grupo.
-	private JFrame frame;
 	private JPanel panel;
 	private ControladorDatosIO cIO;
 	private ControladorMapa cMap;
@@ -78,8 +72,8 @@ public class Archivos extends JPanel {
 	 * @param cMap Controlador datos de mapeados.
 	 */
 	public Archivos(ControladorDatosIO cIO, ControladorMapa cMap) {
-		this.cIO = cIO;
-		this.cMap = cMap;
+		if(cIO != null) this.cIO = cIO;
+		if(cMap != null) this.cMap = cMap;
 		mapaBotonesAbrir = new HashMap<String,JButton>();
 		mapaBotonesGuardar = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
@@ -87,33 +81,7 @@ public class Archivos extends JPanel {
 		panel = new JPanel();
 		
 		hi = wi =  20;
-		configuraFrame();	
 		configuracion();
-		
-		/* Configuración flotante */
-		JToolBar toolBar = new JToolBar();
-		toolBar.add(this);
-		frame.getContentPane().add(toolBar, BorderLayout.CENTER);
-        frame.setLocationRelativeTo(null);
-		frame.getContentPane().add(this);
-        
-        /* Configuración del fondo. */
-	//	frame.setContentPane(fondo);
-		frame.setVisible(false);
-	}
-	
-	private void configuraFrame() {
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Archivos.class.getResource("/vista/imagenes/Iconos/archivo_64px.png")));
-		frame.setBounds(new Rectangle(0, 0, 665, 456));
-		frame.setName("Archivos");
-		frame.setMaximumSize(new Dimension(675, 466));
-		frame.setMinimumSize(new Dimension(600, 400));
-		frame.setSize(new Dimension(677, 400));
-		frame.setTitle("Módulos cargados.");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
-		frame.pack();
 	}
 	
 	/**
@@ -126,13 +94,6 @@ public class Archivos extends JPanel {
 	 * @param mapaModulos El mapa con los Modulos a establecer
 	 */
 	public void setMapaModulos(HashMap<String, DCVS> mapaModulos) {	this.mapaModulos = mapaModulos;	}
-
-	/**
-	 * <p>Title: getFrame</p>  
-	 * <p>Description: Devuelve el marco contendor y su configuración</p> 
-	 * @return Marco contenedor (Frame) con su configuración completa.
-	 */
-	public JFrame getFrame() { return frame;}
 	
 	/**
 	 * <p>Title: getPanel</p>  
@@ -292,21 +253,6 @@ public class Archivos extends JPanel {
 	/* Métodos privados */
 	
 	/**
-	 * <p>Title: getIcon</p>  
-	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
-	 * por parámetros, de la imagen fuente..</p> 
-	 * @param ruta Ruta del archivo de imagen.
-	 * @param w Ancho del escalado de la imagen.
-	 * @param h Alto del escalado de la imagen.
-	 * @return Icono escalado de la imagen.
-	 */
-	private ImageIcon getIcon(String ruta, int w, int h) {
-		Image img= new ImageIcon(Archivos.class.getResource(ruta)).getImage();
-		ImageIcon icon=new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
-		return icon;
-	}
-	
-	/**
 	 * <p>Title: addIconL</p>  
 	 * <p>Description: Añade un icono a una etiqueta</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
@@ -318,7 +264,7 @@ public class Archivos extends JPanel {
 	 */
 	private void addIconL(JLabel componente, String ruta, int w, int h) {
 		componente.setIconTextGap(5);
-		componente.setIcon(getIcon(ruta,w,h));	
+		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
 	
 	
@@ -334,7 +280,7 @@ public class Archivos extends JPanel {
 	 */
 	private void addIconB(JButton componente, String ruta, int w, int h) {
 		componente.setIconTextGap(0);
-		componente.setIcon(getIcon(ruta,w,h));	
+		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
 
 	
@@ -451,8 +397,5 @@ public class Archivos extends JPanel {
 			}
 		}
 	}
-	
-	
-	
 	
 }

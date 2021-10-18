@@ -12,14 +12,13 @@ package vista;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.SwingConstants;
-import java.awt.Image;
-
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
+
+import modelo.IO;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -34,8 +33,8 @@ public class About extends JPanel {
 	private JFrame frame;
 	private JLabel etiqueta;
 	private JButton btnCerrar;
-	private ImageIcon imagen;
 	private JPanel panel;
+	private final String rutaImagen = "/vista/imagenes/Charlestoon.gif";
 
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -4660754389327191558L;
@@ -47,10 +46,9 @@ public class About extends JPanel {
 		frame = new JFrame();
 		frame.setResizable(false);
 		panel = new JPanel();
-		panel.setBounds(0, 5, 447, 343);
+		panel.setBounds(12, 12, 447, 343);
 		etiqueta = new JLabel("");
 		configuracion();
-		setImagenLbl(etiqueta,"/vista/imagenes/Charlestoon.gif");
 	}
 	
 	private void configuracion() {
@@ -62,7 +60,8 @@ public class About extends JPanel {
 		etiqueta.setBorder(new LineBorder(new Color(0, 0, 128), 2, true));
 		etiqueta.setVerticalAlignment(SwingConstants.TOP);
 		etiqueta.setHorizontalAlignment(SwingConstants.CENTER);
-		etiqueta.setBackground(new Color(0, 0, 0));
+		etiqueta.setIcon(IO.getIcon(rutaImagen, etiqueta.getWidth(), etiqueta.getHeight()));
+
 		
 		panel.add(etiqueta);
 		
@@ -73,32 +72,10 @@ public class About extends JPanel {
 		btnCerrar.addMouseListener(new BotonListener());
 	
 		frame.setTitle("Acerca de...");
-		frame.setSize(459,579);
+		frame.setSize(475,583);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	}
 	
-	/**
-	 * <p>Title: setImagenLbl</p>  
-	 * <p>Description: Establece una imagen como relleno a una etiqueta</p>
-	 * La imagen tiene propiedades de escalado automático, ajustandose a las 
-	 * dimensiones de la etiqueta.
-	 * @param etiqueta Estiqueta donde se establecerá la imagen.
-	 * @param ruta Ruta en un dispositivo físico.
-	 */
-	private void setImagenLbl(JLabel etiqueta, String ruta) {
-		this.imagen = new ImageIcon(ruta);
-		Icon icon;
-		int w = etiqueta.getWidth();
-		int h = etiqueta.getHeight();
-		icon = new ImageIcon(
-				this.imagen.getImage().getScaledInstance(w, h, Image.SCALE_DEFAULT)
-		);
-//		icon = new ImageIcon(About.class.getResource(ruta));
-		
-		this.etiqueta.setIcon(icon);
-		System.out.println("w: " + w + ", h: " + h);							//Check del tamaño actual del label.
-		this.repaint();
-	}
 	
 	/**
 	 * <p>Title: BotonListener</p>  
@@ -121,5 +98,15 @@ public class About extends JPanel {
 	 */
 	public void toggleVisible() {
 		frame.setVisible(!frame.isVisible());									//Creamos una función toggle de visibilidad.
+	}
+	
+	/**
+	 * <p>Title: main</p>  
+	 * <p>Description: Para realización de pruebas </p> 
+	 * @param args argumentos.
+	 */
+	public static void main(String[] args) {
+		About about = new About();
+		about.toggleVisible();
 	}
 }

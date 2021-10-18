@@ -63,7 +63,7 @@ public class TablaEditor extends JPanel{
 	private DefaultTableModel modelo;
 	private JLabel lblAsignarTablaA;
 	private JComboBox<String> comboBox;
-	private JButton btnAplicarTabla;
+	private JButton btnAsignarTabla;
 	private ControladorMapa cMap;
 	private ControladorDatosIO cio;
 	private JToolBar jtoolBar;
@@ -99,8 +99,7 @@ public class TablaEditor extends JPanel{
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().add(this);
-		//getIcon(IVentana,128,128)
-		frame.setIconImage(getImage(IVentana));
+		frame.setIconImage(IO.getImagen(IVentana,false,0,0));
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -164,9 +163,9 @@ public class TablaEditor extends JPanel{
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Leyenda", "Relaciones"}));
 		//jtoolBar.add(comboBox);
 		
-		btnAplicarTabla = new JButton("Aplicar tabla");
-		btnAplicarTabla.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
+		btnAsignarTabla = new JButton("Asignar tabla");
+		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAsignarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
 		//jtoolBar.add(btnAplicarTabla);
 		
 		lblAsignarTablaA = new JLabel("Asignar la tabla al módulo");
@@ -177,7 +176,7 @@ public class TablaEditor extends JPanel{
 
 		boxAsignacion.add(lblAsignarTablaA);
 		boxAsignacion.add(comboBox);
-		boxAsignacion.add(btnAplicarTabla);
+		boxAsignacion.add(btnAsignarTabla);
 		
 		//Creación tabla principal.
 		tabla = new JTable();
@@ -196,17 +195,6 @@ public class TablaEditor extends JPanel{
 		//Genera el cuerpo de datos y establace.
 		nuevaTabla();
 		scrollPane.setViewportView(tabla);
-		//Colocación del listener para adaptar la tabla según ancho y con ancho mínimo
-//		tabla.getParent().addComponentListener(new ComponentAdapter() {
-//		    @Override
-//		    public void componentResized(final ComponentEvent e) {
-//		        if (tabla.getPreferredSize().width < tabla.getParent().getWidth()) {
-//		            tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-//		        } else {
-//		            tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//		        }
-//		    }
-//		});
 		setLayout(new BorderLayout(0, 0));
 
 		add(boxAsignacion, BorderLayout.SOUTH);
@@ -237,9 +225,7 @@ public class TablaEditor extends JPanel{
 		btn.setToolTipText(tooltip);
 		if(c != null) btn.setBackground(c);
 		addIconB(btn,ruta,wi,hi);
-		jtoolBar.add(btn);
-		
-		
+		jtoolBar.add(btn);	
 	}
 	
 	/**
@@ -258,24 +244,6 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: getImage</p>  
-	 * <p>Description: Abre una imagen desde la ruta especificada.</p> 
-	 * @param ruta Ruta hasta el archivo de imagen.
-	 * @return Imagen especificada. Null en otro caso.
-	 */
-	private Image getImage(String ruta) {
-		Image img = null;
-		try {
-			img = new ImageIcon(Archivos.class.getResource(ruta)).getImage();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return img;
-		}
-		return img;
-	}
-	
-	/**
 	 * <p>Title: getIcon</p>  
 	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
 	 * por parámetros, de la imagen fuente..</p> 
@@ -285,9 +253,9 @@ public class TablaEditor extends JPanel{
 	 * @return Icono escalado de la imagen, null en otro caso.
 	 */
 	private ImageIcon getIcon(String ruta, int w, int h) {
-		ImageIcon icon = null;
-		Image img = getImage(ruta);
-		if(img != null) icon = new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
+		ImageIcon icon = IO.getIcon(ruta, w, h);
+		//Image img = getImage(ruta);
+		//if(icon != null) icon = new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
 		return icon;
 	}
 	
@@ -298,7 +266,7 @@ public class TablaEditor extends JPanel{
 	 */
 	private void nuevaTabla() {
 		//Cuerpo de datos
-		Object[][] datos = new Object[][]{};	
+		Object[][] datos = new Object[][]{};
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {};
 		modelo = new DefaultTableModel(datos,cabecera){
@@ -350,11 +318,9 @@ public class TablaEditor extends JPanel{
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		//	JOptionPane.showMessageDialog(null, txt, titulo, tipo);
 			String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-				if(txt != "" || txt != null){
-				modelo.addColumn(txt);
-				tabla.setModel(modelo);
+			if(txt != null && !txt.equals("")){									//Si no se ha cancelado o no se ha introducido texto -> procede
+				modelo.addColumn(txt);											//Añade la columna.
 			}
 		}
 	}
@@ -366,7 +332,8 @@ public class TablaEditor extends JPanel{
 			if(ncols > 0) {														//Comprobación de que existe al menos una columna.
 				Object[] o = new Object[ncols];
 				modelo.addRow(o);
-				tabla.setModel(modelo);
+			}else {
+				mostrar("Debe haber una columna como mínimo", 0);
 			}
 		}
 	}
@@ -376,8 +343,8 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			DCVS dcvs = cio.abrirArchivo(null,IO.CSV);			
 			if(dcvs != null) {
-				DefaultTableModel modelo = dcvs.getModelo();
-				tabla.setModel(modelo);
+				modelo = dcvs.getModelo();
+				tabla.setModel(modelo);											//Estabece el nuevo modelo en el scroll tabla.
 				mostrar("Archivo Cargado", 1);
 			}
 		}
