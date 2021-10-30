@@ -60,6 +60,7 @@ public class IO{
     public final static String GIF= "gif";
     /** Archivo de Imagenes PNG, JPG p GIF */
     public final static String IMG = "imagen";
+    
     /**
      * Constructor de la clase IO
      */
@@ -95,18 +96,19 @@ public class IO{
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
 		DCVS dcvs = null;
-		File f = getFile(1,ruta,ext);
-		
+		String ruta2 = ruta;
+		File f = getFile(1,ruta,ext);	
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
 				CSVReader lectorCSV =  new CSVReader(new FileReader(f));		//Abrir el archivo.
 				List<String[]> datos = lectorCSV.readAll();
 				lectorCSV.close();
-				if(ruta == null) ruta = f.getPath();
+				if(ruta == null) ruta2 = f.getPath();
 				dcvs = new DCVS();
 				dcvs.crearModelo(datos);
-				dcvs.setRuta(ruta);
+				dcvs.setRuta(ruta2);
 				dcvs.setTipo(ext);
+				System.out.println(dcvs.getRuta() + " - "	+ dcvs.getTipo());
 			}
 			catch (IOException e) {e.printStackTrace();}
 			catch (CsvException e) {e.printStackTrace();}
@@ -115,32 +117,51 @@ public class IO{
 	}
 	    
 	/**
-	 * Metodo para almacenar en un archivo una cadena de texto.
+	 * Metodo para almacenar en un archivo un texto.
+	 * Este método en caso de no tener asignado el nombre completo del fichero
+	 * de destino con una extensión, le añade la extensión pasada por parámetro.
+	 * En caso de no coincidir la extensión de la ruta completa con la extensión
+	 * deseada, sustituye la primera por la segunda.
 	 * @param bd los datos a guardar.
 	 * @param ruta uta completa con el nombre del fichero. Null si se
 	 * desea que muestre dialogo de selección.
 	 * @param ext extensión del archivo.
-	 * @return TRUE en caso de operación realizada, false en otro caso.
+	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
 	public String grabarArchivo(String bd, String ruta, String ext) {
-		File f = getFile(2,ruta,ext);
+		String ruta2 = ruta;
+		String ext2 = ext;
+		//Comprobación de extensión coincida con extensión de la ruta.
+		if(ruta != null && !checkExt(ruta,ext)) {												//Si son diferentes
+			ext2 = ruta.substring(ruta.length() -3).toLowerCase();
+			//Comprobación de que es una extensión registrada
+			if (!tipos.containsKey(ext2)) {										//Sino esta registrada, tomar como no añadida.
+				ruta2 = ruta + ext;												//Añade la extensión.
+			}else {																//En otro caso remover la que tiene por la nueva.
+				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
+				ruta2 = ruta2 + ext;
+			}
+			System.out.println("Módulo IO - cambio de extensión: " + ruta + " -> " + ruta2);
+		}
 		
+		
+		File f = getFile(2,ruta2,ext2);
 		if(f != null){
-		    try(FileWriter fw=new FileWriter(f)){	 
-		    	ruta = f.getPath();
+		    try(FileWriter fw = new FileWriter(f)){	 
+		    	ruta2 = f.getPath();
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
 		    } catch (IOException e1) {e1.printStackTrace();}
 		}
-		return ruta;
+		return ruta2;
 	}
 	
 	
 	private File getFile(int sel, String path,String ext) {
 		File f = null;
 		String ruta = path;
-		if(ruta == null || ruta == "") {ruta = selFile(sel,ext);	}			// Obtención del archivo.	
-		if(ruta != null) f= new File(ruta);
+		if(ruta == null || ruta == "") {ruta = selFile(sel,ext);}				// Obtención del archivo.	
+		if(ruta != null) f = new File(ruta);
 		return f;
 	}
 	
@@ -153,7 +174,7 @@ public class IO{
 	 * @param ext Extensión del archivo.
 	 * @return Ruta del archivo seleccionado, null en otro caso.
 	 */
-	public String selFile(int sel, String ext) {
+	public static String selFile(int sel, String ext) {
 		String ruta  = null;
 		FileNameExtensionFilter filtro = null;
 		//Comprobación de filtro para imagenes soportadas u otros tipos.
@@ -163,20 +184,22 @@ public class IO{
 			filtro = new FileNameExtensionFilter(tipos.get(ext), PNG, JPG, JPEG, GIF);
 		}
 		
-		JFileChooser sf=new JFileChooser(".");									//Directorio local.
+		JFileChooser sf = new JFileChooser(".");								//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
 		sf.setFileFilter(filtro);												//Establecimiento del filtro
 		int seleccion;
-		//Apertura del dialogo de selección.
-		if(sel==1) seleccion = sf.showOpenDialog(null);
-		else seleccion=sf.showSaveDialog(null);		
+		//Apertura del dialogo correspondiente a la selección indicada.
+		if(sel == 1) seleccion = sf.showOpenDialog(null);
+		else seleccion = sf.showSaveDialog(null);		
 		//Elección del archivo.
 	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
 	        File f = sf.getSelectedFile();										//Obtenemos el archivo.
 			ruta = f.getPath();													//Obtención de la ruta del archivo.
-			if(!checkExt(ruta,ext)) {											//Comprobación de elección de archivo correcta.
-				ruta = null;
-			}
+			//Comprobación de elección de archivo correcta.
+			if(!checkExt(ruta,ext)) {
+				ruta = ruta + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
+				System.out.println("Añadida extensión: " + ext + " al archivo.");
+			}					
 	    }
 		return ruta;
 	}
@@ -190,7 +213,7 @@ public class IO{
 	 * @param ext Extensión con la que comparar.
 	 * @return True si las extensiones coinciden, False en otro caso.
 	 */
-	private static boolean checkExt(String ruta, String ext) {
+	public static boolean checkExt(String ruta, String ext) {
 		boolean ok = true;
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
@@ -198,9 +221,9 @@ public class IO{
 			System.out.println("Tipo de imagen incorrecto: " + ext2);
 			ok = false;
 		}else if(!ext.equals(IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
-			System.out.println("Tipo de fichero incorrecto: " + ext2);
+			System.out.println("Tipo de fichero sin extensión conocida: " + ext2);
 			ok = false;
-		}	
+		}
 		return ok;
 	}
 	

@@ -37,7 +37,9 @@ public class Leyenda extends JPanel implements ActionListener{
 	private ArrayList<Color> paleta;
 	private HashMap<String,JButton> mapaBotones;
 	private static final long serialVersionUID = 3521309276542156368L;
-
+	private int width;
+	private int height;
+	
 	/**
 	 * Creación de una leyenda con la representación de los valores y sus grados
 	 * de color. 
@@ -48,32 +50,60 @@ public class Leyenda extends JPanel implements ActionListener{
 	 */
 	public Leyenda(int width, int height, boolean editable) {
 		super();
-		mapaBotones = new HashMap<String, JButton>();
-		setBorder(new LineBorder(new Color(0, 0, 0)));
-		setBackground(Color.LIGHT_GRAY);
+		this.width = width;
+		this.height = height;
+		this.mapaBotones = new HashMap<String, JButton>();
+		
+		this.setBorder(new LineBorder(new Color(0, 0, 0)));
+		this.setBackground(Color.LIGHT_GRAY);
 		TitledBorder tb = BorderFactory.createTitledBorder("Leyenda");
 		this.setBorder(tb);
-		frame = new JFrame();
-		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-		frame.getContentPane().add(this);
-		setLayout(null);
+		this.setLayout(null);
 		
 		paletaBase();															//Carga la paleta base.
 		creaEtiquetas(50,20,50,20);												//Crea y dibuja las etiquetas.
 		creaBotones(0,20,50,20,editable);										//Crea y dibuja los botones.
-			
-//		frmLeyenda.setTitle("Leyenda");											//Establecimiento del título.
-		frame.setSize(width,height);											//Establecimiento de las dimensiones.
-		frame.setResizable(false); 												//Dimesiones fijas.
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
-		frame.setAlwaysOnTop(false);
+		iniciarFrame();
         repaint();
 	}
 	
+	private void iniciarFrame(){
+		frame = new JFrame();
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+		frame.getContentPane().add(this);
+		frame.setTitle("Leyenda");												//Establecimiento del título.
+		frame.setSize(width,height);											//Establecimiento de las dimensiones.
+		frame.setResizable(false); 												//Dimesiones fijas.
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
+		frame.setAlwaysOnTop(false);
+	}
+	
+	/**
+	 * <p>Title: getFrame</p>  
+	 * <p>Description: Devuelve el frame contenedor para poder manipular sus
+	 * propiedades.</p> 
+	 * @return JFrame con la configuración actual.
+	 */
+	public JFrame getFrame() {return frame;}
 	
 	@Override
 	public void setVisible(boolean ver) {frame.setVisible(ver);}
-
+	
+	/**
+	 * <p>Title: toggleVisible</p>  
+	 * <p>Description: Cambia la propiedad de visibilidad del estado anterior</p>
+	 * Si el estado actual es Visible pasa a estar oculto, de la misma manera
+	 * cuando el estado actual es oculto pasa a estar visible.  
+	 */
+	public void toggleVisible() {setVisible(!frame.isVisible());}
+	
+	/**
+	 * <p>Title: setPosicion</p>  
+	 * <p>Description: Establece la posición para el frame</p> 
+	 * @param xPos Posición X relativa a la pantalla.
+	 * @param yPos Posición Y relativa a la pantalla.
+	 */
+	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
 	
 	/**
 	 * Dibuja las etiquetas en la leyenda en las coordenadas indicadas por 
@@ -227,6 +257,18 @@ public class Leyenda extends JPanel implements ActionListener{
 			if(i<9) {txt += "\n";}
 		}
 		return txt;
+	}
+	
+	/**
+	 * <p>Title: main</p>  
+	 * <p>Description: A efectos de pruebas</p> 
+	 * @param args Nada.
+	 */
+	public static void main(String[] args) {
+		Leyenda leyenda = new Leyenda(100, 205, false);
+		leyenda.setPosicion(0, 0);
+		leyenda.getFrame().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		leyenda.setVisible(true);
 	}
 
 }

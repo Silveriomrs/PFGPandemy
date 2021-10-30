@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import controlador.ControladorMapa;
 import java.awt.event.MouseAdapter;
 
 import modelo.IO;
@@ -53,44 +52,48 @@ public class Pizarra extends JPanel {
 	private int dimX, dimY;														//Dimensiones para la zona de dibujado.
 	private Polygon poligono;
 	private Polygon marco;
-	private ArrayList<Point> listaPuntos;
+	// listaPuntos almacena los puntos, esta manera permite implementar a posteriori funciones tipo "undo". "restore",etc.
+	private ArrayList<Point> listaPuntos;										
 	private JPanel panelCanvas;
 	private JComboBox<String> comboBoxAsignar;
 	private JComboBox<String> comboBoxAsignados;
 	private HashMap<Integer,Zona> zonas;
-	private ControladorMapa cMap;
 	private java.awt.Image fondo;
 
 	/**
 	 * <p>Title: Pizarra de dibujo</p>
 	 * <p>Description: Pizarra donde poder crear los poligonos que representarán
 	 * a cada zona</p>
-	 * @param cMap Módulo controlador del mapa.
+	 * En caso de obtener un valor núlo o cuyo número de zonas no sea mayor a
+	 * cero, no se iniciará el módulo.
+	 * @param zonas Conjunto de zonas.
 	 */
-	public Pizarra(ControladorMapa cMap) {
-		this.dimX = 800;
-		this.dimY = 600;
-		this.cMap = cMap;
-		if(cMap.getZonas() != null) {this.zonas = cMap.getZonas();}
-		else this.zonas = new HashMap<Integer,Zona>();
+	public Pizarra(HashMap<Integer,Zona> zonas) {
+		this.dimX = 1024;
+		this.dimY = 768;
 		this.listaPuntos = new ArrayList<Point>();
-		this.setPreferredSize(new Dimension(dimX, dimY));
-		this.setSize(new Dimension(dimX, dimY));
-	    this.setBackground(Color.white);
-	    this.setLayout(new BorderLayout());
-	    this.setOpaque(false);
-	    configura();
+		//Si el conjunto de zonas es correcto y mayor a 0 -> iniciar módulo.
+		if(zonas != null && zonas.size() > 0) {
+			this.zonas = zonas;
+			this.setPreferredSize(new Dimension(dimX, dimY));
+			this.setSize(new Dimension(dimX, dimY));
+		    this.setBackground(Color.white);
+		    this.setLayout(new BorderLayout());
+		    this.setOpaque(false);
+		    configura();
+		}
 	}
 
 	/**
 	 * <p>Title: setZonas</p>
 	 * <p>Description: Establece el conjunto de zonas contenidas dentro de un HashMAp.</p>
+	 * En caso de que no contenga elementos, no actuará.
 	 * @param zonas HashMap de zonas a establecer.
 	 */
 	public void setZonas(HashMap<Integer,Zona> zonas) {
-		this.zonas = zonas;
-    	zonasToCombo();
-        reinicioBotones();
+	   this.zonas = zonas;
+       zonasToCombo();
+	   reinicioBotones();
 	}
 
 	/**
@@ -142,7 +145,7 @@ public class Pizarra extends JPanel {
 
 	    //Añadir Observadores.
 	    bLimpiar.addActionListener(new LimpiarListener());
-	    bCerrarPoligono.addActionListener(new CierreListener());
+	    bCerrarPoligono.addActionListener(new ComponerListener());
 	    bBoxAplicar.addActionListener(new AsignarBoxListener() );
 	}
 
@@ -249,7 +252,7 @@ public class Pizarra extends JPanel {
         boolean hayPoligono = poligono != null;
         boolean hasItemC1 = comboBoxAsignar.getItemCount() > 1;
         boolean hasItemC2 = comboBoxAsignados.getItemCount() > 1;
-        listaPuntos.clear();
+        listaPuntos.clear();													//Borrado de la lista de puntos almacenada.
 
         //Botones, configuración de activación según contexto.
         comboBoxAsignar.setEnabled(hasItemC1 && hayPoligono);
@@ -373,15 +376,13 @@ public class Pizarra extends JPanel {
 		}
 	}
 
-    private class CierreListener implements ActionListener{
+    private class ComponerListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Creación del poligono.
             poligono = generaPoligono();
             //Primero dibujado de las figuras (por si se desactiva Canvas en reinicio botones).
             dibujarZonas();
-            //Borrado de la lista de puntos almacenada.
-            listaPuntos.clear();
             //Reconfiguramos los estados de los botones para el nuevo contexto.
             reinicioBotones();     
         }
@@ -414,7 +415,7 @@ public class Pizarra extends JPanel {
 					combo1.removeItemAt(index);									// Borrado del item excepto si es el primero (0)
 					combo2.addItem(item);										// Añadir Item al otro comboBox
 					zonas.get(ID).setPoligono(p);			  					// Asignar Poligono a la zona correspondiente al item.
-					cMap.setZonas(zonas); 										
+	//				cMap.setZonas(zonas); 										
 					poligono = null;											// Iniciado del poligono a null.
 					encontrado = true;
 			    }
@@ -428,6 +429,7 @@ public class Pizarra extends JPanel {
             poligono = null;
             dibujarZonas();
             reinicioBotones();
+            c.update(c.getGraphics());
 		}
     }
 
@@ -473,7 +475,7 @@ public class Pizarra extends JPanel {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		//Selección de imagen de fondo.
-    		String ruta = new IO().selFile(1, IO.IMG);
+    		String ruta = IO.selFile(1, IO.IMG);
     		//En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();
@@ -483,27 +485,15 @@ public class Pizarra extends JPanel {
     }
 
 
-    /* Función única para pruebas */
+    /* Funciones para pruebas */
 
 	/**
 	 * <p>Title: testModulo</p>
 	 * <p>Description: Funcion cuyo proposito es realizar pruebas de funcionamiento
 	 * propio del módulo.</p>
-	 * @param zonas HashMap con las zonas como posible parámetro, null para
-	 * zonas creadas internas por esta propia función.
+	 * zonas internas por esta propia función a efecto de pruebas.
 	 */
-	public void testModulo(HashMap<Integer, Zona> zonas) {
-    	//Creación de mapa y zona de prueba.
-		HashMap<Integer, Zona> zonas2;
-		zonas2 = (zonas == null)? new HashMap<Integer, Zona>() : zonas;
-    	Zona z1,z2,z3;
-    	z1 = new Zona(1, "Zona 1", null);
-    	z2 = new Zona(2, "Zona 2", null);
-    	z3 = new Zona(3, "Zona 3", null);
-    	zonas2.put(z1.getID(), z1);
-    	zonas2.put(z2.getID(), z2);
-    	zonas2.put(z3.getID(), z3);
-    	setZonas(zonas2);
+	public void testModulo() {
     	abrirFrame();
     }
 
@@ -513,7 +503,17 @@ public class Pizarra extends JPanel {
 	 * @param args argumentos
 	 */
 	public static void main(String[] args) {
-		Pizarra pizarra = new Pizarra(new ControladorMapa(1000, 1000));
-		pizarra.testModulo(null);
+		HashMap<Integer, Zona> zonas;
+		zonas = new HashMap<Integer, Zona>();
+    	Zona z1,z2,z3;
+    	z1 = new Zona(1, "Zona 1",0,0, null);
+    	z2 = new Zona(2, "Zona 2",0,0, null);
+    	z3 = new Zona(3, "Zona 3",0,0, null);
+    	zonas.put(z1.getID(), z1);
+    	zonas.put(z2.getID(), z2);
+    	zonas.put(z3.getID(), z3);
+		
+		Pizarra pizarra = new Pizarra(zonas);
+		pizarra.testModulo();
 	}
 }

@@ -4,7 +4,7 @@
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 30 sept. 2021  
-* @version 1.0  
+* @version 2.2  
 */  
 package vista;
 
@@ -51,16 +51,15 @@ public class TablaEditor extends JPanel{
 	private static final long serialVersionUID = -3765555595448024955L;
 
 	//
-	private final String IAbrir = "/vista/imagenes/Iconos/carpeta_64px.png";
-	private final String IGuardarA = "/vista/imagenes/Iconos/disquete_64px.png";
 	private final String IVentana = "/vista/imagenes/Iconos/editorGrafico_128px.png";
 	//
-	private JButton btnAbrirArchivo,btnGuardarArchivo,btnBorrarTabla,btnImprimir;
+	private JButton btnAbrirArchivo,btnGuardarArchivo,btnGuardarCambios,btnBorrarTabla,btnImprimir;
 	private JButton btnAddRow,btnAddCol,btnNuevaTabla,btnBorrarFila,btnBorrarColumna;
 	private JScrollPane scrollPane;
 	private JTable tabla;
 
 	private DefaultTableModel modelo;
+	private DCVS dcvs;
 	private JLabel lblAsignarTablaA;
 	private JComboBox<String> comboBox;
 	private JButton btnAsignarTabla;
@@ -69,21 +68,28 @@ public class TablaEditor extends JPanel{
 	private JToolBar jtoolBar;
 	private JPanel boxAsignacion;
 	private JFrame frame;
+	
+	private String ruta;
+	private String tipo;
+	private boolean modificado;
 
 	
 	/**
 	 * <p>Title: TablaEditor</p>  
 	 * <p>Description: Constructor principal</p> 
-	 * @param cio Controlador de entrada y salida de datos al disco.
 	 * @param cMap Controlador de los datos relacionados con el mapa.
 	 */
-	public TablaEditor(ControladorDatosIO cio, ControladorMapa cMap ) {
+	public TablaEditor(ControladorMapa cMap ) {
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
+		setLayout(new BorderLayout(0, 0));
 		setBorder(null);
 		setOpaque(false);
-		this.cio = cio;
+		this.cio = new ControladorDatosIO();
 		this.cMap = cMap;
+		this.ruta = null;
+		this.tipo = null;
+		this.modificado = false;
 		initialize();
 	}
 
@@ -134,19 +140,20 @@ public class TablaEditor extends JPanel{
 		jtoolBar.setOrientation(JToolBar.VERTICAL);
 
 		//Añadir los botones
-		addBotonToolBar(btnNuevaTabla, "Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaMouseListener(),Color.GREEN);
-		addBotonToolBar(btnAddRow, "Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowMouseListener(),null);
-		addBotonToolBar(btnAddCol, "Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColMouseListener(),null);
+		btnNuevaTabla = addBotonToolBar(btnNuevaTabla, "Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaMouseListener(),Color.GREEN);
+		btnAddRow= addBotonToolBar(btnAddRow, "Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowMouseListener(),null);
+		btnAddCol = addBotonToolBar(btnAddCol, "Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColMouseListener(),null);
 		jtoolBar.addSeparator();
-		addBotonToolBar(btnBorrarFila, "Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaMouseListener(),Color.ORANGE);
-		addBotonToolBar(btnBorrarColumna, "Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaMouseListener(),Color.ORANGE);
-		addBotonToolBar(btnBorrarTabla, "Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaMouseListener(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar(btnBorrarFila, "Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaMouseListener(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar(btnBorrarColumna, "Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaMouseListener(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar(btnBorrarTabla, "Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaMouseListener(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		addBotonToolBar(btnGuardarArchivo, "Guardar tabla",IGuardarA,new BtnGuardarArchivoMouseListener(),null);
-		addBotonToolBar(btnAbrirArchivo, "Cargar tabla",IAbrir,new BtnAbrirArchivoMouseListener(),null);
+		btnGuardarCambios = addBotonToolBar(btnGuardarCambios, "Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosMouseListener(),null);
+		btnGuardarArchivo = addBotonToolBar(btnGuardarArchivo, "Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoMouseListener(),null);
+		btnAbrirArchivo = addBotonToolBar(btnAbrirArchivo, "Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoMouseListener(),null);
 		jtoolBar.addSeparator();
-		addBotonToolBar(btnImprimir, "Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirMouseListener(),null);
+		btnImprimir = addBotonToolBar(btnImprimir, "Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirMouseListener(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -158,17 +165,17 @@ public class TablaEditor extends JPanel{
 		comboBox.setMaximumSize(new Dimension(102, 25));
 		comboBox.setMinimumSize(new Dimension(102, 25));
 		comboBox.setName("Asignar tabla");
-		comboBox.setToolTipText("Seleccione el módulo que desea asignar esta tabla.");
+		comboBox.setToolTipText("Seleccione el tipo de tabla.");
 		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Leyenda", "Relaciones"}));
 		//jtoolBar.add(comboBox);
 		
-		btnAsignarTabla = new JButton("Asignar tabla");
+		btnAsignarTabla = new JButton("Aplicar tipo");
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAsignarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
 		//jtoolBar.add(btnAplicarTabla);
 		
-		lblAsignarTablaA = new JLabel("Asignar la tabla al módulo");
+		lblAsignarTablaA = new JLabel("Asignar tipo de tabla:");
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
 		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
 		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -195,11 +202,31 @@ public class TablaEditor extends JPanel{
 		//Genera el cuerpo de datos y establace.
 		nuevaTabla();
 		scrollPane.setViewportView(tabla);
-		setLayout(new BorderLayout(0, 0));
 
 		add(boxAsignacion, BorderLayout.SOUTH);
 		add(jtoolBar, BorderLayout.WEST);
 		add(scrollPane, BorderLayout.CENTER);
+	}
+	
+	private void estadoBotones() {
+		//Botones de guardado.
+		btnGuardarArchivo.setEnabled(modificado);
+		btnGuardarCambios.setEnabled(modificado && ruta != null && tipo != null);
+		//Botones nueva tabla, fila, borrarTabla
+		boolean tieneColumna = modelo.getColumnCount() > 0;
+		btnBorrarTabla.setEnabled(tieneColumna);
+		btnNuevaTabla.setEnabled(tieneColumna);
+		btnAddRow.setEnabled(tieneColumna);
+		btnBorrarColumna.setEnabled(tieneColumna);
+		//Botón borrar fila => debe tener alguna fila.
+		boolean tieneFila = modelo.getRowCount() > 0;
+		btnBorrarFila.setEnabled(tieneFila);
+		
+		//Controles especiales.
+		//comboBox;
+		btnAsignarTabla.setEnabled(tieneColumna && tieneFila);
+		//boxAsignacion;
+		
 	}
 
 	/**
@@ -212,8 +239,9 @@ public class TablaEditor extends JPanel{
 	 * @param ruta Ruta completa hasta el archivo de imagen.
 	 * @param ml El observador o listener adjunto al botón.
 	 * @param c Color para el botón, null en otro caso.
+	 * @return JButton modificado con las propiedades requeridas.
 	 */
-	private void addBotonToolBar(JButton btn, String tooltip,String ruta, MouseAdapter ml, Color c) {
+	private JButton addBotonToolBar(JButton btn, String tooltip,String ruta, MouseAdapter ml, Color c) {
 		int hi,wi;
 		hi = wi =  25;
 		btn = new JButton();
@@ -225,7 +253,8 @@ public class TablaEditor extends JPanel{
 		btn.setToolTipText(tooltip);
 		if(c != null) btn.setBackground(c);
 		addIconB(btn,ruta,wi,hi);
-		jtoolBar.add(btn);	
+		jtoolBar.add(btn);
+		return btn;
 	}
 	
 	/**
@@ -254,8 +283,6 @@ public class TablaEditor extends JPanel{
 	 */
 	private ImageIcon getIcon(String ruta, int w, int h) {
 		ImageIcon icon = IO.getIcon(ruta, w, h);
-		//Image img = getImage(ruta);
-		//if(icon != null) icon = new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
 		return icon;
 	}
 	
@@ -275,7 +302,13 @@ public class TablaEditor extends JPanel{
 	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
 	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
 		};
+		
 		tabla.setModel(modelo);
+		dcvs = new DCVS(modelo);
+		this.ruta = null;
+		this.tipo = null;
+		this.modificado = false;
+		estadoBotones();
 	}
 	
 	/**
@@ -310,17 +343,23 @@ public class TablaEditor extends JPanel{
 	private class BtnImprimirMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			try {tabla.print();}
-			catch (PrinterException e1) {e1.printStackTrace();}
+			if(((JButton) e.getSource()).isEnabled()) {
+				try {tabla.print();}
+				catch (PrinterException e1) {e1.printStackTrace();}
+			}
 		}
 	}
 	
 	private class BtnAddColMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-			if(txt != null && !txt.equals("")){									//Si no se ha cancelado o no se ha introducido texto -> procede
-				modelo.addColumn(txt);											//Añade la columna.
+			if(((JButton) e.getSource()).isEnabled()) {
+				String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
+				if(txt != null && !txt.equals("")){									//Si no se ha cancelado o no se ha introducido texto -> procede
+					modelo.addColumn(txt);											//Añade la columna.
+					modificado = true;
+					estadoBotones();
+				}
 			}
 		}
 	}
@@ -328,12 +367,16 @@ public class TablaEditor extends JPanel{
 	private class BtnAddRowMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			int ncols = modelo.getColumnCount();								//Obtención del número de columnas.
-			if(ncols > 0) {														//Comprobación de que existe al menos una columna.
-				Object[] o = new Object[ncols];
-				modelo.addRow(o);
-			}else {
-				mostrar("Debe haber una columna como mínimo", 0);
+			if(((JButton) e.getSource()).isEnabled()) {
+				int ncols = modelo.getColumnCount();								//Obtención del número de columnas.
+				if(ncols > 0) {														//Comprobación de que existe al menos una columna.
+					Object[] o = new Object[ncols];
+					modelo.addRow(o);
+					modificado = true;
+				}else {
+					mostrar("Debe añadir alguna columna.", 0);
+				}
+				estadoBotones();
 			}
 		}
 	}
@@ -341,11 +384,41 @@ public class TablaEditor extends JPanel{
 	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DCVS dcvs = cio.abrirArchivo(null,IO.CSV);			
-			if(dcvs != null) {
-				modelo = dcvs.getModelo();
-				tabla.setModel(modelo);											//Estabece el nuevo modelo en el scroll tabla.
-				mostrar("Archivo Cargado", 1);
+			if(((JButton) e.getSource()).isEnabled()) {
+				if(tipo == null) tipo = IO.CSV;
+				DCVS dcvs2 = cio.abrirArchivo(null,tipo);			
+				if(dcvs2 != null) {
+					dcvs = dcvs2;
+					ruta = dcvs.getRuta();
+					tipo = dcvs.getTipo();
+					modificado = false;
+					modelo = dcvs.getModelo();
+					tabla.setModel(modelo);										//Estabece el nuevo modelo en el scroll tabla.
+					mostrar("Archivo Cargado", 1);
+					System.out.println(dcvs.getRuta() + " - "	+ dcvs.getTipo());
+					estadoBotones();
+				}
+			}
+		}
+	}
+	
+	private class BtnGuardarCambiosMouseListener extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled() && modificado) {
+				if(tipo == null || tipo.equals("")) tipo = IO.CSV;
+				dcvs.setModelo(tabla.getModel());
+				dcvs.setRuta(ruta);
+				dcvs.setTipo(tipo);			
+				if(dcvs.getRowCount() >0) {
+					String rutaF = cio.guardarArchivo(dcvs);
+					if(rutaF != null) {
+						mostrar("Archivo guardado", 1);
+						dcvs.setRuta(rutaF);
+						modificado = false;
+						estadoBotones();
+					}
+				} else mostrar("No hay datos que guardar",0);
 			}
 		}
 	}
@@ -354,10 +427,24 @@ public class TablaEditor extends JPanel{
 	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DCVS bd = new DCVS( (DefaultTableModel)tabla.getModel());
-			bd.setTipo(IO.CSV);
-			if(cio.guardarArchivo(bd) != null) {
-				mostrar("Archivo guardado", 1);
+			if(((JButton) e.getSource()).isEnabled()) {
+				DCVS bd = new DCVS( (DefaultTableModel)tabla.getModel());
+				String rutaF;
+				//Sino tiene de un tipo se le asigna el tipo general.
+				if(tipo == null || tipo.equals("")) {tipo = IO.CSV;	}			
+				bd.setTipo(tipo);
+				if(bd.getRowCount() >0) {
+					rutaF = cio.guardarArchivo(bd);
+					if(rutaF != null) {
+						mostrar("Archivo guardado", 1);
+						bd.setRuta(rutaF);
+						ruta = rutaF;
+						modificado = false;
+						estadoBotones();
+					}					
+				} else mostrar("No hay datos que guardar",0);
+				
+				
 			}
 		}
 	}
@@ -365,18 +452,26 @@ public class TablaEditor extends JPanel{
 	private class BtnBorrarFilaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DCVS dcvs = new DCVS(modelo);
-			dcvs.delFilas(tabla.getSelectedRows());
-			tabla.setModel(modelo);
+			if(((JButton) e.getSource()).isEnabled()) {
+				DCVS dcvs = new DCVS(modelo);
+				dcvs.delFilas(tabla.getSelectedRows());
+				tabla.setModel(modelo);
+				modificado = true;
+				estadoBotones();
+			}
 		}
 	}
 	
 	private class BtnBorrarColumnaMouseListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e) {	
-			int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
-			modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
-			tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
+				modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
+				tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
+				modificado = true;
+				estadoBotones();
+			}
 		}
 	}
 	
@@ -389,43 +484,50 @@ public class TablaEditor extends JPanel{
 	 * @version versión
 	 */
 	private class BtnAplicarTablaMouseListener extends MouseAdapter {
+		//"Sin asignar", "Mapas", "Historico", "Leyenda", "Relaciones"
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			//Obtener selección
-			String seleccion = (String) comboBox.getSelectedItem();
-			//Si se ha seleccionado módulo ->
-			System.out.println(seleccion);
-			
-			switch(seleccion){
-				case "Mapas":
-					if(modelo != null && modelo.getRowCount() > 0) {
-						cMap.setPoligonos(modelo);
-						mostrar("Mapa cargado en el módulo", 1);
-						nuevaTabla();
-					}
-					break;
-				case "Historico": 
-					cMap.setHistorico(modelo);
-					nuevaTabla();
-					break;
-				case "Leyenda":
-					cMap.setPaleta(modelo);
-					mostrar("Nueva paleta asignada", 1);
-					nuevaTabla();
-					break;
-				case "Relaciones":
-					break;
-			}	
+			if(((JButton) e.getSource()).isEnabled()) {
+				//Obtener selección
+				String seleccion = (String) comboBox.getSelectedItem();
+				//Si se ha seleccionado módulo ->
+				System.out.println(seleccion);
+				
+				switch(seleccion){
+					case "Mapas":
+						tipo = IO.MAP;
+						break;
+					case "Historico": 
+						//cMap.setHistorico(modelo);
+						//nuevaTabla();
+						tipo = IO.HST;
+						break;
+					case "Leyenda":
+						//cMap.setPaleta(modelo);
+						//mostrar("Nueva paleta asignada", 1);
+						//nuevaTabla();
+						tipo = IO.PAL;
+						break;
+					case "Relaciones":
+						tipo = IO.REL;
+						break;
+				}
+				
+				mostrar("Nuevo tipo de tabla especificado: " + tipo, 1);
+				estadoBotones();
+			}
 		}
 	}
 	
 	private class BtnBorrarTablaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			//Mostrar dialogo de confirmación
-			int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla actual con sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
-			//Caso afirmativo borrar el modelo y crear uno nuevo.
-			if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+			if(((JButton) e.getSource()).isEnabled()) {
+				//Mostrar dialogo de confirmación
+				int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla actual con sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
+				//Caso afirmativo borrar el modelo y crear uno nuevo.
+				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+			}
 		}
 	}
 
@@ -433,10 +535,12 @@ public class TablaEditor extends JPanel{
 	private class BtnNuevaTablaMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			//Mostrar dialogo de confirmación
-			int opt = JOptionPane.showConfirmDialog(null, "Eliminará la tabla actual con sus datos ¿Desea continuar?", "Aviso", JOptionPane.YES_NO_OPTION);
-			//Caso afirmativo borrar el modelo y crear uno nuevo.
-			if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+			if(((JButton) e.getSource()).isEnabled()) {
+				//Mostrar dialogo de confirmación
+				int opt = JOptionPane.showConfirmDialog(null, "Eliminará la tabla actual con sus datos ¿Desea continuar?", "Aviso", JOptionPane.YES_NO_OPTION);
+				//Caso afirmativo borrar el modelo y crear uno nuevo.
+				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+			}
 		}
 	}
 
@@ -444,7 +548,7 @@ public class TablaEditor extends JPanel{
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
-		TablaEditor te = new TablaEditor(new ControladorDatosIO(), new ControladorMapa(665,456));
+		TablaEditor te = new TablaEditor(new ControladorMapa(665,456));
 		te.abrirFrame();
 	}
 

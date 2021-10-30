@@ -5,6 +5,7 @@
 package controlador;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,7 +15,6 @@ import javax.swing.table.DefaultTableModel;
 import modelo.DCVS;
 import modelo.IO;
 import modelo.ParserPoly;
-import modelo.ParserSVG;
 import modelo.Zona;
 import vista.Leyenda;
 import vista.Mapa;
@@ -40,6 +40,20 @@ public class ControladorMapa {
 	private Player player;
 	private DefaultTableModel historico;
 	
+	/** LEYENDA referencia una paleta de colores o leyenda*/  
+	public final static String LEYENDA = "paleta";
+	/** MAPA referencia a el módulo de mapa*/  
+	public final static String MAPA = "mapa";
+	/** REPRODUCTOR referencia al player o módulo del reproductor*/  
+	public final static String REPRODUCTOR = "player";
+	//"reproductor", "leyenda", "mapa"
+	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/  
+	public final static Dimension FrameDim = new Dimension(1024, 768);
+	/** PanelCentralDim Dimensión del panel central para estandarizar el aspecto de los diferentes paneles de toda la aplicación */  
+	public final static Dimension PanelCentralDim = new Dimension(1024, 768);
+	/** MinDim damaño mínimo para todo marco o panel de la aplicación*/  
+	public final static Dimension MinDim = new Dimension(800, 600);
+	
 	/**
 	 * Constructor de la clase.
 	 * @param w Ancho del mapa.
@@ -49,7 +63,7 @@ public class ControladorMapa {
 		leyenda = new Leyenda(100, 205, false);
 		mapa = new Mapa(w,h, leyenda);
 		player = new Player(400, 400, true);
-		new ParserSVG();
+		//new ParserSVG();
 		parserPoly = new ParserPoly();
 	}
 
@@ -76,29 +90,66 @@ public class ControladorMapa {
 	 */
 	public void setVisibleMapa(boolean ver) {mapa.setVisible(ver);}
 	
+	
+	/**
+	 * <p>Title: situarVentana</p>  
+	 * <p>Description: Posiciona el marco (frame) del módulo incado en la nueva
+	 *  posición de la pantalla, este método no hace por si solo visible el marco. </p>
+	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA".
+	 * @param nombre Nombre identificador del módulo a posicionar.
+	 * @param posX Posición X a establacer.
+	 * @param posY Posición Y a establecer.
+	 */
+	public void situarVentana(String nombre, int posX, int posY) {
+		switch(nombre) {
+		case REPRODUCTOR:
+			player.setPosicion(posX, posY);
+			break;
+		case LEYENDA:
+			leyenda.setPosicion(posX, posY);
+			break;
+		case MAPA:
+			mapa.setPosicion(posX, posY);
+			break;
+		default:
+			System.out.println("Valor en el controlador de mapa no establecido: " + nombre);
+		}
+	}
+	
+	/**
+	 * <p>Title: isPlayable</p>  
+	 * <p>Description: Evalua si el reproductor puede ser ejecutado en función
+	 *  de disponer de un historico condatos y un conjunto de zonas representables</p>
+	 *  Para facilitar su seguimiento, en caso de no cumplirse la idoniedad, mostrará
+	 *  el mensaje adecuado de información por consola.
+	 * @return True si el reproductor puede ejecutarse, False en otro caso.
+	 */
+	public boolean isPlayable() {
+		boolean OK = historico != null && historico.getRowCount()>0;
+		if(OK) {
+			OK = mapa.getNumZones() > 0;
+			if(OK) {
+			}else {System.out.println("No hay cargadas zonas en la representación");}
+		}else {System.out.println("No hay cargado un historico");}
+		
+		return OK;
+	}
+	
 	/**
 	 * <p>Title: play</p>  
 	 * <p>Description: Ejecuta la reproducción de un historico mostrando gráficamente
 	 * la evolución grabada. </p>
 	 * La representación gráfica corresponde a las zonas creadas. Para poder
 	 * usarse esta función deben haber sido almacezandos previamente los datos
-	 * de los poligonos y los de la leyenda.
-	 * @return Retorna True si se complen las condiciones para su apertura y reproducción,
-	 * false en otro caso. 
-	 *  @also setPoligonos.
-	 *  @also setPaleta.
+	 * de las zonas y el historico a reproducir.
+	 * @also setPoligonos.
+	 * @also setPaleta.
 	 */
-	public boolean play() {
-		boolean OK = false;
-		if(historico != null && historico.getRowCount()>0) {
-			if(mapa.getNumZones() > 0) {
-				player.setPlay(mapa,leyenda,new DCVS(historico));
-				player.setVisible(true);
-				OK = true;
-			}else {System.out.println("No hay cargadas zonas en la representación");}
-		}else {System.out.println("No hay cargado un historico");}
-		
-		return OK;
+	public void play() {
+		if(isPlayable()) {
+			player.setPlay(mapa,new DCVS(historico));
+			player.setVisible(true);
+		}
 	}
 	
 	/**
@@ -124,7 +175,10 @@ public class ControladorMapa {
 	private Zona parser(String[] puntos) {
 		String nombre = puntos[1];
 		int id = Integer.parseInt(puntos[0]);
-		return new Zona(id,nombre,parserPoly.parser(puntos));
+		int habitantes =  Integer.parseInt(puntos[2]);
+		int superficie =  Integer.parseInt(puntos[3]);
+		parserPoly.setEscala(2.18);
+		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));
 	}
 
 	/**
@@ -145,7 +199,6 @@ public class ControladorMapa {
 			Color c = new Color(r,g,b);
 			//establecimiento de la paleta	
 			colores.add(c);
-			//leyenda.setColor(i, c);
 		}
 		//leyenda.setPaleta(leyenda.getPaleta());
 		leyenda.setPaleta(colores);
@@ -155,7 +208,7 @@ public class ControladorMapa {
 	 * <p>Title: getPaleta</p>  
 	 * <p>Description: Devuelve la paleta de colores que este configurada 
 	 * en el entorno actualmente</p> 
-	 * @return Paleta de colores.
+	 * @return JPanel con la paleta de colores.
 	 */
 	public Leyenda getPaleta() {return leyenda;}
 	

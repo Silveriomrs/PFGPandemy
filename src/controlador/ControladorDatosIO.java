@@ -33,7 +33,7 @@ public class ControladorDatosIO {
 	 * @return DefaultTableModel modelo con los datos del archivo abierto.
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
-		DCVS dcvs =  io.abrirArchivo(ruta,ext);	
+		DCVS dcvs =  io.abrirArchivo(ruta,ext);
 		return dcvs;
 	}
 	
@@ -56,7 +56,7 @@ public class ControladorDatosIO {
 	 * @return Ruta del archivo seleccionado, null en otro caso.
 	 */
 	public String selFile(int sel, String ext) {
-		return io.selFile(sel, ext);
+		return IO.selFile(sel, ext);
 	}
 
 

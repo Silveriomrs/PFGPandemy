@@ -31,6 +31,7 @@ public class DCVS implements TableModel{
 	 * @param modelo Objeto DefaultTableModel a establecer o null.
 	 */
 	public DCVS(DefaultTableModel modelo) {
+		super();
 		this.modelo = modelo;
 		ruta = null;
 		tipo = "";
@@ -42,6 +43,7 @@ public class DCVS implements TableModel{
 	 * Su ruta es null y su tipo de datos vacio.  
 	 */
 	public DCVS() {
+		super();
 		ruta = null;
 		tipo = "";
 		nuevoModelo();
@@ -58,12 +60,12 @@ public class DCVS implements TableModel{
 		for(int i = 0; i<columnas;i++) {
 			fila[i] = (String) modelo.getValueAt(f, i);
 		}
-		return fila;	
+		return fila;
 	}
 
 	/**
 	 * Añade una nueva fila a la tabla.
-	 * @param f Fila a añadir al modelo.
+	 * @param f Array de objetos de la fila a añadir al modelo.
 	 * @return TRUE si ha tenido exito la operación, FALSE en otro caso.
 	 */
 	public boolean addFila(Object[] f) {
@@ -112,6 +114,23 @@ public class DCVS implements TableModel{
 			for(int i = (nfilas-1); i >= 0; i--) {
 				modelo.removeRow(filas[i]);
 			}
+			done = true;
+		}
+		return done;
+	}
+	
+	/**
+	 * Función que elimina una fila de la tabla. Para ello se le debe pasar
+	 * el índice de la fila a eliminar.
+	 * @param fila Indice de la fila a eliminar.
+	 * @return done TRUE si se ha realizado con exito la operación,
+	 * false en otro caso.
+	 */
+	public boolean delFila(int fila) {
+		boolean done = false;
+		if (fila > -1 && fila < modelo.getRowCount()) {
+			System.out.println("DCVS delFila ->\nFila: " + fila + " > " + getFila(fila)[0]);
+			modelo.removeRow(fila);
 			done = true;
 		}
 		return done;
@@ -231,10 +250,7 @@ public class DCVS implements TableModel{
 			/** serialVersionUID*/  
 			private static final long serialVersionUID = -2383558100131841835L;
 		};
-		
 	}
-	
-	
 	
 	/**
 	 * Convierte los datos almenceados en el modelo al formato CVS, de esta
@@ -264,7 +280,54 @@ public class DCVS implements TableModel{
 		}
 		return texto;
 	}
+	
+	
+	/**
+	 * <p>Title: getFilaItem</p>  
+	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
+	 * de la tabla.</p> 
+	 * @param v Valor a encontrar.
+	 * @return Número de la fila que contiene dicho valor. -1 En otro caso.
+	 */
+	public int getFilaItem(String v) {
+		int filas = getRowCount();
+		int fila = -1;
+		int indexF = 0;
+		boolean encontrado = false;
+		while(!encontrado && indexF < filas ) {
+			String dato = (String) getValueAt(indexF,0);
+			if(dato.equals(v)) {
+				fila = indexF;
+				encontrado = true;
+			}
+			indexF++;
+		}
+		return fila;
+	}
 
+	/**
+	 * <p>Title: getColItem</p>  
+	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
+	 * de cada columna en la tabla. Es decir sus nombres.</p> 
+	 * @param v Valor a encontrar.
+	 * @return Número de la columna que contiene dicho valor (nombre). -1 En otro caso.
+	 */
+	public int getColItem(String v) { /* Función no probada. */
+		int cols = getColumnCount();
+		int col = -1;
+		int indexC = 0;
+		boolean encontrado = false;
+		while(!encontrado && cols > indexC) {
+			String dato = getColumnName(indexC);
+			if(dato.equals(v)) {
+				col = indexC;
+				encontrado = true;
+			}
+			indexC++;
+		}
+		return col;
+	}
+	
 	@Override
 	public void addTableModelListener(TableModelListener arg0) {modelo.addTableModelListener(arg0);}
 

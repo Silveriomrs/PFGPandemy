@@ -3,10 +3,9 @@
  */
 package modelo;
 
+import java.awt.Point;
 import java.awt.Polygon;
-import java.util.Date;
-import java.util.HashMap;
-
+import java.util.ArrayList;
 import vista.GraficasChart;
 
 /**
@@ -21,16 +20,22 @@ import vista.GraficasChart;
 public class Zona {
 	/** name Nombre de la zona*/  
 	private String name;
-	/** ID ID de la zona*/  
+	/** ID de la zona*/  
 	private int ID;
-	/** zona Poligono que representa gráficamente una zona*/  
+	/** Población de la zona */
+	private int poblacion;
+	/** Superficie de la zona en Kilometros cuadrados*/
+	private int superficie;
+	/** zona Poligono que representa gráficamente una zona*/
 	private Polygon zona;
-	/** nivel Nivel de contagio de una zona [0-9]*/  
+	// Lista de puntos que componen el poligono.
+	private ArrayList<Point> listaPuntos;
+	/** nivel Nivel de contagio de una zona [0-9] */  
 	private int nivel;
 	private final String sn = "Nivel";
-	private int contadorN;
-	/** historico de la zona */
-	private HashMap<Date,Integer> historico;
+	/** Indica el valor del eje X para su representación de cada nivel en el eje Y. */
+	private int contadorN;														
+	
 	private GraficasChart chart;
 	
 	/**
@@ -39,19 +44,24 @@ public class Zona {
 	 * del nombre, nombre de la zona completo y el poligono que la representa.
 	 * @param ID nombre corto unico de la zona representada.
 	 * @param name nombre completo de la zona representada.
+	 * @param nhabitantes Número de habitantes que componen la población del grupo/zona.
+	 * @param superficie Superficie de la zona en kilometros cuadrados.
 	 * @param zona poligono cerrado que contiene la representación gráfica de la zona.
 	 */
-	public Zona(int ID, String name, Polygon zona) {
+	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon zona) {
 		setNivel(0);
-		historico = new HashMap<Date,Integer>();
+		listaPuntos = new ArrayList<Point>();
 		this.name = name;
 		this.ID = ID;
+		this.poblacion = nhabitantes;
+		this.superficie = superficie;
 		this.zona = zona;
 		this.chart = new GraficasChart("Tiempo (días)",
-				"Nivel","Zona: " + name,
+				"Nivel",
+				"Zona: " + name,
 				"Evolución pandemica." + " ID: " + ID);
 		this.contadorN = 0;														//Serie de niveles.
-		chart.nuevaSerie(sn);
+		chart.addSerie(sn);
 	}
 
 	/**
@@ -59,13 +69,32 @@ public class Zona {
 	 */
 	public String getName() {return name;}
 
-
 	/**
 	 * @return devuelve ID de la zona
 	 */
 	public int getID() {return ID;}
 
+	/**
+	 * @return El número de habitantes que componen la población de la zona.
+	 */
+	public int getPoblacion() {	return poblacion;}
+	
+	/**
+	 * @param poblacion El número de habitantes a establecer
+	 */
+	public void setPoblacion(int poblacion) {this.poblacion = poblacion;}
 
+	/**
+	 * @return La superficie de la zona en kilometros cuadrados.
+	 */
+	public int getSuperficie() {return superficie;}
+
+	
+	/**
+	 * @param superficie Los kilometros cuadrados de superficie a establecer
+	 */
+	public void setSuperficie(int superficie) {	this.superficie = superficie;}
+	
 	/**
 	 * Devuelve el Poligono que representa la zona.
 	 * @return devuelve el poligono que representa la zona
@@ -80,10 +109,19 @@ public class Zona {
 	public void setPoligono(Polygon poligono) {this.zona = poligono;}
 
 	/**
+	 * @return La listaPuntos que componen el poligono representación de la zona.
+	 */
+	public ArrayList<Point> getListaPuntos() {return listaPuntos;}
+
+	/**
+	 * @param listaPuntos El/la listaPuntos a establecer
+	 */
+	public void setListaPuntos(ArrayList<Point> listaPuntos) {this.listaPuntos = listaPuntos;}
+
+	/**
 	 * @return devuelve nivel desde 0 hasta 9.
 	 */
 	public int getNivel() {	return nivel;}
-
 
 	/**
 	 * Establecimiento del nivel actual de la zona. Su valor debe estar entre 0 y 9,
@@ -95,7 +133,7 @@ public class Zona {
 	@Override
 	public String toString() {	
 		int npuntos = zona.npoints;
-		String txt = getID() + ", " + getName() + ", Nº Puntos: " + npuntos + "\n";
+		String txt = getID() + ", " + getName() + ", " + getPoblacion() + ", " + getSuperficie() +"\n";
 		int[] Px = zona.xpoints;
 		int[] Py = zona.ypoints;
 		for(int i = 0; i<npuntos; i++) {
@@ -110,36 +148,19 @@ public class Zona {
 	 * nivel añadido como nivel actual.</p>
 	 * Cuando el parámetro de Date es null, unicamente establece el nivel indicado
 	 * como actual. 
-	 * @param d Fecha del nivel (Date).
-	 * @param n Nivel a añadir debe estar entre 0 y 9.
+	 * @param name Nombre de la serie de datos al que añadir el nuevo nivel..
+	 * @param valor Valor o nivel a añadir a dicha serie.
 	 */
-	public void addNivel(Date d, int n) {
-		if(d != null && !historico.containsKey(d)) { historico.put(d,n); }
-		chart.addPunto(sn, contadorN, n);
+	public void addNivel(String name, int valor) {
+		chart.addPunto(name, contadorN, valor);
 		contadorN++;
-		setNivel(n);
+		setNivel(valor);
 	}
 
 	/**
-	 * Devuelve el historico de la pandemia en esa zona.
-	 * @return El historico
-	 */
-	public HashMap<Date,Integer> getHistorico() {return historico;}
-
-	/**
-	 * Devuelve la representación gráfica de los datos dados hasta la fecha
-	 * indicada. En caso de un valor null, devuelve la gráfica con todos los
-	 * valores almacenados.
-	 * @param d Fecha (Date) hasta la cual se debe representar el histograma.
+	 * Devuelve la representación gráfica de los datos dados.
 	 * @return El/la grafica
 	 */
-	public GraficasChart getGrafica(Date d) {
-		//Obtener datos ordenados por fecha.
-		
-		//Ir añadiendo datos a la serie.
-		
-		//Retorno
-		return this.chart;
-	}
+	public GraficasChart getGrafica() {return this.chart;	}
 
 }

@@ -71,7 +71,6 @@ public class Player extends JPanel implements ActionListener{
 	private int contador;
 	private int ultima;
 	private Mapa mapa;
-	private Leyenda leyenda;
 	private DCVS historico;
 	private boolean activo;														//Establece si el reproducctor esta activo o pausado.
 	
@@ -98,7 +97,6 @@ public class Player extends JPanel implements ActionListener{
 		tb.setTitleColor(Color.BLUE);
 		setBorder(tb);
 		//Controles: creación.
-		frame = new JFrame();
 		btnPlayPause = new JButton("Reproducir");
 		slider = new JSlider(0,2000,1000);
 		slider.setBackground(new Color(255, 228, 225));
@@ -111,10 +109,23 @@ public class Player extends JPanel implements ActionListener{
 		lblX = new JLabel("x 50 mSec/día");
 		lblFecha = new JLabel("Fecha:");
 		lblHora = new JLabel("Hora:");
-		frame.setContentPane(fondo);
-		
+		//Frame
+		frame = new JFrame();
 		configuracion();
         repaint();
+	}
+	
+	/**
+	 * <p>Title: iniciarFrame</p>  
+	 * <p>Description: Inicia las propiedades del marco. </p>
+	 */
+	private void iniciarFrame() {
+		frame.setContentPane(fondo);
+		frame.setTitle("Reproductor");											//Establecimiento del título.
+		frame.setSize(344,310);													//Establecimiento de las dimensiones.
+		frame.setResizable(false); 												//Dimesiones fijas.
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
+		frame.setAlwaysOnTop(false);
 	}
 
 	/**
@@ -142,7 +153,6 @@ public class Player extends JPanel implements ActionListener{
 		editor.setEditable(false);
 		dateChooser.addPropertyChangeListener(new DateChooserListener());
 		
-
 		//Establecimiento de los textos tooltips
 		btnPlayPause.setToolTipText("Reproduce o Pausa la animación.");
 		dateChooser.setToolTipText("Fecha representada");
@@ -156,12 +166,7 @@ public class Player extends JPanel implements ActionListener{
 		
 		//Establecimiento de los Layouts
 		setLO();
-		
-		frame.setTitle("Reproductor");											//Establecimiento del título.
-		frame.setSize(344,310);													//Establecimiento de las dimensiones.
-		frame.setResizable(false); 												//Dimesiones fijas.
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
-		frame.setAlwaysOnTop(true);
+		iniciarFrame();
 	}
 	
 	@Override
@@ -177,21 +182,25 @@ public class Player extends JPanel implements ActionListener{
 		//Obtención del botón pulsado	
 	}
 	
+	 /** <p>Title: setPosicion</p>  
+	 * <p>Description: Establece la posición para el frame</p> 
+	 * @param xPos Posición X relativa a la pantalla.
+	 * @param yPos Posición Y relativa a la pantalla.
+	 */
+	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
+	
 	/**
 	 * <p>Title: play</p>  
 	 * <p>Description: Establece la Reprodución del historico con el mapa de las zonas y 
 	 * la leyenda cargadas. </p> 
 	 * @param mapa Mapa con las zonas implicadas.
-	 * @param leyenda Leyenda representación de los grados de contagio.
 	 * @param historico Datos historicos a reproductir.
 	 */
-	public void setPlay(Mapa mapa, Leyenda leyenda, DCVS historico) {
+	public void setPlay(Mapa mapa, DCVS historico) {
 		//Activar visualizar mapa y leyenda.
 		this.mapa = mapa;
-		this.leyenda = leyenda;
 		this.historico = historico;
 		this.mapa.setVisible(true);
-		this.leyenda.setVisible(true);
 		ultima = this.historico.getRowCount() -1;
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(ultima);
@@ -212,18 +221,20 @@ public class Player extends JPanel implements ActionListener{
 	private void play(int linea) {
 		String fila[] = historico.getFila(linea);								//Obtener fila.
 		int columnas = historico.getColumnCount();
+		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
 		//Actualizar fecha
 		String f = (String) historico.getValueAt(linea, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
-		Date d = stringToDate(f);		
-		frmtdtxtfldHoraMinuto.setText(d.getHours() + ":" + d.getMinutes());		//Establece la hora de la línea leída en el cuadro de texto.
+		Date d = stringToDate(f);	
+		frmtdtxtfldHoraMinuto.setText(formato.format(d));
 		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
 		
 		for(int j = 1; j < columnas; j++) {		
 			int id = getID(historico.getColumnName(j));							//Obtener ID columna
 			int nivel = getValor(fila[j]);										//Obtener valor									
-			mapa.addZonaNivel(id, d, nivel);									//Otorgar nivel al mapa/zona
+			mapa.addZonaNivel(id, "Nivel", nivel);								//Otorgar nivel al mapa/zona
 			this.updateUI();
 		}
+		
 		//Si es la última línea -> parar reproducción.
 		if(linea == ultima) {
 			timer.stop();
@@ -232,9 +243,7 @@ public class Player extends JPanel implements ActionListener{
 			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
 		}
 		
-		progressBar.setValue(linea);											//Actualización del la barra de progreso.
-		//System.out.println("Linea: " + linea + "/" + ultima);
-		
+		progressBar.setValue(linea);											//Actualización del la barra de progreso.		
 	}
 	
 	/**
@@ -317,13 +326,13 @@ public class Player extends JPanel implements ActionListener{
 	}
 	
 	/**
-	 * <p>Title: getFrame</p>  
+	 * <p>Title: getPanel</p>  
 	 * <p>Description: Devuelve el JPanel que contiene el reproductor,
 	 * de esta manera puede facilitarse su inclusión dentro otros Frames o JPanels
 	 * </p> 
 	 * @return JPanel contendor de este reproductor y su configuración.
 	 */
-	public JPanel getFrame() {return this;}
+	public JPanel getPanel() {return this;}
 	
 	private class BtnPlay extends MouseAdapter {
 		@Override
@@ -353,16 +362,17 @@ public class Player extends JPanel implements ActionListener{
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			int linea = contador;
+			SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
 			if(!activo && arg0.getPropertyName().equals("date") ) {
 				Date f = dateChooser.getDate();									//Obtención del valor establecido.				
 				linea = getLineaDate(f);
 				
 				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
 				Date d = stringToDate(s);
-				
-				System.out.println("Fecha búscada  : " + f.getDay() + "/" + f.getMonth() + "/" + f.getYear());		
-				System.out.println("Fecha propuesta: " + d.getDay() + "/" + d.getMonth() + "/" + d.getYear());
-				System.out.println("Línea calculada: " + linea);
+
+				System.out.println("Player > Fecha búscada  : " + formato.format(f));		
+				System.out.println("Player > Fecha propuesta: " + formato.format(d));
+				System.out.println("Player > Línea calculada: " + linea);
 	
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador

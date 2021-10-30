@@ -4,11 +4,11 @@
 package vista;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,17 +16,17 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.border.LineBorder;
 
-import modelo.FondoPanel;
+import controlador.ControladorMapa;
 import modelo.Zona;
-import java.awt.CardLayout;
-import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 
 /**
  * Clase para la representación en modo de mapa de los datos de un núcleo
  * poblacional (provincia o comunidad autónoma).
  * @author Silverio Manuel Rosales Santana
  * @date 10/07/2021
- * @version 1.0
+ * @version 1.2
  *
  */
 public class Mapa extends JPanel{
@@ -34,8 +34,6 @@ public class Mapa extends JPanel{
 	private static final long serialVersionUID = 6251836932416777274L;
 	/** frame Marco para dibujado del mapa en modo flotante*/  
 	private JFrame frame;
-	/** fondo Imagen de fondo establecida*/  
-	private FondoPanel fondo;
 	/** zonas Conjunto con las zonas que contiene el mapa.*/  
 	private HashMap<Integer,Zona> zonas;
 	/** leyenda Leyenda del mapa.*/
@@ -49,15 +47,18 @@ public class Mapa extends JPanel{
 	 */
 	public Mapa(int width, int height, Leyenda leyenda) {
 		super();
-		this.leyenda = leyenda;
-		zonas = new HashMap<Integer, Zona>();
-		frame = new JFrame();
-		this.addMouseListener(new SelectorPoligono());
-		setBorder(new LineBorder(new Color(0, 0, 0)));	
-		setBackground(Color.LIGHT_GRAY);
 		setOpaque(false);
-		setLayout(new CardLayout(0, 0));
-	}	
+		this.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		this.setPreferredSize(ControladorMapa.PanelCentralDim);
+		this.setMinimumSize(ControladorMapa.MinDim);
+		this.leyenda = leyenda;
+		this.zonas = new HashMap<Integer, Zona>();
+		this.addMouseListener(new SelectorPoligono());
+		this.setBorder(new LineBorder(new Color(0, 0, 0)));	
+		this.setBackground(Color.LIGHT_GRAY);
+		this.setLayout(new BorderLayout(0, 0));
+		iniciarFrame(width,height);
+	}
 	
 	/**
 	 * <p>Title: verFrame</p>  
@@ -65,28 +66,52 @@ public class Mapa extends JPanel{
 	 * @param w Ancho del marco.
 	 * @param h Alto del marco.
 	 */
-	public void verFrame(int w, int h){	
-		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-		frame.getContentPane().add(this);	
+	public void iniciarFrame(int w, int h){
+		frame = new JFrame();
 		frame.setTitle("Mapa");
 		frame.setSize(w,h);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    frame.setMaximumSize(new Dimension(2767, 2767));
+		frame.setMinimumSize(ControladorMapa.MinDim);
+		frame.getContentPane().add(this);
+		frame.add(this);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setVisible(true);
 	}
+	
+	/**
+	 * <p>Title: verFrame</p>  
+	 * <p>Description: Activa o desactiva la visibilidad del frame.</p> 
+	 * @param activado True para hacerlo visible, False en otro caso.
+	 */
+	public void verFrame(boolean activado) {frame.setVisible(activado);}
+	
+	/**
+	 * <p>Title: toogleVisible</p>  
+	 * <p>Description: Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
+	 * Para tal efecto consulta el estado previo y configura el estado actual en
+	 * función del anterior. 
+	 */
+	public void toogleVisible() {this.setVisible(!this.isVisible());}
+	
+	 /** <p>Title: setPosicion</p>  
+	 * <p>Description: Establece la posición para el frame</p> 
+	 * @param xPos Posición X relativa a la pantalla.
+	 * @param yPos Posición Y relativa a la pantalla.
+	 */
+	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		//frame.setContentPane(fondo.getFodo());
-
 		zonas.forEach((n,z) -> {
-				if(z.getZona() != null) {
+			if(z.getZona() != null) {
 				g.setColor(leyenda.getColor(z.getNivel()));
 				g.fillPolygon(z.getZona());
 				g.setColor(Color.BLACK);
 				g.drawPolygon(z.getZona());
 			}
 		});
+//		System.out.println("Mapa - paintComponent > refrescando");
 		this.updateUI();														//Redibujado y actualización del panel.
 	}
 	
@@ -96,15 +121,6 @@ public class Mapa extends JPanel{
 	 * @return Mapa embebido dentro de un JPanel.
 	 */
 	public JPanel getPanel() {return this;}	
-	
-	/**
-	 * Carga una imagen de fondo para el panel.
-	 * @param nombre nombre de la imagen y su ruta.
-	 */
-	public void setFondo(String nombre) {
-		fondo = new FondoPanel(nombre);
-		frame.setContentPane(fondo.getFondo());
-	}
 
 	/**
 	 * Devuelve el poligono que representa una zona del mapa.
@@ -130,12 +146,12 @@ public class Mapa extends JPanel{
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
-	 * @param d Fecha asociada al nivel almacenado.
+	 * @param serie Nombre de la serie asociada al nivel almacenado.
 	 * @param n Nivel de asignación.
 	 */
-	public void addZonaNivel(int id, Date d, int n) {
+	public void addZonaNivel(int id, String serie, int n) {
 		if(zonas.containsKey(id)) {												//Comprobación de que existe.
-			zonas.get(id).addNivel(d, n);
+			zonas.get(id).addNivel(serie, n);									//Añadir valor a la serie que corresponda.
 		}
 	}
 
@@ -163,21 +179,42 @@ public class Mapa extends JPanel{
 	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
 		public void mousePressed(MouseEvent e)  {
-	    	boolean encontrado = false;
 	    	//Obtención del punto del mapa que ha recibido la pulsación.
 	        Point p = e.getPoint();
+	        Zona z = getZona(p);
+	        if(z != null) {
+	        	GraficasChart chart = z.getGrafica();
+        		chart.genera();
+        		chart.setVisible(true);
+	        }
+	    }
+	    
+//	    @Override
+//	    public void mouseEntered(MouseEvent e) {
+//	        //se llama cuando el mouse entra a los limites del componente.
+//	        //Cuando sale y entra de la ventana (en este caso).
+//	    	Point p = e.getPoint();
+//	        Zona z = getZona(p);
+//	    	if(z != null) {
+//	    		System.out.println("Acabas de entrar a la zona: " + z.getName());
+//	    	}else System.out.println("No sé a donde he entrado");
+//	    }
+	    
+	    private Zona getZona(Point p) {
+	    	boolean encontrado = false;
+	    	Zona zona = null;
+	    	Zona zAux = null;
 	        //Busqueda del poligono que contiene dicha coordenada.
 	        Iterator<Map.Entry<Integer, Zona>> it = zonas.entrySet().iterator();
 	        while (it.hasNext() && !encontrado) {
-	            Map.Entry<Integer, Zona> z = it.next();
-	            //Si se ha encontrado se genera su gráfica y se muestra.
-	            if(z.getValue().getZona().contains(p)) {
-	        		GraficasChart chart = z.getValue().getGrafica(null);
-	        		chart.genera();
-	        		chart.setVisible(true);
+	            zAux = it.next().getValue();									//Obtención del nuevo set sin el valor anterior.
+	            //Si se ha encontrado se termina la búsqueda.
+	            if(zAux.getZona() != null && zAux.getZona().contains(p)) {		//Evita evaluar valores nulos
+	        		zona = zAux;												//Valor final a devolver.
 	        		encontrado = true;											//Detenemos la búsqueda para ahorrar recursos.
 	            }
 	        }
+	    	return zona;
 	    }
 	}
 }

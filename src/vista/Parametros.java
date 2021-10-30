@@ -15,8 +15,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Container;
 
 import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
@@ -54,7 +56,7 @@ public class Parametros extends JPanel {
 		this.setNombre(nombre);
 		setBackground(Color.YELLOW);
 		setLayout(new BorderLayout(0, 0));
-		setPreferredSize(new Dimension(800, 600));
+		setPreferredSize(new Dimension(1024, 768));
 		paneles = new JTabbedPane(JTabbedPane.LEFT);
 		add(paneles, BorderLayout.CENTER);
 		configura();
@@ -67,8 +69,9 @@ public class Parametros extends JPanel {
 	public void abrirFrame() {
 	    JFrame frame = new JFrame("Paneles de configuración");
 	    Dimension m = getPreferredSize();
-	    int x = (int)m.getWidth();
+	    int x = (int)m.getWidth()+ 20;
 	    int y = (int)m.getHeight()+15;
+	    frame.setSize(new Dimension(x, y));
 	    frame.setPreferredSize(new Dimension(x, y));
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(new Dimension(800, 600));
@@ -82,11 +85,11 @@ public class Parametros extends JPanel {
 	private void configura() {
 		//Creación de los paneles
 		//Panel 1 debe ser de información y características del proyecto.
-        JPanel panel1 = new Archivos(null,null);
+        JPanel panel1 = new Parametros_Proyecto();
         //Panel 2 de las características de la enfermedad.
         JPanel panel2 = new JPanel();
         //Panel 3 de las relaciones de las comunidades.
-        JPanel panel3 = new TablaEditor(null, null);
+        JPanel panel3 = new TablaEditor(null);
         //Panel 4 de las características de cada zona.
         JPanel panel4 = new JPanel();
        
@@ -102,6 +105,20 @@ public class Parametros extends JPanel {
 	    iniciarPanel(panel3,false,"Matriz de relaciones","Definir la matriz de contactos (relaciones)","/vista/imagenes/Iconos/nodos_64px.png");
 	    iniciarPanel(panel4,true,"Parámetros de zonas","Define los parámetros de los grupos (zonas)","/vista/imagenes/Iconos/parametros_64px.png");
         
+	    enableComponents(panel2,false);
+	    enableComponents(panel3,false);
+	    enableComponents(panel4,false);
+	}
+	
+	
+	private void enableComponents(Container container, boolean enable) {
+	    Component[] components = container.getComponents();
+	    for (Component component : components) {
+	        component.setEnabled(enable);
+	        if (component instanceof Container) {
+	            enableComponents((Container)component, enable);
+	        }
+	    }
 	}
 	
 	

@@ -4,462 +4,341 @@
 package vista;
 
 import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.GridLayout;
-import java.awt.Panel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.print.PrinterException;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
 import controlador.ControladorDatosIO;
 import controlador.ControladorMapa;
 import modelo.DCVS;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
-import java.awt.Font;
 import modelo.FondoPanel;
 import modelo.IO;
+
 import java.awt.BorderLayout;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 
 /**
  * Clase de la vista principal donde se modelan las tablas
  * que sean necesarias.
  * @author Silverio Manuel Rosales Santana.
  * @date 2021/04/10
- * @version 1.5
+ * @version 2.8
  *
  */
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
-	private JButton btnAbout,btnAbrirArchivo,btnGuardarArchivo,btnBorrarTabla,btnImprimir;
-	private JButton btnAddRow,btnAddCol,btnBorrarFila,btnBorrarColumna;
-	private ControladorDatosIO cio;
-	private JScrollPane scrollPane;
-	private JTable tabla;
-	private Archivos archivos;
-	private About about;
 
-	private DefaultTableModel modelo;
-	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
-	private final Panel panel = new Panel();
-	private JLabel lblAsignarTablaA;
-	private JComboBox<String> comboBox;
-	private JButton btnAplicarTabla;
+	private Archivos archivos;
+	private ControladorDatosIO cio;
+	private TablaEditor tablaEditor;
+	private HashMap<String, JMenuItem> jmitems;
+	private Pizarra pizarra;
+	private Parametros pparametros;
+
+	private About about;
+	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
+	private JPanel panelCentral;
 	private ControladorMapa cMap;
-	private JLayeredPane layeredPane;
-	private JLayeredPane boxAsignacion;
-	private final int panelCentralW = 665;
-	private final int panelCentralH = 456;
+	private String panelActivo;
+	//
+	private JMenuBar menuBar;
+	private final int w = 1024;
+	private final int h = 768;
 
 	/**
-	 * Crea la aplicación.
+	 * Crea el módulo principal de la aplicación.
 	 */
 	public Principal() {
-		setResizable(false);
 		cio = new ControladorDatosIO();
-		cMap = new ControladorMapa(panelCentralW,panelCentralH);
-		panel.setLayout(new GridLayout(1, 0, 0, 0));
+		cMap = new ControladorMapa(w,h);
+		//cMap = new ControladorMapa(panelCentralW,panelCentralH);
+		archivos = new Archivos(cMap);
+		tablaEditor = new TablaEditor(cMap);
+		pizarra = new Pizarra(cMap.getZonas());
+		pparametros = new Parametros("Test",4);
 		about = new About();
-		archivos = new Archivos(cio,cMap);
-		setTitle("Simulador de Pandemias");	
-		getContentPane().setBackground(Color.GRAY);
-		this.setContentPane(fondo);
-		setVisible(true);	
-		initialize();
+		panelActivo = "Mapa";
+		this.setTitle("Simulador de Pandemias");
+		this.getContentPane().setBackground(Color.GRAY);
+		this.setContentPane(fondo);	
+		this.setBounds(0, 0, w + 25, h + 15);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
+		this.setResizable(true);
+		initialize();
+		this.setVisible(true);
 	}
 
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
-	private void initialize() {
-		setBounds(0, 0, 914, 610);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private void initialize() {		
+		fondo.setLayout(new BorderLayout(0, 0));	
+		iniciarMenuBar();
+		
+		panelCentral = new JPanel();
+		panelCentral.setOpaque(false);
+		panelCentral.setMaximumSize(new Dimension(2767, 2767));
+		panelCentral.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);	
+		panelCentral.setLayout(new BorderLayout(0, 0));
+		
+		//Añadir paneles de los módulos.
+		panelCentral.add(tablaEditor, null);
+		panelCentral.add(archivos, null);
+		panelCentral.add(cMap.getJMapa(), null);
+		panelCentral.add(pparametros,null);
 
-		btnAbout = new JButton("");
-		btnAbout.addMouseListener(new BtnAboutMouseListener());
-		btnAbout.setForeground(Color.GRAY);
-		btnAbout.setBackground(Color.GRAY);
-		btnAbout.setIcon(new ImageIcon(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
+		//Añadir elementos al JPanel principal.
+		fondo.add(menuBar, BorderLayout.NORTH);
+		fondo.add(panelCentral, BorderLayout.CENTER);
 		
-		scrollPane = new JScrollPane();
-		scrollPane.setOpaque(false);
-		scrollPane.setAutoscrolls(true);
-		scrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
-		scrollPane.setName("scrollTabla");
-		scrollPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		
-		layeredPane = new JLayeredPane();
-		
-		boxAsignacion = new JLayeredPane();
-		boxAsignacion.setBorder(new LineBorder(new Color(0, 0, 0)));
-		boxAsignacion.setBackground(Color.WHITE);
-		
-		GroupLayout gl_fondo = new GroupLayout(getContentPane());
-		gl_fondo.setHorizontalGroup(
-			gl_fondo.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addGap(12)
-					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_fondo.createSequentialGroup()
-							.addGap(22)
-							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
-							.addGap(33)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, panelCentralW, Short.MAX_VALUE))
-						.addGroup(gl_fondo.createSequentialGroup()
-							.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(76)
-							.addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)))
-					.addGap(23))
-		);
-		gl_fondo.setVerticalGroup(
-			gl_fondo.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_fondo.createSequentialGroup()
-					.addGroup(gl_fondo.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_fondo.createSequentialGroup()
-							.addGap(24)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, panelCentralH, Short.MAX_VALUE))
-						.addGroup(gl_fondo.createSequentialGroup()
-							.addGap(37)
-							.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)))
-					.addGap(18)
-					.addGroup(gl_fondo.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnAbout)
-						.addComponent(boxAsignacion, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-					.addGap(23))
-		);
-		
-		addBotonLayerPane(btnAddRow, "Crear Fila",new BtnAddRowMouseListener(),null,10);
-		addBotonLayerPane(btnAddCol, "Crear Columna",new BtnAddColMouseListener(),null,35);
-		addBotonLayerPane(btnBorrarFila, "Del fila/s",new BtnBorrarFilaMouseListener(),Color.ORANGE,70);
-		addBotonLayerPane(btnBorrarColumna, "Del columna/s",new BtnBorrarColumnaMouseListener(),Color.ORANGE,95);
-		addBotonLayerPane(btnGuardarArchivo, "Guardar tabla",new BtnGuardarArchivoMouseListener(),null,130);
-		addBotonLayerPane(btnAbrirArchivo, "Cargar tabla",new BtnAbrirArchivoMouseListener(),null,155);
-		addBotonLayerPane(btnBorrarTabla, "Borrar tabla",new BtnBorrarTablaMouseListener(),Color.ORANGE,198);
-		addBotonLayerPane(btnImprimir, "Imprimir",new BtnImprimirMouseListener(),null,236);
-		
-		comboBox = new JComboBox<String>();
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Ver Tabla", 
-				"Ver Mapa", "Ver Archivos","Abrir Reproductor","Abrir editor Gráfico"}));
-		
-		btnAplicarTabla = new JButton("Aplicar tabla");
-		btnAplicarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
-		
-		lblAsignarTablaA = new JLabel("Asignar la tabla al módulo");
-		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
-		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
-		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		lblAsignarTablaA.setBackground(Color.WHITE);
-		
-		GroupLayout gl_boxAsignacion = new GroupLayout(boxAsignacion);
-		gl_boxAsignacion.setHorizontalGroup(
-			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_boxAsignacion.createSequentialGroup()
-					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_boxAsignacion.createSequentialGroup()
-							.addGap(6)
-							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnAplicarTabla))
-						.addGroup(gl_boxAsignacion.createSequentialGroup()
-							.addGap(58)
-							.addComponent(lblAsignarTablaA, GroupLayout.PREFERRED_SIZE, 235, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		gl_boxAsignacion.setVerticalGroup(
-			gl_boxAsignacion.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_boxAsignacion.createSequentialGroup()
-					.addGap(6)
-					.addComponent(lblAsignarTablaA)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_boxAsignacion.createParallelGroup(Alignment.BASELINE)
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnAplicarTabla))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		
-		boxAsignacion.setLayout(gl_boxAsignacion);
-		
-		gl_fondo.setAutoCreateContainerGaps(true);
-		gl_fondo.setAutoCreateGaps(true);
-		//Creación tabla principal.
-		tabla = new JTable();
-		tabla.setOpaque(false);
-		tabla.setAutoCreateRowSorter(true);
-		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		tabla.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
-		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tabla.setCellSelectionEnabled(false);
-		tabla.setRowSelectionAllowed(true);
-		tabla.setColumnSelectionAllowed(false);
-		tabla.setBackground(new Color(224, 255, 255));
-		tabla.getTableHeader().setReorderingAllowed(false);
-		//Genera el cuerpo de datos y establace.
-		nuevaTabla();
-		scrollPane.setViewportView(tabla);
-		
+		//Ocultar JPanels no primarios y mostrar el panel por defecto.
+		mostrarPanel(panelActivo);
+	}
+	
+	/**
+	 * <p>Title: iniciarMenuBar</p>  
+	 * <p>Description: Genera una barra de herramientas y la añade
+	 * al JPanel principal, localización Norte.</p> 
+	 */
+	private void iniciarMenuBar() {
+		//Inicializar el HashMap
+		jmitems = new HashMap<String,JMenuItem>();
 		//Barra de menus.
-		JMenuBar menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 		getContentPane().add(menuBar, BorderLayout.NORTH);
-		
-//		fondo.add(scrollPane, BorderLayout.EAST);
-//		fondo.add(layeredPane, BorderLayout.WEST);
-//		fondo.add(lblAsignarTablaA,BorderLayout.SOUTH);
-//		fondo.add(btnAbout,BorderLayout.SOUTH);
 
+		//Menu Archivo
 		JMenu mnArchivo = new JMenu("Archivo");
+		addJMenuItem(mnArchivo, "Nuevo Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		mnArchivo.addSeparator();
+		addJMenuItem(mnArchivo, "Abrir Proyecto","/vista/imagenes/Iconos/carpeta_64px.png" );
+		addJMenuItem(mnArchivo, "Importar Proyecto Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		mnArchivo.addSeparator();
+		addJMenuItem(mnArchivo, "Guardar Proyecto","/vista/imagenes/Iconos/disquete_64px.png" );
+		mnArchivo.addSeparator();
+		addJMenuItem(mnArchivo, "Salir","/vista/imagenes/Iconos/salir_64px.png" );
+		
+		//Menu Ver
 		JMenu mnVer = new JMenu("Ver");
-
-		JMenuItem mntmAbrirProyecto = new JMenuItem("Abrir Proyecto");
-		JMenuItem mntmGuardarProj = new JMenuItem("Guardar Proyecto");
-		JMenuItem mntmtest = new JMenuItem("test");
-
-		mnArchivo.add(mntmGuardarProj);
-		mnArchivo.add(mntmAbrirProyecto);
-		mnVer.add(mntmtest);
+		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
+		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		addJMenuItem(mnVer, "Archivos","/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		
+		//Menu Ejecutar
+		JMenu mnEjecutar = new JMenu("Ejecutar Modulo");
+		addJMenuItem(mnEjecutar, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
+		addJMenuItem(mnEjecutar, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
+		addJMenuItem(mnEjecutar, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		
+		//Menu Ejecutar
+		JMenu mnAyuda = new JMenu("Ayuda");
+		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
+		
+		//Añadir sub-menus a la barra de menus.
 		menuBar.add(mnArchivo);
 		menuBar.add(mnVer);
+		menuBar.add(mnEjecutar);
+		menuBar.add(mnAyuda);
 		
-		fondo.setLayout(gl_fondo);
-	
+		//Configurar estados de cada JMenuItem y/o sus menús según el contexto.
+		actualizarJMItems();
 	}
 	
 	/**
-	 * <p>Title: addBotonLayerPane</p>  
-	 * <p>Description: Añade los controles al LayerPane que los contendrá</p>
-	 * Los añade con el formato correcto y una separación costante, además,
-	 * permite que los botones puedan tener colores personalizados.
-	 * @param btn Botón a ser añadido.
-	 * @param nombre Texto del botón.
-	 * @param ml El observador o listener adjunto al botón.
-	 * @param c Color para el botón, null en otro caso.
-	 * @param yPos Posición vertical dentro del LayerPane
+	 * <p>Title: actualizarJMItems</p>  
+	 * <p>Description: Actualiza los JMenuItems en función del contexto de la aplicación</p>
+	 * Actua leyendo el estado de la aplicación y activando o desactivado las funciones
+	 * de los menús en base a los datos cargados y el estado previo de los diferentes módulos.
 	 */
-	private void addBotonLayerPane(JButton btn, String nombre, MouseAdapter ml, Color c, int yPos) {
-		btn = new JButton(nombre);
-		btn.addMouseListener(ml);
-		if(c != null) btn.setBackground(c);
-		btn.setHorizontalAlignment(SwingConstants.LEFT);
-		int yPos2  = layeredPane.getComponentCount()*30;
-		btn.setBounds(0, yPos2, 140, 25);
-		layeredPane.add(btn);
+	private void actualizarJMItems() {
+		//En caso de no zonas:
+		boolean nozonas = cMap.getZonas().size() > 0;
+		//Desactivar vista mapa.
+		jmitems.get("Mapa").setEnabled(nozonas);
+		//Desactivar editor de zonas gráfico.
+		jmitems.get("Editor Gráfico").setEnabled(nozonas);
+		//Desactivar reproductor.
+	//	jmitems.get("Reproductor").setEnabled(cMap.isPlayable());
+		jmitems.get("Reproductor").setEnabled(nozonas);
+		//En caso de no tener abierto proyecto (y luego no cambios)
+		//Desactivar Guardar proyecto.
+		jmitems.get("Guardar Proyecto").setEnabled(nozonas);
+		
+	}
+
+	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
+		JMenuItem item = new JMenuItem(new VerMenuListener(nombre));
+		if(rutaIcon != null)  item.setIcon(IO.getIcon(rutaIcon,20,20));
+		jmitems.put(nombre, item);
+		padre.add(item);
 	}
 	
-	/**
-	 * <p>Title: nuevaTabla</p>  
-	 * <p>Description: Crea una nueva tabla sin columnas ni filas..</p>
-	 */
-	private void nuevaTabla() {
-		//Cuerpo de datos
-		Object[][] datos = new Object[][]{};	
-		//Cabecera de datos.		
-		String[] cabecera = new String[] {};
-		modelo = new DefaultTableModel(datos,cabecera){
-			private static final long serialVersionUID = 5615251971828569240L;
-	//		@SuppressWarnings("rawtypes")
-	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
-		};
-		tabla.setModel(modelo);
-	}
+	private int getPosX() {	return (int) this.getBounds().getX();}
 	
-	/**
-	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
-	 * no están enlazados con un hilo padre (null). Un número no definido se 
-	 * mostrará como información.
-	 * 
-	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un 
-	 * mensaje tipo 1. 
-	 * @param txt Texto a mostrar.
-	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
-	 *  0 JOptionPane.ERROR_MESSAGE
-	 *  1 JOptionPane.INFORMATION_MESSAGE
-	 *  2 JOptionPane.WARNING_MESSAGE
-	 *  3 JOptionPane.QUESTION_MESSAGE  
-	 *  4 JOptionPane.PLAIN_MESSAGE
-	 */
-	private void mostrar(String txt, int tipo ) {
-		String titulo = "";
-		switch(tipo) {
-		case 0: titulo = "Error";break;
-		case 1: titulo = "Información"; break;
-		case 2: titulo = "¡Antención!"; break;
-		case 3: titulo = "Consulta"; break;
-		case 4: titulo = "Acerca de..."; tipo = 1; break;
-		default:
-			titulo = "";
-		}
-		JOptionPane.showMessageDialog(null, txt, titulo, tipo);
-	}
+	private int getPosY() {	return (int) this.getBounds().getY();}
 	
-	private class BtnImprimirMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			try {tabla.print();}
-			catch (PrinterException e1) {e1.printStackTrace();}
-		}
-	}
-	
-	private class BtnAddColMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-		//	JOptionPane.showMessageDialog(null, txt, titulo, tipo);
-			String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-				if(txt != "" || txt != null){
-				modelo.addColumn(txt);
-				tabla.setModel(modelo);
-			}
-		}
-	}
-	
-	private class BtnAddRowMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			int ncols = modelo.getColumnCount();								//Obtención del número de columnas.
-			if(ncols > 0) {														//Comprobación de que existe al menos una columna.
-				Object[] o = new Object[ncols];
-				modelo.addRow(o);
-				tabla.setModel(modelo);
-			}
-		}
-	}
-	
-	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			 DCVS dcvs = cio.abrirArchivo(null,IO.CSV);			
-			if(dcvs != null) {
-				DefaultTableModel modelo = dcvs.getModelo();
-				tabla.setModel(modelo);
-				mostrar("Archivo Cargado", 1);
-			}
-		}
-	}
-	
-	private class BtnAboutMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			about.toggleVisible();
-		}
-	}
-	
-	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			DCVS bd = new DCVS( (DefaultTableModel)tabla.getModel());
-			bd.setTipo(IO.CSV);
-			if(!cio.guardarArchivo(bd).equals(null)) {
-				mostrar("Archivo guardado", 1);
-			}
-		}
-	}
-	
-	private class BtnBorrarFilaMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			DCVS dcvs = new DCVS(modelo);
-			dcvs.delFilas(tabla.getSelectedRows());
-			tabla.setModel(modelo);
-		}
-	}
-	
-	private class BtnBorrarColumnaMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {	
-			int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
-			modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
-			tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
-		}
-	}
-	
-	/**
-	 * <p>Title: BtnAplicarTablaMouseListener</p>  
+	 /**
+	 * <p>Title: VerMenuListener</p>  
 	 * <p>Description: Clase dedicada al establecimiento de los datos en los
 	 * apartados o módulos oportunos.</p>  
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
 	 * @version versión
 	 */
-	private class BtnAplicarTablaMouseListener extends MouseAdapter {
+	private class VerMenuListener extends AbstractAction {
+		/** serialVersionUID*/  
+		private static final long serialVersionUID = -5103462996882781094L;
+		private String name;
+		
+		public VerMenuListener(String name) {
+			super(name);
+			this.name = name;
+		}
+		
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			//Obtener selección
-			String seleccion = (String) comboBox.getSelectedItem();
+		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
-			System.out.println(seleccion);
-			
-			switch(seleccion){
-				case "Mapas":
-					if(modelo != null && modelo.getRowCount() > 0) {
-						cMap.setPoligonos(modelo);
-						mostrar("Mapa cargado en el módulo", 1);
-						nuevaTabla();
+			System.out.println("Principal AL: " + name);
+			//En cualquier caso actualizar.
+			cMap.setModulos(archivos.getMapaModulos());
+			//
+			switch(name){
+				case "Reproductor":
+					//Pasar mapa de módulos al controlar de mapa.
+					if(cMap.isPlayable()) {
+						cMap.play();
+						mostrarPanel("Reproductor");
 					}
 					break;
-				case "Historico": 
-					cMap.setHistorico(modelo);
-					nuevaTabla();
+				case "Editor Gráfico":				
+					pizarra = new Pizarra(cMap.getZonas());
+					pizarra.abrirFrame();
 					break;
-				case "Leyenda":
-					cMap.setPaleta(modelo);
-					mostrar("Nueva paleta asignada", 1);
-					nuevaTabla();
-				case "Abrir Reproductor":
-					//Pasar mapa de módulos al controlar de mapa.
-					cMap.setModulos(archivos.getMapaModulos());
-					if(cMap.play()) scrollPane.setViewportView(cMap.getJMapa());
+				case "Mapa":
+					cMap.getMapa().setVisible(true);
+					cMap.setVisibleMapa(true);
+				//	cMap.getMapa().verFrame(true);
+					mostrarPanel(name);
 					break;
-				case "Abrir editor Gráfico":
-					cMap.setModulos(archivos.getMapaModulos());
-				//	if(cMap.getMapa() != null && cMap.getMapa().getNumZones() > 0) {					
-						//
-						Pizarra pizarra =new Pizarra(cMap);
-					//	pizarra.setZonas(cMap.getZonas());
-					//	pizarra.abrirFrame();
-						pizarra.testModulo(null);
-				//	}
+				case "Paleta":
+				case "Tabla":
+				case "Archivos":
+				case "Proyecto":
+					mostrarPanel(name);
 					break;
-				case "Ver Mapa":
-					cMap.setModulos(archivos.getMapaModulos());
-					scrollPane.setViewportView(cMap.getMapa());
+				case "Abrir Proyecto":
+					DCVS prj = cio.abrirArchivo(null,IO.PRJ);
+					if(prj != null) archivos.abrirProyecto(prj);
 					break;
-				case "Ver Tabla":
-					scrollPane.setViewportView(tabla);
+				case "Importar Proyecto Vensim":
+					//Hay que conocer la extensión que usa VenSim en sus proyectos.
+//					DCVS prjV = cio.abrirArchivo(null,IO.PRJ);
+					//Requiere nuevo parser completo.
+//					if(prjV != null) archivos.abrirProyecto(prjV);
 					break;
-				case "Ver Archivos":
-					scrollPane.setViewportView(archivos.getPanel());
-			}	
+				case "Nuevo Proyecto":
+					Parametros.main(null);
+					break;
+				case "Salir":
+					if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
+					break;
+				case "Acerca de...":
+					about.toggleVisible();
+					break;
+				default:
+					System.out.println(name + ", tipo no reconocido");
+			}
+			actualizarJMItems();
 		}
 	}
 	
-	private class BtnBorrarTablaMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			//Mostrar dialogo de confirmación
-			int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla y sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
-			//Caso afirmativo borrar el modelo y crear uno nuevo.
-			if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+	private void mostrarPanel(String nombre) {
+		boolean traza = false;
+		
+		switch(nombre){
+		case "Reproductor":
+			cMap.situarVentana(ControladorMapa.REPRODUCTOR,getPosX() - 350, getPosY() + h/3);
+			mostrarPanel("Mapa");
+			break;
+		case "Editor Gráfico":
+			break;
+		case "Paleta":
+			cMap.situarVentana(ControladorMapa.LEYENDA,getPosX() + w + 10, getPosY());
+			cMap.getPaleta().toggleVisible();
+			break;
+		case "Mapa":
+		case "Tabla":
+		case "Archivos":
+		case "Proyecto":	
+			cMap.getMapa().setVisible(nombre.equals("Mapa"));					//Activación del panel correspondiente y desactivación del resto.
+			archivos.setVisible(nombre.equals("Archivos"));
+			tablaEditor.setVisible(nombre.equals("Tabla"));
+			pparametros.setVisible(nombre.equals("Proyecto"));
+			break;
 		}
+		
+		if(traza) System.out.println("Principal - Mostrar Panel > " + nombre);
+		
+		fondo.updateUI();
+		panelCentral.updateUI();
+	}
+	
+	/**
+	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
+	 * no están enlazados con un hilo padre (null). Un número no definido se
+	 * mostrará como información.
+	 *
+	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un
+	 * mensaje tipo 1.
+	 * @param txt Texto a mostrar.
+	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
+	 *  0 showMessageDialog ERROR_MESSAGE
+	 *  1 showMessageDialog INFORMATION_MESSAGE
+	 *  2 showMessageDialog WARNING_MESSAGE
+	 *  3 showConfirmDialog YES_NO_OPTION
+	 *  4 showMessageDialog PLAIN_MESSAGE
+	 * @return En caso de un mensaje de confirmación devuelve el valor Integer
+	 * de la opción escogida.
+	 */
+	private Integer mostrar(String txt, int tipo ) {
+		String titulo = "";
+		Integer opcion = null;
+		
+		switch(tipo) {
+		case 0: titulo = "Error"; break;
+		case 1: titulo = "Información"; break;
+		case 2: titulo = "¡Antención!"; break;
+		case 3: titulo = "Consulta";
+			opcion = JOptionPane.showConfirmDialog(null, txt, titulo, JOptionPane.YES_NO_OPTION);
+		break;
+		case 4: titulo = "Acerca de..."; tipo = 1; break;
+		default:
+			titulo = "";
+		}
+		
+		if(tipo != 3) JOptionPane.showMessageDialog(null, txt, titulo, tipo);
+		
+		return opcion;
+	}
+
+	
+	/**
+	 * Método main de la clase.
+	 * @param args no usado.
+	 */
+	public static void main(String[] args) {
+		Principal ventana = new Principal();
+		ventana.setVisible(true);	
 	}
 }
 

@@ -129,8 +129,8 @@ class PolygonSelector extends MouseAdapter
                 polygonPanel.colors[j] = getColor();
                 polygonPanel.repaint();
         		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Poligono: " + j,"Ejemplo Grafica Lineal");
-        		chart.nuevaSerie("serie1");
-        		chart.nuevaSerie("serie2");
+        		chart.addSerie("serie1");
+        		chart.addSerie("serie2");
         		chart.addPuntos();
         		chart.genera();
         		chart.setVisible(true);

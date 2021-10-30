@@ -10,18 +10,27 @@ package vista;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.imageio.ImageIO;
-
+import javax.swing.AbstractAction;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import modelo.IO;
+
+import java.awt.BorderLayout;
+import javax.swing.JCheckBox;
 
 /**
  * <p>Title: GraficasChart</p>  
@@ -32,18 +41,20 @@ import org.jfree.data.xy.XYSeriesCollection;
  * correspondiente.
  * @author Silverio Manuel Rosales Santana
  * @date 17 sept. 2021
- * @version versión 2.1
+ * @version versión 2.2
  */
-public class GraficasChart {
+public class GraficasChart{
 	private String etiquetaX;
 	private String etiquetaY;
 	private String titulo;
 	private String tituloF;
 	private HashMap<String,XYSeries> seriesMap;
 	private XYSeriesCollection dataset;
-	private ChartFrame frame;
+	private ChartFrame cframe;
 	private JFreeChart chart;
-	
+	private JMenuBar menuBar;
+	private JMenu mnVer;
+	private final String background = "/vista/imagenes/histograma1.jpg";
 	
 	/**
 	 * <p>Title: </p>  
@@ -58,20 +69,104 @@ public class GraficasChart {
 		this.etiquetaY = etqY;
 		this.titulo = titulo;
 		this.tituloF = tituloFrame;
-		seriesMap = new HashMap<String,XYSeries>();
+		this.seriesMap = new HashMap<String,XYSeries>();
 		this.dataset = new XYSeriesCollection();
+		this.menuBar = new JMenuBar();
+		iniciarChart();
+		iniciarFrame();
+		iniciarMenu();
+	}
+	
+	private void iniciarMenu() {
+		cframe.getContentPane().add(menuBar, BorderLayout.NORTH);
+		mnVer = new JMenu("Ver");
+		menuBar.add(mnVer);
+	}
+	
+	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
+		JCheckBox JCBox = new JCheckBox(new VerMenuListener(nombre));
+		JCBox.setSelected(true);
+		if(rutaIcon != null)  JCBox.setIcon(IO.getIcon(rutaIcon,20,20));
+		padre.add(JCBox);
+	}
+	
+	 /**
+	 * <p>Title: VerMenuListener</p>  
+	 * <p>Description: Clase dedicada al establecimiento de los datos en los
+	 * apartados o módulos oportunos.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 10 ago. 2021
+	 * @version versión
+	 */
+	private class VerMenuListener extends AbstractAction {
+		/** serialVersionUID*/  
+		private static final long serialVersionUID = -5103462996882781094L;
+		private final String name;
+		
+		public VerMenuListener(String name) {
+			super(name);
+			this.name = name;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//Si se ha seleccionado módulo ->	
+		    JCheckBox cbLog = (JCheckBox) e.getSource();
+		    //Si se ha seleccionado y no estaba la serie añadida -> añadirla
+	        if (cbLog.isSelected() && !dataset.getSeries().contains(name)) {
+	            dataset.addSeries(seriesMap.get(name));         				//Añade la serie.
+	        //En otro caso eliminar la serie de la representación.
+	        } else {
+				dataset.removeSeries(seriesMap.get(name));						//Eliminar serie.
+	        }
+		}
 	}
 	
 	/**
-	 * <p>Title: nuevaSerie</p>  
+	 * <p>Title: iniciarChart</p>  
+	 * <p>Description: Inicia las propiedades básicas del Chart</p>
+	 * Entre dichas propiedades está la imagen de fondo a mostrar.
+	 */
+	private void iniciarChart() {
+		// Añadir las series al dataset.
+	    chart = ChartFactory.createXYLineChart(
+	            titulo, 														// Título de la gráfica (Embebida)
+	            etiquetaX, 														// Etiqueta Coordenada X
+	            etiquetaY, 														// Etiqueta Coordenada Y
+	            dataset, 														// Datos de la representación.
+	            PlotOrientation.VERTICAL,
+	            true, 															// Muestra la leyenda de los productos (Producto A)
+	            false, 															// Hablita tooltips si está configurado.
+	            false															// Habilita urls si está configurado.
+	    );
+	    addImagen(background);													// Configuración imagen de fondo.
+	}
+	
+	/**
+	 * <p>Title: iniciarFrame</p>  
+	 * <p>Description: Inicia las propiedades básicas del frame.</p>
+	 */
+	private void iniciarFrame() {
+	    cframe = new ChartFrame(tituloF, chart);
+		cframe.setPreferredSize(new Dimension(400,400));
+	    cframe.setDefaultCloseOperation(ChartFrame.DISPOSE_ON_CLOSE);
+	    cframe.getContentPane().setLayout(new BorderLayout(0, 0));
+	    cframe.pack();
+	}
+	
+	/**
+	 * <p>Title: addSerie</p>  
 	 * <p>Description: Añade una nueva serie a la lista de series a representar</p>
 	 * El nombre de la serie no debe existir, no se añadirá una nueva serie, 
 	 * permaneciendo la existente.
 	 * @param nombre Nombre de la nueva serie.
 	 */
-	public void nuevaSerie(String nombre) {
+	public void addSerie(String nombre) {
 		if(!seriesMap.containsKey(nombre)) {
+			//Añadir una nueva serie al mapa de series.
 			seriesMap.put(nombre, new XYSeries(nombre));
+			//Nueva serie -> nueva opción de visualizar en el menú.
+			addJMenuItem(mnVer,nombre,null);
 		}
 	}
 	
@@ -80,29 +175,23 @@ public class GraficasChart {
 	 * <p>Description: Añade un punto nuevo a la serie indicada. Cada punto de una serie
 	 * es representado en una gráfica</p> 
 	 * @param serie Nombre de la de serie a la que añadir el dato.
-	 * @param x Coordenada X del punto.
-	 * @param y Coordenada Y del punto.
+	 * @param x Valor del punto en el eje horizontal.
+	 * @param y Valor del punto en el eje vertical.
 	 */
-	public void addPunto(String serie, int x, int y) {
-		if(seriesMap.containsKey(serie)) {seriesMap.get(serie).add(x,y);}
+	public void addPunto(String serie, double x, double y) {
+		//Comprobación previa si existe dicha serie, en caso contrario la crea.
+		if(!seriesMap.containsKey(serie)) {	addSerie(serie);}
+		//Añade el valor a la serie.
+		seriesMap.get(serie).add(x,y);
+		
 	}
 
 	/**
 	 * <p>Title: setVisible</p>  
-	 * <p>Description: Establece si el frame será visible o estará oculto.</p> 
+	 * <p>Description: Establece si el cframe será visible o estará oculto.</p> 
 	 * @param visible True para hacerlo Visible, False para tenerlo oculto.
 	 */
-	public void setVisible(boolean visible) {frame.setVisible(visible); }
-
-	/**
-	 * Establece las dimensiones para el marco de la gráfica.
-	 * @param dimX La dimensión X de la ventana.
-	 * @param dimY La dimensión Y de la ventana.
-	 */
-	public void setDimensionesFrame(int dimX, int dimY) {
-		frame.setPreferredSize(new Dimension(dimX,dimY));
-		frame.pack();
-	}
+	public void setVisible(boolean visible) {cframe.setVisible(visible); }
 	
 	/**
 	 * <p>Title: addImagen</p>  
@@ -114,7 +203,7 @@ public class GraficasChart {
 		File imageFile = new File(ruta); 										// guarda la imagen en un archivo
 		try {img = ImageIO.read(getClass().getResourceAsStream(imageFile.toString()));}
 		catch (IOException e) {e.printStackTrace();} 
-		chart.setBackgroundImage(img);											//Establecimiento del fondo.
+		this.chart.setBackgroundImage(img);										//Establecimiento del fondo.
 	}
 
 	/**
@@ -122,36 +211,41 @@ public class GraficasChart {
 	 * <p>Description: Genera la gráfica con los datos contenidos y establecidos</p> 
 	 */
 	public void genera() {
-		if(!seriesMap.isEmpty()) {seriesMap.forEach((k,v) -> dataset.addSeries(v));}	// Añadir las series al dataset.
-	    chart = ChartFactory.createXYLineChart(
-	            titulo, 														// Título de la gráfica (Embebida)
-	            etiquetaX, 														// Etiqueta Coordenada X
-	            etiquetaY, 														// Etiqueta Coordenada Y
-	            dataset, 														// Datos de la representación.
-	            PlotOrientation.VERTICAL,
-	            true, 															// Muestra la leyenda de los productos (Producto A)
-	            false, 															// Hablita tooltips si está configurado.
-	            false															// Habilita urls si está configurado.
-	    );  
-	    
-	    addImagen("/vista/imagenes/histograma1.jpg");							// Configuración imagen de fondo.    
-	    frame = new ChartFrame(tituloF, chart);									// Mostramos la grafica en pantalla a traves de un frame específico.
-	    setDimensionesFrame(400,400);
-	    frame.setDefaultCloseOperation(ChartFrame.DISPOSE_ON_CLOSE);	
-	}	
+		if(!seriesMap.isEmpty()) {												// Garantiza que el HashMap no esté vacio.
+			List<?> series = dataset.getSeries();
+			seriesMap.forEach((k,v) -> {
+				if(!series.contains(v) ) {										// Comprobación de que no hay ya una serie igual.
+					dataset.addSeries(v);
+				}
+			});
+		}
+		
+		//Si cframe no está inicializado crear.
+	    if(cframe == null) {
+		    System.out.println("Graficas Chart - Genera > frame era nulo y se reinicia");
+	    	iniciarFrame();
+	    }else if(cframe != null && !cframe.isVisible()) {							// En caso de estar oculto, mostrar.
+	    	cframe.setVisible(true);
+	    }
+	}
 
-	/* FUNCIONES A BORRAR - SOLO PARA PRUEBAS */
+	/* FUNCIONES SOLO PARA PRUEBAS */
+	
+	/**
+	 * <p>Title: addPuntos</p>  
+	 * <p>Description: A efectos de pruebas</p> 
+	 */
 	public void addPuntos() {
 	    // Introduccion de datos
-	    addPunto("serie1",1, 1);
-	    addPunto("serie1",2, 6);
-	    addPunto("serie1",3, 3);
-	    addPunto("serie1",4, 10);
+	    addPunto("serie1",1.0, 1.8);
+	    addPunto("serie1",2.3, 6.65);
+	    addPunto("serie1",3.1, 3);
+	    addPunto("serie1",3.2, 10);
 	    // Datos serie 2
 	    addPunto("serie2",1, 2);
 	    addPunto("serie2",2, 6);
 	    addPunto("serie2",3, 8);
-	    addPunto("serie2",4, 100);
+	    addPunto("serie2",4, 12);
 	}
 	
 	/**
@@ -160,11 +254,11 @@ public class GraficasChart {
 	 * @param args Argumentos si fuera necesario.
 	 */
 	public static void main(String[] args) {
-//		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Título","Ejemplo Grafica Lineal");
-//		chart.nuevaSerie("serie1");
-//		chart.nuevaSerie("serie2");
-//		chart.addPuntos();
-//		chart.genera();
-//		chart.setVisible(true);
+		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Título","Ejemplo Grafica Lineal");
+		chart.addSerie("serie1");
+		chart.addSerie("serie2");
+		chart.addPuntos();
+		chart.genera();
+		chart.setVisible(true);
     }
 }
