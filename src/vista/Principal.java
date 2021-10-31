@@ -42,6 +42,7 @@ public class Principal extends JFrame {
 	private HashMap<String, JMenuItem> jmitems;
 	private Pizarra pizarra;
 	private Parametros pparametros;
+	private JPanel mapa;
 
 	private About about;
 	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
@@ -91,10 +92,11 @@ public class Principal extends JFrame {
 		panelCentral.setLayout(new BorderLayout(0, 0));
 		
 		//Añadir paneles de los módulos.
-		panelCentral.add(tablaEditor, null);
-		panelCentral.add(archivos, null);
-		panelCentral.add(cMap.getJMapa(), null);
-		panelCentral.add(pparametros,null);
+		mapa = cMap.getMapa();
+		panelCentral.add(tablaEditor, BorderLayout.CENTER);
+		panelCentral.add(archivos, BorderLayout.CENTER);
+		panelCentral.add(mapa,BorderLayout.CENTER);
+		panelCentral.add(pparametros,BorderLayout.CENTER);
 
 		//Añadir elementos al JPanel principal.
 		fondo.add(menuBar, BorderLayout.NORTH);
@@ -225,8 +227,7 @@ public class Principal extends JFrame {
 					pizarra.abrirFrame();
 					break;
 				case "Mapa":
-					cMap.getMapa().setVisible(true);
-					cMap.setVisibleMapa(true);
+					cMap.setMapaVisible(true);
 				//	cMap.getMapa().verFrame(true);
 					mostrarPanel(name);
 					break;
@@ -280,7 +281,7 @@ public class Principal extends JFrame {
 		case "Tabla":
 		case "Archivos":
 		case "Proyecto":	
-			cMap.getMapa().setVisible(nombre.equals("Mapa"));					//Activación del panel correspondiente y desactivación del resto.
+			cMap.setMapaVisible(nombre.equals("Mapa"));							//Mostrar panel correspondiente y ocultación del resto.
 			archivos.setVisible(nombre.equals("Archivos"));
 			tablaEditor.setVisible(nombre.equals("Tabla"));
 			pparametros.setVisible(nombre.equals("Proyecto"));
@@ -289,8 +290,8 @@ public class Principal extends JFrame {
 		
 		if(traza) System.out.println("Principal - Mostrar Panel > " + nombre);
 		
-		fondo.updateUI();
-		panelCentral.updateUI();
+//		fondo.updateUI();
+//		panelCentral.updateUI();
 	}
 	
 	/**

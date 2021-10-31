@@ -107,20 +107,18 @@ class PolygonPanel extends JPanel
     }
 }
   
-class PolygonSelector extends MouseAdapter
-{
+class PolygonSelector extends MouseAdapter {
     PolygonPanel polygonPanel;
     Random seed;
     GraficasChart chart;
-    public PolygonSelector(PolygonPanel pp)
-    {
+    
+    public PolygonSelector(PolygonPanel pp){
         polygonPanel = pp;
         seed = new Random();   
     }
   
     @Override
-	public void mousePressed(MouseEvent e)
-    {
+	public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         Polygon[] polys = polygonPanel.polygons;
         for(int j = 0; j < polys.length; j++)
@@ -138,8 +136,7 @@ class PolygonSelector extends MouseAdapter
             }
     }
   
-    private Color getColor()
-    {
+    private Color getColor(){
         return new Color(seed.nextInt(0xffffff));
     }
 }

@@ -161,16 +161,13 @@ public class Pizarra extends JPanel {
 
     private Polygon generaPoligono() {
     	int contador = listaPuntos.size();
-    	//Creación de los arreglos de coordenadas.
-		int[] polX = new int[contador];
-		int[] polY = new int[contador];
+    	Polygon pol = new Polygon();
 		//Volcado de coordenadas desde la lista de puntos.
 		for(int i = 0; i<contador; i++) {
 			Point p = listaPuntos.get(i);
-			polX[i] = (int)p.getX();
-			polY[i] = (int)p.getY();
+			pol.addPoint((int)p.getX(),(int)p.getY());
 		}
-		return new Polygon(polX, polY, contador);
+		return pol;
     }
 
     private boolean isPrimero() {return 0 == listaPuntos.size();}
@@ -475,7 +472,7 @@ public class Pizarra extends JPanel {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		//Selección de imagen de fondo.
-    		String ruta = IO.selFile(1, IO.IMG);
+    		String ruta = new IO().selFile(1, IO.IMG);
     		//En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();

@@ -63,8 +63,8 @@ public class TablaEditor extends JPanel{
 	private JLabel lblAsignarTablaA;
 	private JComboBox<String> comboBox;
 	private JButton btnAsignarTabla;
-	private ControladorMapa cMap;
 	private ControladorDatosIO cio;
+	private ControladorMapa cMap;
 	private JToolBar jtoolBar;
 	private JPanel boxAsignacion;
 	private JFrame frame;
@@ -77,16 +77,16 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: TablaEditor</p>  
 	 * <p>Description: Constructor principal</p> 
-	 * @param cMap Controlador de los datos relacionados con el mapa.
+	 * @param cMap Controlador de mapa.
 	 */
-	public TablaEditor(ControladorMapa cMap ) {
+	public TablaEditor(ControladorMapa cMap) {
+		this.cMap = cMap;
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
 		setLayout(new BorderLayout(0, 0));
 		setBorder(null);
 		setOpaque(false);
 		this.cio = new ControladorDatosIO();
-		this.cMap = cMap;
 		this.ruta = null;
 		this.tipo = null;
 		this.modificado = false;
@@ -98,7 +98,7 @@ public class TablaEditor extends JPanel{
 	 * <p>Description: Abre el módulo en un frame particular</p> 
 	 */
 	public void abrirFrame() {
-		frame = new JFrame("Simulador de Pandemias");
+		frame = new JFrame("Editor de tablas");
 		frame.setTitle("Editor CSV");
 		frame.getContentPane().setBackground(Color.GRAY);
 		frame.setBounds(0, 0, 914, 610);
@@ -498,13 +498,13 @@ public class TablaEditor extends JPanel{
 						tipo = IO.MAP;
 						break;
 					case "Historico": 
-						//cMap.setHistorico(modelo);
+						cMap.setHistorico(modelo);
 						//nuevaTabla();
 						tipo = IO.HST;
 						break;
 					case "Leyenda":
-						//cMap.setPaleta(modelo);
-						//mostrar("Nueva paleta asignada", 1);
+						cMap.setPaleta(modelo);
+						mostrar("Nueva paleta asignada", 1);
 						//nuevaTabla();
 						tipo = IO.PAL;
 						break;
@@ -543,12 +543,10 @@ public class TablaEditor extends JPanel{
 			}
 		}
 	}
-
-
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
-		TablaEditor te = new TablaEditor(new ControladorMapa(665,456));
+		TablaEditor te = new TablaEditor(new ControladorMapa(500, 500));
 		te.abrirFrame();
 	}
 

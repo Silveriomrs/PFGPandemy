@@ -1,12 +1,14 @@
 /**
- * 
+ *
  */
 package vista;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -26,19 +28,19 @@ import java.awt.ComponentOrientation;
  * poblacional (provincia o comunidad autónoma).
  * @author Silverio Manuel Rosales Santana
  * @date 10/07/2021
- * @version 1.2
+ * @version 1.4
  *
  */
 public class Mapa extends JPanel{
 
 	private static final long serialVersionUID = 6251836932416777274L;
-	/** frame Marco para dibujado del mapa en modo flotante*/  
+	/** frame Marco para dibujado del mapa en modo flotante*/
 	private JFrame frame;
-	/** zonas Conjunto con las zonas que contiene el mapa.*/  
+	/** zonas Conjunto con las zonas que contiene el mapa.*/
 	private HashMap<Integer,Zona> zonas;
 	/** leyenda Leyenda del mapa.*/
 	private Leyenda leyenda;
-	
+
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
 	 * @param width ancho del mapa.
@@ -47,21 +49,20 @@ public class Mapa extends JPanel{
 	 */
 	public Mapa(int width, int height, Leyenda leyenda) {
 		super();
-		setOpaque(false);
 		this.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		this.setPreferredSize(ControladorMapa.PanelCentralDim);
 		this.setMinimumSize(ControladorMapa.MinDim);
 		this.leyenda = leyenda;
 		this.zonas = new HashMap<Integer, Zona>();
 		this.addMouseListener(new SelectorPoligono());
-		this.setBorder(new LineBorder(new Color(0, 0, 0)));	
+		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setLayout(new BorderLayout(0, 0));
-		iniciarFrame(width,height);
+	//	iniciarFrame(width,height);
 	}
-	
+
 	/**
-	 * <p>Title: verFrame</p>  
+	 * <p>Title: verFrame</p>
 	 * <p>Description: Aunar códigos de las propiedades del frame.</p>
 	 * @param w Ancho del marco.
 	 * @param h Alto del marco.
@@ -72,55 +73,60 @@ public class Mapa extends JPanel{
 		frame.setSize(w,h);
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(ControladorMapa.MinDim);
-		frame.getContentPane().add(this);
 		frame.add(this);
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.pack();
 	}
-	
+
 	/**
-	 * <p>Title: verFrame</p>  
-	 * <p>Description: Activa o desactiva la visibilidad del frame.</p> 
+	 * <p>Title: verFrame</p>
+	 * <p>Description: Activa o desactiva la visibilidad del frame.</p>
 	 * @param activado True para hacerlo visible, False en otro caso.
 	 */
 	public void verFrame(boolean activado) {frame.setVisible(activado);}
-	
+
 	/**
-	 * <p>Title: toogleVisible</p>  
+	 * <p>Title: toogleVisible</p>
 	 * <p>Description: Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
 	 * Para tal efecto consulta el estado previo y configura el estado actual en
-	 * función del anterior. 
+	 * función del anterior.
 	 */
 	public void toogleVisible() {this.setVisible(!this.isVisible());}
-	
-	 /** <p>Title: setPosicion</p>  
-	 * <p>Description: Establece la posición para el frame</p> 
+
+	 /** <p>Title: setPosicion</p>
+	 * <p>Description: Establece la posición para el frame</p>
 	 * @param xPos Posición X relativa a la pantalla.
 	 * @param yPos Posición Y relativa a la pantalla.
 	 */
 	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+
 		zonas.forEach((n,z) -> {
 			if(z.getZona() != null) {
-				g.setColor(leyenda.getColor(z.getNivel()));
-				g.fillPolygon(z.getZona());
-				g.setColor(Color.BLACK);
-				g.drawPolygon(z.getZona());
+				g2.setPaint(leyenda.getColor(z.getNivel()));
+				g2.fill(z.getZona());
+				g2.setPaint(Color.BLACK);
+				g2.draw(z.getZona());
 			}
 		});
-//		System.out.println("Mapa - paintComponent > refrescando");
-		this.updateUI();														//Redibujado y actualización del panel.
+		g2.setPaint(Color.BLACK);
+		g2.drawRect(100,110,200,80);
+		System.out.println("Mapa - paintComponent > refrescando");
+//		this.updateUI();														//Redibujado y actualización del panel.
 	}
-	
+
 	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Obtiene el JPanel contenedor del mapa </p> 
+	 * <p>Title: getPanel</p>
+	 * <p>Description: Obtiene el JPanel contenedor del mapa </p>
 	 * @return Mapa embebido dentro de un JPanel.
 	 */
-	public JPanel getPanel() {return this;}	
+	public JPanel getPanel() {return this;}
 
 	/**
 	 * Devuelve el poligono que representa una zona del mapa.
@@ -142,7 +148,7 @@ public class Mapa extends JPanel{
 	 * @return Nivel asignado a una zona, null si dicha zona no existe.
 	 */
 	public int getZonaNivel(int id) {return zonas.get(id).getNivel();}
-	
+
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
@@ -160,22 +166,22 @@ public class Mapa extends JPanel{
 	 * @return número de zonas que contiene el mapa.
 	 */
 	public int getNumZones() {return zonas.size();}
-	
+
 	/**
-	 * <p>Title: getZonas</p>  
-	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya 
-	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p> 
+	 * <p>Title: getZonas</p>
+	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya
+	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p>
 	 * @return El conjunto de zonas.
 	 */
 	public HashMap<Integer,Zona> getZonas(){return this.zonas;}
-	
+
 	/**
-	 * <p>Title: setZonas</p>  
-	 * <p>Description: Establece el conjunto de zonas</p> 
+	 * <p>Title: setZonas</p>
+	 * <p>Description: Establece el conjunto de zonas</p>
 	 * @param zonas2 Mapa cuya clave es la ID de cada zona y valor la zona.
 	 */
 	public void setZonas(HashMap<Integer, Zona> zonas2) { this.zonas = zonas2;}
-	
+
 	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
 		public void mousePressed(MouseEvent e)  {
@@ -188,18 +194,7 @@ public class Mapa extends JPanel{
         		chart.setVisible(true);
 	        }
 	    }
-	    
-//	    @Override
-//	    public void mouseEntered(MouseEvent e) {
-//	        //se llama cuando el mouse entra a los limites del componente.
-//	        //Cuando sale y entra de la ventana (en este caso).
-//	    	Point p = e.getPoint();
-//	        Zona z = getZona(p);
-//	    	if(z != null) {
-//	    		System.out.println("Acabas de entrar a la zona: " + z.getName());
-//	    	}else System.out.println("No sé a donde he entrado");
-//	    }
-	    
+
 	    private Zona getZona(Point p) {
 	    	boolean encontrado = false;
 	    	Zona zona = null;
@@ -216,5 +211,15 @@ public class Mapa extends JPanel{
 	        }
 	    	return zona;
 	    }
+	}
+
+	/* Funciones para pruebas */
+
+
+	@SuppressWarnings("javadoc")
+	public static void main(String[] args) {
+		Mapa mapa = new Mapa(500, 500, new Leyenda(100, 205, false));
+		mapa.iniciarFrame(520, 520);
+		mapa.verFrame(true);
 	}
 }

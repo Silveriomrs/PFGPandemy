@@ -82,7 +82,7 @@ public class Archivos extends JPanel {
 		mBtnGuardarCambios = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
 		mapaModulos = new HashMap<String,DCVS>();
-		panelCentral = new JPanel();	
+		panelCentral = new JPanel();
 		hi = wi =  20;
 		configuracion();
 	}
@@ -122,8 +122,7 @@ public class Archivos extends JPanel {
 	 * <p>Description: Devuelve el panelCentral con su estado actual.</p> 
 	 * @return Panel actual.
 	 */
-	public JPanel getPanel() { return this;}
-	
+	public JPanel getPanel() {return this;}	
 
 	private void configuracion() {
 		//Configuración del borde.
@@ -141,8 +140,8 @@ public class Archivos extends JPanel {
 		setLayout(new BorderLayout(0, 0));	
 		
 		panelCentral.setToolTipText("Selección archivos asignados a los módulos.");
-		add(panelCentral, BorderLayout.CENTER);
 		panelCentral.setLayout(null);
+		add(panelCentral, BorderLayout.CENTER);
 		
 		iniciarLabels(lblProyecto,"Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png");
 		iniciarLabels(lblMapa,"Mapa","/vista/imagenes/Iconos/region_64px.png");
@@ -177,8 +176,7 @@ public class Archivos extends JPanel {
 		btnGCREL = iniciarBoton(btnGCREL,"","Guardar cambios.REL",IGuardarC,x0,false);
 		btnGCPAL = iniciarBoton(btnGCPAL,"","Guardar cambios.PAL",IGuardarC,x0,false);
 		btnGCHST = iniciarBoton(btnGCHST,"","Guardar cambios.HST",IGuardarC,x0,false);
-		
-		
+			
 		inicializarMapas();
 		
 		JLabel labelLogo = new JLabel("");
@@ -194,17 +192,15 @@ public class Archivos extends JPanel {
 	 * @param mp Archivo de proyecto con los datos del resto de módulos.
 	 */
 	public void abrirProyecto(DCVS mp) {
-		boolean traza = false;						 /* Bandera de registro */
+		boolean traza = false;						 							/* Bandera de registro */
 		
 		DCVS dcvs = mp;
 		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
 		//NO hace falta comparar a nulo, pues esa comprobación ya está hecha desde el Action Listener.
-		if(traza) System.out.println("Archivos - AbrirProyecto: " + dcvs.getRuta() + "\n");
 		//Borrado etiquetas actuales.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
 		//Borrado de todos los módulos.
 		mapaModulos.clear();
-		
 		//Añadir ruta del proyecto a la etiqueta correspondiente.
 		mapaFields.get(dcvs.getTipo()).setText(dcvs.getRuta());
 		
@@ -243,44 +239,44 @@ public class Archivos extends JPanel {
 		cIO.guardarArchivo(dcvs);												
 	}
 	
-	/* Esta función debe usarse para crear un módulo PRJ Básico para cuando no hay 
-	 * ninguno creado porque no se han cargado o no se ha generado.*/
-	private DCVS creaModuloProyecto() {
-		DCVS dcvs = new DCVS();
-		dcvs.nuevoModelo();
-		dcvs.setTipo(IO.PRJ);
-		dcvs.addCabecera(new Object[] {"Tipo","Ruta"});
-		//Bucle para añadir cada módulo al proyecto.
-		mapaModulos.forEach((tipo,modulo) -> {
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				dcvs.addFila(new Object[] {tipo, modulo.getRuta()});
-			}
-		});
-		dcvs.toString();
-		return dcvs;
-	}
-	
-/* Trabajando aquí para que cree una lista con
- *  todos los tipos y rutas de módulos cargados ¿Para qué? quizás para facilitar
- *  una actualización, reinicio de datos o guardado de los datos. */
-	
-	/* Función no probada. */
-	private String[][] getRutasModulos(){
-		int size = mapaModulos.size();
-		if(mapaModulos.containsKey(IO.PRJ)) size--;								//Si contiene un módulo PRJ -> descontarlo.
-		String[][] lista = new String[size][2];
-		
-		mapaModulos.forEach((tipo,modulo) -> {
-			int fil = 0;
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				lista[fil][0] = tipo;
-				lista[fil][1] = modulo.getRuta();
-				fil++;
-			}
-		});
-		
-		return lista;
-	}
+//	/* Esta función debe usarse para crear un módulo PRJ Básico para cuando no hay 
+//	 * ninguno creado porque no se han cargado o no se ha generado.*/
+//	private DCVS creaModuloProyecto() {
+//		DCVS dcvs = new DCVS();
+//		dcvs.nuevoModelo();
+//		dcvs.setTipo(IO.PRJ);
+//		dcvs.addCabecera(new Object[] {"Tipo","Ruta"});
+//		//Bucle para añadir cada módulo al proyecto.
+//		mapaModulos.forEach((tipo,modulo) -> {
+//			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
+//				dcvs.addFila(new Object[] {tipo, modulo.getRuta()});
+//			}
+//		});
+//		dcvs.toString();
+//		return dcvs;
+//	}
+//	
+///* Trabajando aquí para que cree una lista con
+// *  todos los tipos y rutas de módulos cargados ¿Para qué? quizás para facilitar
+// *  una actualización, reinicio de datos o guardado de los datos. */
+//	
+//	/* Función no probada. */
+//	private String[][] getRutasModulos(){
+//		int size = mapaModulos.size();
+//		if(mapaModulos.containsKey(IO.PRJ)) size--;								//Si contiene un módulo PRJ -> descontarlo.
+//		String[][] lista = new String[size][2];
+//		
+//		mapaModulos.forEach((tipo,modulo) -> {
+//			int fil = 0;
+//			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
+//				lista[fil][0] = tipo;
+//				lista[fil][1] = modulo.getRuta();
+//				fil++;
+//			}
+//		});
+//		
+//		return lista;
+//	}
 	
 	/**
 	 * <p>Title: guardarProyecto</p>  
@@ -293,11 +289,11 @@ public class Archivos extends JPanel {
 	private void guardarProyecto(DCVS dcvsIn) {
 		DCVS dcvs = dcvsIn;
 		//Si se llama con null a la función crear nuevo módulo proyecto.	
-		if(dcvs == null) dcvs = creaModuloProyecto();
+//		if(dcvs == null) dcvs = creaModuloProyecto();
 		
 		//Guardado del fichero:
 		String ruta = cIO.guardarArchivo(dcvs);
-		if(ruta != null) {
+		if(dcvs != null && ruta != null) {
 			//Configuración de la ruta
 			dcvs.setRuta(ruta);
 			//Mostrar ruta en Field.
@@ -494,10 +490,9 @@ public class Archivos extends JPanel {
 			String op = tt.split(" ")[0];
 			String aux = tt.split(" ")[1];
 			int size = aux.length() -4;
-			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.						
+			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.							
 			
-			
-			boolean traza = false;													/* No olvidar borrar flag de traza */
+			boolean traza = false;												/* No olvidar borrar flag de traza */
 			if(traza) System.out.println(op + " " + op2 + " " + ext);
 			//Opciones de Carga de módulo, NO módulo PRJ.
 			if(op.equals("Abrir") && !ext.equals(IO.PRJ)) {

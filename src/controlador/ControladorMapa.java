@@ -32,8 +32,6 @@ public class ControladorMapa {
 	private Mapa mapa;
 	/** parserPoly Parser para datos en formato coordenadas de poligonos*/  
 	private ParserPoly parserPoly;
-	/** datos Almacen de datos*/  
-	private DCVS datos;
 	/** leyenda Leyenda del mapa.*/  
 	private Leyenda leyenda;
 	/** Player para la reproducción de una simulación */
@@ -74,7 +72,7 @@ public class ControladorMapa {
 	 * @param modelo con los datos especificados de cada zona.
 	 */
 	public void setPoligonos(DefaultTableModel modelo) {
-		datos = new DCVS(modelo);
+		DCVS datos = new DCVS(modelo);
 		int filas = datos.getRowCount();										//Número de poligonos a procesar.	
 		
 		for(int i = 0; i<filas;i++) {
@@ -88,7 +86,7 @@ public class ControladorMapa {
 	 * <p>Description: Activa o desactiva la visualización del mapa</p> 
 	 * @param ver True para activarla, false en otro caso.
 	 */
-	public void setVisibleMapa(boolean ver) {mapa.setVisible(ver);}
+	public void setMapaVisible(boolean ver) {mapa.setVisible(ver);}
 	
 	
 	/**
@@ -197,7 +195,7 @@ public class ControladorMapa {
 			int g = Integer.parseInt((String) modelo.getValueAt(i, 1));
 			int b = Integer.parseInt((String) modelo.getValueAt(i, 2));
 			Color c = new Color(r,g,b);
-			//establecimiento de la paleta	
+			//establecimiento de la paleta
 			colores.add(c);
 		}
 		//leyenda.setPaleta(leyenda.getPaleta());
@@ -252,7 +250,7 @@ public class ControladorMapa {
 			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
 				switch(tipo) {
 				case(IO.HST):
-					setHistorico( modulo.getModelo());
+					setHistorico(modulo.getModelo());
 					break;
 				case(IO.PAL):
 					setPaleta(modulo.getModelo());

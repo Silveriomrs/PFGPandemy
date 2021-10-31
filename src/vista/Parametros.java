@@ -23,6 +23,7 @@ import java.awt.Container;
 import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 
+import controlador.ControladorMapa;
 import modelo.IO;
 
 /**
@@ -89,7 +90,7 @@ public class Parametros extends JPanel {
         //Panel 2 de las características de la enfermedad.
         JPanel panel2 = new JPanel();
         //Panel 3 de las relaciones de las comunidades.
-        JPanel panel3 = new TablaEditor(null);
+        JPanel panel3 = new TablaEditor(new ControladorMapa(500, 500));
         //Panel 4 de las características de cada zona.
         JPanel panel4 = new JPanel();
        
