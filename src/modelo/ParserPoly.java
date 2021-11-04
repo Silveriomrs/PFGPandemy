@@ -15,7 +15,7 @@ import java.awt.Polygon;
  */
 public class ParserPoly {
 	
-	private double escala = 2.4;
+	private double escala = 2.2;
 	
 	/**
 	 * Crear un poligono cerrado a partir de los datos que lo conforman.
@@ -33,9 +33,8 @@ public class ParserPoly {
 		//Lectura y almacenamiento de coordenadas.
 		for(int i=inicio; i<size;i++) {												
 			//Separación coordenadas.
-			String Pxy = zona[i];
-			if(!Pxy.equals("")) {												//Si la posición no está vacia, leemos.
-				String[] coordenadas = Pxy.split(";");							//Aplicamos separador y obtención de coordenadas.
+			if(!zona[i].equals("")) {												//Si la posición no está vacia, leemos.
+				String[] coordenadas = zona[i].split(";");							//Aplicamos separador y obtención de coordenadas.
 				//Obtener coordenadas convertidas a int.
 				int x = (int) (Double.valueOf(coordenadas[0])/escala);			//Conversión coordenada X
 				int y = (int) (Double.valueOf(coordenadas[1])/escala);			//Conversión coordenada Y
@@ -43,6 +42,7 @@ public class ParserPoly {
 			}
 		}
 		return pol;
+		
 	}
 
 	/**

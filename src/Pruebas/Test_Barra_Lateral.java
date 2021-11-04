@@ -1,5 +1,5 @@
 /**  
-* <p>Title: Test_MainMenu.java</p>  
+* <p>Title: Test_Barra_Lateral.java</p>  
 * <p>Description: </p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
@@ -36,14 +36,42 @@ import javax.swing.JFrame;
  *
  * @author r.kumbara
  */
-public class Test_MainMenu extends JFrame {
+public class Test_Barra_Lateral extends JFrame {
 
     /** serialVersionUID*/  
 	private static final long serialVersionUID = 1L;
+	
+    //Etiquetas
+    private JLabel jLabel1;
+    private JLabel jLabel10;
+    private JLabel jLabel11;
+    private JLabel jLabel12;
+    private JLabel jLabel13;
+    private JLabel jLabel14;
+    private JLabel jLabel15;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JLabel jLabel6;
+    private JLabel jLabel7;
+    private JLabel jLabel8;
+    private JLabel jLabel9;
+    //Paneles
+    private JPanel JP_Principal;
+    private JPanel jPanel_Deslizante;
+    private JPanel jPanel4;
+    private JPanel jPanel5;
+    private JPanel jPanel6;
+    private JPanel jPanel7;
+    private JPanel jPanel8;
+    
+    int x = 210;
+ //   int a = 0;
+
 	/**
-     * Creates new form Test_MainMenu
+     * Creates new form Test_Barra_Lateral
      */
-    public Test_MainMenu() {
+    public Test_Barra_Lateral() {
         initComponents();
     }
 
@@ -56,37 +84,40 @@ public class Test_MainMenu extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new JPanel();
-        jPanel2 = new JPanel();
+        JP_Principal = new JPanel();
+        jPanel_Deslizante = new JPanel();
         jPanel4 = new JPanel();
-        jLabel4 = new JLabel();
-        jLabel5 = new JLabel();
         jPanel5 = new JPanel();
-        jLabel6 = new JLabel();
-        jLabel7 = new JLabel();
         jPanel6 = new JPanel();
+        jPanel7 = new JPanel();
+        jPanel8 = new JPanel();
+        
+        //
+        jLabel1 = new JLabel();
+        
+        jLabel3 = new JLabel();
+        jLabel4 = new JLabel();
+        jLabel5 = new JLabel();    
+        jLabel6 = new JLabel();
+        jLabel7 = new JLabel();    
         jLabel8 = new JLabel();
         jLabel9 = new JLabel();
-        jPanel7 = new JPanel();
         jLabel10 = new JLabel();
         jLabel11 = new JLabel();
-        jPanel8 = new JPanel();
         jLabel12 = new JLabel();
         jLabel13 = new JLabel();
         jLabel14 = new JLabel();
         jLabel15 = new JLabel();
-        jLabel3 = new JLabel();
-        jLabel1 = new JLabel();
-
+        
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1000, 625));
-        jPanel1.setLayout(new AbsoluteLayout());
+        JP_Principal.setBackground(new java.awt.Color(204, 204, 255));
+        JP_Principal.setMinimumSize(new java.awt.Dimension(1000, 625));
+        JP_Principal.setLayout(new AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(54, 70, 78));
-        jPanel2.setLayout(new AbsoluteLayout());
+        jPanel_Deslizante.setBackground(new java.awt.Color(54, 70, 78));
+        jPanel_Deslizante.setLayout(new AbsoluteLayout());
 
         jPanel4.setBackground(new java.awt.Color(54, 70, 78));
         jPanel4.setLayout(new AbsoluteLayout());
@@ -100,7 +131,7 @@ public class Test_MainMenu extends JFrame {
         jLabel5.setText("Catalogs");
         jPanel4.add(jLabel5, new AbsoluteConstraints(60, 10, 140, 20));
 
-        jPanel2.add(jPanel4, new AbsoluteConstraints(0, 70, 210, 40));
+        jPanel_Deslizante.add(jPanel4, new AbsoluteConstraints(0, 70, 210, 40));
 
         jPanel5.setBackground(new java.awt.Color(54, 70, 78));
         jPanel5.setLayout(new AbsoluteLayout());
@@ -114,7 +145,7 @@ public class Test_MainMenu extends JFrame {
         jLabel7.setText("Dashboard");
         jPanel5.add(jLabel7, new AbsoluteConstraints(60, 10, 140, 20));
 
-        jPanel2.add(jPanel5, new AbsoluteConstraints(0, 30, 210, 40));
+        jPanel_Deslizante.add(jPanel5, new AbsoluteConstraints(0, 30, 210, 40));
 
         jPanel6.setBackground(new java.awt.Color(54, 70, 78));
         jPanel6.setLayout(new AbsoluteLayout());
@@ -128,7 +159,7 @@ public class Test_MainMenu extends JFrame {
         jLabel9.setText("Members");
         jPanel6.add(jLabel9, new AbsoluteConstraints(60, 10, 140, 20));
 
-        jPanel2.add(jPanel6, new AbsoluteConstraints(0, 110, 210, 40));
+        jPanel_Deslizante.add(jPanel6, new AbsoluteConstraints(0, 110, 210, 40));
 
         jPanel7.setBackground(new java.awt.Color(54, 70, 78));
         jPanel7.setLayout(new AbsoluteLayout());
@@ -142,7 +173,7 @@ public class Test_MainMenu extends JFrame {
         jLabel11.setText("Report");
         jPanel7.add(jLabel11, new AbsoluteConstraints(60, 10, 140, 20));
 
-        jPanel2.add(jPanel7, new AbsoluteConstraints(0, 190, 210, 40));
+        jPanel_Deslizante.add(jPanel7, new AbsoluteConstraints(0, 190, 210, 40));
 
         jPanel8.setBackground(new java.awt.Color(54, 70, 78));
         jPanel8.setLayout(new AbsoluteLayout());
@@ -156,27 +187,29 @@ public class Test_MainMenu extends JFrame {
         jLabel13.setText("Collections");
         jPanel8.add(jLabel13, new AbsoluteConstraints(60, 10, 140, 20));
 
-        jPanel2.add(jPanel8, new AbsoluteConstraints(0, 150, 210, 40));
+        jPanel_Deslizante.add(jPanel8, new AbsoluteConstraints(0, 150, 210, 40));
 
         jLabel14.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel14.setForeground(new java.awt.Color(255, 255, 255));
         jLabel14.setHorizontalAlignment(SwingConstants.CENTER);
         jLabel14.setText("Blessing Software");
-        jPanel2.add(jLabel14, new AbsoluteConstraints(20, 486, 160, 20));
+        jPanel_Deslizante.add(jLabel14, new AbsoluteConstraints(20, 486, 160, 20));
 
         jLabel15.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
         jLabel15.setHorizontalAlignment(SwingConstants.CENTER);
         jLabel15.setText("Copyright @ Ricid Kumbara");
-        jPanel2.add(jLabel15, new AbsoluteConstraints(20, 470, 160, -1));
+        jPanel_Deslizante.add(jLabel15, new AbsoluteConstraints(20, 470, 160, -1));
 
-        jPanel1.add(jPanel2, new AbsoluteConstraints(0, 73, 210, 552));
+        JP_Principal.add(jPanel_Deslizante, new AbsoluteConstraints(0, 73, 210, 552));
 
         jLabel3.setBackground(new java.awt.Color(0, 102, 204));
         jLabel3.setHorizontalAlignment(SwingConstants.CENTER);
         jLabel3.setIcon(new ImageIcon(getClass().getResource("/Icons/icons8-menu-30.png"))); // NOI18N
         jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel3.setOpaque(true);
+        
+        /* Añadido del ML con los eventos que debe disparar la etiqueta en su interacción con el ratón.*/
         jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
 			public void mouseClicked(MouseEvent evt) {
@@ -191,55 +224,53 @@ public class Test_MainMenu extends JFrame {
                 jLabel3MouseExited(evt);
             }
         });
-        jPanel1.add(jLabel3, new AbsoluteConstraints(204, 40, 40, -1));
-
-        jLabel1.setIcon(new ImageIcon(getClass().getResource("/Icons/FMainMenu.png"))); // NOI18N
-        jPanel1.add(jLabel1, new AbsoluteConstraints(0, 0, 1000, 625));
+        
+        JP_Principal.add(jLabel3, new AbsoluteConstraints(204, 40, 40, -1));
+        jLabel1.setIcon(new ImageIcon(getClass().getResource("/Icons/FMainMenu.png")));
+        JP_Principal.add(jLabel1, new AbsoluteConstraints(0, 0, 1000, 625));
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(JP_Principal, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(JP_Principal, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
-    int x = 210;
-    int a = 0;
-    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+    }
+    
+    /* Función principal encargada de realizar la ocultación del panel izquierdo (JPanel2). */
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {
         if ( x == 210 ) {
-            jPanel2.setSize(210, 552);
+            jPanel_Deslizante.setSize(210, 552);        
             Thread th = new Thread() {
                 @Override
                 public void run(){
                     try {
-                        
                         for ( int i = 210; i >= 0; i--){
                             Thread.sleep(1);
-                            jPanel2.setSize(i, 552);
-                            
-                            a++;
+                            jPanel_Deslizante.setSize(i, 552);
+  //                          a++;
                         }
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, e);
-                    }
+                    } catch (Exception e) {JOptionPane.showMessageDialog(null, e); }
                 }
-            };th.start();
+            };
+            
+            th.start();
             x=0;
         } else if( x == 0 ){
-            jPanel2.setSize(x, 552);
+            jPanel_Deslizante.setSize(x, 552);
             Thread th = new Thread(){
                 @Override
                 public void run(){
                     try {
                         for (int i = 0; i <= x; i++){
                             Thread.sleep(1);
-                            jPanel2.setSize(i, 552);
+                            jPanel_Deslizante.setSize(i, 552);
                         }
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, e);
@@ -248,15 +279,11 @@ public class Test_MainMenu extends JFrame {
             };th.start();
             x = 210;
         }
-    }//GEN-LAST:event_jLabel3MouseClicked
+    }
 
-    private void jLabel3MouseEntered(MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseEntered
-        labelcolor(jLabel3);
-    }//GEN-LAST:event_jLabel3MouseEntered
-
-    private void jLabel3MouseExited(MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseExited
-        resetlabelcolor(jLabel3);
-    }//GEN-LAST:event_jLabel3MouseExited
+    /* Funciones encargadas de cambiar el color de la etiqueta */
+    private void jLabel3MouseEntered(MouseEvent evt) {labelcolor(jLabel3);}
+    private void jLabel3MouseExited(MouseEvent evt) {resetlabelcolor(jLabel3);}
 
     /**
      * @param args the command line arguments
@@ -285,34 +312,11 @@ public class Test_MainMenu extends JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
 			public void run() {
-                new Test_MainMenu().setVisible(true);
+                new Test_Barra_Lateral().setVisible(true);
             }
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel1;
-    private JLabel jLabel10;
-    private JLabel jLabel11;
-    private JLabel jLabel12;
-    private JLabel jLabel13;
-    private JLabel jLabel14;
-    private JLabel jLabel15;
-    private JLabel jLabel3;
-    private JLabel jLabel4;
-    private JLabel jLabel5;
-    private JLabel jLabel6;
-    private JLabel jLabel7;
-    private JLabel jLabel8;
-    private JLabel jLabel9;
-    private JPanel jPanel1;
-    private JPanel jPanel2;
-    private JPanel jPanel4;
-    private JPanel jPanel5;
-    private JPanel jPanel6;
-    private JPanel jPanel7;
-    private JPanel jPanel8;
-    // End of variables declaration//GEN-END:variables
     private void labelcolor(JLabel label){
         label.setBackground(new java.awt.Color(53,162,107));
     }

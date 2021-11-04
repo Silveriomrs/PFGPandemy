@@ -11,12 +11,9 @@ package vista;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -199,10 +196,7 @@ public class GraficasChart{
 	 * @param ruta Ruta de la imagen a establecer de fondo.
 	 */
 	private void addImagen(String ruta) {
-		Image img = null;
-		File imageFile = new File(ruta); 										// guarda la imagen en un archivo
-		try {img = ImageIO.read(getClass().getResourceAsStream(imageFile.toString()));}
-		catch (IOException e) {e.printStackTrace();} 
+		Image img = IO.getImagen(ruta, false, 0, 0);
 		this.chart.setBackgroundImage(img);										//Establecimiento del fondo.
 	}
 

@@ -99,7 +99,7 @@ public class Archivos extends JPanel {
 	    frame.setPreferredSize(new Dimension(x, y));
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(new Dimension(650, 400));
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);
 	    frame.getContentPane().add(this);
 		frame.pack();
@@ -314,7 +314,6 @@ public class Archivos extends JPanel {
 	 */
 	public void establecerDatos(DCVS datos) {
 		String tipo = datos.getTipo();		
-		
 		//Actualizar etiqueta correspondiente con la ruta del archivo.
 		if(mapaFields.containsKey(tipo)) {
 			mapaFields.get(tipo).setText(datos.getRuta());
@@ -337,7 +336,7 @@ public class Archivos extends JPanel {
 		//Operaciones extras según tipo de módulo.
 		switch(tipo) {
 			case (IO.MAP):
-				cMap.setPoligonos(datos.getModelo());
+				cMap.setPoligonos(datos);
 				break;
 			default:
 				mBtnGuardar.get(IO.PRJ).setEnabled(true);
@@ -522,6 +521,7 @@ public class Archivos extends JPanel {
 				if(ext.equals(IO.PRJ)) guardarProyecto(dcvs);
 				else guardarModulo(dcvs);
 			}
+			
 			if(traza) System.out.println("Archivos - AL OK 5");
 		}
 	}

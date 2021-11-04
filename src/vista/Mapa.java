@@ -58,7 +58,7 @@ public class Mapa extends JPanel{
 		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setLayout(new BorderLayout(0, 0));
-	//	iniciarFrame(width,height);
+		iniciarFrame(width,height);
 	}
 
 	/**

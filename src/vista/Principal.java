@@ -211,8 +211,6 @@ public class Principal extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
 			System.out.println("Principal AL: " + name);
-			//En cualquier caso actualizar.
-			cMap.setModulos(archivos.getMapaModulos());
 			//
 			switch(name){
 				case "Reproductor":

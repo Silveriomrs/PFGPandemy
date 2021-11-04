@@ -362,18 +362,18 @@ public class Player extends JPanel implements ActionListener{
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			int linea = contador;
-			SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
+//			SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
 			if(!activo && arg0.getPropertyName().equals("date") ) {
 				Date f = dateChooser.getDate();									//Obtención del valor establecido.				
 				linea = getLineaDate(f);
 				
 				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
 				Date d = stringToDate(s);
-
-				System.out.println("Player > Fecha búscada  : " + formato.format(f));		
-				System.out.println("Player > Fecha propuesta: " + formato.format(d));
-				System.out.println("Player > Línea calculada: " + linea);
-	
+//
+//				System.out.println("Player > Fecha búscada  : " + formato.format(f));		
+//				System.out.println("Player > Fecha propuesta: " + formato.format(d));
+//				System.out.println("Player > Línea calculada: " + linea);
+//	
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador
 				play(contador);
@@ -385,7 +385,7 @@ public class Player extends JPanel implements ActionListener{
 	private class SliderListener implements ChangeListener {
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			int valor = slider.getValue();									//Obtención del valor establecido.
+			int valor = slider.getValue();										//Obtención del valor establecido.
 			lblX.setText("x " + valor + " mSec/día");							//Mostrar valor de la escala en el slider.			
 			timer.setDelay(valor);												//Establece el timer con el nuevo valor.
 		}

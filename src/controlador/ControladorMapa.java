@@ -30,13 +30,12 @@ public class ControladorMapa {
 
 	/** mapa Instancia de un mapa*/  
 	private Mapa mapa;
-	/** parserPoly Parser para datos en formato coordenadas de poligonos*/  
-	private ParserPoly parserPoly;
 	/** leyenda Leyenda del mapa.*/  
 	private Leyenda leyenda;
 	/** Player para la reproducción de una simulación */
 	private Player player;
 	private DefaultTableModel historico;
+	private ParserPoly parserPoly;
 	
 	/** LEYENDA referencia una paleta de colores o leyenda*/  
 	public final static String LEYENDA = "paleta";
@@ -61,23 +60,21 @@ public class ControladorMapa {
 		leyenda = new Leyenda(100, 205, false);
 		mapa = new Mapa(w,h, leyenda);
 		player = new Player(400, 400, true);
-		//new ParserSVG();
 		parserPoly = new ParserPoly();
+		parserPoly.setEscala(2.18);
 	}
 
 	/**
 	 * <p>Title: setPoligonos</p>  
 	 * <p>Description: Establece la representación gráfica de cada zona. Una fila
 	 * por zona.</p> 
-	 * @param modelo con los datos especificados de cada zona.
+	 * @param datos DCVS con los datos especificados de cada zona.
 	 */
-	public void setPoligonos(DefaultTableModel modelo) {
-		DCVS datos = new DCVS(modelo);
-		int filas = datos.getRowCount();										//Número de poligonos a procesar.	
-		
+	public void setPoligonos(DCVS datos) {
+		int filas = datos.getRowCount();										//Número de poligonos a procesar.
 		for(int i = 0; i<filas;i++) {
-			Zona z= parser(datos.getFila(i));									//Llamar función parser.
-			mapa.addZona(z);													//Añadido al resto de zonas del mapa.
+			Zona z = parser(datos.getFila(i));									//Llamar función parser.
+			if(z != null) mapa.addZona(z);										//Añadido al resto de zonas del mapa.
 		}
 	}
 	
@@ -174,9 +171,12 @@ public class ControladorMapa {
 		String nombre = puntos[1];
 		int id = Integer.parseInt(puntos[0]);
 		int habitantes =  Integer.parseInt(puntos[2]);
-		int superficie =  Integer.parseInt(puntos[3]);
-		parserPoly.setEscala(2.18);
-		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));
+		int superficie =  Integer.parseInt(puntos[3]);	
+//		System.out.println("Controlador Mapa > parser: " +id + "," + nombre + "," + habitantes + "," + superficie);
+		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));		
+
+
+		
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class ControladorMapa {
 					setPaleta(modulo.getModelo());
 					break;
 				case(IO.MAP):
-					setPoligonos(modulo.getModelo());
+					setPoligonos(modulo);
 					break;
 				}
 			}

@@ -41,8 +41,6 @@ import javax.swing.JSeparator;
 public class Parametros_Proyecto extends JPanel {
 	
 	
-	
-	
 	/**
 	 * <p>Title: Constructor de la clase</p>  
 	 * <p>Description: Inicialización de las propiedades y datos principales
