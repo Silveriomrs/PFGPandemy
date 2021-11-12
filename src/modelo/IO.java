@@ -50,6 +50,8 @@ public class IO{
     public final static String MAP = "map";
     /** Archivo definición Relaciones entre zonas */
     public final static String REL = "rel";
+    /** Archivo definición grupos (zonas) de estudio */
+    public final static String GRP = "grp";
     /** Archivo de Imagenes PNG */
     public final static String PNG = "png";
     /** Archivo de Imagenes JPG */
@@ -74,6 +76,7 @@ public class IO{
     	tipos.put(CSV, "Archivo general");
     	tipos.put(HST, "Archivo historico");
     	tipos.put(MAP, "Archivo de mapa");
+    	tipos.put(GRP, "Archivo definición de grupos");
     	tipos.put(PRJ, "Archivo de proyecto");
     	tipos.put(REL, "Archivo de relaciones");
     	tipos.put(PNG, "Archivos de imagen PNG");

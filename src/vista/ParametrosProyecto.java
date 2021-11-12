@@ -1,6 +1,6 @@
 /**  
-* <p>Title: Parametros_Proyecto.java</p>  
-* <p>Description: Clase dependiente de la clase Parametros.</p>    
+* <p>Title: ParametrosProyecto.java</p>  
+* <p>Description: Clase dependiente de la clase ParametrosGrupos.</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 19 oct. 2021  
@@ -24,36 +24,116 @@ import javax.swing.SwingConstants;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextArea;
 import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JTextFieldDateEditor;
 
+import modelo.DCVS;
 import modelo.IO;
 
 import java.awt.Rectangle;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.swing.border.LineBorder;
 import javax.swing.JSeparator;
 
 /**
- * <p>Title: Parametros_Proyecto</p>  
+ * <p>Title: ParametrosProyecto</p>  
  * <p>Description: Panel de las propiedades del proyecto </p>  
  * @author Silverio Manuel Rosales Santana
  * @date 19 oct. 2021
  * @version versión 1.0
  */
-public class Parametros_Proyecto extends JPanel {
+public class ParametrosProyecto extends JPanel {
 	
-	
+	/** serialVersionUID*/  
+	private static final long serialVersionUID = -73292561581668096L;
+	private JPanel panel_central;
+	private JTextField tfNombre;
+	private JTextField tfAutor;
+	private JDateChooser dateChooser;
+	private JFormattedTextField fTFNGrupos;
+	private JTextArea textArea;
+	private JFormattedTextField fTFVersion;
+	private DCVS dcvs;
+	private JPanel panel_archivos;
+	private Archivos archivos;
+		
 	/**
 	 * <p>Title: Constructor de la clase</p>  
 	 * <p>Description: Inicialización de las propiedades y datos principales
 	 * del proyecto.</p>  
+	 * @param archivos Módulo encargado de la gestión de los archivos del proyecto.
 	 */
-	public Parametros_Proyecto() {
+	public ParametrosProyecto(Archivos archivos) {
+		super();
+		this.archivos = archivos;
 		setBackground(Color.ORANGE);
 		setAutoscrolls(true);
 		setSize(new Dimension(1024, 768));
 		setName("Propiedades_Proyecto");
 		setLayout(new BorderLayout(0, 0));
+		panel_central = new JPanel();
+		panel_archivos = this.archivos.getPanel();
+		configurar();
+	}
+
+	/**
+	 * @return El dcvs con los datos.
+	 */
+	public DCVS getDCVS() {return dcvs;}
+
+	/**
+	 * @param dcvs La tabla dcvs contenedora de los parámetros del proyecto
+	 * a establecer en la vista y proyecto.
+	 */
+	public void setDCVS(DCVS dcvs) {
+		this.dcvs = dcvs;
 		
-		JPanel panel_central = new JPanel();
+		int fila = dcvs.getFilaItem("NAME");
+		if(fila > -1) tfNombre.setText( (String) dcvs.getValueAt(fila,1));
+		
+		fila = dcvs.getFilaItem("AUTHOR");
+		if(fila > -1) tfAutor.setText( (String) dcvs.getValueAt(fila,1));
+		
+		fila = dcvs.getFilaItem("DESCRIPTION");
+		if(fila > -1) textArea.setText( (String) dcvs.getValueAt(fila,1));
+		
+		fila = dcvs.getFilaItem("DATE");
+		if(fila > -1) {
+			 String fecha = (String) dcvs.getValueAt(fila,1);
+			 Date f = stringToDate(fecha);
+			 if(f != null) dateChooser.setDate(f);
+		}
+		
+		fila = dcvs.getFilaItem("VERSION");
+		if(fila > -1) fTFVersion.setText( (String) dcvs.getValueAt(fila,1));
+		
+		//Número de grupos.
+		fila = dcvs.getFilaItem("NG");
+		if(fila > -1) fTFNGrupos.setText( (String) dcvs.getValueAt(fila,1));
+		
+	}
+	
+	
+	/**
+	 * <p>Title: stringToDate</p>  
+	 * <p>Description: Convierte una cadena de texto que contiene una fecha
+	 * en un objeto Date</p> 
+	 * @param fecha Grupo fecha/hora en formato: "dd/MM/yyyy hh:mm"
+	 * @return Date con los valores leidos almacenados.
+	 */
+	@SuppressWarnings("finally")
+	private Date stringToDate(String fecha){
+		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
+		 Date date = null;
+		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
+		 catch (ParseException ex) { ex.printStackTrace(); }
+		 finally {return date;} 
+	}
+
+	private void configurar() {
+		
 		panel_central.setName("panel_central");
 		panel_central.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		panel_central.setBackground(Color.LIGHT_GRAY);
@@ -86,15 +166,17 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblNombreDelProyecto.gridy = 1;
 		panel_central.add(lblNombreDelProyecto, gbc_lblNombreDelProyecto);
 		
-		textField = new JTextField();
-		textField.setBackground(new Color(255, 255, 255));
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 1;
-		panel_central.add(textField, gbc_textField);
-		textField.setColumns(10);
+		tfNombre = new JTextField();
+		tfNombre.setHorizontalAlignment(SwingConstants.LEFT);
+		tfNombre.setToolTipText("Nombre del proyecto, se usará para dar nombre a los archivos que lo componen.");
+		tfNombre.setBackground(new Color(255, 255, 255));
+		GridBagConstraints gbc_tfNombre = new GridBagConstraints();
+		gbc_tfNombre.insets = new Insets(0, 0, 5, 5);
+		gbc_tfNombre.fill = GridBagConstraints.HORIZONTAL;
+		gbc_tfNombre.gridx = 2;
+		gbc_tfNombre.gridy = 1;
+		panel_central.add(tfNombre, gbc_tfNombre);
+		tfNombre.setColumns(10);
 		
 		JLabel lblAutor = new JLabel("Autor/a:");
 		lblAutor.setHorizontalAlignment(SwingConstants.LEFT);
@@ -105,15 +187,16 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblAutor.gridy = 2;
 		panel_central.add(lblAutor, gbc_lblAutor);
 		
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.gridwidth = 2;
-		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_1.gridx = 2;
-		gbc_textField_1.gridy = 2;
-		panel_central.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
+		tfAutor = new JTextField();
+		tfAutor.setHorizontalAlignment(SwingConstants.LEFT);
+		tfAutor.setToolTipText("Autor del proyecto.");
+		GridBagConstraints gbc_tfAutor = new GridBagConstraints();
+		gbc_tfAutor.insets = new Insets(0, 0, 5, 5);
+		gbc_tfAutor.fill = GridBagConstraints.HORIZONTAL;
+		gbc_tfAutor.gridx = 2;
+		gbc_tfAutor.gridy = 2;
+		panel_central.add(tfAutor, gbc_tfAutor);
+		tfAutor.setColumns(10);
 		
 		JLabel lblDescripcin = new JLabel("Descripción del proyecto:");
 		GridBagConstraints gbc_lblDescripcin = new GridBagConstraints();
@@ -123,7 +206,10 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblDescripcin.gridy = 3;
 		panel_central.add(lblDescripcin, gbc_lblDescripcin);
 		
-		JTextArea textArea = new JTextArea();
+		textArea = new JTextArea();
+		textArea.setMinimumSize(new Dimension(200, 100));
+		textArea.setMaximumSize(new Dimension(2147, 2147));
+		textArea.setToolTipText("Introduzca cualquier texto descriptivo que crea necesario acerca del proyecto.");
 		textArea.setBorder(new LineBorder(Color.BLACK, 2, true));
 		textArea.setBackground(Color.WHITE);
 		textArea.setColumns(10);
@@ -143,8 +229,13 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblFechaDeltima.gridy = 4;
 		panel_central.add(lblFechaDeltima, gbc_lblFechaDeltima);
 		
-		JDateChooser dateChooser = new JDateChooser();
+		dateChooser = new JDateChooser();
+		dateChooser.setToolTipText("Puede dejar indicado la última fecha de modificación o creación.");
 		dateChooser.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		//Desactivar la edición de fechas de forma manual.
+		JTextFieldDateEditor editor = (JTextFieldDateEditor) dateChooser.getDateEditor();
+		editor.setEditable(false);
+		
 		GridBagConstraints gbc_dateChooser = new GridBagConstraints();
 		gbc_dateChooser.fill = GridBagConstraints.HORIZONTAL;
 		gbc_dateChooser.insets = new Insets(0, 0, 5, 5);
@@ -152,24 +243,24 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_dateChooser.gridy = 4;
 		panel_central.add(dateChooser, gbc_dateChooser);
 		
-		txtVersin = new JLabel();
-		txtVersin.setText("Versión:");
-		GridBagConstraints gbc_txtVersin = new GridBagConstraints();
-		gbc_txtVersin.anchor = GridBagConstraints.WEST;
-		gbc_txtVersin.insets = new Insets(0, 0, 5, 5);
-		gbc_txtVersin.gridx = 1;
-		gbc_txtVersin.gridy = 5;
-		panel_central.add(txtVersin, gbc_txtVersin);
+		JLabel txtVersion = new JLabel();
+		txtVersion.setText("Versión:");
+		GridBagConstraints gbc_txtVersion = new GridBagConstraints();
+		gbc_txtVersion.anchor = GridBagConstraints.WEST;
+		gbc_txtVersion.insets = new Insets(0, 0, 5, 5);
+		gbc_txtVersion.gridx = 1;
+		gbc_txtVersion.gridy = 5;
+		panel_central.add(txtVersion, gbc_txtVersion);
 		
-		JFormattedTextField formattedTextField_1 = new JFormattedTextField();
-		formattedTextField_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		formattedTextField_1.setText("1.0");
-		GridBagConstraints gbc_formattedTextField_1 = new GridBagConstraints();
-		gbc_formattedTextField_1.insets = new Insets(0, 0, 5, 5);
-		gbc_formattedTextField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_formattedTextField_1.gridx = 2;
-		gbc_formattedTextField_1.gridy = 5;
-		panel_central.add(formattedTextField_1, gbc_formattedTextField_1);
+		fTFVersion = new JFormattedTextField();
+		fTFVersion.setHorizontalAlignment(SwingConstants.CENTER);
+		fTFVersion.setText("1.0");
+		GridBagConstraints gbc_fTFVersion = new GridBagConstraints();
+		gbc_fTFVersion.insets = new Insets(0, 0, 5, 5);
+		gbc_fTFVersion.fill = GridBagConstraints.HORIZONTAL;
+		gbc_fTFVersion.gridx = 2;
+		gbc_fTFVersion.gridy = 5;
+		panel_central.add(fTFVersion, gbc_fTFVersion);
 		
 		JSeparator separator = new JSeparator();
 		GridBagConstraints gbc_separator = new GridBagConstraints();
@@ -199,14 +290,15 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblNmeroDeGrupos.gridy = 7;
 		panel_central.add(lblNmeroDeGrupos, gbc_lblNmeroDeGrupos);
 		
-		JFormattedTextField formattedTextField = new JFormattedTextField();
-		formattedTextField.setColumns(10);
-		GridBagConstraints gbc_formattedTextField = new GridBagConstraints();
-		gbc_formattedTextField.insets = new Insets(0, 0, 5, 5);
-		gbc_formattedTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_formattedTextField.gridx = 2;
-		gbc_formattedTextField.gridy = 7;
-		panel_central.add(formattedTextField, gbc_formattedTextField);
+		fTFNGrupos = new JFormattedTextField();
+		fTFNGrupos.setHorizontalAlignment(SwingConstants.CENTER);
+		fTFNGrupos.setColumns(10);
+		GridBagConstraints gbc_fTFNGrupos = new GridBagConstraints();
+		gbc_fTFNGrupos.insets = new Insets(0, 0, 5, 5);
+		gbc_fTFNGrupos.fill = GridBagConstraints.HORIZONTAL;
+		gbc_fTFNGrupos.gridx = 2;
+		gbc_fTFNGrupos.gridy = 7;
+		panel_central.add(fTFNGrupos, gbc_fTFNGrupos);
 		
 		JLabel lblArchivosDelProyecto = new JLabel("Archivos del Proyecto:");
 		GridBagConstraints gbc_lblArchivosDelProyecto = new GridBagConstraints();
@@ -216,7 +308,7 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_lblArchivosDelProyecto.gridy = 9;
 		panel_central.add(lblArchivosDelProyecto, gbc_lblArchivosDelProyecto);
 		
-		JPanel panel_archivos = new Archivos(null);
+		
 		GridBagConstraints gbc_panel_archivos = new GridBagConstraints();
 		gbc_panel_archivos.gridwidth = 3;
 		gbc_panel_archivos.gridheight = 2;
@@ -225,8 +317,6 @@ public class Parametros_Proyecto extends JPanel {
 		gbc_panel_archivos.gridy = 9;
 		panel_central.add(panel_archivos, gbc_panel_archivos);
 	}
-
-	
 	
 	/**
 	 * <p>Title: abrirFrame</p>  
@@ -248,12 +338,6 @@ public class Parametros_Proyecto extends JPanel {
         frame.setVisible(true);
 	}
 	
-	
-	/** serialVersionUID*/  
-	private static final long serialVersionUID = -73292561581668096L;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JLabel txtVersin;
 
 	/**
 	 * <p>Title: main</p>  
@@ -261,7 +345,7 @@ public class Parametros_Proyecto extends JPanel {
 	 * @param args Nada
 	 */
 	public static void main(String[] args) {
-		Parametros_Proyecto pp = new Parametros_Proyecto();
+		ParametrosProyecto pp = new ParametrosProyecto(new Archivos(null));
 		pp.abrirFrame();
 
 	}

@@ -26,7 +26,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.JTextField;
 import java.awt.Rectangle;
-import javax.swing.ImageIcon;
 
 /**
  * <p>Title: VistaZona</p>  
@@ -44,11 +43,11 @@ public class VistaZona extends JPanel {
 	private JPanel panelCentral;
 	private JPanel panel_poligono;
 	//
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField;
-	private JTextField textField_4;
+	private JTextField tf_Nombre;
+	private JTextField tf_Poblacion;
+	private JTextField tf_Superficie;
+	private JTextField tf_ID;
+	private JTextField tf_Nivel;
 	//
 	
 
@@ -57,27 +56,26 @@ public class VistaZona extends JPanel {
 	 * @param zona Zona con los datos propios del grupo de estudio. Null en otro caso.
 	 */
 	public VistaZona(Zona zona) {
-		if(zona == null) zona = new Zona(0, "No asignado", 0, 0, null);
-		else this.setZona(zona);
+		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0, null);
+		else this.zona =zona;
 		panelCentral = new JPanel();
 		panel_poligono = new JPanel();
 		configurar();
 	}
 	
 	private void configurar() {
-		setBackground(Color.CYAN);
-		setLayout(new BorderLayout(0, 0));
-		
+		setLayout(new BorderLayout(0, 0));	
+//		setBackground(Color.RED);
 	
 		add(panelCentral);
 		panelCentral.setLayout(null);
 		
 		int gap = 20;
-		iniciarLabel("ID:", null, 12,gap,19,15);
-		iniciarLabel("Nombre:",null,12,2*gap,172,15);
-		iniciarLabel("Población:",null,12,3*gap,81,15);
-		iniciarLabel("Superficie:",null,12,4*gap,81,15);
-		iniciarLabel("Nivel de contagio:",null,12,5*gap,175,15);
+		addLabel("ID:", null, 12,gap,19,15);
+		addLabel("Nombre:",null,12,2*gap,172,15);
+		addLabel("Población:",null,12,3*gap,81,15);
+		addLabel("Superficie:",null,12,4*gap,81,15);
+		addLabel("Nivel de contagio:",null,12,5*gap,175,15);
 		
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(0, 0, 139));
@@ -97,23 +95,46 @@ public class VistaZona extends JPanel {
 		panel_poligono.setLayout(null);
 		
 		JLabel lblSinPoligono = new JLabel();
-		lblSinPoligono.setIcon(new ImageIcon(VistaZona.class.getResource("/vista/imagenes/Iconos/sinImg_256px.png")));
-		lblSinPoligono.setBounds(new Rectangle(0, 0, 243, 162));
+		lblSinPoligono.setBounds(new Rectangle(0, 0, 291, 189));
+		lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",panel_poligono.getWidth(),panel_poligono.getHeight()));
 		panel_poligono.add(lblSinPoligono);
 		
-		//
-		textField = iniciarTextField(textField, "ID",100, 18, 114, 19);
-		textField_1 = iniciarTextField(textField_1,"Nombre",100, 38, 166, 19);
-		textField_2 = iniciarTextField(textField_2,"Población",100, 58, 166, 19);
-		textField_3 = iniciarTextField(textField_3,"Superficie",100, 78, 166, 19);
-		textField_4 = iniciarTextField(textField_4,"Nivel",152, 98, 114, 19);
+		//Iniciar los JTextFields
+		int posX = 100;
+		int posY = 18;
+		int alto = 19;
+		tf_ID = iniciarTextField(tf_ID, "ID",posX, posY, 114, alto);
+		tf_Nombre = iniciarTextField(tf_Nombre,"Nombre",posX, posY + gap*1, 166, alto);
+		tf_Poblacion = iniciarTextField(tf_Poblacion,"Población",posX, posY + gap*2, 166, alto);
+		tf_Superficie = iniciarTextField(tf_Superficie,"Superficie",posX, posY + gap*3, 166, alto);
+		tf_Nivel = iniciarTextField(tf_Nivel,"Nivel",152, posY + gap*4, 114, 19);
 		
 		JButton btnAplicar = new JButton("Aplicar");
-		btnAplicar.setIcon(new ImageIcon(VistaZona.class.getResource("/vista/imagenes/Iconos/ok_64px.png")));
+		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
 		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
 		btnAplicar.setBounds(288, 20, 150, 87);
 		panelCentral.add(btnAplicar);
-
+		
+		recargarDatos();
+	}
+	
+	/**
+	 * <p>Title: recargarDatos</p>  
+	 * <p>Description: Recarga los campos de los TextFields con los datos del modelo</p>
+	 * Realiza una nueva lectura de cada campo del modelo introduciendo sus valores
+	 * en los correspondientes JTextFields. 
+	 */
+	private void recargarDatos() {
+		//Configura los datos iniciales de la vista con los obtenidos por el constructor.
+		if(zona != null) {
+			tf_ID.setText("" + zona.getID());
+			tf_ID.setEditable(false);
+			tf_ID.setBorder(null);
+			tf_Nombre.setText(zona.getName());
+			tf_Poblacion.setText("" + zona.getPoblacion());
+			tf_Superficie.setText("" + zona.getSuperficie());
+			tf_Nivel.setText("" + zona.getNivel());
+		}
 	}
 	
 	
@@ -129,9 +150,9 @@ public class VistaZona extends JPanel {
 	    frame.setPreferredSize(new Dimension(x, y));
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(new Dimension(650, 400));
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);
-	    frame.getContentPane().add(this);
+	    frame.add(this);
 		frame.pack();
         frame.setVisible(true);
 	}
@@ -172,7 +193,7 @@ public class VistaZona extends JPanel {
 	 * @param wi Ancho de la etiqueta.
 	 * @param hi Alto de la etiqueta.
 	 */
-	private void iniciarLabel(String nombre, String ruta, int posX, int posY, int wi, int hi) {
+	private void addLabel(String nombre, String ruta, int posX, int posY, int wi, int hi) {
 		JLabel jl = new JLabel(nombre);
 		if(ruta != null) addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, wi, hi);
@@ -187,17 +208,30 @@ public class VistaZona extends JPanel {
 	public JPanel getPanel() {return this;}
 	
 	/**
-	 * @return El/la zona
+	 * @return La zona con sus atributos.
 	 */
 	public Zona getZona() {	return zona;}
 
 	/**
-	 * @param zona El/la zona a establecer
+	 * @param zona La zona a establecer
 	 */
-	public void setZona(Zona zona) {this.zona = zona;}
-	
+	public void setZona(Zona zona) {
+		this.zona = zona;
+		recargarDatos();
+	}
 	
 	/* Funciones de pruebas */
+	
+	/**
+	 * <p>Title: generaTest</p>  
+	 * <p>Description: Genera unos datos básicos de prueba</p>
+	 * Función para comprobar el correcto funcionamiento. Genera unos datos de prueba
+	 * que será mostrados en la vista.
+	 */
+	public void generaTest() {
+		this.zona = new Zona(1, "Zona_Test", 0 , 0 , null);
+		recargarDatos();
+	}
 	
 	/**
 	 * <p>Title: main</p>  
@@ -206,6 +240,7 @@ public class VistaZona extends JPanel {
 	 */
 	public static void main(String[] args) {
 		VistaZona vz = new VistaZona(null);
+		vz.generaTest();
 		vz.abrirFrame();
 	}
 }

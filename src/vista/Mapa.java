@@ -115,8 +115,6 @@ public class Mapa extends JPanel{
 				g2.draw(z.getZona());
 			}
 		});
-		g2.setPaint(Color.BLACK);
-		g2.drawRect(100,110,200,80);
 		System.out.println("Mapa - paintComponent > refrescando");
 //		this.updateUI();														//Redibujado y actualización del panel.
 	}
@@ -131,9 +129,13 @@ public class Mapa extends JPanel{
 	/**
 	 * Devuelve el poligono que representa una zona del mapa.
 	 * @param id Identificador de la zona.
-	 * @return devuelve zona del mapa.
+	 * @return devuelve zona del mapa. Null en caso de no existir.
 	 */
-	public Zona getZona(int id) {return zonas.get(id);}
+	public Zona getZona(int id) {
+		Zona z = null;
+		if(zonas.containsKey(id)) z = zonas.get(id);
+		return z;
+	}
 
 	/**
 	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
@@ -157,7 +159,7 @@ public class Mapa extends JPanel{
 	 */
 	public void addZonaNivel(int id, String serie, int n) {
 		if(zonas.containsKey(id)) {												//Comprobación de que existe.
-			zonas.get(id).addNivel(serie, n);									//Añadir valor a la serie que corresponda.
+			zonas.get(id).addNivel(serie,0, n);									//Añadir valor a la serie que corresponda.
 		}
 	}
 

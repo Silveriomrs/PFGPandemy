@@ -1,0 +1,12 @@
+Tipo,Dato
+NAME,"Proyecto Prueba"
+AUTHOR,"Paco Lucia"
+DESCRIPTION,"Proyecto de pruebas para aprovechar la immplementación de tipos de datos diversos y blablabla"
+DATE,06/10/2021
+VER,1.0
+NG,6
+hst,/home/silverio/Dropbox/Asignaturas En Curso/Cursando/Mi PFG/PFGPandemy/src/modelo/Datos/Casos_Covid19_100mil_ccaa_para_Silverio.hst
+rel,/home/silverio/Dropbox/Asignaturas En Curso/Cursando/Mi PFG/PFGPandemy/src/modelo/Datos/relaciones4.rel
+pal,/home/silverio/Dropbox/Asignaturas En Curso/Cursando/Mi PFG/PFGPandemy/src/modelo/Datos/PaletaEU.pal
+map,/home/silverio/Dropbox/Asignaturas En Curso/Cursando/Mi PFG/PFGPandemy/src/modelo/Datos/Mapa España Comunidades2.map
+grp,/home/silverio/Dropbox/Asignaturas En Curso/Cursando/Mi PFG/PFGPandemy/src/modelo/Datos/Grupo Comunidades España.map

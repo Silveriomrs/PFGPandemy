@@ -14,7 +14,9 @@ import javax.swing.table.DefaultTableModel;
 
 import modelo.DCVS;
 import modelo.IO;
+import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
+import modelo.ParserProyectoVS;
 import modelo.Zona;
 import vista.Leyenda;
 import vista.Mapa;
@@ -151,9 +153,9 @@ public class ControladorMapa {
 	 * <p>Title: setHistorico</p>  
 	 * <p>Description: Actualiza el historico de un cálculo realizado, permitiendo
 	 * su reproducción.</p> 
-	 * @param historico historico con los datos de la evolución calculada.
+	 * @param historico Historico con los datos de la evolución calculada.
 	 */
-	public void setHistorico(DefaultTableModel historico) {	this.historico = historico;	}
+	public void setHistorico(DCVS historico) {	this.historico = historico.getModelo();	}
 	
 			
 	/**
@@ -172,11 +174,7 @@ public class ControladorMapa {
 		int id = Integer.parseInt(puntos[0]);
 		int habitantes =  Integer.parseInt(puntos[2]);
 		int superficie =  Integer.parseInt(puntos[3]);	
-//		System.out.println("Controlador Mapa > parser: " +id + "," + nombre + "," + habitantes + "," + superficie);
 		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));		
-
-
-		
 	}
 
 	/**
@@ -250,7 +248,7 @@ public class ControladorMapa {
 			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
 				switch(tipo) {
 				case(IO.HST):
-					setHistorico(modulo.getModelo());
+					setHistorico(modulo);
 					break;
 				case(IO.PAL):
 					setPaleta(modulo.getModelo());
@@ -262,5 +260,35 @@ public class ControladorMapa {
 			}
 		});
 	}
+	
+	/* En progreso de implementación */
+	
+	/**
+	 * <p>Title: importarProyectoVS</p>  
+	 * <p>Description: Importa los datos de un archivo de proyecto generado con VenSim.</p>
+	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, tales como la
+	 * matriz de contactos, R,S,I, tasas, etcetera.
+	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
+	 * @param prjV Conjunto de datos del archivo de salida Vensim.
+	 */
+	public void importarProyectoVS(DCVS prjV) {
+		ParserProyectoVS parserPVS = new ParserProyectoVS(prjV);
+		
+		
+		
+	}
+	
+	/**
+	 * <p>Title: importarHistoricoVS</p>  
+	 * <p>Description: Importa los datos de un archivo de salida (histórico) generado con VenSim.</p>
+	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, R,S,I, tasas, etcetera,
+	 * siempre que estén contenidos.
+	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
+	 * @param prjV Conjunto de datos del archivo de salida Vensim.
+	 */
+	public void importarHistoricoVS(DCVS prjV) {
+		ParserHistoricoVS parseHVS = new ParserHistoricoVS(prjV);
+	}
+	
 	
 }

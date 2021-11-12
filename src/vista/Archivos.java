@@ -15,7 +15,6 @@ import controlador.ControladorDatosIO;
 import controlador.ControladorMapa;
 import modelo.DCVS;
 import modelo.IO;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
@@ -25,6 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -40,8 +40,9 @@ public class Archivos extends JPanel {
 
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 5320403899683788073L;
+	private final int ELEMENTOS = 5;
 	//Campos de texto que indicarán la ruta del fichero cargado.
-	private JTextField textFieldMapa,txtFieldProyecto,textFieldHistorico,textFieldLeyenda,textFieldRelaciones;
+	private JTextField TFMapa,TFProyecto,TFHistorico,TFLeyenda,TFRelaciones;
 	private TitledBorder tb;
 	// Etiquetas
 	private JLabel lblMapa, lblProyecto,lblRelaciones, lblPaleta, lblHistorico;
@@ -144,16 +145,16 @@ public class Archivos extends JPanel {
 		add(panelCentral, BorderLayout.CENTER);
 		
 		iniciarLabels(lblProyecto,"Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(lblMapa,"Mapa","/vista/imagenes/Iconos/region_64px.png");
+		iniciarLabels(lblMapa,"Mapa","/vista/imagenes/Iconos/grupos_64px.png");
 		iniciarLabels(lblRelaciones,"Relaciones","/vista/imagenes/Iconos/nodos_64px.png");
 		iniciarLabels(lblPaleta,"Leyenda","/vista/imagenes/Iconos/circulo-de-color_64px.png");
 		iniciarLabels(lblHistorico,"Histórico","/vista/imagenes/Iconos/animar_128px.png");		
 		//
-		txtFieldProyecto = iniciarTextField(txtFieldProyecto);
-		textFieldMapa= iniciarTextField(textFieldMapa);
-		textFieldRelaciones = iniciarTextField(textFieldRelaciones);
-		textFieldLeyenda = iniciarTextField(textFieldLeyenda);
-		textFieldHistorico = iniciarTextField(textFieldHistorico);
+		TFProyecto = iniciarTextField(TFProyecto);
+		TFMapa= iniciarTextField(TFMapa);
+		TFRelaciones = iniciarTextField(TFRelaciones);
+		TFLeyenda = iniciarTextField(TFLeyenda);
+		TFHistorico = iniciarTextField(TFHistorico);	
 		//
 		int gap = 30;
 		int x0 = 480;
@@ -164,7 +165,7 @@ public class Archivos extends JPanel {
 		btnAbrirHistorico = iniciarBoton(btnAbrirHistorico,"","Abrir historico.HST",IAbrir,x0,true);
 		//
 		x0 = x0 + gap;
-		btnGuardarPRJ = iniciarBoton(btnGuardarPRJ,"","Guardar como.PRJ",IGuardarA,x0,false);	
+		btnGuardarPRJ = iniciarBoton(btnGuardarPRJ,"","Guardar como.PRJ",IGuardarA,x0,false);
 		btnGuardarMapa = iniciarBoton(btnGuardarMapa,"","Guardar como.MAP",IGuardarA,x0,false);
 		btnGuardarRelaciones = iniciarBoton(btnGuardarRelaciones,"","Guardar como.REL",IGuardarA,x0,false);
 		btnGuardarPaleta = iniciarBoton(btnGuardarPaleta,"","Guardar como.PAL",IGuardarA,x0,false);
@@ -189,12 +190,10 @@ public class Archivos extends JPanel {
 	 * <p>Title: abrirProyecto</p>  
 	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
 	 * correspondientes.</p>
-	 * @param mp Archivo de proyecto con los datos del resto de módulos.
+	 * @param dcvs Archivo de proyecto con los datos del resto de módulos.
 	 */
-	public void abrirProyecto(DCVS mp) {
+	public void abrirProyecto(DCVS dcvs) {
 		boolean traza = false;						 							/* Bandera de registro */
-		
-		DCVS dcvs = mp;
 		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
 		//NO hace falta comparar a nulo, pues esa comprobación ya está hecha desde el Action Listener.
 		//Borrado etiquetas actuales.
@@ -207,13 +206,17 @@ public class Archivos extends JPanel {
 		//Lectura de los módulos a cargar
 		for(int i= 0;  i < nm; i++) {
 			String[] m = dcvs.getFila(i);
-			String ruta = m[1];
-			String tipo = m[0];
-			if(!tipo.equals(IO.PRJ)) {											//Nos asegurarmos que no cargue por error un PRJ.
-				DCVS mAux = cIO.abrirArchivo(ruta,tipo);						//Carga el módulo desde el sistema de archivos.
+			String dato = m[1];
+			String etiq = m[0];
+			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
+			if(!etiq.equals(IO.PRJ) && mapaFields.containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
+				DCVS mAux = cIO.abrirArchivo(dato,etiq);						//Carga el módulo desde el sistema de archivos.
 				establecerDatos(mAux);											//Establecer el módulo.
-				if(traza) System.out.println("\nArchivos - Abrir Proyecto: Modulo a cargar: " + tipo + " - " + ruta);
-			}		
+				if(traza) System.out.println("\nArchivos - Abrir Proyecto: Modulo a cargar: " + etiq + " - " + dato);
+			}else {
+				//En otro caso es una etiqueta con información del proyecto.
+//				establecerCampo(dcvs);
+			}
 		}
 		
 		//Desactivar todos los botones de guardado.
@@ -223,6 +226,20 @@ public class Archivos extends JPanel {
 		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
 		mapaModulos.put(dcvs.getTipo(), dcvs);
 	}
+	
+	/**
+	 * <p>Title: getModulo</p>  
+	 * <p>Description: Devuelve el módulo con la información que contenga. </p>
+	 * El tipo de módulo es acorde a las extensiones aceptadas.
+	 * @param tipo Tipo de módulo a devolver. Ej. MAP, HST, etc.
+	 * @return El módulo solicitado.
+	 */
+	public DCVS getModulo(String tipo) {
+		DCVS dcvs = null;
+		if(mapaModulos.containsKey(tipo)) dcvs = mapaModulos.get(tipo);
+		return dcvs;
+	}
+	
 	
 	/**
 	 * <p>Title: guardarModulo</p>  
@@ -313,7 +330,7 @@ public class Archivos extends JPanel {
 	 * @param datos Conjunto de datos y cabecera encapsulados.
 	 */
 	public void establecerDatos(DCVS datos) {
-		String tipo = datos.getTipo();		
+		String tipo = datos.getTipo();
 		//Actualizar etiqueta correspondiente con la ruta del archivo.
 		if(mapaFields.containsKey(tipo)) {
 			mapaFields.get(tipo).setText(datos.getRuta());
@@ -337,6 +354,9 @@ public class Archivos extends JPanel {
 		switch(tipo) {
 			case (IO.MAP):
 				cMap.setPoligonos(datos);
+				break;
+			case (IO.HST):
+				cMap.setHistorico(datos);
 				break;
 			default:
 				mBtnGuardar.get(IO.PRJ).setEnabled(true);
@@ -376,6 +396,7 @@ public class Archivos extends JPanel {
 		componente.setIconTextGap(0);
 		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
+	
 
 	
 	/**
@@ -386,7 +407,7 @@ public class Archivos extends JPanel {
 	 * @param ruta Ruta al icono de la etiqueta.
 	 */
 	private void iniciarLabels(JLabel jl, String nombre, String ruta) {
-		if(contador == 5) contador = 0;
+		if(contador == ELEMENTOS) contador = 0;
 		int posY = lineaBase + 30*contador;
 		contador++;
 		int w = 105;
@@ -399,7 +420,7 @@ public class Archivos extends JPanel {
 	
 	
 	private JTextField iniciarTextField(JTextField jtf){
-		if(contador == 5) contador = 0;
+		if(contador == ELEMENTOS) contador = 0;
 		int posY = lineaBase + 30*contador;
 		contador++;
 		jtf = new JTextField();
@@ -429,7 +450,7 @@ public class Archivos extends JPanel {
 	 * @return la propia instancia del botón.
 	 */
 	private JButton iniciarBoton(JButton boton, String nombre,String tt,  String ruta, int posX, boolean activado) {
-		if(contador == 5) contador = 0;
+		if(contador == ELEMENTOS) contador = 0;
 		int posY = lineaBase + 30*contador;
 		contador++;
 		boton = new JButton(nombre);
@@ -467,11 +488,11 @@ public class Archivos extends JPanel {
 		mBtnGuardarCambios.put(IO.PAL, btnGCPAL);
 		mBtnGuardarCambios.put(IO.HST, btnGCHST);
 		
-		mapaFields.put(IO.PRJ, txtFieldProyecto);
-		mapaFields.put(IO.MAP, textFieldMapa);
-		mapaFields.put(IO.REL, textFieldRelaciones);
-		mapaFields.put(IO.PAL, textFieldLeyenda);
-		mapaFields.put(IO.HST, textFieldHistorico);
+		mapaFields.put(IO.PRJ, TFProyecto);
+		mapaFields.put(IO.MAP, TFMapa);
+		mapaFields.put(IO.REL, TFRelaciones);
+		mapaFields.put(IO.PAL, TFLeyenda);
+		mapaFields.put(IO.HST, TFHistorico);
 	}
 		
 	
@@ -489,10 +510,11 @@ public class Archivos extends JPanel {
 			String op = tt.split(" ")[0];
 			String aux = tt.split(" ")[1];
 			int size = aux.length() -4;
-			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.							
-			
-			boolean traza = false;												/* No olvidar borrar flag de traza */
+			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.
+/* No olvidar borrar líneas de traza */
+			boolean traza = false;
 			if(traza) System.out.println(op + " " + op2 + " " + ext);
+			
 			//Opciones de Carga de módulo, NO módulo PRJ.
 			if(op.equals("Abrir") && !ext.equals(IO.PRJ)) {
 				dcvs = cIO.abrirArchivo(null,ext);
@@ -500,18 +522,15 @@ public class Archivos extends JPanel {
 	//				modificado = true;
 					establecerDatos(dcvs);
 				}
-				if(traza) System.out.println("Archivos - AL OK 2");
 			//Opciones de carga de módulo PRJ
 			}else if(op.equals("Abrir") && ext.equals(IO.PRJ)) {
 				dcvs = cIO.abrirArchivo(null,ext);
-				if(traza) System.out.println("Archivos - AL OK 3");
 				if(dcvs != null) {
 					abrirProyecto(dcvs);
 				}
 			//Opciones de Guarga de módulo.
 			}else if(btn.isEnabled()){											//Comprobación de guardado activado.		
 				//Optención del módulo correspondiente
-				if(traza) System.out.println("Archivos - AL OK 4");
 				if(mapaModulos.containsKey(ext)) {
 					dcvs = mapaModulos.get(ext);
 					//Si es guardar como, poner ruta a null. En otro caso guardará con la ruta que contiene.
@@ -521,10 +540,9 @@ public class Archivos extends JPanel {
 				if(ext.equals(IO.PRJ)) guardarProyecto(dcvs);
 				else guardarModulo(dcvs);
 			}
-			
-			if(traza) System.out.println("Archivos - AL OK 5");
 		}
 	}
+	
 	
 	/**
 	 * <p>Title: main</p>  

@@ -356,22 +356,23 @@ public class DCVS implements TableModel{
 	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
 
 	/**
-	 * @return El/la ruta
+	 * @return La ruta en el dispositivo, de la que procede la fuente de los datos.
 	 */
 	public String getRuta() {return ruta;}
 
 	/**
-	 * @param ruta El/la ruta a establecer
+	 * @param ruta La nueva ruta en el dispositivo de almacenamiento donde guardar
+	 * los datos.
 	 */
 	public void setRuta(String ruta) {this.ruta = ruta;	}
 
 	/**
-	 * @return El/la tipo
+	 * @return Devuelve el tipo de datos almacenados en esta instancia.
 	 */
 	public String getTipo() {return tipo;}
 
 	/**
-	 * @param tipo El/la tipo a establecer
+	 * @param tipo El tipo de datos a establecer para esta instancia.
 	 */
 	public void setTipo(String tipo) {	this.tipo = tipo;}
 	

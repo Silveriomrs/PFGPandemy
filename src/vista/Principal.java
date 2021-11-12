@@ -41,7 +41,8 @@ public class Principal extends JFrame {
 	private TablaEditor tablaEditor;
 	private HashMap<String, JMenuItem> jmitems;
 	private Pizarra pizarra;
-	private Parametros pparametros;
+	private ParametrosGrupos pgrupos;
+	private ParametrosProyecto pproyecto;
 	private JPanel mapa;
 
 	private About about;
@@ -60,13 +61,14 @@ public class Principal extends JFrame {
 	public Principal() {
 		cio = new ControladorDatosIO();
 		cMap = new ControladorMapa(w,h);
-		//cMap = new ControladorMapa(panelCentralW,panelCentralH);
 		archivos = new Archivos(cMap);
 		tablaEditor = new TablaEditor(cMap);
 		pizarra = new Pizarra(cMap.getZonas());
-		pparametros = new Parametros("Test",4);
+		pgrupos = new ParametrosGrupos(10);
+		pproyecto = new ParametrosProyecto(archivos);
 		about = new About();
-		panelActivo = "Mapa";
+		
+		panelActivo = "NONE";
 		this.setTitle("Simulador de Pandemias");
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
@@ -74,14 +76,14 @@ public class Principal extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(true);
-		initialize();
+		configurar();
 		this.setVisible(true);
 	}
 
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
-	private void initialize() {		
+	private void configurar() {		
 		fondo.setLayout(new BorderLayout(0, 0));	
 		iniciarMenuBar();
 		
@@ -94,16 +96,19 @@ public class Principal extends JFrame {
 		//Añadir paneles de los módulos.
 		mapa = cMap.getMapa();
 		panelCentral.add(tablaEditor, BorderLayout.CENTER);
-		panelCentral.add(archivos, BorderLayout.CENTER);
+//		panelCentral.add(archivos, BorderLayout.CENTER);
 		panelCentral.add(mapa,BorderLayout.CENTER);
-		panelCentral.add(pparametros,BorderLayout.CENTER);
+		panelCentral.add(pgrupos.getPanel(),BorderLayout.CENTER);
+		panelCentral.add(pproyecto,BorderLayout.CENTER);
 
 		//Añadir elementos al JPanel principal.
 		fondo.add(menuBar, BorderLayout.NORTH);
 		fondo.add(panelCentral, BorderLayout.CENTER);
 		
 		//Ocultar JPanels no primarios y mostrar el panel por defecto.
+		//Mostrar panel correspondiente y ocultación del resto.
 		mostrarPanel(panelActivo);
+		
 	}
 	
 	/**
@@ -123,8 +128,11 @@ public class Principal extends JFrame {
 		addJMenuItem(mnArchivo, "Nuevo Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
 		addJMenuItem(mnArchivo, "Abrir Proyecto","/vista/imagenes/Iconos/carpeta_64px.png" );
+		//SubMenu VenSIM
 		addJMenuItem(mnArchivo, "Importar Proyecto Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo, "Importar Histórico Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
+		//
 		addJMenuItem(mnArchivo, "Guardar Proyecto","/vista/imagenes/Iconos/disquete_64px.png" );
 		mnArchivo.addSeparator();
 		addJMenuItem(mnArchivo, "Salir","/vista/imagenes/Iconos/salir_64px.png" );
@@ -133,7 +141,8 @@ public class Principal extends JFrame {
 		JMenu mnVer = new JMenu("Ver");
 		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
 		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
-		addJMenuItem(mnVer, "Archivos","/vista/imagenes/Iconos/archivo_64px.png" );
+//		addJMenuItem(mnVer, "Archivos","/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnVer, "Grupos","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		
 		//Menu Ejecutar
@@ -169,13 +178,16 @@ public class Principal extends JFrame {
 		jmitems.get("Mapa").setEnabled(nozonas);
 		//Desactivar editor de zonas gráfico.
 		jmitems.get("Editor Gráfico").setEnabled(nozonas);
+		//Desactivar vistas de grupos.
+		jmitems.get("Grupos").setEnabled(nozonas);
 		//Desactivar reproductor.
-	//	jmitems.get("Reproductor").setEnabled(cMap.isPlayable());
+	/* QUIZÁS ESTE SEA EL PROBLEMA DEL PANEL MAPA, la forma en que es refrescado, puede que esta que 
+	 * he comentado sea la que fuerza la actualización*/
+//		jmitems.get("Reproductor").setEnabled(cMap.isPlayable());
 		jmitems.get("Reproductor").setEnabled(nozonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
 		jmitems.get("Guardar Proyecto").setEnabled(nozonas);
-		
 	}
 
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
@@ -195,7 +207,7 @@ public class Principal extends JFrame {
 	 * apartados o módulos oportunos.</p>  
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
-	 * @version versión
+	 * @version versión 1.1
 	 */
 	private class VerMenuListener extends AbstractAction {
 		/** serialVersionUID*/  
@@ -217,7 +229,8 @@ public class Principal extends JFrame {
 					//Pasar mapa de módulos al controlar de mapa.
 					if(cMap.isPlayable()) {
 						cMap.play();
-						mostrarPanel("Reproductor");
+						cMap.situarVentana(ControladorMapa.REPRODUCTOR,getPosX() - 350, getPosY() + h/3);
+						mostrarPanel("Mapa");
 					}
 					break;
 				case "Editor Gráfico":				
@@ -230,23 +243,38 @@ public class Principal extends JFrame {
 					mostrarPanel(name);
 					break;
 				case "Paleta":
+					cMap.situarVentana(ControladorMapa.LEYENDA,getPosX() + w + 10, getPosY());
+					cMap.getPaleta().toggleVisible();
+					break;
+				case "Grupos":
+					pgrupos.setZonas(cMap.getZonas());
 				case "Tabla":
-				case "Archivos":
+//				case "Archivos":
 				case "Proyecto":
 					mostrarPanel(name);
 					break;
 				case "Abrir Proyecto":
 					DCVS prj = cio.abrirArchivo(null,IO.PRJ);
-					if(prj != null) archivos.abrirProyecto(prj);
+					if(prj != null) {
+						archivos.abrirProyecto(prj);
+						pproyecto.setDCVS(prj);
+						
+					}					
 					break;
 				case "Importar Proyecto Vensim":
-					//Hay que conocer la extensión que usa VenSim en sus proyectos.
-//					DCVS prjV = cio.abrirArchivo(null,IO.PRJ);
+					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
+					DCVS pVS = cio.abrirArchivo(null,IO.CSV);
 					//Requiere nuevo parser completo.
-//					if(prjV != null) archivos.abrirProyecto(prjV);
+					if(pVS != null) cMap.importarProyectoVS(pVS);
 					break;
+				case "Importar Histórico Vensim":
+					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
+					DCVS hVS = cio.abrirArchivo(null,IO.CSV);
+					//Requiere nuevo parser completo.
+					if(hVS != null) cMap.importarHistoricoVS(hVS);
+					break;		
 				case "Nuevo Proyecto":
-					Parametros.main(null);
+					ParametrosProyecto.main(null);
 					break;
 				case "Salir":
 					if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
@@ -265,31 +293,24 @@ public class Principal extends JFrame {
 		boolean traza = false;
 		
 		switch(nombre){
-		case "Reproductor":
-			cMap.situarVentana(ControladorMapa.REPRODUCTOR,getPosX() - 350, getPosY() + h/3);
-			mostrarPanel("Mapa");
-			break;
-		case "Editor Gráfico":
-			break;
-		case "Paleta":
-			cMap.situarVentana(ControladorMapa.LEYENDA,getPosX() + w + 10, getPosY());
-			cMap.getPaleta().toggleVisible();
-			break;
+		case "Grupos":
+			pgrupos.setZonas(cMap.getZonas());
 		case "Mapa":
 		case "Tabla":
-		case "Archivos":
-		case "Proyecto":	
-			cMap.setMapaVisible(nombre.equals("Mapa"));							//Mostrar panel correspondiente y ocultación del resto.
-			archivos.setVisible(nombre.equals("Archivos"));
+//		case "Archivos":
+		case "Proyecto":
+		case "NONE":
+			//Mostrar panel correspondiente y ocultación del resto.
+			cMap.setMapaVisible(nombre.equals("Mapa"));							
+//			archivos.setVisible(nombre.equals("Archivos"));
 			tablaEditor.setVisible(nombre.equals("Tabla"));
-			pparametros.setVisible(nombre.equals("Proyecto"));
-			break;
+			pgrupos.setVisible(nombre.equals("Grupos"));
+			pproyecto.setVisible(nombre.equals("Proyecto"));
 		}
 		
 		if(traza) System.out.println("Principal - Mostrar Panel > " + nombre);
-		
-//		fondo.updateUI();
-//		panelCentral.updateUI();
+		fondo.updateUI();
+		panelCentral.updateUI();
 	}
 	
 	/**
@@ -337,7 +358,7 @@ public class Principal extends JFrame {
 	 */
 	public static void main(String[] args) {
 		Principal ventana = new Principal();
-		ventana.setVisible(true);	
+		ventana.setVisible(true);
 	}
 }
 

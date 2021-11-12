@@ -498,7 +498,7 @@ public class TablaEditor extends JPanel{
 						tipo = IO.MAP;
 						break;
 					case "Historico": 
-						cMap.setHistorico(modelo);
+						cMap.setHistorico(new DCVS(modelo));
 						//nuevaTabla();
 						tipo = IO.HST;
 						break;

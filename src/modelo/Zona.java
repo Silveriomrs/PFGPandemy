@@ -9,73 +9,73 @@ import java.util.ArrayList;
 import vista.GraficasChart;
 
 /**
- * Clase inicial que almacena los datos significativos de una zona representada
+ * Clase inicial que almacena los datos significativos de una poligono representada
  * por el poligono en cuestión, como su identificador, nombre y figura. También
- * el nivel de contagio de la zona.
+ * el nivel de contagio de la poligono.
  * @author Silverio Manuel Rosales Santana
  * @date 23707/2021
  * @version 1.0
  *
  */
 public class Zona {
-	/** name Nombre de la zona*/  
+	/** name Nombre de la poligono*/  
 	private String name;
-	/** ID de la zona*/  
+	/** ID de la poligono*/  
 	private int ID;
-	/** Población de la zona */
+	/** Población de la poligono */
 	private int poblacion;
-	/** Superficie de la zona en Kilometros cuadrados*/
+	/** Superficie de la poligono en Kilometros cuadrados*/
 	private int superficie;
-	/** zona Poligono que representa gráficamente una zona*/
-	private Polygon zona;
+	/** poligono Poligono que representa gráficamente una poligono*/
+	private Polygon poligono;
 	// Lista de puntos que componen el poligono.
 	private ArrayList<Point> listaPuntos;
-	/** nivel Nivel de contagio de una zona [0-9] */  
+	/** nivel Nivel de contagio de una poligono [0-9] */  
 	private int nivel;
-	private final String sn = "Nivel";
+	private final String SN = "Nivel";
 	/** Indica el valor del eje X para su representación de cada nivel en el eje Y. */
-	private int contadorN;														
+	private int contadorN;
 	
 	private GraficasChart chart;
 	
 	/**
 	 * Constructor de las instancias de zonas.
 	 * Recibe todos sus paramétros al instanciarse, ID (normalmente una abreviatura
-	 * del nombre, nombre de la zona completo y el poligono que la representa.
-	 * @param ID nombre corto unico de la zona representada.
-	 * @param name nombre completo de la zona representada.
-	 * @param nhabitantes Número de habitantes que componen la población del grupo/zona.
-	 * @param superficie Superficie de la zona en kilometros cuadrados.
-	 * @param zona poligono cerrado que contiene la representación gráfica de la zona.
+	 * del nombre, nombre de la poligono completo y el poligono que la representa.
+	 * @param ID nombre corto unico de la poligono representada.
+	 * @param name nombre completo de la poligono representada.
+	 * @param nhabitantes Número de habitantes que componen la población del grupo/poligono.
+	 * @param superficie Superficie de la poligono en kilometros cuadrados.
+	 * @param poligono poligono cerrado que contiene la representación gráfica de la poligono.
 	 */
-	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon zona) {
+	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon poligono) {
 		setNivel(0);
 		listaPuntos = new ArrayList<Point>();
 		this.name = name;
 		this.ID = ID;
 		this.poblacion = nhabitantes;
 		this.superficie = superficie;
-		this.zona = zona;
+		this.poligono = poligono;
 		this.chart = new GraficasChart("Tiempo (días)",
 				"Nivel",
 				"Zona: " + name,
 				"Evolución pandemica." + " ID: " + ID);
 		this.contadorN = 0;														//Serie de niveles.
-		chart.addSerie(sn);
+		chart.addSerie(SN);
 	}
 
 	/**
-	 * @return devuelve el nombre de la zona.
+	 * @return devuelve el nombre de la poligono.
 	 */
 	public String getName() {return name;}
 
 	/**
-	 * @return devuelve ID de la zona
+	 * @return devuelve ID de la poligono
 	 */
 	public int getID() {return ID;}
 
 	/**
-	 * @return El número de habitantes que componen la población de la zona.
+	 * @return El número de habitantes que componen la población de la poligono.
 	 */
 	public int getPoblacion() {	return poblacion;}
 	
@@ -85,7 +85,7 @@ public class Zona {
 	public void setPoblacion(int poblacion) {this.poblacion = poblacion;}
 
 	/**
-	 * @return La superficie de la zona en kilometros cuadrados.
+	 * @return La superficie de la poligono en kilometros cuadrados.
 	 */
 	public int getSuperficie() {return superficie;}
 
@@ -96,20 +96,20 @@ public class Zona {
 	public void setSuperficie(int superficie) {	this.superficie = superficie;}
 	
 	/**
-	 * Devuelve el Poligono que representa la zona.
-	 * @return devuelve el poligono que representa la zona
+	 * Devuelve el Poligono que representa la poligono.
+	 * @return devuelve el poligono que representa la poligono
 	 */
-	public Polygon getZona() {return zona;}
+	public Polygon getZona() {return poligono;}
 
 	/**
 	 * <p>Title: setPoligono</p>  
-	 * <p>Description: Establece un Poligono como zona representativa gráfica</p> 
+	 * <p>Description: Establece un Poligono como poligono representativa gráfica</p> 
 	 * @param poligono Figura geometrica.
 	 */
-	public void setPoligono(Polygon poligono) {this.zona = poligono;}
+	public void setPoligono(Polygon poligono) {this.poligono = poligono;}
 
 	/**
-	 * @return La listaPuntos que componen el poligono representación de la zona.
+	 * @return La listaPuntos que componen el poligono representación de la poligono.
 	 */
 	public ArrayList<Point> getListaPuntos() {return listaPuntos;}
 
@@ -124,7 +124,7 @@ public class Zona {
 	public int getNivel() {	return nivel;}
 
 	/**
-	 * Establecimiento del nivel actual de la zona. Su valor debe estar entre 0 y 9,
+	 * Establecimiento del nivel actual de la poligono. Su valor debe estar entre 0 y 9,
 	 *  ambos inclusive. 
 	 * @param nivel Nivel a establecer.
 	 */
@@ -132,12 +132,15 @@ public class Zona {
 	
 	@Override
 	public String toString() {	
-		int npuntos = zona.npoints;
 		String txt = getID() + ", " + getName() + ", " + getPoblacion() + ", " + getSuperficie() +"\n";
-		int[] Px = zona.xpoints;
-		int[] Py = zona.ypoints;
-		for(int i = 0; i<npuntos; i++) {
-			txt += "(" + Px[i] + "," + Py[i] + ")";
+		//Si contiene un poligono obtenemos sus coordenadas:
+		if(poligono != null) {
+			int npuntos = poligono.npoints;
+			int[] Px = poligono.xpoints;
+			int[] Py = poligono.ypoints;
+			for(int i = 0; i<npuntos; i++) {
+				txt += "(" + Px[i] + ";" + Py[i] + ")";
+			}
 		}
 		return txt;
 	}
@@ -146,15 +149,17 @@ public class Zona {
 	 * <p>Title: addNivel</p>  
 	 * <p>Description: Añade un nuevo nivel a su hisstorico y establece el 
 	 * nivel añadido como nivel actual.</p>
-	 * Cuando el parámetro de Date es null, unicamente establece el nivel indicado
-	 * como actual. 
 	 * @param name Nombre de la serie de datos al que añadir el nuevo nivel..
+	 * @param t Variable tiempo, indica el valor en el eje X de tiempo al que corresponderá el valor de la función.
 	 * @param valor Valor o nivel a añadir a dicha serie.
 	 */
-	public void addNivel(String name, int valor) {
-		chart.addPunto(name, contadorN, valor);
-		contadorN++;
-		setNivel(valor);
+	public void addNivel(String name, int t, double valor) {
+		if(name.equals(SN)) {
+			chart.addPunto(name, contadorN, valor);
+			contadorN++;			
+		}else chart.addPunto(name, t, valor);
+		
+		setNivel((int) valor);
 	}
 
 	/**

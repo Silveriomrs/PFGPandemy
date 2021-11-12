@@ -472,7 +472,7 @@ public class Pizarra extends JPanel {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		//Selección de imagen de fondo.
-    		String ruta = new IO().selFile(1, IO.IMG);
+    		String ruta = IO.selFile(1, IO.IMG);
     		//En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();

@@ -12,8 +12,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
-import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -82,7 +80,7 @@ public class GraficasChart{
 	
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
 		JCheckBox JCBox = new JCheckBox(new VerMenuListener(nombre));
-		JCBox.setSelected(true);
+		JCBox.setSelected(false);
 		if(rutaIcon != null)  JCBox.setIcon(IO.getIcon(rutaIcon,20,20));
 		padre.add(JCBox);
 	}
@@ -132,7 +130,7 @@ public class GraficasChart{
 	            etiquetaY, 														// Etiqueta Coordenada Y
 	            dataset, 														// Datos de la representación.
 	            PlotOrientation.VERTICAL,
-	            true, 															// Muestra la leyenda de los productos (Producto A)
+	            true, 															// Muestra la leyenda de los productos (Producto A).
 	            false, 															// Hablita tooltips si está configurado.
 	            false															// Habilita urls si está configurado.
 	    );
@@ -205,14 +203,17 @@ public class GraficasChart{
 	 * <p>Description: Genera la gráfica con los datos contenidos y establecidos</p> 
 	 */
 	public void genera() {
-		if(!seriesMap.isEmpty()) {												// Garantiza que el HashMap no esté vacio.
-			List<?> series = dataset.getSeries();
-			seriesMap.forEach((k,v) -> {
-				if(!series.contains(v) ) {										// Comprobación de que no hay ya una serie igual.
-					dataset.addSeries(v);
-				}
-			});
-		}
+		/* Comentado porque causa problemas en la selección inicial. De esta forma
+		 * se inciia sin estar soleccionado nada, pero el usuario puede seleccionar
+		 * desde el menú correspondiente.*/
+//		if(!seriesMap.isEmpty()) {												// Garantiza que el HashMap no esté vacio.
+//			List<?> series = dataset.getSeries();
+//			seriesMap.forEach((k,v) -> {
+//				if(!series.contains(v) ) {										// Comprobación de que no hay ya una serie igual.
+//					dataset.addSeries(v);
+//				}
+//			});
+//		}
 		
 		//Si cframe no está inicializado crear.
 	    if(cframe == null) {
@@ -252,7 +253,7 @@ public class GraficasChart{
 		chart.addSerie("serie1");
 		chart.addSerie("serie2");
 		chart.addPuntos();
-		chart.genera();
+//		chart.genera();
 		chart.setVisible(true);
     }
 }
