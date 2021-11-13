@@ -272,10 +272,7 @@ public class ControladorMapa {
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
 	public void importarProyectoVS(DCVS prjV) {
-		ParserProyectoVS parserPVS = new ParserProyectoVS(prjV);
-		
-		
-		
+		ParserProyectoVS parserPVS = new ParserProyectoVS(prjV);			
 	}
 	
 	/**

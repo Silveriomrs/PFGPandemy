@@ -24,7 +24,7 @@ import vista.GraficasChart;
  */
 public class ParserHistoricoVS {
 	
-	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
+	private DCVS dcvs;															//Conjunto de datos importados desde VenSim.
 	private DCVS mContactos;													//Matriz de contactos (relaciones).
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
@@ -56,31 +56,44 @@ public class ParserHistoricoVS {
 	 */
 	public void importarVensim(DCVS prjV) {
 		if (prjV != null) this.dcvs = prjV;
+		System.out.println();
 		
 		//Obtención de los nombres de cada grupo.
 		this.IDs = getNombresGrupos();
+		
 		//Obtención del número de grupos.
 		this.NG = IDs.length;
-		for(int i=0; i<NG;i++) System.out.println(IDs[i]);
+		String nombres = "Número de Grupos: " + NG + " >";
+		for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
+		System.out.println(nombres);
+		
 		//Obtención de los tiempos inicial y final.
 	    readTimes();
 	    System.out.println("IT: " + IT + " FT: " + FT);
+	    
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
 		System.out.println("Creadas " + zonas.size() + " zonas");
 		//Leer tabla de relaciones.
 		crearMatriz();
 		
-		//Leer R,S,I y P
+		//Leer R,S,I
 		readXs("R");
 		readXs("S");
 		readXs("I");
-		readXs("P");
 		
 		//Leer casos de CC,CVS,CI
 		readXs("CC");
 		readXs("CVS");
 		readXs("CI");
+		
+		//Leer o calcular Prevalencia.
+		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
+		else {getPs();}															//En otro caso calcular las prevalencias.
+		
+		//Leer o calcular nivel de contagio por cada 100 mil habitantes			//Equivale al nivel de contagio.
+//		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
+//		else {getPs();}															//En otro caso calcular las prevalencias.
 		
 		//Leer tasas TC, TCONTAGIO
 		readXs("TC");
@@ -88,10 +101,52 @@ public class ParserHistoricoVS {
 		
 		//Leer casos de contactos de A con B y tasas de A con B
 		readXenZ("TCS");
-		readXenZ("CAB");
-		
+		readXenZ("CAB");	
 	}
 	
+	/**
+	 * <p>Title: getPs</p>  
+	 * <p>Description: Calcula las prevalencias instantaneas para cada una de
+	 * las zonas o grupos de población</p>
+	 * Para ello hace uso de los valores previamente almacenados de R,S e I de cada zona.
+	 */
+	private void getPs() {
+		for(int i = 1; i<=NG; i++) {
+			Zona z = zonas.get(i);
+			String ns = labels.getWord("P");									//Nombre de la serie.
+			//Obtener los valores S,R e I correspondientes al mismo tiempo.
+			for(int j = IT; j < FT; j++) {
+				String name = z.getName();
+				double vs = z.getGrafica().getYValue(labels.getWord("S"), j);	//valor Sj.
+				double vr = z.getGrafica().getYValue(labels.getWord("R"), j);	//valor Rj.
+				double vi = z.getGrafica().getYValue(labels.getWord("I"), j);	//valor Ij.
+
+				//Cálculo de la prevalencia instantánea. P = I/(R+I+S)
+				double pj = vi/(vs+vi+vr);
+				//Guardado de la prevalencia.
+				z.addNivel(ns, j, pj);
+				
+				//Calculo casos incidentes por cada 100 mil habitantes = 100000*(CI/(S+I+R))
+				double vci = z.getGrafica().getYValue(labels.getWord("CI"), j);	//valor Ij.
+				double ci10K = 100000*vci/(vs+vi+vr);							//Cálculo
+				z.addNivel("Nivel", j, ci10K);									//Guardado del Nivel de contagio.
+				
+				if(j==0) {
+					System.out.println(ns + " inicial " + name + " : " + pj);
+					System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci10K);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * <p>Title: readXenZ</p>  
+	 * <p>Description: Lee los datos referentes a las etiquetas que contienen
+	 * una relación directa entre dos grupos de población.</p>
+	 * Por ejemplo TCS y CAB. 
+	 * @param et Etiqueta a leer.
+	 */
 	private void readXenZ(String et) {
 		//Primera ronda para el primer parámetro.
 		for(int i = 1; i<=NG; i++) {
@@ -107,7 +162,6 @@ public class ParserHistoricoVS {
 			GraficasChart gc = z.getGrafica();
 			gc.setVisible(true);
 		}
-
 	}
 	
 	
@@ -135,12 +189,12 @@ public class ParserHistoricoVS {
 			int row = dcvs.getFilaItem(sID);		
 			if(row > -1) addSerieXs(et,row,z);									//Añadir la serie localizada a la zona indicada	
 		}
-
 	}
 	
 	/**
 	 * <p>Title: addXs</p>  
-	 * <p>Description: </p> 
+	 * <p>Description: Agrega la información de una serie de datos a la gráfica
+	 * correspondiente a una zona.</p> 
 	 * @param et Etiqueta u operador correspondiente de la columna.
 	 * @param pos Número de fila en la que está situada dicha etiqueta.
 	 * @param z Zona a la que añadir los valores correspondientes a la serie indicada en la etiqueta.
@@ -162,8 +216,10 @@ public class ParserHistoricoVS {
 					etiqueta = etiqueta.replaceFirst("Z",getSecondID(et));
 				}
 				//Si etiqueta es nulo usar el pasado por parámetro.
-				if(etiqueta == null ) etiqueta = et;							
-				if(s != null && !s.equals("")) z.addNivel(etiqueta, contador,valor);
+				if(etiqueta == null ) etiqueta = et;
+				//Guardar el valor en la gráfica de la zona.
+				z.addNivel(etiqueta, contador,valor);
+				
 			}else { correcto = false; }											//Si un valor leído no es válido no continuar con la lectura.
 			//Siguiente línea.
 			contador++;
@@ -248,9 +304,20 @@ public class ParserHistoricoVS {
 	 */
 	private int getPeople(int ID) {
 		int habitantes = 0;
-		int row = dcvs.getFilaItem("PT0 " + IDs[ID]);
+		String name = IDs[ID];
+		int row = dcvs.getFilaItem("PT0 " + name);
+		//Si existe la etiqueta concreta se toma su valor.
 		if(row>-1) habitantes = Integer.parseInt((String) dcvs.getValueAt(row, 0));
-		System.out.println("Parser VenSim > getPeople: " + habitantes);
+		//En otro caso se realiza una suma de los valores de las etiquetas R,S,I.
+		else {
+			int posS = dcvs.getFilaItem("S " + name);
+			if(posS > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posS,1));
+			int posR = dcvs.getFilaItem("R " + name);
+			if(posR > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posR,1));
+			int posI = dcvs.getFilaItem("I " + name);
+			if(posI > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posI,1));
+		}
+		System.out.println("Población Inicial " + name + ": " + habitantes);
 		return habitantes;	
 	}
 	
@@ -279,12 +346,8 @@ public class ParserHistoricoVS {
 			for(int i=1; i<NG ;i++) {
 				String IDAux = null;
 				parte = (String) dcvs.getValueAt(row0 + i,0);
-				if(op.equals("C")) {
-					IDAux = getSecondID(parte);
-				}else {
-					IDAux = getFirstID(parte);
-				}
-				System.out.println(IDAux);
+				if(op.equals("C")) {IDAux = getSecondID(parte);	}
+				else {IDAux = getFirstID(parte);}
 				nombres[i] = IDAux;
 			}
 		}
@@ -306,26 +369,22 @@ public class ParserHistoricoVS {
 		int nRows = dcvs.getRowCount();
 		//Primero encontramos la posición de la primera etiqueta C perteneciente a la matriz de contactos.
 		int row = getPosOp(OP);
-//		System.out.println("Parser > getNumberGroups Fila primera: " + row);
 		//Si se ha encontrado (col1 != -1)
 		if(row > -1) {
 			//Encontrada primera coincidencia, se incrementa el contador.
 			contador++;
 			//obtenemos el primer ID
 			String ID1 = getFirstID( (String) dcvs.getValueAt(row, 0));
-			//While mientras la siguiente columna tenga C + ID igual.	
+			//Repetición de la operación mientras la siguiente columna contenga "C + ID" igual.	
 			while(!fin && row < nRows) {		
 				row++;
 				String s = (String) dcvs.getValueAt(row, 0);
-				String IDAux = getFirstID(s);
-				
-				
+				String IDAux = getFirstID(s);	
 				fin = !hasOperator(OP,s);
 //				System.out.println(fin + " | Parser > getNumberGroups s: " + s + " ID: " + IDAux);
 				if(!fin && !IDAux.equals(ID1)) contador++;
 			}
 		}
-//		System.out.println("Parser > getNumberGroups contador: " + contador);
 		return contador;														//Devolver número de coincidencias == número de grupos.
 	}
 	

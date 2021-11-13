@@ -29,8 +29,8 @@ public class Zona {
 	/** poligono Poligono que representa gráficamente una poligono*/
 	private Polygon poligono;
 	// Lista de puntos que componen el poligono.
-	private ArrayList<Point> listaPuntos;
-	/** nivel Nivel de contagio de una poligono [0-9] */  
+	private ArrayList<Point> puntosPoligono;
+	/** nivel Nivel de contagio de una poligono [0-9] */
 	private int nivel;
 	private final String SN = "Nivel";
 	/** Indica el valor del eje X para su representación de cada nivel en el eje Y. */
@@ -50,7 +50,7 @@ public class Zona {
 	 */
 	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon poligono) {
 		setNivel(0);
-		listaPuntos = new ArrayList<Point>();
+		puntosPoligono = new ArrayList<Point>();
 		this.name = name;
 		this.ID = ID;
 		this.poblacion = nhabitantes;
@@ -109,14 +109,14 @@ public class Zona {
 	public void setPoligono(Polygon poligono) {this.poligono = poligono;}
 
 	/**
-	 * @return La listaPuntos que componen el poligono representación de la poligono.
+	 * @return La listas de puntos que componen el poligono que representa la zona.
 	 */
-	public ArrayList<Point> getListaPuntos() {return listaPuntos;}
+	public ArrayList<Point> getListaPuntos() {return puntosPoligono;}
 
 	/**
-	 * @param listaPuntos El/la listaPuntos a establecer
+	 * @param listaPuntos El/la puntosPoligono a establecer
 	 */
-	public void setListaPuntos(ArrayList<Point> listaPuntos) {this.listaPuntos = listaPuntos;}
+	public void setListaPuntos(ArrayList<Point> listaPuntos) {this.puntosPoligono = listaPuntos;}
 
 	/**
 	 * @return devuelve nivel desde 0 hasta 9.

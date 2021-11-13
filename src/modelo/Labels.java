@@ -49,7 +49,7 @@ public class Labels {
 		dic.put("I", "Incidencias");
 		dic.put("S", "Susceptibles");
 		dic.put("R", "Recuperados");
-		dic.put("P", "Prevalecia");
+		dic.put("P", "Prevalencia");
 		//Tasas
 		dic.put("TC", "Tasa de contactos");
 		dic.put("TCONTAGIO", "Tasa de contagio");
@@ -57,7 +57,7 @@ public class Labels {
 		dic.put("CAB", "Contactos con Z");										//X y Z serán sustituidos por el ID o el nombre de los grupos correspondientes.
 		dic.put("TCS", "Tasa de contactos con sintomáticos en Z");		
 		//Iniciales
-		dic.put("I0", "Incidencias iniciales");
+		dic.put("I0", "Incidentes iniciales");
 		dic.put("S0", "Susceptibles iniciales");
 		dic.put("PT0", "Población inicial");
 		dic.put("FINAL TIME", "Tiempo final");

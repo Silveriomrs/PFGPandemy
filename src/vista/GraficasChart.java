@@ -49,6 +49,8 @@ public class GraficasChart{
 	private JFreeChart chart;
 	private JMenuBar menuBar;
 	private JMenu mnVer;
+	private JMenu mnCasos;
+	private JMenu mnTasas;
 	private final String background = "/vista/imagenes/histograma1.jpg";
 	
 	/**
@@ -75,7 +77,11 @@ public class GraficasChart{
 	private void iniciarMenu() {
 		cframe.getContentPane().add(menuBar, BorderLayout.NORTH);
 		mnVer = new JMenu("Ver");
+		mnCasos = new JMenu("Casos");
+		mnTasas = new JMenu("Tasas");
 		menuBar.add(mnVer);
+		menuBar.add(mnCasos);
+		menuBar.add(mnTasas);
 	}
 	
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
@@ -161,7 +167,9 @@ public class GraficasChart{
 			//Añadir una nueva serie al mapa de series.
 			seriesMap.put(nombre, new XYSeries(nombre));
 			//Nueva serie -> nueva opción de visualizar en el menú.
-			addJMenuItem(mnVer,nombre,null);
+			if(nombre.startsWith("Casos")) addJMenuItem(mnCasos,nombre,null);
+			else if(nombre.startsWith("Tasa")) addJMenuItem(mnTasas,nombre,null);
+			else addJMenuItem(mnVer,nombre,null);
 		}
 	}
 	
@@ -178,7 +186,48 @@ public class GraficasChart{
 		if(!seriesMap.containsKey(serie)) {	addSerie(serie);}
 		//Añade el valor a la serie.
 		seriesMap.get(serie).add(x,y);
-		
+	}
+	
+	
+	/**
+	 * <p>Title: getYValue</p>  
+	 * <p>Description: Devuelve el valor del eje Y en la posición indicada por
+	 * parámetro</p>
+	 * En este proyecto el eje X indica el tiempo en días y son unidades enteras. 
+	 * @param serie Nombre de la serie cuyo valor se quiere obtener.
+	 * @param x Posición del valor a obtener, equivalente al día.
+	 * @return Valor del punto en la serie cuya posición es la indicada. -1.0 en otro caso.
+	 */
+	public double getYValue(String serie, int x) {
+		double y = -1.0;
+		if(seriesMap.containsKey(serie)) {
+			double tmp[][] = seriesMap.get(serie).toArray();
+			int size = tmp[0].length;
+			// [0 = X / 1 = Y][xPos]
+			try{y = tmp[1][x];}
+			catch(Exception e) {
+				System.out.println("GraciasChart > getYValue : Valores incorrectos: " + serie + " size: " + size + " X: "+ x);
+				e.printStackTrace();
+			}
+		}
+		return y;
+	}
+	
+	
+	/**
+	 * <p>Title: printSerie</p>  
+	 * <p>Description: Imprime por consola los valores X e Y pertenecientes a la serie.</p> 
+	 * @param serie Nombre de la serie.
+	 */
+	public void printSerie(String serie) {
+		if(seriesMap.containsKey(serie)) {
+			double tmp[][] = seriesMap.get(serie).toArray();
+			for(int j = 0; j<tmp[0].length ; j++) {
+				double x = tmp[0][j];
+				double y = tmp[1][j];
+				System.out.println("(" + x +  "," + y + ")");
+			}	
+		}
 	}
 
 	/**
@@ -202,24 +251,12 @@ public class GraficasChart{
 	 * <p>Title: genera</p>  
 	 * <p>Description: Genera la gráfica con los datos contenidos y establecidos</p> 
 	 */
-	public void genera() {
-		/* Comentado porque causa problemas en la selección inicial. De esta forma
-		 * se inciia sin estar soleccionado nada, pero el usuario puede seleccionar
-		 * desde el menú correspondiente.*/
-//		if(!seriesMap.isEmpty()) {												// Garantiza que el HashMap no esté vacio.
-//			List<?> series = dataset.getSeries();
-//			seriesMap.forEach((k,v) -> {
-//				if(!series.contains(v) ) {										// Comprobación de que no hay ya una serie igual.
-//					dataset.addSeries(v);
-//				}
-//			});
-//		}
-		
+	public void genera() {	
 		//Si cframe no está inicializado crear.
 	    if(cframe == null) {
 		    System.out.println("Graficas Chart - Genera > frame era nulo y se reinicia");
 	    	iniciarFrame();
-	    }else if(cframe != null && !cframe.isVisible()) {							// En caso de estar oculto, mostrar.
+	    }else if(cframe != null && !cframe.isVisible()) {						// En caso de estar oculto, mostrar.
 	    	cframe.setVisible(true);
 	    }
 	}
@@ -253,7 +290,8 @@ public class GraficasChart{
 		chart.addSerie("serie1");
 		chart.addSerie("serie2");
 		chart.addPuntos();
-//		chart.genera();
 		chart.setVisible(true);
+		//Pruebas
+		System.out.println(chart.getYValue("serie1", 0));		
     }
 }

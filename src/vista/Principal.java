@@ -265,13 +265,15 @@ public class Principal extends JFrame {
 					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
 					DCVS pVS = cio.abrirArchivo(null,IO.CSV);
 					//Requiere nuevo parser completo.
-					if(pVS != null) cMap.importarProyectoVS(pVS);
+					if(pVS != null && pVS.getValueAt(0,0).equals("0")) cMap.importarProyectoVS(pVS);
+					else if(pVS != null) mostrar("Archivo seleccionado no reconocido.",0);
 					break;
 				case "Importar Histórico Vensim":
 					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
 					DCVS hVS = cio.abrirArchivo(null,IO.CSV);
 					//Requiere nuevo parser completo.
-					if(hVS != null) cMap.importarHistoricoVS(hVS);
+					if(hVS != null && hVS.getColumnName(1).equals("0")) cMap.importarHistoricoVS(hVS);
+					else if(hVS != null) mostrar("Archivo seleccionado no reconocido.",0);
 					break;		
 				case "Nuevo Proyecto":
 					ParametrosProyecto.main(null);
