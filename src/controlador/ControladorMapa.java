@@ -125,10 +125,8 @@ public class ControladorMapa {
 		boolean OK = historico != null && historico.getRowCount()>0;
 		if(OK) {
 			OK = mapa.getNumZones() > 0;
-			if(OK) {
-			}else {System.out.println("No hay cargadas zonas en la representación");}
+			if(!OK) {System.out.println("No hay cargadas zonas en la representación");}
 		}else {System.out.println("No hay cargado un historico");}
-		
 		return OK;
 	}
 	

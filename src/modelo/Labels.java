@@ -48,15 +48,17 @@ public class Labels {
 		//Básicas
 		dic.put("I", "Incidencias");
 		dic.put("S", "Susceptibles");
-		dic.put("R", "Recuperados");
-		dic.put("P", "Prevalencia");
+		dic.put("R", "Recuperados");	
 		//Tasas
+		dic.put("P", "Prevalencia");
 		dic.put("TC", "Tasa de contactos");
+		dic.put("TR", "Tasa de curación");
+		dic.put("TVS", "Tasa vuelta a la susceptibilidad");
 		dic.put("TCONTAGIO", "Tasa de contagio");
 		//Contactos y tasas de X con Z.
 		dic.put("CAB", "Contactos con Z");										//X y Z serán sustituidos por el ID o el nombre de los grupos correspondientes.
 		dic.put("TCS", "Tasa de contactos con sintomáticos en Z");		
-		//Iniciales
+		//Iniciales y constantes.
 		dic.put("I0", "Incidentes iniciales");
 		dic.put("S0", "Susceptibles iniciales");
 		dic.put("PT0", "Población inicial");
@@ -88,6 +90,7 @@ public class Labels {
 	public String getWord(String label) {
 		String word = null;
 		if(existLabel(label)) word = dic.get(label);
+		else System.out.println("No está agregada al diccionario: " + label);
 		return word;
 	}
 	

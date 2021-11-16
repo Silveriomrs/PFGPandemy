@@ -132,7 +132,7 @@ public class Zona {
 	
 	@Override
 	public String toString() {	
-		String txt = getID() + ", " + getName() + ", " + getPoblacion() + ", " + getSuperficie() +"\n";
+		String txt = getID() + ", " + getName() + ", " + getPoblacion() + ", " + getSuperficie();
 		//Si contiene un poligono obtenemos sus coordenadas:
 		if(poligono != null) {
 			int npuntos = poligono.npoints;
@@ -143,6 +143,21 @@ public class Zona {
 			}
 		}
 		return txt;
+	}
+	
+	
+	/**
+	 * <p>Title: setSIR</p>  
+	 * <p>Description: Establece los valores iniciales Susceptibles, Recuperados
+	 * e Incidentes del grupo de población representado.</p> 
+	 * @param s Número de susceptibles.
+	 * @param i Número de incidentes o infectados.
+	 * @param r Número de recuperados o curados.
+	 */
+	public void setSIR(double s, double i, double r) {
+		addNivel("Susceptibles",0,s);
+		addNivel("Incidencias",0,i);
+		addNivel("Recuperados",0,r);
 	}
 	
 	/**
