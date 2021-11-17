@@ -9,15 +9,12 @@ import java.util.HashMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import controlador.ControladorDatosIO;
-import controlador.ControladorMapa;
-import modelo.DCVS;
+import controlador.ControladorModulos;
 import modelo.FondoPanel;
 import modelo.IO;
 
 import java.awt.BorderLayout;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -35,40 +32,22 @@ import java.awt.Dimension;
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
-
-	private Archivos archivos;
-	private ControladorDatosIO cio;
-	private TablaEditor tablaEditor;
+	
 	private HashMap<String, JMenuItem> jmitems;
-	private Pizarra pizarra;
-	private ParametrosGrupos pgrupos;
-	private ParametrosProyecto pproyecto;
-	private JPanel mapa;
-
-	private About about;
 	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
 	private JPanel panelCentral;
-	private ControladorMapa cMap;
-	private String panelActivo;
+	private ControladorModulos cm;
 	//
 	private JMenuBar menuBar;
-	private final int w = 1024;
-	private final int h = 768;
 
 	/**
 	 * Crea el módulo principal de la aplicación.
+	 * @param cm Controlador de las vistas y módulos.
 	 */
-	public Principal() {
-		cio = new ControladorDatosIO();
-		cMap = new ControladorMapa(w,h);
-		archivos = new Archivos(cMap);
-		tablaEditor = new TablaEditor(cMap);
-		pizarra = new Pizarra(cMap.getZonas());
-		pgrupos = new ParametrosGrupos(10);
-		pproyecto = new ParametrosProyecto(archivos);
-		about = new About();
-		
-		panelActivo = "NONE";
+	public Principal(ControladorModulos cm) {
+		int w = 1024;
+		int h = 768;
+		this.cm = cm;	
 		this.setTitle("Simulador de Pandemias");
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
@@ -92,23 +71,20 @@ public class Principal extends JFrame {
 		panelCentral.setMaximumSize(new Dimension(2767, 2767));
 		panelCentral.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);	
 		panelCentral.setLayout(new BorderLayout(0, 0));
-		
-		//Añadir paneles de los módulos.
-		mapa = cMap.getMapa();
-		panelCentral.add(tablaEditor, BorderLayout.CENTER);
-//		panelCentral.add(archivos, BorderLayout.CENTER);
-		panelCentral.add(mapa,BorderLayout.CENTER);
-		panelCentral.add(pgrupos.getPanel(),BorderLayout.CENTER);
-		panelCentral.add(pproyecto,BorderLayout.CENTER);
 
 		//Añadir elementos al JPanel principal.
 		fondo.add(menuBar, BorderLayout.NORTH);
 		fondo.add(panelCentral, BorderLayout.CENTER);
-		
-		//Ocultar JPanels no primarios y mostrar el panel por defecto.
-		//Mostrar panel correspondiente y ocultación del resto.
-		mostrarPanel(panelActivo);
-		
+	}
+	
+	/**
+	 * <p>Title: addPanelToView</p>  
+	 * <p>Description: Agrega un panel a la vista central.</p> 
+	 * @param panel JPanel o vista para agregar.
+	 */
+	public void addPanelToView(JPanel panel) {
+		panel.setVisible(false);
+		panelCentral.add(panel,BorderLayout.CENTER);
 	}
 	
 	/**
@@ -173,17 +149,15 @@ public class Principal extends JFrame {
 	 */
 	private void actualizarJMItems() {
 		//En caso de no zonas:
-		boolean nozonas = cMap.getZonas().size() > 0;
+		boolean nozonas = cm.getZonas().size() > 0;
 		//Desactivar vista mapa.
 		jmitems.get("Mapa").setEnabled(nozonas);
 		//Desactivar editor de zonas gráfico.
 		jmitems.get("Editor Gráfico").setEnabled(nozonas);
 		//Desactivar vistas de grupos.
 		jmitems.get("Grupos").setEnabled(nozonas);
-		//Desactivar reproductor.
-	/* QUIZÁS ESTE SEA EL PROBLEMA DEL PANEL MAPA, la forma en que es refrescado, puede que esta que 
-	 * he comentado sea la que fuerza la actualización*/
-//		jmitems.get("Reproductor").setEnabled(cMap.isPlayable());
+
+//		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
 		jmitems.get("Reproductor").setEnabled(nozonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
@@ -196,10 +170,6 @@ public class Principal extends JFrame {
 		jmitems.put(nombre, item);
 		padre.add(item);
 	}
-	
-	private int getPosX() {	return (int) this.getBounds().getX();}
-	
-	private int getPosY() {	return (int) this.getBounds().getY();}
 	
 	 /**
 	 * <p>Title: VerMenuListener</p>  
@@ -223,143 +193,19 @@ public class Principal extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
 			System.out.println("Principal AL: " + name);
-			//
-			switch(name){
-				case "Reproductor":
-					//Pasar mapa de módulos al controlar de mapa.
-					if(cMap.isPlayable()) {
-						cMap.play();
-						cMap.situarVentana(ControladorMapa.REPRODUCTOR,getPosX() - 350, getPosY() + h/3);
-						mostrarPanel("Mapa");
-					}
-					break;
-				case "Editor Gráfico":				
-					pizarra = new Pizarra(cMap.getZonas());
-					pizarra.abrirFrame();
-					break;
-				case "Mapa":
-					cMap.setMapaVisible(true);
-				//	cMap.getMapa().verFrame(true);
-					mostrarPanel(name);
-					break;
-				case "Paleta":
-					cMap.situarVentana(ControladorMapa.LEYENDA,getPosX() + w + 10, getPosY());
-					cMap.getPaleta().toggleVisible();
-					break;
-				case "Grupos":
-					pgrupos.setZonas(cMap.getZonas());
-				case "Tabla":
-//				case "Archivos":
-				case "Proyecto":
-					mostrarPanel(name);
-					break;
-				case "Abrir Proyecto":
-					DCVS prj = cio.abrirArchivo(null,IO.PRJ);
-					if(prj != null) {
-						archivos.abrirProyecto(prj);
-						pproyecto.setDCVS(prj);
-						
-					}					
-					break;
-				case "Importar Proyecto Vensim":
-					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
-					DCVS pVS = cio.abrirArchivo(null,IO.CSV);
-					//Requiere nuevo parser completo.
-					if(pVS != null && pVS.getValueAt(0,0).equals("0")) cMap.importarProyectoVS(pVS);
-					else if(pVS != null) mostrar("Archivo seleccionado no reconocido.",0);
-					break;
-				case "Importar Histórico Vensim":
-					//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
-					DCVS hVS = cio.abrirArchivo(null,IO.CSV);
-					//Requiere nuevo parser completo.
-					if(hVS != null && hVS.getColumnName(1).equals("0")) cMap.importarHistoricoVS(hVS);
-					else if(hVS != null) mostrar("Archivo seleccionado no reconocido.",0);
-					break;		
-				case "Nuevo Proyecto":
-					ParametrosProyecto.main(null);
-					break;
-				case "Salir":
-					if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
-					break;
-				case "Acerca de...":
-					about.toggleVisible();
-					break;
-				default:
-					System.out.println(name + ", tipo no reconocido");
-			}
+			cm.doAction(name);
 			actualizarJMItems();
 		}
 	}
 	
-	private void mostrarPanel(String nombre) {
-		boolean traza = false;
-		
-		switch(nombre){
-		case "Grupos":
-			pgrupos.setZonas(cMap.getZonas());
-		case "Mapa":
-		case "Tabla":
-//		case "Archivos":
-		case "Proyecto":
-		case "NONE":
-			//Mostrar panel correspondiente y ocultación del resto.
-			cMap.setMapaVisible(nombre.equals("Mapa"));							
-//			archivos.setVisible(nombre.equals("Archivos"));
-			tablaEditor.setVisible(nombre.equals("Tabla"));
-			pgrupos.setVisible(nombre.equals("Grupos"));
-			pproyecto.setVisible(nombre.equals("Proyecto"));
-		}
-		
-		if(traza) System.out.println("Principal - Mostrar Panel > " + nombre);
-		fondo.updateUI();
-		panelCentral.updateUI();
-	}
-	
-	/**
-	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
-	 * no están enlazados con un hilo padre (null). Un número no definido se
-	 * mostrará como información.
-	 *
-	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un
-	 * mensaje tipo 1.
-	 * @param txt Texto a mostrar.
-	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
-	 *  0 showMessageDialog ERROR_MESSAGE
-	 *  1 showMessageDialog INFORMATION_MESSAGE
-	 *  2 showMessageDialog WARNING_MESSAGE
-	 *  3 showConfirmDialog YES_NO_OPTION
-	 *  4 showMessageDialog PLAIN_MESSAGE
-	 * @return En caso de un mensaje de confirmación devuelve el valor Integer
-	 * de la opción escogida.
-	 */
-	private Integer mostrar(String txt, int tipo ) {
-		String titulo = "";
-		Integer opcion = null;
-		
-		switch(tipo) {
-		case 0: titulo = "Error"; break;
-		case 1: titulo = "Información"; break;
-		case 2: titulo = "¡Antención!"; break;
-		case 3: titulo = "Consulta";
-			opcion = JOptionPane.showConfirmDialog(null, txt, titulo, JOptionPane.YES_NO_OPTION);
-		break;
-		case 4: titulo = "Acerca de..."; tipo = 1; break;
-		default:
-			titulo = "";
-		}
-		
-		if(tipo != 3) JOptionPane.showMessageDialog(null, txt, titulo, tipo);
-		
-		return opcion;
-	}
-
+	/* Funciones para pruebas */
 	
 	/**
 	 * Método main de la clase.
 	 * @param args no usado.
 	 */
 	public static void main(String[] args) {
-		Principal ventana = new Principal();
+		Principal ventana = new Principal(new ControladorModulos());
 		ventana.setVisible(true);
 	}
 }

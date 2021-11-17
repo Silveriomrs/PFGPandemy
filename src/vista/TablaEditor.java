@@ -31,7 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import controlador.ControladorDatosIO;
-import controlador.ControladorMapa;
+import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
 
@@ -64,7 +64,7 @@ public class TablaEditor extends JPanel{
 	private JComboBox<String> comboBox;
 	private JButton btnAsignarTabla;
 	private ControladorDatosIO cio;
-	private ControladorMapa cMap;
+	private ControladorModulos cMap;
 	private JToolBar jtoolBar;
 	private JPanel boxAsignacion;
 	private JFrame frame;
@@ -79,7 +79,7 @@ public class TablaEditor extends JPanel{
 	 * <p>Description: Constructor principal</p> 
 	 * @param cMap Controlador de mapa.
 	 */
-	public TablaEditor(ControladorMapa cMap) {
+	public TablaEditor(ControladorModulos cMap) {
 		this.cMap = cMap;
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
@@ -286,6 +286,12 @@ public class TablaEditor extends JPanel{
 		return icon;
 	}
 	
+	/**
+	 * <p>Title: setModelo</p>  
+	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
+	 * @param modelo JTableModel o modelo que se quiere establecer.
+	 */
+	public void setModelo(DCVS modelo) {tabla.setModel(modelo);	}
 	
 	/**
 	 * <p>Title: nuevaTabla</p>  
@@ -304,7 +310,8 @@ public class TablaEditor extends JPanel{
 		};
 		
 		tabla.setModel(modelo);
-		dcvs = new DCVS(modelo);
+		dcvs = new DCVS();
+		dcvs.setModelo(modelo);
 		this.ruta = null;
 		this.tipo = null;
 		this.modificado = false;
@@ -395,7 +402,6 @@ public class TablaEditor extends JPanel{
 					modelo = dcvs.getModelo();
 					tabla.setModel(modelo);										//Estabece el nuevo modelo en el scroll tabla.
 					mostrar("Archivo Cargado", 1);
-					System.out.println(dcvs.getRuta() + " - "	+ dcvs.getTipo());
 					estadoBotones();
 				}
 			}
@@ -428,7 +434,8 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				DCVS bd = new DCVS( (DefaultTableModel)tabla.getModel());
+				DCVS bd = new DCVS();
+				bd.setModelo(tabla.getModel());
 				String rutaF;
 				//Sino tiene de un tipo se le asigna el tipo general.
 				if(tipo == null || tipo.equals("")) {tipo = IO.CSV;	}			
@@ -453,7 +460,8 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				DCVS dcvs = new DCVS(modelo);
+				DCVS dcvs = new DCVS();
+				dcvs.setModelo(modelo);
 				dcvs.delFilas(tabla.getSelectedRows());
 				tabla.setModel(modelo);
 				modificado = true;
@@ -466,9 +474,11 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				int[] cols = tabla.getSelectedColumns();							//Obtención de las columnas a eliminar.
-				modelo = new DCVS(modelo).delColumnas(cols);						//Creación del modelo nuevo sin las columnas indicadas
-				tabla.setModel(modelo);												//Establecemos el nuevo modelo en la tabla.
+				int[] cols = tabla.getSelectedColumns();						//Obtención de las columnas a eliminar.
+				DCVS dcvs = new DCVS();
+				dcvs.setModelo(modelo);
+				dcvs.delColumnas(cols);				
+				tabla.setModel(dcvs.getModelo());								//Establecemos el nuevo modelo en la tabla.
 				modificado = true;
 				estadoBotones();
 			}
@@ -498,7 +508,9 @@ public class TablaEditor extends JPanel{
 						tipo = IO.MAP;
 						break;
 					case "Historico": 
-						cMap.setHistorico(new DCVS(modelo));
+						DCVS dcvs = new DCVS();
+						dcvs.setModelo(modelo);
+						cMap.setHistorico(dcvs);
 						//nuevaTabla();
 						tipo = IO.HST;
 						break;
@@ -546,7 +558,7 @@ public class TablaEditor extends JPanel{
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
-		TablaEditor te = new TablaEditor(new ControladorMapa(500, 500));
+		TablaEditor te = new TablaEditor(new ControladorModulos());
 		te.abrirFrame();
 	}
 

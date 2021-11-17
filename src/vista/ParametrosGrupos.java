@@ -117,6 +117,8 @@ public class ParametrosGrupos extends JPanel {
 	 * (vistas de zonas) como grupos/zonas compongan el proyecto.
 	 */
 	private void generaPaneles() {
+		if(zonas == null) System.out.println("PGRUPOS > generaPanales: " + zonas);
+
 		//Crear las pestañas de cada zona (grupo) con los datos correspondientes.
 		//Creación ordenada de un árbol con los elementos.
 		TreeMap<Integer, Zona> t = new TreeMap<>();
@@ -139,6 +141,7 @@ public class ParametrosGrupos extends JPanel {
 	 * @param icono Imagen a mostrar como icono de la pestaña.
 	 */
 	private void iniciarTabZona(Zona zona, String icono) {
+		if(zona == null) System.out.println("PGRUPOS > iniciarTabZona: " + zona);
 		int ID = zona.getID();
 		String nombre = zona.getName();
 		//Crea panel.
@@ -180,13 +183,16 @@ public class ParametrosGrupos extends JPanel {
 	 * @param zonas Conjunto de zonas cuyas vistas deben establecerse.
 	 */
 	public void setZonas(HashMap<Integer, Zona> zonas) {
-		this.zonas = zonas;
+		if(zonas == null) System.out.println("PGRUPOS > setZONAS: " + zonas);
 		//Si hay vistas ya en los paneles, eliminar.
 		if(vistasZonas.size() > 0) {
 			paneles.removeAll();												//Elimina los paneles existentes
 			vistasZonas.clear();												//Elimina las vistas.
 			contadorPaneles = 0;
+			this.zonas = zonas;
+			this.numeroZonas = zonas.size();
 		}
+		//
 		generaPaneles();
 	}
 	

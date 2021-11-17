@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -111,6 +113,8 @@ public class IO{
 				dcvs.crearModelo(datos);
 				dcvs.setRuta(ruta2);
 				dcvs.setTipo(ext);
+				dcvs.setDate(new Date( f.lastModified() ));
+				
 				System.out.println(dcvs.getRuta() + " - "	+ dcvs.getTipo());
 			}
 			catch (IOException e) {e.printStackTrace();}

@@ -5,6 +5,9 @@
  */
 package modelo;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.event.TableModelListener;
@@ -20,22 +23,12 @@ import javax.swing.table.TableModel;
 public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
 	private String ruta;
+	private String directorio;
+	private String nombre;
 	private String tipo;
+	private Date fecha;
 	private Object[] cabecera;
 	private Object datos[][];
-
-	/**
-	 * Constructor de la clase. Recepciona un objeto de la clase DefaultTable Model
-	 * y lo establece como su modelo por defecto. En caso de recepcionar 'null'
-	 * establece este como modelo.
-	 * @param modelo Objeto DefaultTableModel a establecer o null.
-	 */
-	public DCVS(DefaultTableModel modelo) {
-		super();
-		this.modelo = modelo;
-		ruta = null;
-		tipo = "";
-	}
 	
 	/**
 	 * <p>Title: Constructor básico</p>  
@@ -48,6 +41,24 @@ public class DCVS implements TableModel{
 		tipo = "";
 		nuevoModelo();
 	}
+	
+	
+	/**
+	 * <p>Title: getDirectorio</p>  
+	 * <p>Description: Devuelve el directorio del que ha sido cargado este módulo</p>
+	 * No incluye nombre del fichero.
+	 * @return Directorio del módulo.
+	 */
+	public String getDirectorio() { return this.directorio;}
+	
+	/**
+	 * <p>Title: getNombre</p>  
+	 * <p>Description: Devuelve el nombre del archivo, con extensión inclusive</p> 
+	 * @return Nombre del archivo.
+	 */
+	public String getNombre() {return this.nombre;}
+	
+
 
 	/**
 	 * Devuelve la fila referenciada.
@@ -364,12 +375,39 @@ public class DCVS implements TableModel{
 	 * @param ruta La nueva ruta en el dispositivo de almacenamiento donde guardar
 	 * los datos.
 	 */
-	public void setRuta(String ruta) {this.ruta = ruta;	}
+	public void setRuta(String ruta) {
+		this.ruta = ruta;
+		Path p;
+		p = Paths.get(ruta);
+	    nombre = p.getFileName().toString();	   
+	    directorio = p.getParent().toString();
+	}
+	
+	
 
 	/**
 	 * @return Devuelve el tipo de datos almacenados en esta instancia.
 	 */
 	public String getTipo() {return tipo;}
+	
+	/**
+	 * <p>Title: getLastDate</p>  
+	 * <p>Description: Devuelve la última fecha de modificación de este módulo</p>
+	 * Accede a la fecha de modificación del archivo y la devuelve. 
+	 * @return Date con la última fecha de modificación, día/hora actual en otro caso.
+	 */
+	public Date getDate() {
+		Date f = new Date();
+		if (this.fecha != null) f = fecha;
+		return f;		
+	}
+	
+	/**
+	 * <p>Title: setDate</p>  
+	 * <p>Description: Establece la fecha indicada como la de modificación del módulo</p> 
+	 * @param d Date con el grupo hora a establecer.
+	 */
+	public void setDate(Date d) {this.fecha = d;}
 
 	/**
 	 * @param tipo El tipo de datos a establecer para esta instancia.

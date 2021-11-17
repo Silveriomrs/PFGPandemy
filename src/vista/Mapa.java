@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.border.LineBorder;
 
-import controlador.ControladorMapa;
+import controlador.ControladorModulos;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
@@ -50,8 +50,8 @@ public class Mapa extends JPanel{
 	public Mapa(int width, int height, Leyenda leyenda) {
 		super();
 		this.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		this.setPreferredSize(ControladorMapa.PanelCentralDim);
-		this.setMinimumSize(ControladorMapa.MinDim);
+		this.setPreferredSize(ControladorModulos.PanelCentralDim);
+		this.setMinimumSize(ControladorModulos.MinDim);
 		this.leyenda = leyenda;
 		this.zonas = new HashMap<Integer, Zona>();
 		this.addMouseListener(new SelectorPoligono());
@@ -72,7 +72,7 @@ public class Mapa extends JPanel{
 		frame.setTitle("Mapa");
 		frame.setSize(w,h);
 	    frame.setMaximumSize(new Dimension(2767, 2767));
-		frame.setMinimumSize(ControladorMapa.MinDim);
+		frame.setMinimumSize(ControladorModulos.MinDim);
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.pack();

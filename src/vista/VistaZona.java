@@ -11,6 +11,8 @@
 package vista;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,12 +22,15 @@ import modelo.IO;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.JTextField;
-import java.awt.Rectangle;
+import java.awt.RenderingHints;
 
 /**
  * <p>Title: VistaZona</p>  
@@ -89,15 +94,21 @@ public class VistaZona extends JPanel {
 		panelCentral.add(lblRepresentacingrfica);
 		
 		//
-		panel_poligono.setBorder(new BevelBorder(BevelBorder.LOWERED, new Color(0, 0, 255), null, new Color(0, 0, 128), null));
-		panel_poligono.setBounds(73, 154, 291, 189);
-		panelCentral.add(panel_poligono);
-		panel_poligono.setLayout(null);
+		PanelPoligono pp = new PanelPoligono();
 		
-		JLabel lblSinPoligono = new JLabel();
-		lblSinPoligono.setBounds(new Rectangle(0, 0, 291, 189));
-		lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",panel_poligono.getWidth(),panel_poligono.getHeight()));
-		panel_poligono.add(lblSinPoligono);
+//		panel_poligono.setBorder(new BevelBorder(BevelBorder.LOWERED, new Color(0, 0, 255), null, new Color(0, 0, 128), null));
+//		panel_poligono.setBounds(73, 154, 291, 189);
+//		panel_poligono.setLayout(null);
+		
+//		panelCentral.add(panel_poligono);
+		panelCentral.add(pp);
+		
+		
+//		JLabel lblSinPoligono = new JLabel();
+//		lblSinPoligono.setBounds(new Rectangle(0, 0, 291, 189));
+//		lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",panel_poligono.getWidth(),panel_poligono.getHeight()));
+//		panel_poligono.add(lblSinPoligono);
+//		pp.add(lblSinPoligono);
 		
 		//Iniciar los JTextFields
 		int posX = 100;
@@ -220,6 +231,41 @@ public class VistaZona extends JPanel {
 		recargarDatos();
 	}
 	
+	
+	private class PanelPoligono extends JPanel{		
+		/** serialVersionUID*/  
+		private static final long serialVersionUID = 1575177244442912505L;
+		private JLabel lblSinPoligono;
+
+		public PanelPoligono() {
+			setBorder(new BevelBorder(BevelBorder.LOWERED, new Color(0, 0, 255), null, new Color(0, 0, 128), null));
+			setBounds(73, 154, 291, 189);
+			setLayout(null);
+			lblSinPoligono = new JLabel();
+			lblSinPoligono.setBounds(new Rectangle(0, 0, getWidth(), getHeight()));
+			lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",getWidth(),getHeight()));
+			add(lblSinPoligono);
+		}
+		
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+	        Graphics2D g2 = (Graphics2D)g;
+	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+	                            RenderingHints.VALUE_ANTIALIAS_ON);
+	        
+	        if(zona.getZona() == null) {
+	        	lblSinPoligono.setVisible(true);
+	        }else {
+	        	lblSinPoligono.setVisible(false);
+	        	g2.setPaint(Color.GREEN);
+	  			g2.fill(zona.getZona());
+	  			g2.setPaint(Color.BLACK);
+				g2.draw(zona.getZona());
+	        }    
+		}
+	}
+	
 	/* Funciones de pruebas */
 	
 	/**
@@ -229,8 +275,14 @@ public class VistaZona extends JPanel {
 	 * que será mostrados en la vista.
 	 */
 	public void generaTest() {
-		this.zona = new Zona(1, "Zona_Test", 0 , 0 , null);
+		Polygon p = new Polygon();
+		p.addPoint( 65, 45 );
+		p.addPoint( 95, 150 );
+		p.addPoint( 170, 100 );
+		
+		this.zona = new Zona(1, "Zona_Test", 10 , 400 , p);
 		recargarDatos();
+		panel_poligono.setVisible(true);
 	}
 	
 	/**

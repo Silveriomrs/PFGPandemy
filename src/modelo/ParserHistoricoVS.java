@@ -10,8 +10,6 @@ package modelo;
 
 import java.util.HashMap;
 
-import vista.GraficasChart;
-
 /**
  * <p>Title: ParserProyectoVS</p>  
  * <p>Description: Parser para importar datos de un proyecto VenSim </p> 
@@ -32,6 +30,7 @@ public class ParserHistoricoVS {
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
 	private int FT;																//Tiempo final de la simulación.
+	private boolean traza = false;
 
 	/**
 	 * <p>Title: Constructor del parser</p>  
@@ -65,15 +64,15 @@ public class ParserHistoricoVS {
 		this.NG = IDs.length;
 		String nombres = "Número de Grupos: " + NG + " >";
 		for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
-		System.out.println(nombres);
+		if(traza) System.out.println(nombres);
 		
 		//Obtención de los tiempos inicial y final.
 	    readTimes();
-	    System.out.println("IT: " + IT + " FT: " + FT);
+	    if(traza) System.out.println("IT: " + IT + " FT: " + FT);
 	    
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
-		System.out.println("Creadas " + zonas.size() + " zonas");
+		if(traza) System.out.println("Creadas " + zonas.size() + " zonas");
 		//Leer tabla de relaciones.
 		crearMatriz();
 		
@@ -132,8 +131,8 @@ public class ParserHistoricoVS {
 				z.addNivel("Nivel", j, ci10K);									//Guardado del Nivel de contagio.
 				
 				if(j==0) {
-					System.out.println(ns + " inicial " + name + " : " + pj);
-					System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci10K);
+					if(traza) System.out.println(ns + " inicial " + name + " : " + pj);
+					if(traza) System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci10K);
 				}
 			}
 		}
@@ -158,9 +157,6 @@ public class ParserHistoricoVS {
 				int row = dcvs.getFilaItem(nameS);
 				if(row > -1) {addSerieXs(nameS,row,z);}							//Añadir la serie localizada a la zona indicada.
 			}	
-			
-			GraficasChart gc = z.getGrafica();
-			gc.setVisible(true);
 		}
 	}
 	
@@ -277,7 +273,7 @@ public class ParserHistoricoVS {
 			mContactos.addFila(fila);
 		}
 		
-		System.out.println( mContactos.toString() );
+		if(traza) System.out.println( mContactos.toString() );
 	}
 	
 	
@@ -317,7 +313,7 @@ public class ParserHistoricoVS {
 			int posI = dcvs.getFilaItem("I " + name);
 			if(posI > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posI,1));
 		}
-		System.out.println("Población Inicial " + name + ": " + habitantes);
+		if(traza) System.out.println("Población Inicial " + name + ": " + habitantes);
 		return habitantes;	
 	}
 	
@@ -450,11 +446,24 @@ public class ParserHistoricoVS {
 		return encontrado;
 	}
 
-
 	
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getRelaciones() {return mContactos;}
+	public DCVS getMContactos() {return mContactos;}
+
+
+	/**
+	 * @return El/la zonas
+	 */
+	public HashMap<Integer, Zona> getZonas() {return zonas;	}
+
+
+	/**
+	 * <p>Title: getNG</p>  
+	 * <p>Description: Devuelve el número de grupos de población.</p> 
+	 * @return Número de grupos de población.
+	 */
+	public int getNG() {return this.NG;}
 	
 }

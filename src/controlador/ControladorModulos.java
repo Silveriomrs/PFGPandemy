@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,9 +19,16 @@ import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
 import modelo.ParserProyectoVS;
 import modelo.Zona;
+import vista.About;
+import vista.Archivos;
 import vista.Leyenda;
 import vista.Mapa;
+import vista.ParametrosGrupos;
+import vista.ParametrosProyecto;
+import vista.Pizarra;
 import vista.Player;
+import vista.Principal;
+import vista.TablaEditor;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -28,14 +36,22 @@ import vista.Player;
  * @version 1.0
  *
  */
-public class ControladorMapa {
+public class ControladorModulos {
 
-	/** mapa Instancia de un mapa*/  
-	private Mapa mapa;
-	/** leyenda Leyenda del mapa.*/  
+	
 	private Leyenda leyenda;
-	/** Player para la reproducción de una simulación */
+	private ControladorDatosIO cio;
+	//Vistas
+	private About about;
+	private Principal principal;
 	private Player player;
+	private Mapa mapa;
+	private Archivos archivos;
+	private TablaEditor tablaEditor;
+	private ParametrosGrupos pgrupos;
+	private ParametrosProyecto pproyecto;
+	
+	//
 	private DefaultTableModel historico;
 	private ParserPoly parserPoly;
 	
@@ -53,18 +69,39 @@ public class ControladorMapa {
 	/** MinDim damaño mínimo para todo marco o panel de la aplicación*/  
 	public final static Dimension MinDim = new Dimension(800, 600);
 	
+	private int w = 1024;
+	private int h = 768;
+	private String panelActivo = "None";
+	
+	
 	/**
 	 * Constructor de la clase.
-	 * @param w Ancho del mapa.
-	 * @param h Alto del mapa.
 	 */
-	public ControladorMapa(int w, int h) {
+	public ControladorModulos() {
+		cio = new ControladorDatosIO();
+		archivos = new Archivos(this);
+		tablaEditor = new TablaEditor(this);
+		pgrupos = new ParametrosGrupos(10);
+		pproyecto = new ParametrosProyecto(archivos);
+		about = new About();
 		leyenda = new Leyenda(100, 205, false);
 		mapa = new Mapa(w,h, leyenda);
+		principal = new Principal(this);
 		player = new Player(400, 400, true);
 		parserPoly = new ParserPoly();
 		parserPoly.setEscala(2.18);
+		agregarPaneles();
 	}
+	
+	private void agregarPaneles() {
+		//Añadir paneles de los módulos.
+		principal.addPanelToView(tablaEditor);
+		principal.addPanelToView(mapa);
+		principal.addPanelToView(pgrupos);
+		principal.addPanelToView(pproyecto);
+		mostrarPanel(panelActivo);
+	}
+	
 
 	/**
 	 * <p>Title: setPoligonos</p>  
@@ -85,7 +122,7 @@ public class ControladorMapa {
 	 * <p>Description: Activa o desactiva la visualización del mapa</p> 
 	 * @param ver True para activarla, false en otro caso.
 	 */
-	public void setMapaVisible(boolean ver) {mapa.setVisible(ver);}
+	private void setMapaVisible(boolean ver) {mapa.setVisible(ver);}
 	
 	
 	/**
@@ -97,7 +134,7 @@ public class ControladorMapa {
 	 * @param posX Posición X a establacer.
 	 * @param posY Posición Y a establecer.
 	 */
-	public void situarVentana(String nombre, int posX, int posY) {
+	private void situarVentana(String nombre, int posX, int posY) {
 		switch(nombre) {
 		case REPRODUCTOR:
 			player.setPosicion(posX, posY);
@@ -140,9 +177,11 @@ public class ControladorMapa {
 	 * @also setPoligonos.
 	 * @also setPaleta.
 	 */
-	public void play() {
+	private void play() {
 		if(isPlayable()) {
-			player.setPlay(mapa,new DCVS(historico));
+			DCVS h = new DCVS();
+			h.setModelo(historico);
+			player.setPlay(mapa,h);
 			player.setVisible(true);
 		}
 	}
@@ -231,10 +270,17 @@ public class ControladorMapa {
 
 	/**
 	 * <p>Title: setZonas</p>  
-	 * <p>Description: Establece el conjunto de zonas</p> 
+	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
+	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
 	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
 	 */
-	public void setZonas(HashMap<Integer,Zona> zonas) {mapa.setZonas(zonas);}
+	public void setZonas(HashMap<Integer,Zona> zonas) {
+		//Actualiza el mapa.
+		mapa.setZonas(zonas);
+		//Actualizar Grupos.
+		pgrupos.setZonas(zonas);
+		
+	}
 	
 	/**
 	 * <p>Title: setModulos</p>  
@@ -259,7 +305,144 @@ public class ControladorMapa {
 		});
 	}
 	
+	/* Control de los módulos */
+	
+	/**
+	 * <p>Title: doAction</p>  
+	 * <p>Description: Realiza la acción concreta indicada desde la vista
+	 * que ha realizado la llamada.</p> 
+	 * @param nombre Nombre de la acción.
+	 */
+	public void doAction(String nombre) {
+		//
+		switch(nombre){
+			case "Reproductor":
+				//Pasar mapa de módulos al controlar de mapa.
+				if(isPlayable()) {
+					play();
+					situarVentana(ControladorModulos.REPRODUCTOR, principal.getX() - 350, principal.getY() + h/3);
+					mostrarPanel("Mapa");
+				}
+				break;
+			case "Editor Gráfico":		
+			new Pizarra(mapa.getZonas());
+				//pizarra.toogleVisible();
+				break;
+			case "Mapa":
+				//getMapa().verFrame(true);
+				mostrarPanel(nombre);
+				break;
+			case "Paleta":
+				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
+				getPaleta().toggleVisible();
+				break;
+			case "Grupos":
+				pgrupos.setZonas(getZonas());
+			case "Tabla":
+//			case "Archivos":
+			case "Proyecto":
+				mostrarPanel(nombre);
+				break;
+			case "Abrir Proyecto":
+				DCVS prj = cio.abrirArchivo(null,IO.PRJ);
+				if(prj != null) {
+					archivos.abrirProyecto(prj);
+					pproyecto.setDCVS(prj);		
+				}					
+				break;
+			case "Importar Proyecto Vensim":
+				DCVS pVS = cio.abrirArchivo(null,IO.CSV);
+				//Requiere nuevo parser completo.
+				if(pVS != null && pVS.getValueAt(0,0).equals("0")) importarProyectoVS(pVS);
+				else if(pVS != null) mostrar("Archivo seleccionado no reconocido.",0);
+				break;
+			case "Importar Histórico Vensim":
+				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
+				DCVS hVS = cio.abrirArchivo(null,IO.CSV);
+				//Requiere nuevo parser completo.
+				if(hVS != null && hVS.getColumnName(1).equals("0")) importarHistoricoVS(hVS);
+				else if(hVS != null) mostrar("Archivo seleccionado no reconocido.",0);
+				break;		
+			case "Nuevo Proyecto":
+				ParametrosProyecto.main(null);
+				break;
+			case "Salir":
+				if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
+				break;
+			case "Acerca de...":
+				about.toggleVisible();
+				break;
+			default:
+				System.out.println(nombre + ", tipo no reconocido");
+		}
+		
+		mostrarPanel(nombre);
+	}
+	
+	private void mostrarPanel(String nombre) {		
+		switch(nombre){
+		case "Grupos":
+			pgrupos.setZonas(getZonas());
+		case "Mapa":
+		case "Tabla":
+//		case "Archivos":
+		case "Proyecto":
+		case "NONE":
+			//Mostrar panel correspondiente y ocultación del resto.
+			setMapaVisible(nombre.equals("Mapa"));							
+			tablaEditor.setVisible(nombre.equals("Tabla"));
+			pgrupos.setVisible(nombre.equals("Grupos"));
+			pproyecto.setVisible(nombre.equals("Proyecto"));
+		}
+	}
+	
+	/**
+	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
+	 * no están enlazados con un hilo padre (null). Un número no definido se
+	 * mostrará como información.
+	 *
+	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un
+	 * mensaje tipo 1.
+	 * @param txt Texto a mostrar.
+	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
+	 *  0 showMessageDialog ERROR_MESSAGE
+	 *  1 showMessageDialog INFORMATION_MESSAGE
+	 *  2 showMessageDialog WARNING_MESSAGE
+	 *  3 showConfirmDialog YES_NO_OPTION
+	 *  4 showMessageDialog PLAIN_MESSAGE
+	 * @return En caso de un mensaje de confirmación devuelve el valor Integer
+	 * de la opción escogida.
+	 */
+	private Integer mostrar(String txt, int tipo ) {
+		String titulo = "";
+		Integer opcion = null;
+		
+		switch(tipo) {
+		case 0: titulo = "Error"; break;
+		case 1: titulo = "Información"; break;
+		case 2: titulo = "¡Antención!"; break;
+		case 3: titulo = "Consulta";
+			opcion = JOptionPane.showConfirmDialog(null, txt, titulo, JOptionPane.YES_NO_OPTION);
+		break;
+		case 4: titulo = "Acerca de..."; tipo = 1; break;
+		default:
+			titulo = "";
+		}
+		
+		if(tipo != 3) JOptionPane.showMessageDialog(null, txt, titulo, tipo);
+		
+		return opcion;
+	}
+	
+
+	
 	/* En progreso de implementación */
+	
+	private void setDatosProyecto(DCVS dcvs, int NG) {
+		dcvs.addFila(new String[] {"NG","" + NG});
+		pproyecto.setDCVS(dcvs);
+		
+	}
 	
 	/**
 	 * <p>Title: importarProyectoVS</p>  
@@ -269,8 +452,16 @@ public class ControladorMapa {
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	public void importarProyectoVS(DCVS prjV) {
-		ParserProyectoVS parserPVS = new ParserProyectoVS(prjV);			
+	private void importarProyectoVS(DCVS prjV) {
+		ParserProyectoVS parser = new ParserProyectoVS(prjV);
+		//Establecer las zonas en las vistas correspondientes.
+		setZonas(parser.getZonas());
+		//Establecer los datos del proyecto en la vista.
+		setDatosProyecto(prjV,parser.getNG());
+		//Establecer el historico de niveles.
+		
+		//Establecer matriz de relaciones.
+		tablaEditor.setModelo(parser.getMContactos());
 	}
 	
 	/**
@@ -281,9 +472,25 @@ public class ControladorMapa {
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	public void importarHistoricoVS(DCVS prjV) {
-		ParserHistoricoVS parseHVS = new ParserHistoricoVS(prjV);
+	private void importarHistoricoVS(DCVS prjV) {
+		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
+		//Establecer las zonas en las vistas correspondientes.
+		setZonas(parser.getZonas());
+		//Establecer los datos del proyecto en la vista.
+		setDatosProyecto(prjV,parser.getNG());
+		//Establecer el historico de niveles.
+		
+		//Establecer matriz de relaciones.
+		tablaEditor.setModelo(parser.getMContactos());
+		
 	}
 	
-	
+	/* Funciones para pruebas */
+	/**
+	 * Método main de la clase.
+	 * @param args no usado.
+	 */
+	public static void main(String[] args) {
+		ControladorModulos cm = new ControladorModulos();
+	}
 }

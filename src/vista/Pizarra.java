@@ -43,18 +43,19 @@ import modelo.Zona;
  * @date 23 sept. 2021
  * @version versión 1.0
  */
-public class Pizarra extends JPanel {
+public class Pizarra extends JFrame {
 	/** serialVersionUID*/
 	private static final long serialVersionUID = 6537461228067301333L;
 	private JButton bLimpiar,bGuardar,bAImagen,bCerrarPoligono,bBoxAplicar;
 	private Canvas c;
 	private JToolBar toolBar;
 	private int dimX, dimY;														//Dimensiones para la zona de dibujado.
+	private Dimension dim;
 	private Polygon poligono;
 	private Polygon marco;
 	// listaPuntos almacena los puntos, esta manera permite implementar a posteriori funciones tipo "undo". "restore",etc.
-	private ArrayList<Point> listaPuntos;										
-	private JPanel panelCanvas;
+	private ArrayList<Point> listaPuntos;
+	private JPanel panelCentral, panelCanvas;
 	private JComboBox<String> comboBoxAsignar;
 	private JComboBox<String> comboBoxAsignados;
 	private HashMap<Integer,Zona> zonas;
@@ -71,30 +72,37 @@ public class Pizarra extends JPanel {
 	public Pizarra(HashMap<Integer,Zona> zonas) {
 		this.dimX = 1024;
 		this.dimY = 768;
+		this.dim = new Dimension(dimX, dimY);
 		this.listaPuntos = new ArrayList<Point>();
+		this.panelCentral = new JPanel();
+		this.panelCanvas = new JPanel();
+		this.c = new MiCanvas();
+	
 		//Si el conjunto de zonas es correcto y mayor a 0 -> iniciar módulo.
-		if(zonas != null && zonas.size() > 0) {
-			this.zonas = zonas;
-			this.setPreferredSize(new Dimension(dimX, dimY));
-			this.setSize(new Dimension(dimX, dimY));
-		    this.setBackground(Color.white);
-		    this.setLayout(new BorderLayout());
-		    this.setOpaque(false);
-		    configura();
-		}
+		if(zonas != null && zonas.size() > 0) {	this.zonas = zonas; }
+		configura();
 	}
-
+	
 	/**
-	 * <p>Title: setZonas</p>
-	 * <p>Description: Establece el conjunto de zonas contenidas dentro de un HashMAp.</p>
-	 * En caso de que no contenga elementos, no actuará.
-	 * @param zonas HashMap de zonas a establecer.
+	 * <p>Title: abrirFrame</p>
+	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p>
 	 */
-	public void setZonas(HashMap<Integer,Zona> zonas) {
-	   this.zonas = zonas;
-       zonasToCombo();
-	   reinicioBotones();
+	public void configuraFrame() {
+	    Dimension m = panelCentral.getPreferredSize();
+	    int y = (int) m.getHeight() + 15;										//Una altura extra para no ocultar el canvas.
+	    setPreferredSize(new Dimension(dimX, y));
+	    setResizable(false);
+	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    pack();
+	    setVisible(true);	
 	}
+	
+	/**
+	 * <p>Title: toogleVisible</p>  
+	 * <p>Description: Cambia de un estado de visibilidad a uno de oculto y
+	 * viceversa.</p> 
+	 */
+	public void toogleVisible() { this.setVisible(!isVisible());}
 
 	/**
 	 * <p>Title: getZonas</p>
@@ -102,51 +110,38 @@ public class Pizarra extends JPanel {
 	 * @return Conjunto de las zonas.
 	 */
 	public HashMap<Integer,Zona> getZonas() {return this.zonas;}
-
-	/**
-	 * <p>Title: abrirFrame</p>
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p>
-	 */
-	public void abrirFrame() {
-	    JFrame frame = new JFrame("Diseño de figuras");
-	    Dimension m = getPreferredSize();
-	    int y = (int)m.getHeight() + 15;										//Una altura extra para no ocultar el canvas.
-	    frame.setPreferredSize(new Dimension(dimX, y));
-	    frame.setResizable(false);
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    frame.getContentPane().add(this);
-		frame.pack();
-        frame.setVisible(true);
-	}
-
-	private void creaMarco() {
-		listaPuntos.add(new Point(5,5));
-		listaPuntos.add(new Point(c.getWidth() - 5,5));
-		listaPuntos.add(new Point(c.getWidth() - 5,c.getHeight() - 5));
-		listaPuntos.add(new Point(5,c.getHeight() - 5));	
-		this.marco = generaPoligono();
-		listaPuntos.clear();
-	}
 	
 	private void configura() {
 		//Inicialización de los componentes en estricto orden de dependencia.
-		iniciarPizarra();
+		iniciarCanvas();
 		creaMarco();
 		iniciarBotones();
 		iniciarCombos();
         iniciarToolBar();
         reinicioBotones();
-
-	    panelCanvas = new JPanel();
+        
+        panelCentral.setPreferredSize(dim);
+		panelCentral.setSize(dim);
+	    panelCentral.setBackground(Color.white);
+	    panelCentral.setLayout(new BorderLayout());
+	    panelCentral.setOpaque(false);
+	    
 	    panelCanvas.setOpaque(false);
 	    panelCanvas.setLayout(null);
-	    panelCanvas.add(c);
-	    add(panelCanvas, BorderLayout.CENTER);
-
+	    
 	    //Añadir Observadores.
 	    bLimpiar.addActionListener(new LimpiarListener());
 	    bCerrarPoligono.addActionListener(new ComponerListener());
 	    bBoxAplicar.addActionListener(new AsignarBoxListener() );
+	    
+	    
+	    //Conectar las partes.
+	    panelCanvas.add(c);
+	    //Añadimos al panel central y este al frame
+	    panelCentral.add(panelCanvas, BorderLayout.CENTER);
+	    this.add(panelCentral);
+
+	    configuraFrame();
 	}
 
     /**
@@ -155,7 +150,7 @@ public class Pizarra extends JPanel {
      * pizarra</p>
      * @return El JPanel configurado.
      */
-    public JPanel getPanel() {return this;}
+    public JPanel getPanel() {return panelCentral;}
 
     /* Métodos privados */
 
@@ -172,6 +167,19 @@ public class Pizarra extends JPanel {
 
     private boolean isPrimero() {return 0 == listaPuntos.size();}
 
+    /**
+	 * <p>Title: creaMarco</p>  
+	 * <p>Description: Dibuja un marco alrededor de la zona de pintado.</p>
+	 */
+	private void creaMarco() {
+		listaPuntos.add(new Point(5,5));
+		listaPuntos.add(new Point(c.getWidth() - 5,5));
+		listaPuntos.add(new Point(c.getWidth() - 5,c.getHeight() - 5));
+		listaPuntos.add(new Point(5,c.getHeight() - 5));	
+		this.marco = generaPoligono();
+		listaPuntos.clear();
+	}
+    
 	private void iniciarToolBar() {
 	    toolBar = new JToolBar();
 	    toolBar.add(bLimpiar);
@@ -266,10 +274,24 @@ public class Pizarra extends JPanel {
         // Desactivar cuando no hay poligonos o ya no hay más zonas sin asignar.
         c.setEnabled(!hayPoligono && hasItemC1);
 	}
+		
+	/**
+	 * <p>Title: setZonas</p>
+	 * <p>Description: Establece el conjunto de zonas contenidas dentro de un HashMAp.</p>
+	 * En caso de que no contenga elementos, no actuará.
+	 * @param zonas HashMap de zonas a establecer.
+	 */
+	public void setZonas(HashMap<Integer,Zona> zonas) {
+	   this.zonas = zonas;
+       zonasToCombo();
+	   reinicioBotones();
+	}
 	
-	private void iniciarPizarra() {
-		//Configuración de la pizarra
-		c = new MiCanvas();
+	/**
+	 * <p>Title: iniciarCanvas</p>  
+	 * <p>Description: Inicializa el Canvas o zona de dibujo.</p>
+	 */
+	private void iniciarCanvas() {
 		c.setBounds(0, 0, dimX, dimY -25);
 		c.setName("pizarra");
 		c.setBackground(Color.LIGHT_GRAY);
@@ -281,7 +303,7 @@ public class Pizarra extends JPanel {
 			Graphics g = c.getGraphics();
 			if (g == null) {
 				System.out.println("G es nulo");
-				iniciarPizarra();
+				iniciarCanvas();
 				g = c.getGraphics();
 			} else {
 				/* El que queda dibujado es el último impreso */
@@ -471,11 +493,13 @@ public class Pizarra extends JPanel {
     private class AbrirListener extends MouseAdapter {
     	@Override
     	public void mouseClicked(MouseEvent e) {
-    		//Selección de imagen de fondo.
+    		// Selección de imagen de fondo.
+    		IO io = new IO();
     		String ruta = IO.selFile(1, IO.IMG);
-    		//En caso de tener una ruta correcta se procede a la carga.
+    		// En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();
+//    			fondo = IO.getImagen(ruta,false, 0, 0);
     			dibujarZonas();
     		}
     	}
@@ -491,7 +515,8 @@ public class Pizarra extends JPanel {
 	 * zonas internas por esta propia función a efecto de pruebas.
 	 */
 	public void testModulo() {
-    	abrirFrame();
+    	configuraFrame();
+//    	toogleVisible();
     }
 
 	/**

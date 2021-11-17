@@ -42,11 +42,11 @@ public class Zona {
 	 * Constructor de las instancias de zonas.
 	 * Recibe todos sus paramétros al instanciarse, ID (normalmente una abreviatura
 	 * del nombre, nombre de la poligono completo y el poligono que la representa.
-	 * @param ID nombre corto unico de la poligono representada.
-	 * @param name nombre completo de la poligono representada.
-	 * @param nhabitantes Número de habitantes que componen la población del grupo/poligono.
-	 * @param superficie Superficie de la poligono en kilometros cuadrados.
-	 * @param poligono poligono cerrado que contiene la representación gráfica de la poligono.
+	 * @param ID Número identificador unico de la población representada.
+	 * @param name Nombre del grupo de población representado.
+	 * @param nhabitantes Número de habitantes que componen la población del grupo.
+	 * @param superficie Superficie del poligono en kilometros cuadrados.
+	 * @param poligono Poligono cerrado representación gráfica de la zona.
 	 */
 	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon poligono) {
 		setNivel(0);

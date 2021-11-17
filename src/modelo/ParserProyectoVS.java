@@ -32,6 +32,7 @@ public class ParserProyectoVS {
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
 	private int FT;																//Tiempo final de la simulación.
+	private boolean traza = false;
 
 	/**
 	 * <p>Title: Constructor del parser</p>  
@@ -61,7 +62,9 @@ public class ParserProyectoVS {
 		this.IDs = getNombresGrupos();
 		//Obtención del número de grupos.
 		this.NG = IDs.length;
-		for(int i=0; i<NG;i++) System.out.println(IDs[i]);
+		for(int i=0; i<NG;i++) {
+			if(traza) System.out.println(IDs[i]);
+		}
 		//Obtención de los tiempos inicial y final.
 	    readTimes();
 		//Crear tantas Zonas como Grupos.
@@ -103,8 +106,10 @@ public class ParserProyectoVS {
 				if(col > -1) {addSerieXs(nameS,col,z);}							//Añadir la serie localizada a la zona indicada.
 			}
 			
-			GraficasChart gc = z.getGrafica();
-			gc.setVisible(true);
+			if(traza) {
+				GraficasChart gc = z.getGrafica();
+				gc.setVisible(true);
+			}
 		}
 		
 	}
@@ -157,7 +162,7 @@ public class ParserProyectoVS {
 				String etiqueta = labels.getWord(op);							//Obtener el valor de la etiqueta.	
 				//Caso especial para etiquetas con dos operandos.
 				if( op.equals("CAB") || op.equals("TCS")) {
-					System.out.println(et + " > col: " + col + " fila: " + contador + " - "+ etiqueta + ", Valor: " + valor);
+					if(traza) System.out.println(et + " > col: " + col + " fila: " + contador + " - "+ etiqueta + ", Valor: " + valor);
 					etiqueta = etiqueta.replaceFirst("Z",getSecondID(et));
 				}
 				//Si etiqueta es nulo usar el pasado por parámetro.
@@ -210,7 +215,7 @@ public class ParserProyectoVS {
 			mContactos.addFila(fila);
 		}
 		
-		System.out.println( mContactos.toString() );
+		if(traza) System.out.println( mContactos.toString() );
 	}
 	
 	
@@ -239,7 +244,7 @@ public class ParserProyectoVS {
 		int habitantes = 0;
 		int col = dcvs.getColItem("PT0 " + IDs[ID]);
 		if(col>-1) habitantes = Integer.parseInt((String) dcvs.getValueAt(0, col));
-		System.out.println("Parser VenSim > getPeople: " + habitantes);
+		if(traza) System.out.println("Parser VenSim > getPeople: " + habitantes);
 		return habitantes;	
 	}
 	
@@ -311,6 +316,12 @@ public class ParserProyectoVS {
 	public int getFT() {return FT;}
 
 
+	/**
+	 * @return El número de grupos de población.
+	 */
+	public int getNG() {return NG;}
+
+
 	private String getFirstID(String parte) {return parte.split(" ")[1];}
 	
 	
@@ -353,6 +364,14 @@ public class ParserProyectoVS {
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getRelaciones() {return mContactos;}
+	public DCVS getMContactos() {return mContactos;}
+
+
+	/**
+	 * <p>Title: getZonas</p>  
+	 * <p>Description: </p> 
+	 * @return Los grupos de población o zonas obtenidas.
+	 */
+	public HashMap<Integer, Zona> getZonas() {return zonas;	}
 	
 }

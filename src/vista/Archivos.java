@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorDatosIO;
-import controlador.ControladorMapa;
+import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
 import java.awt.Color;
@@ -41,6 +41,7 @@ public class Archivos extends JPanel {
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 5320403899683788073L;
 	private final int ELEMENTOS = 5;
+	
 	//Campos de texto que indicarán la ruta del fichero cargado.
 	private JTextField TFMapa,TFProyecto,TFHistorico,TFLeyenda,TFRelaciones;
 	private TitledBorder tb;
@@ -63,7 +64,7 @@ public class Archivos extends JPanel {
 //	private boolean modificado = false;
 	private JPanel panelCentral;
 	private ControladorDatosIO cIO;
-	private ControladorMapa cMap;
+	private ControladorModulos cMap;
 	private HashMap<String,JButton> mBtnAbrir;
 	private HashMap<String,JButton> mBtnGuardar;
 	private HashMap<String,JButton> mBtnGuardarCambios;
@@ -75,7 +76,7 @@ public class Archivos extends JPanel {
 	 * Create the panelCentral.
 	 * @param cMap Controlador datos de mapeados.
 	 */
-	public Archivos(ControladorMapa cMap) {
+	public Archivos(ControladorModulos cMap) {
 		this.cIO = new ControladorDatosIO();
 		if(cMap != null) this.cMap = cMap;
 		mBtnAbrir = new HashMap<String,JButton>();
@@ -106,6 +107,19 @@ public class Archivos extends JPanel {
 		frame.pack();
         frame.setVisible(true);
 	}
+	
+	/**
+	 * <p>Title: setLabel</p>  
+	 * <p>Description: Establece el texto al campo que se le indique.</p> 
+	 * @param label Etiqueta o campo a escribir.
+	 * @param text Texto a escribir en el campo.
+	 */
+	public void setLabel(String label, String text) {
+		if(mapaFields.containsKey(label)) {
+			mapaFields.get(label).setText(text);
+		}
+	}
+	
 	
 	/**
 	 * @return El mapa de los módulos cargadoss
@@ -511,15 +525,11 @@ public class Archivos extends JPanel {
 			String aux = tt.split(" ")[1];
 			int size = aux.length() -4;
 			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.
-/* No olvidar borrar líneas de traza */
-			boolean traza = false;
-			if(traza) System.out.println(op + " " + op2 + " " + ext);
 			
 			//Opciones de Carga de módulo, NO módulo PRJ.
 			if(op.equals("Abrir") && !ext.equals(IO.PRJ)) {
 				dcvs = cIO.abrirArchivo(null,ext);
 				if(dcvs != null) {
-	//				modificado = true;
 					establecerDatos(dcvs);
 				}
 			//Opciones de carga de módulo PRJ
@@ -550,7 +560,7 @@ public class Archivos extends JPanel {
 	 * @param args Nada.
 	 */
 	public static void main(String[] args) {
-		Archivos archivos = new Archivos(new ControladorMapa(0,0));
+		Archivos archivos = new Archivos(new ControladorModulos());
 		archivos.abrirFrame();	
 	}
 	

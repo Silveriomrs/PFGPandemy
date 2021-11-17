@@ -89,9 +89,17 @@ public class ParametrosProyecto extends JPanel {
 	 */
 	public void setDCVS(DCVS dcvs) {
 		this.dcvs = dcvs;
+		int fila = -1;
 		
-		int fila = dcvs.getFilaItem("NAME");
-		if(fila > -1) tfNombre.setText( (String) dcvs.getValueAt(fila,1));
+		String nombre = dcvs.getNombre();
+		if(nombre != null) {
+			tfNombre.setText(nombre);
+			archivos.setLabel(IO.PRJ, dcvs.getRuta());
+		}
+		
+		Date d = dcvs.getDate();
+		if(d != null) { dateChooser.setDate(d);}
+		else {dateChooser.setDate(new Date());}									//Establece la fecha de hoy.	
 		
 		fila = dcvs.getFilaItem("AUTHOR");
 		if(fila > -1) tfAutor.setText( (String) dcvs.getValueAt(fila,1));
@@ -99,15 +107,9 @@ public class ParametrosProyecto extends JPanel {
 		fila = dcvs.getFilaItem("DESCRIPTION");
 		if(fila > -1) textArea.setText( (String) dcvs.getValueAt(fila,1));
 		
-		fila = dcvs.getFilaItem("DATE");
-		if(fila > -1) {
-			 String fecha = (String) dcvs.getValueAt(fila,1);
-			 Date f = stringToDate(fecha);
-			 if(f != null) dateChooser.setDate(f);
-		}
-		
 		fila = dcvs.getFilaItem("VERSION");
 		if(fila > -1) fTFVersion.setText( (String) dcvs.getValueAt(fila,1));
+		else fTFVersion.setText("1.0");											//Configura como versión la del día de hoy.
 		
 		//Número de grupos.
 		fila = dcvs.getFilaItem("NG");
@@ -347,7 +349,6 @@ public class ParametrosProyecto extends JPanel {
 	public static void main(String[] args) {
 		ParametrosProyecto pp = new ParametrosProyecto(new Archivos(null));
 		pp.abrirFrame();
-
 	}
 
 }
