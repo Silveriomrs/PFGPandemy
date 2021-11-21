@@ -62,6 +62,16 @@ public class Mapa extends JPanel{
 	}
 
 	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Elimina los datos almacenados en el mismo.
+	 */
+	public void reset() {
+//		zonas.clear();
+		updateUI();
+	}
+	
+	/**
 	 * <p>Title: verFrame</p>
 	 * <p>Description: Aunar códigos de las propiedades del frame.</p>
 	 * @param w Ancho del marco.

@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 
+import controlador.ControladorModulos;
 import modelo.IO;
 import modelo.Zona;
 
@@ -34,10 +35,11 @@ public class ParametrosGrupos extends JPanel {
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -4920717884036584918L;
 	JFrame frame;
+	private ControladorModulos cm;
 	private JTabbedPane paneles;	
-	private int numeroZonas;
+//	private int numeroZonas;
 	private int contadorPaneles;
-	private HashMap<Integer, Zona> zonas;
+//	private HashMap<Integer, Zona> zonas;
 	private HashMap<Integer, VistaZona> vistasZonas;
 	
 	/**
@@ -45,17 +47,20 @@ public class ParametrosGrupos extends JPanel {
 	 * <p>Description: Constructor de la clase que recibe los valores esenciales
 	 * del proyecto, como por ejemplo número inicial de grupos, nombre del proyecto,
 	 * etcétera. </p>  
-	 * @param numeroZonas Número de grupos de estudio del proyecto.
+	 * @param cm Controlador de los módulos. Necesario para el correcto funcionamiento
+	 * de la aplicación permitiendo la comunicación y el flujo de datos bidireccional.
 	 */
-	public ParametrosGrupos(int numeroZonas) {
+	public ParametrosGrupos(ControladorModulos cm) {
 		super();
+		this.cm = cm;
 		setMaximumSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(800, 600));
 		this.setPreferredSize(new Dimension(800, 600));
 		this.contadorPaneles = 0;
-		this.numeroZonas = numeroZonas;
-		this.zonas = new HashMap<Integer,Zona>();
+//		this.numeroZonas = 0;
+//		this.zonas = new HashMap<Integer,Zona>();
 		this.vistasZonas = new HashMap<Integer,VistaZona>();
+		this.setEnabled(false);
 		setLayout(new BorderLayout(0, 0));
 		paneles = new JTabbedPane(JTabbedPane.LEFT);
 		paneles.setMinimumSize(new Dimension(800, 600));
@@ -64,6 +69,25 @@ public class ParametrosGrupos extends JPanel {
 		configurarFrame();
 	}
 
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * por cadenas vacias y reinicia el resto de valores.
+	 */
+	public void reset() {
+		//Eliminar por orden jerarquico.
+		if(paneles.getTabCount() > 0) {
+			paneles.removeAll();
+			contadorPaneles = 0;
+		}
+		vistasZonas.clear();															//Para correcto funcionamiento este valor inciial no puede ser 0.
+		
+		this.setEnabled(cm.hasZonas());
+		updatePaneles();
+		updateUI();
+	}
+	
 	/**
 	 * <p>Title: abrirFrame</p>  
 	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
@@ -92,43 +116,27 @@ public class ParametrosGrupos extends JPanel {
 	public void toggleVisible() { frame.setVisible( !frame.isVisible()); }
 	
 	private void configura() {
-		if(zonas.size() < 1) crearZonas();										//Crear zonas prototipo sino las hay establecidas.
-		generaPaneles();
+		if(cm.getNumberZonas() > 0) updatePaneles();
 	}
 	
 	/**
-	 * <p>Title: crearZonas</p>  
-	 * <p>Description: Función básica generadora de unos grupos primitivos con
-	 * unos datos básicos cuando no hay unos grupos previamente cargados.</p>
-	 * La función creará tantas zonas como indique el valor de las propiedades del
-	 * proyecto.
-	 */
-	private void crearZonas() {
-		for(int i=1; i<=numeroZonas;i++) {
-			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),null));
-		}
-	}
-	
-	/**
-	 * <p>Title: generaPaneles</p>  
+	 * <p>Title: updatePaneles</p>  
 	 * <p>Description: Genera los paneles que representan cada una de las zonas
 	 * que componen el proyecto </p>
 	 * En caso de no haberse cargado unas zonas con datos, se generan tantas pestañas
 	 * (vistas de zonas) como grupos/zonas compongan el proyecto.
 	 */
-	private void generaPaneles() {
-		if(zonas == null) System.out.println("PGRUPOS > generaPanales: " + zonas);
-
+	private void updatePaneles() {
 		//Crear las pestañas de cada zona (grupo) con los datos correspondientes.
 		//Creación ordenada de un árbol con los elementos.
 		TreeMap<Integer, Zona> t = new TreeMap<>();
-		t.putAll(zonas);
+		t.putAll(cm.getZonas());
 		//Reccorrer los elementos y añadir sus vistas.
-		for(int i = 1; i <= numeroZonas; i++) {
+		for(int i = 1; i <= cm.getNumberZonas(); i++) {
 			Zona z = t.get(i);
-			if(!vistasZonas.containsKey(i)) {
+			if(z != null && !vistasZonas.containsKey(i)) {
 				iniciarTabZona(z,"/vista/imagenes/Iconos/sinImg_256px.png");
-			}else {
+			}else if(z != null){
 				vistasZonas.get(i).setZona(z);
 			}
 		}
@@ -141,11 +149,10 @@ public class ParametrosGrupos extends JPanel {
 	 * @param icono Imagen a mostrar como icono de la pestaña.
 	 */
 	private void iniciarTabZona(Zona zona, String icono) {
-		if(zona == null) System.out.println("PGRUPOS > iniciarTabZona: " + zona);
 		int ID = zona.getID();
 		String nombre = zona.getName();
 		//Crea panel.
-		VistaZona panelVZ = new VistaZona(zona);
+		VistaZona panelVZ = new VistaZona(zona,cm);
 		//Configuración del borde.
 		setBorder(nombre,panelVZ);
 		//Añadir panel a las pestañas.
@@ -153,7 +160,8 @@ public class ParametrosGrupos extends JPanel {
 		//Añadir el la vista del panel al conjunto.
 		vistasZonas.put(ID, panelVZ);
         // Configurar Icono para la pestaña particular
-		if(icono != null && !icono.equals("")) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
+//		if(icono != null && !icono.equals("")) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
+		if(icono.isBlank()) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
 		contadorPaneles++;
 	}
 	
@@ -174,35 +182,30 @@ public class ParametrosGrupos extends JPanel {
 		return panel;
 	}
 	
-	/**
-	 * @return El conjunto de zonas
-	 */
-	public HashMap<Integer, Zona> getZonas() {return zonas;}
-
+	
+	/* Funciones para realización de pruebas de funcionamiento */
+	
 	/**
 	 * @param zonas Conjunto de zonas cuyas vistas deben establecerse.
 	 */
-	public void setZonas(HashMap<Integer, Zona> zonas) {
-		if(zonas == null) System.out.println("PGRUPOS > setZONAS: " + zonas);
-		//Si hay vistas ya en los paneles, eliminar.
-		if(vistasZonas.size() > 0) {
-			paneles.removeAll();												//Elimina los paneles existentes
-			vistasZonas.clear();												//Elimina las vistas.
-			contadorPaneles = 0;
-			this.zonas = zonas;
-			this.numeroZonas = zonas.size();
+	public void setZonasTest(HashMap<Integer, Zona> zonas) {		
+		//Crear las pestañas de cada zona (grupo) con los datos correspondientes.
+		//Creación ordenada de un árbol con los elementos.
+		reset();
+		int nz = zonas.size();
+		TreeMap<Integer, Zona> t = new TreeMap<>();
+		t.putAll(zonas);
+		//Reccorrer los elementos y añadir sus vistas.
+		for(int i = 1; i <= nz; i++) {
+			Zona z = t.get(i);
+			if(z != null && !vistasZonas.containsKey(i)) {
+				iniciarTabZona(z,"/vista/imagenes/Iconos/sinImg_256px.png");
+			}else if(z != null){
+				vistasZonas.get(i).setZona(z);
+			}
 		}
-		//
-		generaPaneles();
 	}
-	
-	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Devuelve el panel contenedor de la vista.</p> 
-	 * @return Devuelve el panel contenedor de la vista.
-	 */
-	public JPanel getPanel() { return this;}
-	
+		
 	/**
 	 * <p>Title: main</p>  
 	 * <p>Description: funciona para pruebas</p> 
@@ -210,7 +213,13 @@ public class ParametrosGrupos extends JPanel {
 	 */
 	public static void main(String[] args) {
 		// Trabajo con un grupo inicial de 4.
-		ParametrosGrupos parametrosGrupos = new ParametrosGrupos(4);
+		ParametrosGrupos parametrosGrupos = new ParametrosGrupos(new ControladorModulos());
+		HashMap<Integer, Zona> zonas = new HashMap<Integer,Zona>();
+		for(int i=1; i<=4 ;i++) {
+			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),null));
+		}
+
+		parametrosGrupos.setZonasTest(zonas);
 		parametrosGrupos.toggleVisible();
 	}
 

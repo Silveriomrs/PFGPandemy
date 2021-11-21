@@ -34,6 +34,7 @@ import controlador.ControladorDatosIO;
 import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
+import modelo.Types;
 
 
 /**
@@ -110,6 +111,13 @@ public class TablaEditor extends JPanel{
 		frame.setVisible(true);
 	}
 
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia todos los datos del módulo.</p> 
+	 */
+	public void reset() {
+		nuevaTabla();
+	}
 	
 	/**
 	 * <p>Title: getPanel</p>  
@@ -392,7 +400,7 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				if(tipo == null) tipo = IO.CSV;
+				if(tipo == null) tipo = Types.CSV;
 				DCVS dcvs2 = cio.abrirArchivo(null,tipo);			
 				if(dcvs2 != null) {
 					dcvs = dcvs2;
@@ -412,7 +420,7 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
-				if(tipo == null || tipo.equals("")) tipo = IO.CSV;
+				if(tipo == null || tipo.equals("")) tipo = Types.CSV;
 				dcvs.setModelo(tabla.getModel());
 				dcvs.setRuta(ruta);
 				dcvs.setTipo(tipo);			
@@ -438,7 +446,7 @@ public class TablaEditor extends JPanel{
 				bd.setModelo(tabla.getModel());
 				String rutaF;
 				//Sino tiene de un tipo se le asigna el tipo general.
-				if(tipo == null || tipo.equals("")) {tipo = IO.CSV;	}			
+				if(tipo == null || tipo.equals("")) {tipo = Types.CSV;	}			
 				bd.setTipo(tipo);
 				if(bd.getRowCount() >0) {
 					rutaF = cio.guardarArchivo(bd);
@@ -505,23 +513,23 @@ public class TablaEditor extends JPanel{
 				
 				switch(seleccion){
 					case "Mapas":
-						tipo = IO.MAP;
+						tipo = Types.MAP;
 						break;
 					case "Historico": 
 						DCVS dcvs = new DCVS();
 						dcvs.setModelo(modelo);
 						cMap.setHistorico(dcvs);
 						//nuevaTabla();
-						tipo = IO.HST;
+						tipo = Types.HST;
 						break;
 					case "Leyenda":
 						cMap.setPaleta(modelo);
 						mostrar("Nueva paleta asignada", 1);
 						//nuevaTabla();
-						tipo = IO.PAL;
+						tipo = Types.PAL;
 						break;
 					case "Relaciones":
-						tipo = IO.REL;
+						tipo = Types.REL;
 						break;
 				}
 				

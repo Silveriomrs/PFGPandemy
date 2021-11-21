@@ -16,9 +16,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -37,57 +34,15 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
-	
-	private static HashMap<String,String> tipos;
-    
-    /** Archivos generales formato CSV*/  
-    public final static String CSV = "csv";
-    /** Archivo de proyecto PRJ*/  
-    public final static String PRJ = "prj";
-    /** Archivo historico con la salida generada HST*/  
-    public final static String HST = "hst";
-    /** Archivo configuración de la paleta de colores PAL*/  
-    public final static String PAL = "pal";
-    /** Archivo definición gráfica de las zonas ZON*/  
-    public final static String MAP = "map";
-    /** Archivo definición Relaciones entre zonas */
-    public final static String REL = "rel";
-    /** Archivo definición grupos (zonas) de estudio */
-    public final static String GRP = "grp";
-    /** Archivo de Imagenes PNG */
-    public final static String PNG = "png";
-    /** Archivo de Imagenes JPG */
-    public final static String JPG = "jpg";
-    /** Archivo de Imagenes JPEG */
-    public final static String JPEG = "jpeg";
-    /** Archivo de Imagenes GIF */
-    public final static String GIF= "gif";
-    /** Archivo de Imagenes PNG, JPG p GIF */
-    public final static String IMG = "imagen";
-    
+ 
     /**
      * Constructor de la clase IO
      */
     public IO(){
-    	configurar();
+
     }
     
-    private void configurar() {
-    	tipos = new HashMap<String,String>();
-    	tipos.put(PAL,"Paleta de colores");
-    	tipos.put(CSV, "Archivo general");
-    	tipos.put(HST, "Archivo historico");
-    	tipos.put(MAP, "Archivo de mapa");
-    	tipos.put(GRP, "Archivo definición de grupos");
-    	tipos.put(PRJ, "Archivo de proyecto");
-    	tipos.put(REL, "Archivo de relaciones");
-    	tipos.put(PNG, "Archivos de imagen PNG");
-    	tipos.put(JPG, "Archivos de imagen JPG");
-    	tipos.put(JPEG,"Archivos de imagen JPEG");
-    	tipos.put(GIF, "Archivos de imagen GIF");
-    	tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
-    }
-    
+
 
 	/**
 	 * Metodo que lee un archivo del disco en formato CVS con separación de comas
@@ -113,9 +68,8 @@ public class IO{
 				dcvs.crearModelo(datos);
 				dcvs.setRuta(ruta2);
 				dcvs.setTipo(ext);
-				dcvs.setDate(new Date( f.lastModified() ));
-				
-				System.out.println(dcvs.getRuta() + " - "	+ dcvs.getTipo());
+				dcvs.setName(f.getName());
+				dcvs.setDirectorio(f.getParent());
 			}
 			catch (IOException e) {e.printStackTrace();}
 			catch (CsvException e) {e.printStackTrace();}
@@ -142,7 +96,7 @@ public class IO{
 		if(ruta != null && !checkExt(ruta,ext)) {												//Si son diferentes
 			ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 			//Comprobación de que es una extensión registrada
-			if (!tipos.containsKey(ext2)) {										//Sino esta registrada, tomar como no añadida.
+			if (!Types.hasType(ext2)) {										//Sino esta registrada, tomar como no añadida.
 				ruta2 = ruta + ext;												//Añade la extensión.
 			}else {																//En otro caso remover la que tiene por la nueva.
 				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
@@ -185,10 +139,10 @@ public class IO{
 		String ruta  = null;
 		FileNameExtensionFilter filtro = null;
 		//Comprobación de filtro para imagenes soportadas u otros tipos.
-		if(!ext.equals(IMG)) {
-			filtro = new FileNameExtensionFilter(tipos.get(ext),ext);
+		if(!ext.equals(Types.IMG)) {
+			filtro = new FileNameExtensionFilter(Types.get(ext),ext);
 		}else {
-			filtro = new FileNameExtensionFilter(tipos.get(ext), PNG, JPG, JPEG, GIF);
+			filtro = new FileNameExtensionFilter(Types.get(ext), Types.PNG, Types.JPG, Types.JPEG, Types.GIF);
 		}
 		
 		JFileChooser sf = new JFileChooser(".");								//Directorio local.
@@ -224,10 +178,10 @@ public class IO{
 		boolean ok = true;
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
-		if(ext.equals(IMG) && !(ext2.equals(JPG) || ext2.equals(PNG) || ext2.equals(JPEG) || ext2.equals(GIF))) {
+		if(ext.equals(Types.IMG) && !(ext2.equals(Types.JPG) || ext2.equals(Types.PNG) || ext2.equals(Types.JPEG) || ext2.equals(Types.GIF))) {
 			System.out.println("Tipo de imagen incorrecto: " + ext2);
 			ok = false;
-		}else if(!ext.equals(IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
+		}else if(!ext.equals(Types.IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
 			System.out.println("Tipo de fichero sin extensión conocida: " + ext2);
 			ok = false;
 		}
@@ -273,9 +227,7 @@ public class IO{
 			icon = new ImageIcon(img);
 			icon.setImage(icon.getImage().getScaledInstance(w,h, java.awt.Image.SCALE_DEFAULT));
 		}
-		
 		return icon;
-	}
-	
+	}	
 	
 }

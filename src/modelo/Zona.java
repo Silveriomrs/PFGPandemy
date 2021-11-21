@@ -70,6 +70,12 @@ public class Zona {
 	public String getName() {return name;}
 
 	/**
+	 * @param name Nuevo nombre para el grupo de población.
+	 */
+	public void setName(String name) {this.name = name;}
+
+	
+	/**
 	 * @return devuelve ID de la poligono
 	 */
 	public int getID() {return ID;}
@@ -128,7 +134,7 @@ public class Zona {
 	 *  ambos inclusive. 
 	 * @param nivel Nivel a establecer.
 	 */
-	private void setNivel(int nivel) {this.nivel = nivel;}
+	public void setNivel(int nivel) {this.nivel = nivel;}
 	
 	@Override
 	public String toString() {	

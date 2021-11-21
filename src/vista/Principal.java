@@ -5,6 +5,8 @@ package vista;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
@@ -52,11 +54,14 @@ public class Principal extends JFrame {
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
 		this.setBounds(0, 0, w + 25, h + 15);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(true);
 		configurar();
 		this.setVisible(true);
+		//Clase privada para salir controlando guardar o no los cambios realizados.
+		this.addWindowListener(new WindowListener());
+		//Desactivar el cierre automático para relizar un cierre controlado.
+	    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
 
 	/**
@@ -117,7 +122,7 @@ public class Principal extends JFrame {
 		JMenu mnVer = new JMenu("Ver");
 		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
 		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
-//		addJMenuItem(mnVer, "Archivos","/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnVer, "Parámetros SIR","/vista/imagenes/Iconos/archivo_64px.png" );
 		addJMenuItem(mnVer, "Grupos","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		
@@ -142,6 +147,16 @@ public class Principal extends JFrame {
 	}
 	
 	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinia la vista</p>
+	 * Provoca una lectura de los datos requeridos para que la cosistencia de
+	 *  la vista sea adecuada. 
+	 */
+	public void reset() {
+		actualizarJMItems();
+	}
+	
+	/**
 	 * <p>Title: actualizarJMItems</p>  
 	 * <p>Description: Actualiza los JMenuItems en función del contexto de la aplicación</p>
 	 * Actua leyendo el estado de la aplicación y activando o desactivado las funciones
@@ -149,19 +164,20 @@ public class Principal extends JFrame {
 	 */
 	private void actualizarJMItems() {
 		//En caso de no zonas:
-		boolean nozonas = cm.getZonas().size() > 0;
+		boolean hasZonas = cm.hasZonas();
 		//Desactivar vista mapa.
-		jmitems.get("Mapa").setEnabled(nozonas);
+		jmitems.get("Mapa").setEnabled(hasZonas);
 		//Desactivar editor de zonas gráfico.
-		jmitems.get("Editor Gráfico").setEnabled(nozonas);
+		jmitems.get("Editor Gráfico").setEnabled(hasZonas);
 		//Desactivar vistas de grupos.
-		jmitems.get("Grupos").setEnabled(nozonas);
+		jmitems.get("Grupos").setEnabled(hasZonas);
 
 //		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
-		jmitems.get("Reproductor").setEnabled(nozonas);
+		jmitems.get("Reproductor").setEnabled(hasZonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
-		jmitems.get("Guardar Proyecto").setEnabled(nozonas);
+		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);
+		jmitems.get("Parámetros SIR").setEnabled(hasZonas);
 	}
 
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
@@ -193,10 +209,29 @@ public class Principal extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
 			System.out.println("Principal AL: " + name);
-			cm.doAction(name);
+			cm.doActionPrincipal(name);
 			actualizarJMItems();
 		}
 	}
+	
+	/**
+	 * <p>Title: WindowListener</p>  
+	 * <p>Description: Clase privada para controlar el cierre de la aplicación.</p>
+	 * El objetivo principal es permitir a la clase controladora interrogar sobre
+	 * la operación, así como realizar el guardado de los datos antes de salir
+	 * de manera abrupta o incontrolada.  
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 18 nov. 2021
+	 * @version versión 1.0
+	 */
+	private class WindowListener extends WindowAdapter {
+		
+			@Override
+			public void windowClosing(WindowEvent e) {
+				cm.doActionPrincipal("Salir");
+		    }
+	}
+
 	
 	/* Funciones para pruebas */
 	

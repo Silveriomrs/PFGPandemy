@@ -8,6 +8,9 @@
 */  
 package modelo;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import vista.GraficasChart;
@@ -26,6 +29,7 @@ public class ParserProyectoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
 	private DCVS mContactos;													//Matriz de contactos (relaciones).
+	private DCVS historico;														//Matriz de contactos (relaciones).
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
@@ -42,12 +46,14 @@ public class ParserProyectoVS {
 	public ParserProyectoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
 		this.mContactos = new DCVS();
+		this.historico = new DCVS();
 		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
+		
 		if(prjV != null) importarVensim(prjV);
 	}
-
+	
 
 	/**
 	 * <p>Title: importarVensim</p>  
@@ -62,14 +68,19 @@ public class ParserProyectoVS {
 		this.IDs = getNombresGrupos();
 		//Obtención del número de grupos.
 		this.NG = IDs.length;
-		for(int i=0; i<NG;i++) {
-			if(traza) System.out.println(IDs[i]);
+		if(traza) {
+			for(int i=0; i<NG;i++) System.out.println(IDs[i]);
 		}
+		
 		//Obtención de los tiempos inicial y final.
 	    readTimes();
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
 		
+		//Configuración del historico. Debe hacerse después de obtener Nombres e IDs
+		//después de crear las zonas y antes del cálculo de los niveles de contagio.
+		setUpHistorico();
+
 		//Leer tabla de relaciones.
 		crearMatriz();
 		
@@ -92,6 +103,87 @@ public class ParserProyectoVS {
 		readXenZ("TCS");
 		readXenZ("CAB");
 		
+		//Cálcular niveles en base al número de incidentes por cada 100 mil habitantes.
+		generateLevels();
+	
+	}
+	
+	/**
+	 * <p>Title: setUpHistorico</p>  
+	 * <p>Description: Genera la cabecera y filas legibles por la aplicación.</p>
+	 * Usando los datos de cada grupo de población (ID y Nombre) genera cada
+	 * una de las columnas que requiere el histórico para ser reproducido en el
+	 * player.
+	 * <p>Añade también una columna para indicar la posición del tiempo<p>
+	 */
+	private void setUpHistorico() {
+		historico.setTipo(Types.HST);
+		
+		String[] cabecera = new String[NG + 1];									//Una columna por cada zona y una columna para el tiempo.
+		//Generar cabecera.
+		cabecera[0] = "fecha";													//Fecha se situa en la primera columna (posición 0).
+		for(int i = 1; i<=NG; i++) {
+			Zona z = zonas.get(i);
+			cabecera[i] = z.getID() + " " + z.getName();
+		}
+		//Añadir la cabecera.
+		historico.addCabecera(cabecera);
+		
+		//Añadir tantas filas como lecturas de tiempo hay.	
+		for(int i = IT; i<FT ;i++) {
+			String[] fila = new String[NG+1];									//Cada fila tiene NG+1 Slots (columnas).
+			historico.addFila(fila);
+		}
+		
+	}
+	
+	/**
+	 * <p>Title: generateLevels</p>  
+	 * <p>Description: Cálcula los niveles de contagio.</p>
+	 * Los niveles de contagio se calcula por cada 100 mil habitantes y responde
+	 * a la formula general 100000*(ci/(s+i+r)), siendo CI el número de casos 
+	 * incidentes, S el número de sintómaticos, I el de infectados o incidentes 
+	 * y R el de recuperados.
+	 * <p> Esta función debe ser llamada después de haber calculado u obtenido
+	 * los valores para CI, S, R e I.</p>
+	 */
+	private void generateLevels() {
+		boolean correcto = true;												//Finaliza la lectura si hay un valor no válido.
+		int contador = IT;
+		Date hoy = new Date();     							//Establece el día de hoy.
+		
+		for(int col = 1; col<=NG; col++) {
+			Zona z = zonas.get(col);
+			//Se recorre para cada tipo de dato todos los registros.
+			while(correcto && (contador < FT)) {
+				double ci = z.getGrafica().getYValue(labels.getWord("CI"), contador);
+				double s = z.getGrafica().getYValue(labels.getWord("S"), contador);
+				double i = z.getGrafica().getYValue(labels.getWord("I"), contador);
+				double r = z.getGrafica().getYValue(labels.getWord("R"), contador);
+				if(ci > -1 && s > -1 && i > -1 && r > -1 ) {
+					double nivel = 100000*(ci/(s+i+r));
+					//z.addNivel("Nivel", contador,nivel);
+					//Añadir fecha solo 1 vez, usar col = 1.
+					if(col == 1) {
+						//Añadimos valor al histórico.
+						historico.setValueAt("" + nivel, contador, col);
+						//Añadimos el tiempo.
+						String date =  new SimpleDateFormat("dd/MM/yyyy hh:mm").format(hoy);
+						historico.setValueAt(date, contador, 0);
+						hoy = addDay(hoy);    									//Incrementar un día.
+					}
+					
+					contador++;													//Siguiente línea.
+				} else correcto = false;		
+			}
+		}
+	}
+	
+	private Date addDay(Date dt) {
+		 Calendar c = Calendar.getInstance();
+	        c.setTime(dt);
+	        c.add(Calendar.DATE, 1);
+	        return c.getTime();
 	}
 	
 	private void readXenZ(String et) {
@@ -373,5 +465,13 @@ public class ParserProyectoVS {
 	 * @return Los grupos de población o zonas obtenidas.
 	 */
 	public HashMap<Integer, Zona> getZonas() {return zonas;	}
+
+
+	/**
+	 * @return El historico con la representación de nivel de contagio.
+	 */
+	public DCVS getHistorico() {
+		System.out.println(historico.toString());
+		return historico;}
 	
 }

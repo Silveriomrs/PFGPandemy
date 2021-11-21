@@ -34,6 +34,7 @@ import java.util.Map.Entry;
 import java.awt.event.MouseAdapter;
 
 import modelo.IO;
+import modelo.Types;
 import modelo.Zona;
 
 /**
@@ -81,6 +82,21 @@ public class Pizarra extends JFrame {
 		//Si el conjunto de zonas es correcto y mayor a 0 -> iniciar módulo.
 		if(zonas != null && zonas.size() > 0) {	this.zonas = zonas; }
 		configura();
+	}
+	
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Elimina los datos almacenados en el mismo.
+	 */
+	public void reset() {
+		zonas.clear();
+		comboBoxAsignar.removeAllItems();
+		comboBoxAsignados.removeAllItems();
+		listaPuntos.clear();
+		poligono = new Polygon();
+		fondo = null;
+		reinicioBotones();
 	}
 	
 	/**
@@ -347,6 +363,13 @@ public class Pizarra extends JFrame {
         g.drawLine(posX, posY -5, posX, posY +5);							// Línea vertical
 	}
 
+	/**
+	 * <p>Title: dibujarZonas</p>  
+	 * <p>Description: Realiza una lectura de las figuras gráficas y las dibuja</p>
+	 * Dibuja los poligonos almacenados, las líneas y puntos actuales inclusive, 
+	 *  así como el marco.
+	 *  <p>En caso de haber una imagen de fondo cargada, también la redibuja.</p>
+	 */
 	private void dibujarZonas() {
 		Graphics g = c.getGraphics();
 		
@@ -379,7 +402,6 @@ public class Pizarra extends JFrame {
 				dibujaLinea(pAux,p);											// Dibuja línea de unión entre el punto anterior y el actual.
 				pAux = p;														// Punto actual pasa a ser el nuevo punto anterior.
 			}
-			
 		}
 	}
 
@@ -495,7 +517,7 @@ public class Pizarra extends JFrame {
     	public void mouseClicked(MouseEvent e) {
     		// Selección de imagen de fondo.
     		IO io = new IO();
-    		String ruta = IO.selFile(1, IO.IMG);
+    		String ruta = IO.selFile(1, Types.IMG);
     		// En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();

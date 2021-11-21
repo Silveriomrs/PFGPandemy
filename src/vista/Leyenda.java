@@ -23,7 +23,7 @@ import javax.swing.JColorChooser;
  * <p>Description: Clase para mostrar la leyenda de un mapa. </p>  
  * @author Silverio Manuel Rosales Santana
  * @date 29 jul. 2021
- * @version versión
+ * @version versión 1.2
  */
 public class Leyenda extends JPanel implements ActionListener{
 
@@ -39,6 +39,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 3521309276542156368L;
 	private int width;
 	private int height;
+	private boolean editable;
 	
 	/**
 	 * Creación de una leyenda con la representación de los valores y sus grados
@@ -52,6 +53,7 @@ public class Leyenda extends JPanel implements ActionListener{
 		super();
 		this.width = width;
 		this.height = height;
+		this.editable = editable;
 		this.mapaBotones = new HashMap<String, JButton>();
 		
 		this.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -86,8 +88,22 @@ public class Leyenda extends JPanel implements ActionListener{
 	 */
 	public JFrame getFrame() {return frame;}
 	
-	@Override
-	public void setVisible(boolean ver) {frame.setVisible(ver);}
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Elimina los datos previamente almacenados en el mismo.
+	 */
+	public void reset() {
+		paletaBase();
+		updateUI();
+	}
+
+	/**
+	 * <p>Title: setFrameVisible</p>  
+	 * <p>Description: Establece el frame como visible o no.</p> 
+	 * @param ver TRUE para hacerlo visible, FALSE en otro caso.
+	 */
+	public void setFrameVisible(boolean ver) {frame.setVisible(ver);}
 	
 	/**
 	 * <p>Title: toggleVisible</p>  
@@ -147,7 +163,6 @@ public class Leyenda extends JPanel implements ActionListener{
 			button.setBackground(paleta.get(i));
 			button.setName(name);
 			button.setEnabled(editable);
-			button.setEnabled(true);
 			button.addActionListener(this);
 			mapaBotones.put(name, button);
 			this.add(mapaBotones.get(name));
@@ -232,18 +247,20 @@ public class Leyenda extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		//Obtención del botón pulsado
-		JButton boton = (JButton)e.getSource();
-		//Obtención de su posición
-		int pos = Integer.parseInt(boton.getName());
-		//Obtención de un color desde el selector.
-		Color color = JColorChooser.showDialog(null, "Seleccione nuevo color", null);
-		//Establece color si no es nulo.
-		if(color != null) {
-			boton.setBackground(color);
-			this.setVisible(true);
-			//Añadir nuevo color a la paleta en sustitución del anterior.
-			setColor(pos, color);
+		if(editable) {
+			//Obtención del botón pulsado
+			JButton boton = (JButton)e.getSource();
+			//Obtención de su posición
+			int pos = Integer.parseInt(boton.getName());
+			//Obtención de un color desde el selector.
+			Color color = JColorChooser.showDialog(null, "Seleccione nuevo color", null);
+			//Establece color si no es nulo.
+			if(color != null) {
+				boton.setBackground(color);
+				this.setVisible(true);
+				//Añadir nuevo color a la paleta en sustitución del anterior.
+				setColor(pos, color);
+			}
 		}
 	}
 	
@@ -267,8 +284,8 @@ public class Leyenda extends JPanel implements ActionListener{
 	public static void main(String[] args) {
 		Leyenda leyenda = new Leyenda(100, 205, false);
 		leyenda.setPosicion(0, 0);
-		leyenda.getFrame().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		leyenda.setVisible(true);
+		leyenda.setFrameVisible(true);
+		System.out.println(leyenda.toString());
 	}
 
 }

@@ -46,7 +46,6 @@ public class ParserHistoricoVS {
 		if(prjV != null) importarVensim(prjV);
 	}
 
-
 	/**
 	 * <p>Title: importarVensim</p>  
 	 * <p>Description: Importa los datos de un archivo generado con VenSim.</p>
@@ -92,7 +91,7 @@ public class ParserHistoricoVS {
 		
 		//Leer o calcular nivel de contagio por cada 100 mil habitantes			//Equivale al nivel de contagio.
 //		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
-//		else {getPs();}															//En otro caso calcular las prevalencias.
+//		else {getPs();}															//Sino están, calcular las prevalencias.
 		
 		//Leer tasas TC, TCONTAGIO
 		readXs("TC");
@@ -330,7 +329,7 @@ public class ParserHistoricoVS {
 		
 		String parte;
 		// Encontrar el número de grupos total.
-		int NG = getNumberGroups();
+		int NG = readNumberGroups();
 		// Proceso de búsqueda de todas las IDs
 		String[] nombres = new String[NG];
 		if(NG > 0) {
@@ -353,12 +352,14 @@ public class ParserHistoricoVS {
 	
 	
 	/**
-	 * <p>Title: getNumberGroups</p>  
+	 * <p>Title: redNumberGroups</p>  
 	 * <p>Description: Obtiene el número de grupos de población en un archivo
-	 * con formato VenSim CSV </p> 
+	 * con formato VenSim CSV </p>
+	 * Para realizar su tarea realiza una cuenta de uno de los operadores indespensables
+	 * en el archivo de entrada, en este caso la etiqueta 'R'. 
 	 * @return Número de elementos identificados como grupos de población.
 	 */
-	private int getNumberGroups() {
+	private int readNumberGroups() {
 		int contador = 0;
 		boolean fin = false;
 		String OP = "R";
@@ -377,7 +378,6 @@ public class ParserHistoricoVS {
 				String s = (String) dcvs.getValueAt(row, 0);
 				String IDAux = getFirstID(s);	
 				fin = !hasOperator(OP,s);
-//				System.out.println(fin + " | Parser > getNumberGroups s: " + s + " ID: " + IDAux);
 				if(!fin && !IDAux.equals(ID1)) contador++;
 			}
 		}

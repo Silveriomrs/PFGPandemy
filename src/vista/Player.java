@@ -124,8 +124,9 @@ public class Player extends JPanel implements ActionListener{
 		frame.setTitle("Reproductor");											//Establecimiento del título.
 		frame.setSize(344,310);													//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
 		frame.setAlwaysOnTop(false);
+		
 	}
 
 	/**
@@ -172,6 +173,7 @@ public class Player extends JPanel implements ActionListener{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		mapa.updateUI();
 	}
 	
 	@Override
@@ -243,7 +245,13 @@ public class Player extends JPanel implements ActionListener{
 			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
 		}
 		
-		progressBar.setValue(linea);											//Actualización del la barra de progreso.		
+		progressBar.setValue(linea);											//Actualización del la barra de progreso.
+		
+		//En caso de cierre del reproductor, pausar la reproducción y dejarlo listo para reanudar.
+		if(!frame.isVisible()) {
+			btnPlayPause.setText("Reproducir");									//Estado siguiente: Parado.
+			timer.stop();
+		}
 	}
 	
 	/**

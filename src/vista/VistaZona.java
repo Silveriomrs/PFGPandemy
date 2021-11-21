@@ -6,13 +6,14 @@
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 2 nov. 2021  
-* @version 1.0  
+* @version 1.2
 */  
 package vista;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,19 +29,26 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
+
+import controlador.ControladorModulos;
+
 import javax.swing.JTextField;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * <p>Title: VistaZona</p>  
  * <p>Description: </p>  
  * @author Silverio Manuel Rosales Santana
  * @date 2 nov. 2021
- * @version versión
+ * @version versión 1.2
  */
 public class VistaZona extends JPanel {
 	private Zona zona;
+	private ControladorModulos cm;
 	
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 2843655383959458235L;
@@ -59,9 +67,12 @@ public class VistaZona extends JPanel {
 	/**
 	 * Creación del panel con la vista de una zona.
 	 * @param zona Zona con los datos propios del grupo de estudio. Null en otro caso.
+	 * @param cm Controlador de módulos, necesario para permitir el flujo de datos
+	 * entre las vistas, el módelo y el controlador.
 	 */
-	public VistaZona(Zona zona) {
-		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0, null);
+	public VistaZona(Zona zona, ControladorModulos cm) {
+		this.cm = cm;
+		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0, null);	
 		else this.zona =zona;
 		panelCentral = new JPanel();
 		panel_poligono = new JPanel();
@@ -95,20 +106,7 @@ public class VistaZona extends JPanel {
 		
 		//
 		PanelPoligono pp = new PanelPoligono();
-		
-//		panel_poligono.setBorder(new BevelBorder(BevelBorder.LOWERED, new Color(0, 0, 255), null, new Color(0, 0, 128), null));
-//		panel_poligono.setBounds(73, 154, 291, 189);
-//		panel_poligono.setLayout(null);
-		
-//		panelCentral.add(panel_poligono);
 		panelCentral.add(pp);
-		
-		
-//		JLabel lblSinPoligono = new JLabel();
-//		lblSinPoligono.setBounds(new Rectangle(0, 0, 291, 189));
-//		lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",panel_poligono.getWidth(),panel_poligono.getHeight()));
-//		panel_poligono.add(lblSinPoligono);
-//		pp.add(lblSinPoligono);
 		
 		//Iniciar los JTextFields
 		int posX = 100;
@@ -121,6 +119,7 @@ public class VistaZona extends JPanel {
 		tf_Nivel = iniciarTextField(tf_Nivel,"Nivel",152, posY + gap*4, 114, 19);
 		
 		JButton btnAplicar = new JButton("Aplicar");
+		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
 		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
 		btnAplicar.setBounds(288, 20, 150, 87);
@@ -132,19 +131,19 @@ public class VistaZona extends JPanel {
 	/**
 	 * <p>Title: recargarDatos</p>  
 	 * <p>Description: Recarga los campos de los TextFields con los datos del modelo</p>
-	 * Realiza una nueva lectura de cada campo del modelo introduciendo sus valores
-	 * en los correspondientes JTextFields. 
+	 * Realiza una nueva lectura de cada campo del modelo (zona) e introduciendo
+	 *  sus valores en los correspondientes JTextFields. 
 	 */
 	private void recargarDatos() {
-		//Configura los datos iniciales de la vista con los obtenidos por el constructor.
+		//Si no es nulo actúa.
 		if(zona != null) {
-			tf_ID.setText("" + zona.getID());
-			tf_ID.setEditable(false);
-			tf_ID.setBorder(null);
-			tf_Nombre.setText(zona.getName());
+			tf_ID.setText("" + zona.getID());									//ID
+			tf_ID.setEditable(false);											//Desactivar edición del ID
+			tf_ID.setBorder(null);												//Quitamos el border a su campo.
+			tf_Nombre.setText(zona.getName());									//Establecer el campo nombre.
 			tf_Poblacion.setText("" + zona.getPoblacion());
 			tf_Superficie.setText("" + zona.getSuperficie());
-			tf_Nivel.setText("" + zona.getNivel());
+			tf_Nivel.setText("" + zona.getNivel());								//Nivel inicial de contagio.
 		}
 	}
 	
@@ -163,7 +162,7 @@ public class VistaZona extends JPanel {
 		frame.setMinimumSize(new Dimension(650, 400));
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);
-	    frame.add(this);
+	    frame.getContentPane().add(this);
 		frame.pack();
         frame.setVisible(true);
 	}
@@ -231,18 +230,38 @@ public class VistaZona extends JPanel {
 		recargarDatos();
 	}
 	
+	/* Clases privadas */
 	
-	private class PanelPoligono extends JPanel{		
+	private class BotonL extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent evt) {
+			zona.setName(tf_Nombre.getText());
+			//
+			try{
+				zona.setPoblacion(Integer.parseInt(tf_Poblacion.getText()));
+				zona.setSuperficie(Integer.parseInt(tf_Superficie.getText()));
+				zona.setNivel(Integer.parseInt(tf_Nivel.getText()));}
+			catch(Exception e) {System.out.println("Valor incorrecto");}
+			cm.doActionVistaZona();
+			
+		}
+	}
+	
+	private class PanelPoligono extends JPanel{
 		/** serialVersionUID*/  
 		private static final long serialVersionUID = 1575177244442912505L;
 		private JLabel lblSinPoligono;
+		private final int w = 290;
+		private final int h = 190;
+		private final int x = 60;
+		private final int y = 160;
 
 		public PanelPoligono() {
-			setBorder(new BevelBorder(BevelBorder.LOWERED, new Color(0, 0, 255), null, new Color(0, 0, 128), null));
-			setBounds(73, 154, 291, 189);
-			setLayout(null);
+			setBounds(x, y, w, h);
+			setLayout(null);	
+			//Etiqueta para mostrar en caso de falta de poligono.
 			lblSinPoligono = new JLabel();
-			lblSinPoligono.setBounds(new Rectangle(0, 0, getWidth(), getHeight()));
+			lblSinPoligono.setBounds(new Rectangle(0, 0, w, h));
 			lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",getWidth(),getHeight()));
 			add(lblSinPoligono);
 		}
@@ -258,11 +277,42 @@ public class VistaZona extends JPanel {
 	        	lblSinPoligono.setVisible(true);
 	        }else {
 	        	lblSinPoligono.setVisible(false);
-	        	g2.setPaint(Color.GREEN);
-	  			g2.fill(zona.getZona());
-	  			g2.setPaint(Color.BLACK);
-				g2.draw(zona.getZona());
-	        }    
+	        	Shape p = fitPolygon();											//Ajustamos la forma.
+	  			g2.setPaint(Color.GREEN);
+	            g2.fill(p);														//Rellenar el poligono de verde.
+	            g2.setPaint(Color.RED);
+	  			g2.draw(p);														//Dibuja sus bordes.
+	            g2.setPaint(Color.BLACK);
+	            g2.draw(p.getBounds());											//Dibuja un marco encima del poligono.	
+	        }
+		}
+		
+		/**
+		 * <p>Title: fitPolygon</p>  
+		 * <p>Description: Función de escalado y posicionamiento</p>
+		 * Permite situar la figura en el origen de coordenadas y posteriormente
+		 * la escala ajustandola el lado mayor (y manteniendo la proporción del 
+		 * lado menor) a la caja que lo va a contener. 
+		 * @return Figura transformada para encanjar en el panel.
+		 */
+		private Shape fitPolygon() {
+			Polygon pz = zona.getZona();
+			Polygon p2 = new Polygon(pz.xpoints, pz.ypoints, pz.npoints);
+			Rectangle rp = p2.getBounds();
+			int xp = rp.x;
+			int yp = rp.y;
+			//Primeramente transformamos para llevar al punto de origen de coordenadas.
+			p2.translate(-xp, -yp);
+			//Ahora escalar usando el factor menor (es decir el lado más corto)
+			AffineTransform tx = new AffineTransform();
+            Rectangle2D r2d = pz.getBounds2D();
+            /*Cálculo del mejor factor de escalada. 
+             * El menor => evitar desbordamiento, por tanto ese será el mejor.*/
+            double factorX = w/(r2d.getWidth() + 3);							// Suma de pixels extra para evitar solapamiento de líneas.
+            double factorY = h/(r2d.getHeight() + 3);
+            double factor = (factorX >= factorY)? factorY:factorX;
+            tx.scale(factor ,factor);											// Establece la misma escala para ambas dimensiones.
+            return tx.createTransformedShape(p2);
 		}
 	}
 	
@@ -291,7 +341,7 @@ public class VistaZona extends JPanel {
 	 * @param args ninguno.
 	 */
 	public static void main(String[] args) {
-		VistaZona vz = new VistaZona(null);
+		VistaZona vz = new VistaZona(null,new ControladorModulos());
 		vz.generaTest();
 		vz.abrirFrame();
 	}

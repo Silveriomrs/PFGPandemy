@@ -5,9 +5,6 @@
  */
 package modelo;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.event.TableModelListener;
@@ -26,7 +23,6 @@ public class DCVS implements TableModel{
 	private String directorio;
 	private String nombre;
 	private String tipo;
-	private Date fecha;
 	private Object[] cabecera;
 	private Object datos[][];
 	
@@ -41,23 +37,6 @@ public class DCVS implements TableModel{
 		tipo = "";
 		nuevoModelo();
 	}
-	
-	
-	/**
-	 * <p>Title: getDirectorio</p>  
-	 * <p>Description: Devuelve el directorio del que ha sido cargado este módulo</p>
-	 * No incluye nombre del fichero.
-	 * @return Directorio del módulo.
-	 */
-	public String getDirectorio() { return this.directorio;}
-	
-	/**
-	 * <p>Title: getNombre</p>  
-	 * <p>Description: Devuelve el nombre del archivo, con extensión inclusive</p> 
-	 * @return Nombre del archivo.
-	 */
-	public String getNombre() {return this.nombre;}
-	
 
 
 	/**
@@ -354,6 +333,12 @@ public class DCVS implements TableModel{
 	@Override
 	public int getRowCount() {return modelo.getRowCount();}
 
+	/**
+	 * Obtiene el valor en la posición indicada (No se tiene en cuenta la cabecera).
+	 * @param arg0 Número de fila.
+	 * @param arg1 Número de columna.
+	 * @return Dato almacenado en dicha posición.
+	 */
 	@Override
 	public Object getValueAt(int arg0, int arg1) {return modelo.getValueAt(arg0, arg1);}
 
@@ -363,8 +348,16 @@ public class DCVS implements TableModel{
 	@Override
 	public void removeTableModelListener(TableModelListener arg0) { modelo.removeTableModelListener(arg0);}
 
+	
+	/**
+	 * Establece el dato en la posición indicada dentro de la tabla.
+	 * @param arg0 Objeto o dato a establecer.
+	 * @param arg1 Número de fila.
+	 * @param arg2 Número de columna.
+	 */
 	@Override
 	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
+	
 
 	/**
 	 * @return La ruta en el dispositivo, de la que procede la fuente de los datos.
@@ -375,43 +368,49 @@ public class DCVS implements TableModel{
 	 * @param ruta La nueva ruta en el dispositivo de almacenamiento donde guardar
 	 * los datos.
 	 */
-	public void setRuta(String ruta) {
-		this.ruta = ruta;
-		Path p;
-		p = Paths.get(ruta);
-	    nombre = p.getFileName().toString();	   
-	    directorio = p.getParent().toString();
-	}
-	
-	
+	public void setRuta(String ruta) {	this.ruta = ruta;}
 
 	/**
 	 * @return Devuelve el tipo de datos almacenados en esta instancia.
 	 */
 	public String getTipo() {return tipo;}
 	
-	/**
-	 * <p>Title: getLastDate</p>  
-	 * <p>Description: Devuelve la última fecha de modificación de este módulo</p>
-	 * Accede a la fecha de modificación del archivo y la devuelve. 
-	 * @return Date con la última fecha de modificación, día/hora actual en otro caso.
-	 */
-	public Date getDate() {
-		Date f = new Date();
-		if (this.fecha != null) f = fecha;
-		return f;		
-	}
-	
-	/**
-	 * <p>Title: setDate</p>  
-	 * <p>Description: Establece la fecha indicada como la de modificación del módulo</p> 
-	 * @param d Date con el grupo hora a establecer.
-	 */
-	public void setDate(Date d) {this.fecha = d;}
 
 	/**
 	 * @param tipo El tipo de datos a establecer para esta instancia.
 	 */
 	public void setTipo(String tipo) {	this.tipo = tipo;}
+	
+	/**
+	 * <p>Title: getNombre</p>  
+	 * <p>Description: Devuelve el nombre del archivo, con extensión inclusive</p> 
+	 * @return Nombre del archivo.
+	 */
+	public String getNombre() {return this.nombre;}
+
+
+	/**
+	 * <p>Title: setName</p>  
+	 * <p>Description: </p> 
+	 * @param name Nombre del archivo.
+	 */
+	public void setName(String name) {this.nombre = name;}
+	
+	
+	/**
+	 * <p>Title: getDirectorio</p>  
+	 * <p>Description: Devuelve el directorio del que ha sido cargado este módulo</p>
+	 * No incluye nombre del fichero.
+	 * @return Directorio del módulo.
+	 */
+	public String getDirectorio() { return this.directorio;}
+	
+	/**
+	 * <p>Title: setDirectorio</p>  
+	 * <p>Description: Establece su directorio de trabajo </p> 
+	 * @param ruta Ruta desde el raíz hasta el directorio padre.
+	 */
+	public void setDirectorio(String ruta) {this.directorio = ruta;}
+	
 	
 }

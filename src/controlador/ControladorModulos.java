@@ -6,18 +6,22 @@ package controlador;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import modelo.DCVS;
-import modelo.IO;
+import modelo.Labels;
 import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
 import modelo.ParserProyectoVS;
+import modelo.Types;
 import modelo.Zona;
 import vista.About;
 import vista.Archivos;
@@ -29,11 +33,12 @@ import vista.Pizarra;
 import vista.Player;
 import vista.Principal;
 import vista.TablaEditor;
+import vista.VistaSIR;
 
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 13/07/2021
- * @version 1.0
+ * @version 2.4
  *
  */
 public class ControladorModulos {
@@ -47,13 +52,19 @@ public class ControladorModulos {
 	private Player player;
 	private Mapa mapa;
 	private Archivos archivos;
+	private VistaSIR vistaSIR;
 	private TablaEditor tablaEditor;
 	private ParametrosGrupos pgrupos;
 	private ParametrosProyecto pproyecto;
-	
+//	private Pizarra pizarra;
+	private HashMap<String,DCVS> modulos;										//Conexión con la parte del modelo. Almacena todos los datos de cada modelo.
+	private HashMap<Integer,Zona> zonas;
 	//
 	private DefaultTableModel historico;
 	private ParserPoly parserPoly;
+	//Obtener dimensiones de la pantalla para controlar donde aparecen los módulos.
+	Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
+
 	
 	/** LEYENDA referencia una paleta de colores o leyenda*/  
 	public final static String LEYENDA = "paleta";
@@ -78,58 +89,133 @@ public class ControladorModulos {
 	 * Constructor de la clase.
 	 */
 	public ControladorModulos() {
+		//Inicio del mapa de módulos.
+		modulos = new HashMap<String, DCVS>();
+		zonas = new HashMap<Integer,Zona>();
+		@SuppressWarnings("unused")
+		Types types = new Types();												//Necesario para inicializar las funciones correctamente de la clase Types.
+		//Inicio de los controladores
 		cio = new ControladorDatosIO();
+		//Inicio de las vistas
 		archivos = new Archivos(this);
 		tablaEditor = new TablaEditor(this);
-		pgrupos = new ParametrosGrupos(10);
+		pgrupos = new ParametrosGrupos(this);
 		pproyecto = new ParametrosProyecto(archivos);
 		about = new About();
 		leyenda = new Leyenda(100, 205, false);
 		mapa = new Mapa(w,h, leyenda);
 		principal = new Principal(this);
 		player = new Player(400, 400, true);
+		vistaSIR = new VistaSIR(this);
+//		pizarra = new Pizarra(mapa.getZonas());
+		//Inicio de los parsers.
 		parserPoly = new ParserPoly();
 		parserPoly.setEscala(2.18);
 		agregarPaneles();
 	}
 	
+	/**
+	 * <p>Title: agregarPaneles</p>  
+	 * <p>Description: Aquí se situan todos los paneles (módulos) que se quieren
+	 * añadir al a vista principal en su panel central.</p>
+	 */
 	private void agregarPaneles() {
 		//Añadir paneles de los módulos.
-		principal.addPanelToView(tablaEditor);
-		principal.addPanelToView(mapa);
-		principal.addPanelToView(pgrupos);
-		principal.addPanelToView(pproyecto);
+		addDefaultBorder(tablaEditor,"Editor General");
+		addDefaultBorder(mapa,"Visor de Mapa");
+		addDefaultBorder(pgrupos,"Visor Grupos de Poblaci\u00F3n");
+		addDefaultBorder(pproyecto,"Parámetros del Proyecto");
+		addDefaultBorder(vistaSIR,"Configuraci\u00F3n SIR");
 		mostrarPanel(panelActivo);
 	}
 	
-
+	/**
+	 * <p>Title: addDefaultBorder</p>  
+	 * <p>Description: Añade un JPanel (módulo) a la vista central del módulo principal 
+	 * dotándole además de un border personalizado para la aplicación a todos los paneles.</p>
+	 * Como añadido coloca un título a dicho panel, permitiendo identificarlo con 
+	 * un nombre personalizado. 
+	 * @param jp JPanel para añadir a la vista principal.
+	 * @param title Título a colocar en el borde que rodea el panel.
+	 */
+	private void addDefaultBorder(JPanel jp,String title) {
+		jp.setBorder(new TitledBorder(new BevelBorder(BevelBorder.LOWERED,
+				new Color(255, 0, 0),
+				new Color(255, 175, 175),
+				new Color(0, 255, 255),
+				new Color(0, 0, 255)),
+				title,
+				TitledBorder.LEFT,
+				TitledBorder.TOP,
+				null,
+				new Color(51, 51, 51)));
+		principal.addPanelToView(jp);
+	}
+		
+	/**
+	 * <p>Title: hasZonas</p>  
+	 * <p>Description: Indica si hay zonas cargadas.</p> 
+	 * @return TRUE si el sistema tiene zonas definidas, FALSE en otro caso.
+	 */
+	public boolean hasZonas() {return !zonas.isEmpty();}
+	
+	/**
+	 * <p>Title: getNumberZonas</p>  
+	 * <p>Description: Devuelve el número de zonas actuales.</p> 
+	 * @return Número de grupos de población o zonas actuales en el sistema.
+	 */
+	public int getNumberZonas() {
+		int nz = 0;
+		if(hasZonas()) nz = zonas.size();
+		return nz;
+	}
+	
+	
 	/**
 	 * <p>Title: setPoligonos</p>  
 	 * <p>Description: Establece la representación gráfica de cada zona. Una fila
 	 * por zona.</p> 
 	 * @param datos DCVS con los datos especificados de cada zona.
 	 */
-	public void setPoligonos(DCVS datos) {
+	private void setPoligonos(DCVS datos) {
 		int filas = datos.getRowCount();										//Número de poligonos a procesar.
 		for(int i = 0; i<filas;i++) {
 			Zona z = parser(datos.getFila(i));									//Llamar función parser.
-			if(z != null) mapa.addZona(z);										//Añadido al resto de zonas del mapa.
+			if(z != null) zonas.put(z.getID(), z);
 		}
+	
+		if(!zonas.isEmpty()) mapa.setZonas(zonas);
 	}
 	
-	/**
-	 * <p>Title: setVisibleMapa</p>  
-	 * <p>Description: Activa o desactiva la visualización del mapa</p> 
-	 * @param ver True para activarla, false en otro caso.
-	 */
-	private void setMapaVisible(boolean ver) {mapa.setVisible(ver);}
+	public HashMap<Integer,Zona> getZonas() { return this.zonas;}
 	
+	/**
+	 * Realiza la conversión de datos de texto a un poligono cerrado. En el array
+	 * de datos debe estar conforme a ID, Nombre, Px;y... donde Px;y son las
+	 * coordenadas (X;Y) de cada punto, con separador ';'.
+	 * @param puntos String con las coordenadas de los puntos componentes del
+	 * debe estar conforme al formato ID,Nombre,P0x;y,P1x;y... del poligono. Es
+	 * decir, la posición 0 reservada al ID, la posición 1 reservada al nombre,
+	 * las siguientes posiciones representan cada uno de los puntos que conforman
+	 * el poligono.
+	 * @return Devuelve la zona creada para dicho poligono.
+	 */
+	private Zona parser(String[] puntos) {
+		int id = Integer.parseInt(puntos[0]);
+		String nombre = puntos[1];
+		int habitantes =  Integer.parseInt(puntos[2]);
+		int superficie =  Integer.parseInt(puntos[3]);	
+		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));		
+	}
+
+	/*  Métodos relacionados con la reproducción  */
 	
 	/**
 	 * <p>Title: situarVentana</p>  
 	 * <p>Description: Posiciona el marco (frame) del módulo incado en la nueva
 	 *  posición de la pantalla, este método no hace por si solo visible el marco. </p>
-	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA".
+	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA". Los cuales
+	 * son los nombres de los módulos externos a la aplicación.
 	 * @param nombre Nombre identificador del módulo a posicionar.
 	 * @param posX Posición X a establacer.
 	 * @param posY Posición Y a establecer.
@@ -193,26 +279,7 @@ public class ControladorModulos {
 	 * @param historico Historico con los datos de la evolución calculada.
 	 */
 	public void setHistorico(DCVS historico) {	this.historico = historico.getModelo();	}
-	
 			
-	/**
-	 * Realiza la conversión de datos de texto a un poligono cerrado. En el array
-	 * de datos debe estar conforme a ID, Nombre, Px;y... donde Px;y son las
-	 * coordenadas (X;Y) de cada punto, con separador ';'.
-	 * @param puntos String con las coordenadas de los puntos componentes del
-	 * debe estar conforme al formato ID,Nombre,P0x;y,P1x;y... del poligono. Es
-	 * decir, la posición 0 reservada al ID, la posición 1 reservada al nombre,
-	 * las siguientes posiciones representan cada uno de los puntos que conforman
-	 * el poligono.
-	 * @return Devuelve la zona creada para dicho poligono.
-	 */
-	private Zona parser(String[] puntos) {
-		String nombre = puntos[1];
-		int id = Integer.parseInt(puntos[0]);
-		int habitantes =  Integer.parseInt(puntos[2]);
-		int superficie =  Integer.parseInt(puntos[3]);	
-		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));		
-	}
 
 	/**
 	 * <p>Title: crearPaleta</p>  
@@ -236,76 +303,9 @@ public class ControladorModulos {
 		//leyenda.setPaleta(leyenda.getPaleta());
 		leyenda.setPaleta(colores);
 	}
-	
-	/**
-	 * <p>Title: getPaleta</p>  
-	 * <p>Description: Devuelve la paleta de colores que este configurada 
-	 * en el entorno actualmente</p> 
-	 * @return JPanel con la paleta de colores.
-	 */
-	public Leyenda getPaleta() {return leyenda;}
-	
-	/**
-	 * <p>Title: getJMapa</p>  
-	 * <p>Description: Obtención de panel contendor del mapa</p> 
-	 * @return Panel contenedor del mapa.
-	 */
-	public JPanel getJMapa() {return mapa.getPanel();}
-	
-	/**
-	 * <p>Title: getMapa</p>  
-	 * <p>Description: Devuelve una instacia de la clase Mapa con la configuración
-	 * con la que está almacenada</p> 
-	 * @return Mapa 
-	 */
-	public Mapa getMapa() {return mapa;}
-	
-	/**
-	 * <p>Title: getZonas</p>  
-	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya 
-	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p> 
-	 * @return El conjunto de zonas.
-	 */
-	public HashMap<Integer,Zona> getZonas() {return mapa.getZonas();}
-
-	/**
-	 * <p>Title: setZonas</p>  
-	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
-	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
-	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
-	 */
-	public void setZonas(HashMap<Integer,Zona> zonas) {
-		//Actualiza el mapa.
-		mapa.setZonas(zonas);
-		//Actualizar Grupos.
-		pgrupos.setZonas(zonas);
 		
-	}
 	
-	/**
-	 * <p>Title: setModulos</p>  
-	 * <p>Description: Establece los módulos que conforman un proyecto.</p> 
-	 * @param mapaModulos HasMap con los módulos del proyecto.
-	 */
-	public void setModulos(HashMap<String, DCVS> mapaModulos) {
-		mapaModulos.forEach((tipo,modulo) -> {
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				switch(tipo) {
-				case(IO.HST):
-					setHistorico(modulo);
-					break;
-				case(IO.PAL):
-					setPaleta(modulo.getModelo());
-					break;
-				case(IO.MAP):
-					setPoligonos(modulo);
-					break;
-				}
-			}
-		});
-	}
-	
-	/* Control de los módulos */
+	/* Progreso de implementación control Principal */
 	
 	/**
 	 * <p>Title: doAction</p>  
@@ -313,7 +313,7 @@ public class ControladorModulos {
 	 * que ha realizado la llamada.</p> 
 	 * @param nombre Nombre de la acción.
 	 */
-	public void doAction(String nombre) {
+	public void doActionPrincipal(String nombre) {
 		//
 		switch(nombre){
 			case "Reproductor":
@@ -334,46 +334,42 @@ public class ControladorModulos {
 				break;
 			case "Paleta":
 				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
-				getPaleta().toggleVisible();
+				leyenda.toggleVisible();
 				break;
 			case "Grupos":
-				pgrupos.setZonas(getZonas());
 			case "Tabla":
-//			case "Archivos":
+			case "Parámetros SIR":
 			case "Proyecto":
 				mostrarPanel(nombre);
 				break;
 			case "Abrir Proyecto":
-				DCVS prj = cio.abrirArchivo(null,IO.PRJ);
-				if(prj != null) {
-					archivos.abrirProyecto(prj);
-					pproyecto.setDCVS(prj);		
-				}					
+				DCVS prj = cio.abrirArchivo(null,Types.PRJ);
+				if(prj != null) {abrirProyecto(prj);}
 				break;
 			case "Importar Proyecto Vensim":
-				DCVS pVS = cio.abrirArchivo(null,IO.CSV);
-				//Requiere nuevo parser completo.
+				DCVS pVS = cio.abrirArchivo(null,Types.CSV);
+				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) importarProyectoVS(pVS);
-				else if(pVS != null) mostrar("Archivo seleccionado no reconocido.",0);
+				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
 			case "Importar Histórico Vensim":
 				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
-				DCVS hVS = cio.abrirArchivo(null,IO.CSV);
-				//Requiere nuevo parser completo.
+				DCVS hVS = cio.abrirArchivo(null,Types.CSV);
+				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) importarHistoricoVS(hVS);
-				else if(hVS != null) mostrar("Archivo seleccionado no reconocido.",0);
+				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;		
 			case "Nuevo Proyecto":
-				ParametrosProyecto.main(null);
+				clearProject();
 				break;
 			case "Salir":
-				if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
+				if(showMessage("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
 			case "Acerca de...":
 				about.toggleVisible();
 				break;
 			default:
-				System.out.println(nombre + ", tipo no reconocido");
+				System.out.println("Controlador Modulos > doPrincipal: " + nombre + ", tipo no reconocido");
 		}
 		
 		mostrarPanel(nombre);
@@ -382,17 +378,18 @@ public class ControladorModulos {
 	private void mostrarPanel(String nombre) {		
 		switch(nombre){
 		case "Grupos":
-			pgrupos.setZonas(getZonas());
+//			pgrupos.setZonas(getZonas());
 		case "Mapa":
 		case "Tabla":
-//		case "Archivos":
+		case "Parámetros SIR":
 		case "Proyecto":
 		case "NONE":
 			//Mostrar panel correspondiente y ocultación del resto.
-			setMapaVisible(nombre.equals("Mapa"));							
+			mapa.setVisible(nombre.equals("Mapa"));							
 			tablaEditor.setVisible(nombre.equals("Tabla"));
 			pgrupos.setVisible(nombre.equals("Grupos"));
 			pproyecto.setVisible(nombre.equals("Proyecto"));
+			vistaSIR.setVisible(nombre.equals("Parámetros SIR"));
 		}
 	}
 	
@@ -413,7 +410,7 @@ public class ControladorModulos {
 	 * @return En caso de un mensaje de confirmación devuelve el valor Integer
 	 * de la opción escogida.
 	 */
-	private Integer mostrar(String txt, int tipo ) {
+	private Integer showMessage(String txt, int tipo ) {
 		String titulo = "";
 		Integer opcion = null;
 		
@@ -434,14 +431,253 @@ public class ControladorModulos {
 		return opcion;
 	}
 	
+	/* En progreso de implementación control ARCHIVOS */
+	
+	/**
+	 * <p>Title: guardarModulo</p>  
+	 * <p>Description: Guardar los datos del módulo en el dispositivo indicado
+	 * u establecido en el propio modelo</p> 
+	 * @param dcvs Módulo DCVS a exportar a dispositivo de almacenamiento.
+	 */
+	public void guardarModulo(DCVS dcvs) {cio.guardarArchivo(dcvs);}
+	
+	/**
+	 * <p>Title: getModulo</p>  
+	 * <p>Description: Devuelve el módulo con la información que contenga. </p>
+	 * El tipo de módulo es acorde a las extensiones aceptadas.
+	 * @param tipo Tipo de módulo a devolver. Ej. MAP, HST, etc.
+	 * @return El módulo solicitado.
+	 */
+	public DCVS getModulo(String tipo) {
+		DCVS dcvs = null;
+		if(modulos.containsKey(tipo)) dcvs = modulos.get(tipo);
+		return dcvs;
+	}
+	
+	/**
+	 * <p>Title: guardarProyecto</p>  
+	 * <p>Description: Guarda la configuración del proyecto</p> En caso de que
+	 * el módulo recibido sea null, se crea un módulo nuevo con los valores de
+	 * ruta de los demás módulos.
+	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ o null si hay
+	 * que crear uno nuevo
+	 */
+	public void guardarProyecto(DCVS dcvsIn) {
+		DCVS dcvs = dcvsIn;
+		//Si se llama con null a la función crear nuevo módulo proyecto.	
+//		if(dcvs == null) dcvs = creaModuloProyecto();
+		
+		//Guardado del fichero:
+		String ruta = cio.guardarArchivo(dcvs);
+		if(dcvs != null && ruta != null) {
+			//Configuración de la ruta
+			dcvs.setRuta(ruta);
+			//Mostrar ruta en Field.
+			archivos.setLabel(Types.PRJ,ruta);
+//			mapaFields.get(IO.PRJ).setText(ruta);
+			modulos.put(Types.PRJ, dcvs);
+		}
+
+	}
+	
+	private void clearProject() {
+		//Borrado de todos los módulos.
+		modulos.clear();
+		//Limpieza de las etiquetas de las vistas de diferentes módulos.
+		archivos.clearJTFields();
+		vistaSIR.reset();
+		pproyecto.reset();
+		tablaEditor.reset();
+		mapa.reset();
+		pgrupos.reset();
+//		pizarra.reset();
+//		principal.reset();
+		
+	}
+	
+	/**
+	 * <p>Title: abrirProyecto</p>  
+	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
+	 * correspondientes.</p>
+	 * @param dcvs Archivo de proyecto con los datos del resto de módulos.
+	 */
+	public void abrirProyecto(DCVS dcvs) {
+		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
+		//Reiniciar todas las vistas y borrar datos anteriores.
+		clearProject();	
+		//Añadir ruta del proyecto a la etiqueta correspondiente.
+		archivos.setLabel(dcvs.getTipo(), dcvs.getNombre());
+
+		//Lectura de los módulos a cargar
+		for(int i= 0;  i < nm; i++) {
+			String[] m = dcvs.getFila(i);
+			String dato = m[1];
+			String etiq = m[0];
+			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
+			if(!etiq.equals(Types.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
+				DCVS mAux = cio.abrirArchivo(dato,etiq);						//Carga el módulo desde el sistema de archivos.
+				establecerDatos(mAux);											//Establecer el módulo.
+			}else if(etiq.equals(Labels.NG)){									//Crea tantas zonas iniciales como indiqué el proyecto.
+				pproyecto.setField(etiq, dato);
+				int NG = Integer.parseInt(dato);
+				/* hay que asegurar que si no hay zonas definidas, se generen en base
+				 * a este parámetro, en alguna parte de CM */
+//				pgrupos.setNumeroZonas(NG);
+			}else pproyecto.setField(etiq, dato);								//Etiquetas de la vista -> mostrar en la vista.
+		}
+		
+		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
+		archivos.disableAllSavers();
+		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
+		modulos.put(dcvs.getTipo(), dcvs);
+		//Forzar a todas las vistas a actualizar sus datos.
+		setZonas(zonas);
+	}
+	
+	
+	/**
+	 * <p>Title: establecerDatos</p>  
+	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
+	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
+	 * @param datos Conjunto de datos y cabecera encapsulados.
+	 */
+	public void establecerDatos(DCVS datos) {
+		String tipo = datos.getTipo();
+		//Actualizar etiqueta correspondiente con la ruta del archivo.
+		archivos.setLabel(tipo,datos.getNombre());
+		
+		//Añadir la ruta del módulo al módulo del proyecto.
+		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
+		if(modulos.containsKey(Types.PRJ)) {
+			String[] nuevaEntrada = {tipo,datos.getRuta()};
+			int linea = modulos.get(Types.PRJ).getFilaItem(tipo);
+			boolean lineaDuplicada = linea > -1;
+			//Si hay un módulo ya cargado, hay que sustituirlo.
+			if(lineaDuplicada) {modulos.get(Types.PRJ).delFila(linea);}			//Eliminar entrada duplicada.
+			modulos.get(Types.PRJ).addFila(nuevaEntrada);						//Añadir nueva entrada.
+		}
+		
+		//Guardar los datos del módulo en su conjunto.
+		modulos.put(tipo, datos);
+
+		//Operaciones extras según tipo de módulo.
+		switch(tipo) {
+			case (Types.MAP):
+				setPoligonos(datos);
+				break;
+			case (Types.HST):
+				setHistorico(datos);
+				break;		
+			default:			
+		}
+		
+		//Actualización de las opciones de Principal.
+		principal.reset();
+		
+	}
 
 	
-	/* En progreso de implementación */
+	/* En progreso de implementación acciones Archivos */
+	
+	/**
+	 * <p>Title: doActionArchivos</p>  
+	 * <p>Description: Función dedicada a la realización de las funciones de la
+	 * la vista correspondiente.</p>
+	 * Recibiendo dos operadores por parámetros realiza las diferentes actividades
+	 * correspondientes al módulo correspondiente (entrada salida de archivos).
+	 * Finalmente devolverá el resultado de la carga o guardado de la operación
+	 * desde la ruta especifícada.
+	 * @param op Operación a realizar "Abrir", "Guardar", "Guardar como".
+	 * @param ext Extensión del tipo de datos, equivalente a los disponibles en
+	 * la clase IO.
+	 * @return TRUE si la operación ha concluido correctamente, FALSE en otro caso.
+	 */
+	public boolean doActionArchivos(String op, String ext) {
+		DCVS dcvs = null;
+		boolean ok = true;														//Indica si la operación ha tenido exito o no.
+		//Opciones de Carga de módulo, NO módulo PRJ.
+		if(op.equals("Abrir")) {
+			dcvs = cio.abrirArchivo(null,ext);
+			ok = dcvs != null;
+			if(ok && !ext.equals(Types.PRJ)) {establecerDatos(dcvs);}
+			else if(ok) {abrirProyecto(dcvs);}
+		//Opciones de Guarga de módulo.
+		}else{
+			//Optención del módulo correspondiente
+			dcvs = getModulo(ext);
+			ok = dcvs != null;
+			if(ok) {
+				//Si es guardar como, poner ruta a null. En otro caso guardará con la ruta que contiene.
+				if(op.equals("Guardar como")) { dcvs.setRuta(null); }
+				//
+				if(ext.equals(Types.PRJ)) guardarProyecto(dcvs);
+				else guardarModulo(dcvs);
+			}
+		}	
+		return ok;
+	}
+
+	/* En progreso de implementación VistasZonas y Grupos */
+	
+	/**
+	 * <p>Title: doActionVistaZona</p>  
+	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * de Zonas</p>
+	 * La vista de zonas solo ejerce una opción, aplicar cambios de los campos.
+	 * Dichos cambios son efectuados en las referencias de las zonas por tanto 
+	 * quedan establecidas directamente en el grupo en el que están almacenadas.
+	 * Si bien, es necesario detectar tales cambios a efectos de activar los botones
+	 * correspondientes en la visa de Archivos.
+	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
+	 */
+	public boolean doActionVistaZona() {
+		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
+		archivos.enableBotonesGuardado(Types.MAP, true);
+		return true;
+	}
+	
+	/* En progreso de implementación acciones VistaSIR */
+	
+	/**
+	 * <p>Title: doActionVistaSIR</p>  
+	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * de parámetros SIR</p>
+	 * La vista solo ejerce una opción, aplicar cambios de los campos.
+	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
+	 */
+	public boolean doActionVistaSIR() {
+		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
+		archivos.enableBotonesGuardado(Types.MAP, true);
+		return true;
+	}
+		
+	
+	/* En progreso de implamentación PARSERS archivos de pruebas*/
+	
+	/**
+	 * <p>Title: setZonas</p>  
+	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
+	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
+	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
+	 */
+	private void setZonas(HashMap<Integer,Zona> zonas) {
+		//Actualiza el mapa.
+		this.zonas = zonas;
+		mapa.setZonas(zonas);
+		//Actualizar Grupos.
+		pgrupos.reset();
+		//Actualizar en vista del proyecto en valor de NG.
+		pproyecto.setField(Labels.NG,"" + zonas.size());
+		//Actualización de la vista principal.
+		principal.reset();
+	}
 	
 	private void setDatosProyecto(DCVS dcvs, int NG) {
-		dcvs.addFila(new String[] {"NG","" + NG});
-		pproyecto.setDCVS(dcvs);
-		
+		dcvs.addFila(new String[] {Labels.NG,"" + NG});
+		//Cambiamos la etiqueta de tipo de módulo a PRJ para poder procesarla correctamente.
+		dcvs.setTipo(Types.PRJ);
+		//Llamamos a la función correspondiente.
+		abrirProyecto(dcvs);
 	}
 	
 	/**
@@ -453,13 +689,16 @@ public class ControladorModulos {
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
 	private void importarProyectoVS(DCVS prjV) {
+		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
+		// impediría modularidad e independencia de módulos.
+		clearProject();
 		ParserProyectoVS parser = new ParserProyectoVS(prjV);
 		//Establecer las zonas en las vistas correspondientes.
-		setZonas(parser.getZonas());
+		zonas = parser.getZonas();
 		//Establecer los datos del proyecto en la vista.
 		setDatosProyecto(prjV,parser.getNG());
 		//Establecer el historico de niveles.
-		
+		establecerDatos(parser.getHistorico());
 		//Establecer matriz de relaciones.
 		tablaEditor.setModelo(parser.getMContactos());
 	}
@@ -473,15 +712,19 @@ public class ControladorModulos {
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
 	private void importarHistoricoVS(DCVS prjV) {
+		//Limpiar todos los datos previos. No debe hacerse en otra parte pues 
+		// impediría modularidad e independencia de módulos.
+		clearProject();
 		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
 		//Establecer las zonas en las vistas correspondientes.
-		setZonas(parser.getZonas());
+		zonas = parser.getZonas();
 		//Establecer los datos del proyecto en la vista.
 		setDatosProyecto(prjV,parser.getNG());
 		//Establecer el historico de niveles.
 		
 		//Establecer matriz de relaciones.
 		tablaEditor.setModelo(parser.getMContactos());
+		//Establecer los parámetros de la enfermedad.
 		
 	}
 	
@@ -492,5 +735,6 @@ public class ControladorModulos {
 	 */
 	public static void main(String[] args) {
 		ControladorModulos cm = new ControladorModulos();
+		cm.isPlayable();
 	}
 }

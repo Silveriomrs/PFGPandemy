@@ -96,6 +96,10 @@ public class MotorSIR {
 				//Cálculo CI
 				double CI = getCC(TContagio,s);
 				z.addNivel(labels.getWord("CI"), time, CI);
+				//Cálculo del nivel (casos por cada 100 mil habitantes)
+				double nivel = getCI100K(CI, s, i, r);
+				z.addNivel("Nivel", time, nivel);
+				
 				//Cálculo de los siguientes SIR (t+1).
 				z.addNivel(labels.getWord("S"), time+1 , CVS - CI );
 				z.addNivel(labels.getWord("I"), time+1 , CI - CC );

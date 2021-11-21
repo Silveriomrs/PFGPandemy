@@ -19,7 +19,6 @@ import javax.swing.JLabel;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextArea;
@@ -28,6 +27,8 @@ import com.toedter.calendar.JTextFieldDateEditor;
 
 import modelo.DCVS;
 import modelo.IO;
+import modelo.Labels;
+import modelo.Types;
 
 import java.awt.Rectangle;
 import java.text.ParseException;
@@ -48,13 +49,13 @@ public class ParametrosProyecto extends JPanel {
 	
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -73292561581668096L;
-	private JPanel panel_central;
-	private JTextField tfNombre;
-	private JTextField tfAutor;
-	private JDateChooser dateChooser;
+	private JFormattedTextField fTFNombre;
+	private JFormattedTextField fTFAutor;
 	private JFormattedTextField fTFNGrupos;
-	private JTextArea textArea;
 	private JFormattedTextField fTFVersion;
+	private JDateChooser dateChooser;	
+	private JTextArea textArea;
+	
 	private DCVS dcvs;
 	private JPanel panel_archivos;
 	private Archivos archivos;
@@ -68,14 +69,56 @@ public class ParametrosProyecto extends JPanel {
 	public ParametrosProyecto(Archivos archivos) {
 		super();
 		this.archivos = archivos;
-		setBackground(Color.ORANGE);
+//		setBackground(Color.ORANGE);
 		setAutoscrolls(true);
 		setSize(new Dimension(1024, 768));
 		setName("Propiedades_Proyecto");
 		setLayout(new BorderLayout(0, 0));
-		panel_central = new JPanel();
 		panel_archivos = this.archivos.getPanel();
 		configurar();
+	}
+	
+	
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * por cadenas vacias y reinicia el resto de valores.
+	 */
+	public void reset() {
+		fTFNombre.setText(null);		
+		fTFAutor.setText(null);
+		textArea.setText(null);
+		fTFVersion.setText(null);
+		fTFNGrupos.setText(null);
+		textArea.setText(null);
+		dateChooser.setDate(new Date());
+	}
+		
+	/**
+	 * <p>Title: setField</p>  
+	 * <p>Description: Modifica el contenido mostrado por un campo</p>
+	 * @see Labels
+	 * @param fieldName Nombre de la etiqueta que representa el campo.
+	 * @param txt Texto a introducir en el campo.
+	 */
+	public void setField(String fieldName, String txt) {
+		switch(fieldName) {
+		case(Labels.NAME): fTFNombre.setText(txt);
+			break;
+		case(Labels.AUTHOR): fTFAutor.setText(txt);
+			break;
+		case(Labels.DESCRIPTION): textArea.setText(txt);
+			break;
+		case(Labels.VERSION): fTFVersion.setText(txt);
+			break;
+		case(Labels.NG): fTFNGrupos.setText(txt);
+			break;
+		case(Labels.DATE): dateChooser.setDate(stringToDate(txt));
+			break;
+		default:
+			System.out.println("ParametrosProyecto > setField, campo no reconocido: " + fieldName);
+		}
 	}
 
 	/**
@@ -83,39 +126,42 @@ public class ParametrosProyecto extends JPanel {
 	 */
 	public DCVS getDCVS() {return dcvs;}
 
-	/**
-	 * @param dcvs La tabla dcvs contenedora de los parámetros del proyecto
-	 * a establecer en la vista y proyecto.
-	 */
-	public void setDCVS(DCVS dcvs) {
-		this.dcvs = dcvs;
-		int fila = -1;
-		
-		String nombre = dcvs.getNombre();
-		if(nombre != null) {
-			tfNombre.setText(nombre);
-			archivos.setLabel(IO.PRJ, dcvs.getRuta());
-		}
-		
-		Date d = dcvs.getDate();
-		if(d != null) { dateChooser.setDate(d);}
-		else {dateChooser.setDate(new Date());}									//Establece la fecha de hoy.	
-		
-		fila = dcvs.getFilaItem("AUTHOR");
-		if(fila > -1) tfAutor.setText( (String) dcvs.getValueAt(fila,1));
-		
-		fila = dcvs.getFilaItem("DESCRIPTION");
-		if(fila > -1) textArea.setText( (String) dcvs.getValueAt(fila,1));
-		
-		fila = dcvs.getFilaItem("VERSION");
-		if(fila > -1) fTFVersion.setText( (String) dcvs.getValueAt(fila,1));
-		else fTFVersion.setText("1.0");											//Configura como versión la del día de hoy.
-		
-		//Número de grupos.
-		fila = dcvs.getFilaItem("NG");
-		if(fila > -1) fTFNGrupos.setText( (String) dcvs.getValueAt(fila,1));
-		
-	}
+//	/**
+//	 * @param dcvs La tabla dcvs contenedora de los parámetros del proyecto
+//	 * a establecer en la vista y proyecto.
+//	 */
+//	public void setDCVS(DCVS dcvs) {
+//		this.dcvs = dcvs;
+//		int fila = -1;
+//		//Nombre
+//		String nombre = dcvs.getNombre();
+//		if(nombre != null) {
+//			fTFNombre.setText(nombre);
+//			archivos.setLabel(Types.PRJ, dcvs.getRuta());
+//		}					
+//		//Fecha
+//		fila = dcvs.getFilaItem(Labels.DATE);
+//		Date date = new Date();													//Establece la fecha de hoy en caso de no tener una definida.
+//		if(fila > -1) {															
+//			String sdate = (String) dcvs.getValueAt(fila,1);
+//			date = stringToDate(sdate);
+//		}
+//		dateChooser.setDate(date);												//Establece el resultado.								
+//		//Autor
+//		fila = dcvs.getFilaItem(Labels.AUTHOR);
+//		if(fila > -1) fTFAutor.setText( (String) dcvs.getValueAt(fila,1));
+//		//Descripción
+//		fila = dcvs.getFilaItem(Labels.DESCRIPTION);
+//		if(fila > -1) textArea.setText( (String) dcvs.getValueAt(fila,1));
+//		//Versión
+//		fila = dcvs.getFilaItem(Labels.VERSION);
+//		if(fila > -1) fTFVersion.setText( (String) dcvs.getValueAt(fila,1));
+//		else fTFVersion.setText("1.0");											//Configura como versión la del día de hoy.
+//		//Número de grupos.
+//		fila = dcvs.getFilaItem(Labels.NG);
+//		if(fila > -1) fTFNGrupos.setText( (String) dcvs.getValueAt(fila,1));
+//		
+//	}
 	
 	
 	/**
@@ -127,26 +173,57 @@ public class ParametrosProyecto extends JPanel {
 	 */
 	@SuppressWarnings("finally")
 	private Date stringToDate(String fecha){
-		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
+		 System.out.println("ParametrosProyecto > stringToDate: " + fecha);
+		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");			//Formato de la fecha.
 		 Date date = null;
 		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
 		 catch (ParseException ex) { ex.printStackTrace(); }
 		 finally {return date;} 
 	}
+	
+	/**
+	 * <p>Title: setUpTextField</p>  
+	 * <p>Description: Establece una configuración general para los campos de texto</p> 
+	 * Dicha configuración consta de tooltip, un borde personalizado, el ancho, alineación,
+	 *  y el texto inicial. Además de un Listener para el resalte de los campos.
+	 * @param texto Texto inicial a mostrar en el campo. Acepta null como parámetro.
+	 * @param tt Tooltip o información extra que se mostrará al pasar el cursor por encima.
+	 * @param align Alineación del texto. @see ComponentOrientation.
+	 * @return El propio campo formateado con las opciones por defecto y las indicadas
+	 *  por parámetro.
+	 */
+	private JFormattedTextField setUpTextField(String texto,String tt, int align) {
+		JFormattedTextField jtf = new JFormattedTextField(texto);
+		jtf.addFocusListener(new FocusJTextField(jtf));
+		jtf.setHorizontalAlignment(align);
+		jtf.setBorder(new LineBorder(Color.BLACK, 1, true));
+		jtf.setToolTipText(tt);
+		jtf.setColumns(10);
+		return jtf;
+	}
 
 	private void configurar() {
+		//Parámetros repetitivos -> factorizar para mejorar lejibilidad general.
+		Insets insets = new Insets(0, 0, 5, 5);
+		//TFIelds para factorizar:
+		fTFNombre = setUpTextField(null,"Nombre del proyecto, se usará para dar nombre a los archivos que lo componen.", SwingConstants.LEFT);
+		fTFAutor = setUpTextField(null,"Autor del proyecto.",SwingConstants.LEFT);
+		fTFVersion = setUpTextField("1.0","Número de versión del proyecto.",SwingConstants.CENTER);	
+		fTFNGrupos = setUpTextField(null,"Número de grupos de población que componen el proyecto.",SwingConstants.CENTER);
+		//
+		setName("panel");
+		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		setBackground(Color.LIGHT_GRAY);
+		setAutoscrolls(true);
 		
-		panel_central.setName("panel_central");
-		panel_central.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		panel_central.setBackground(Color.LIGHT_GRAY);
-		panel_central.setAutoscrolls(true);
-		add(panel_central, BorderLayout.CENTER);
-		GridBagLayout gbl_panel_central = new GridBagLayout();
-		gbl_panel_central.columnWidths = new int[]{32, 241, 243, 212, 143, 0};
-		gbl_panel_central.rowHeights = new int[]{15, 30, 0, 114, 10, 0, 0, 0, 0, 220, 54, 0};
-		gbl_panel_central.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_central.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panel_central.setLayout(gbl_panel_central);
+		//GRIDS
+		
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{32, 241, 243, 212, 143, 0};
+		gbl_panel.rowHeights = new int[]{15, 30, 0, 114, 10, 0, 0, 0, 0, 220, 54, 0};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		setLayout(gbl_panel);
 		
 		JLabel label_obligatorio = new JLabel("");
 		label_obligatorio.setToolTipText("Campo obligatorio");
@@ -154,82 +231,75 @@ public class ParametrosProyecto extends JPanel {
 		label_obligatorio.setMaximumSize(new Dimension(25, 25));
 		label_obligatorio.setIcon(IO.getIcon("/vista/imagenes/Iconos/obligatorio2_64px.png",20,20));
 		GridBagConstraints gbc_label_obligatorio = new GridBagConstraints();
-		gbc_label_obligatorio.insets = new Insets(0, 0, 5, 5);
+		gbc_label_obligatorio.insets = insets;
 		gbc_label_obligatorio.gridx = 0;
 		gbc_label_obligatorio.gridy = 1;
-		panel_central.add(label_obligatorio, gbc_label_obligatorio);
+		add(label_obligatorio, gbc_label_obligatorio);
 		
 		JLabel lblNombreDelProyecto = new JLabel("Nombre del Proyecto:");
 		lblNombreDelProyecto.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblNombreDelProyecto = new GridBagConstraints();
-		gbc_lblNombreDelProyecto.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNombreDelProyecto.insets = insets;
 		gbc_lblNombreDelProyecto.anchor = GridBagConstraints.WEST;
 		gbc_lblNombreDelProyecto.gridx = 1;
 		gbc_lblNombreDelProyecto.gridy = 1;
-		panel_central.add(lblNombreDelProyecto, gbc_lblNombreDelProyecto);
+		add(lblNombreDelProyecto, gbc_lblNombreDelProyecto);
 		
-		tfNombre = new JTextField();
-		tfNombre.setHorizontalAlignment(SwingConstants.LEFT);
-		tfNombre.setToolTipText("Nombre del proyecto, se usará para dar nombre a los archivos que lo componen.");
-		tfNombre.setBackground(new Color(255, 255, 255));
 		GridBagConstraints gbc_tfNombre = new GridBagConstraints();
-		gbc_tfNombre.insets = new Insets(0, 0, 5, 5);
+		gbc_tfNombre.insets = insets;
 		gbc_tfNombre.fill = GridBagConstraints.HORIZONTAL;
 		gbc_tfNombre.gridx = 2;
 		gbc_tfNombre.gridy = 1;
-		panel_central.add(tfNombre, gbc_tfNombre);
-		tfNombre.setColumns(10);
+		add(fTFNombre, gbc_tfNombre);
 		
 		JLabel lblAutor = new JLabel("Autor/a:");
 		lblAutor.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblAutor = new GridBagConstraints();
 		gbc_lblAutor.anchor = GridBagConstraints.WEST;
-		gbc_lblAutor.insets = new Insets(0, 0, 5, 5);
+		gbc_lblAutor.insets = insets;
 		gbc_lblAutor.gridx = 1;
 		gbc_lblAutor.gridy = 2;
-		panel_central.add(lblAutor, gbc_lblAutor);
+		add(lblAutor, gbc_lblAutor);
 		
-		tfAutor = new JTextField();
-		tfAutor.setHorizontalAlignment(SwingConstants.LEFT);
-		tfAutor.setToolTipText("Autor del proyecto.");
+
 		GridBagConstraints gbc_tfAutor = new GridBagConstraints();
-		gbc_tfAutor.insets = new Insets(0, 0, 5, 5);
+		gbc_tfAutor.insets = insets;
 		gbc_tfAutor.fill = GridBagConstraints.HORIZONTAL;
 		gbc_tfAutor.gridx = 2;
 		gbc_tfAutor.gridy = 2;
-		panel_central.add(tfAutor, gbc_tfAutor);
-		tfAutor.setColumns(10);
+		add(fTFAutor, gbc_tfAutor);
+		
 		
 		JLabel lblDescripcin = new JLabel("Descripción del proyecto:");
 		GridBagConstraints gbc_lblDescripcin = new GridBagConstraints();
 		gbc_lblDescripcin.anchor = GridBagConstraints.NORTHWEST;
-		gbc_lblDescripcin.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescripcin.insets = insets;
 		gbc_lblDescripcin.gridx = 1;
 		gbc_lblDescripcin.gridy = 3;
-		panel_central.add(lblDescripcin, gbc_lblDescripcin);
+		add(lblDescripcin, gbc_lblDescripcin);
 		
 		textArea = new JTextArea();
 		textArea.setMinimumSize(new Dimension(200, 100));
 		textArea.setMaximumSize(new Dimension(2147, 2147));
 		textArea.setToolTipText("Introduzca cualquier texto descriptivo que crea necesario acerca del proyecto.");
-		textArea.setBorder(new LineBorder(Color.BLACK, 2, true));
+		textArea.setBorder(new LineBorder(Color.BLACK, 1, true));
 		textArea.setBackground(Color.WHITE);
 		textArea.setColumns(10);
 		textArea.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		GridBagConstraints gbc_textArea = new GridBagConstraints();
 		gbc_textArea.fill = GridBagConstraints.BOTH;
-		gbc_textArea.insets = new Insets(0, 0, 5, 5);
+		gbc_textArea.insets = insets;
 		gbc_textArea.gridx = 2;
 		gbc_textArea.gridy = 3;
-		panel_central.add(textArea, gbc_textArea);
+		add(textArea, gbc_textArea);
 		
 		JLabel lblFechaDeltima = new JLabel("Fecha de última modificación:");
 		GridBagConstraints gbc_lblFechaDeltima = new GridBagConstraints();
 		gbc_lblFechaDeltima.anchor = GridBagConstraints.WEST;
-		gbc_lblFechaDeltima.insets = new Insets(0, 0, 5, 5);
+		gbc_lblFechaDeltima.insets = insets;
 		gbc_lblFechaDeltima.gridx = 1;
 		gbc_lblFechaDeltima.gridy = 4;
-		panel_central.add(lblFechaDeltima, gbc_lblFechaDeltima);
+		add(lblFechaDeltima, gbc_lblFechaDeltima);
 		
 		dateChooser = new JDateChooser();
 		dateChooser.setToolTipText("Puede dejar indicado la última fecha de modificación o creación.");
@@ -240,38 +310,35 @@ public class ParametrosProyecto extends JPanel {
 		
 		GridBagConstraints gbc_dateChooser = new GridBagConstraints();
 		gbc_dateChooser.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dateChooser.insets = new Insets(0, 0, 5, 5);
+		gbc_dateChooser.insets = insets;
 		gbc_dateChooser.gridx = 2;
 		gbc_dateChooser.gridy = 4;
-		panel_central.add(dateChooser, gbc_dateChooser);
+		add(dateChooser, gbc_dateChooser);
 		
 		JLabel txtVersion = new JLabel();
 		txtVersion.setText("Versión:");
 		GridBagConstraints gbc_txtVersion = new GridBagConstraints();
 		gbc_txtVersion.anchor = GridBagConstraints.WEST;
-		gbc_txtVersion.insets = new Insets(0, 0, 5, 5);
+		gbc_txtVersion.insets = insets;
 		gbc_txtVersion.gridx = 1;
 		gbc_txtVersion.gridy = 5;
-		panel_central.add(txtVersion, gbc_txtVersion);
+		add(txtVersion, gbc_txtVersion);
 		
-		fTFVersion = new JFormattedTextField();
-		fTFVersion.setHorizontalAlignment(SwingConstants.CENTER);
-		fTFVersion.setText("1.0");
 		GridBagConstraints gbc_fTFVersion = new GridBagConstraints();
-		gbc_fTFVersion.insets = new Insets(0, 0, 5, 5);
+		gbc_fTFVersion.insets = insets;
 		gbc_fTFVersion.fill = GridBagConstraints.HORIZONTAL;
 		gbc_fTFVersion.gridx = 2;
 		gbc_fTFVersion.gridy = 5;
-		panel_central.add(fTFVersion, gbc_fTFVersion);
+		add(fTFVersion, gbc_fTFVersion);
 		
 		JSeparator separator = new JSeparator();
 		GridBagConstraints gbc_separator = new GridBagConstraints();
 		gbc_separator.fill = GridBagConstraints.BOTH;
 		gbc_separator.gridwidth = 4;
-		gbc_separator.insets = new Insets(0, 0, 5, 5);
+		gbc_separator.insets = insets;
 		gbc_separator.gridx = 1;
 		gbc_separator.gridy = 6;
-		panel_central.add(separator, gbc_separator);
+		add(separator, gbc_separator);
 		
 		JLabel label_obligatorio_1 = new JLabel("");
 		label_obligatorio_1.setToolTipText("Campo obligatorio");
@@ -279,36 +346,34 @@ public class ParametrosProyecto extends JPanel {
 		label_obligatorio_1.setBounds(new Rectangle(0, 0, 15, 15));
 		label_obligatorio_1.setIcon(IO.getIcon("/vista/imagenes/Iconos/obligatorio2_64px.png",20,20));
 		GridBagConstraints gbc_label_obligatorio_1 = new GridBagConstraints();
-		gbc_label_obligatorio_1.insets = new Insets(0, 0, 5, 5);
+		gbc_label_obligatorio_1.insets = insets;
 		gbc_label_obligatorio_1.gridx = 0;
 		gbc_label_obligatorio_1.gridy = 7;
-		panel_central.add(label_obligatorio_1, gbc_label_obligatorio_1);
+		add(label_obligatorio_1, gbc_label_obligatorio_1);
 		
 		JLabel lblNmeroDeGrupos = new JLabel("Número de Grupos de estudio:");
 		GridBagConstraints gbc_lblNmeroDeGrupos = new GridBagConstraints();
 		gbc_lblNmeroDeGrupos.anchor = GridBagConstraints.WEST;
-		gbc_lblNmeroDeGrupos.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNmeroDeGrupos.insets = insets;
 		gbc_lblNmeroDeGrupos.gridx = 1;
 		gbc_lblNmeroDeGrupos.gridy = 7;
-		panel_central.add(lblNmeroDeGrupos, gbc_lblNmeroDeGrupos);
+		add(lblNmeroDeGrupos, gbc_lblNmeroDeGrupos);
 		
-		fTFNGrupos = new JFormattedTextField();
-		fTFNGrupos.setHorizontalAlignment(SwingConstants.CENTER);
-		fTFNGrupos.setColumns(10);
+
 		GridBagConstraints gbc_fTFNGrupos = new GridBagConstraints();
-		gbc_fTFNGrupos.insets = new Insets(0, 0, 5, 5);
+		gbc_fTFNGrupos.insets = insets;
 		gbc_fTFNGrupos.fill = GridBagConstraints.HORIZONTAL;
 		gbc_fTFNGrupos.gridx = 2;
 		gbc_fTFNGrupos.gridy = 7;
-		panel_central.add(fTFNGrupos, gbc_fTFNGrupos);
+		add(fTFNGrupos, gbc_fTFNGrupos);
 		
 		JLabel lblArchivosDelProyecto = new JLabel("Archivos del Proyecto:");
 		GridBagConstraints gbc_lblArchivosDelProyecto = new GridBagConstraints();
 		gbc_lblArchivosDelProyecto.anchor = GridBagConstraints.WEST;
-		gbc_lblArchivosDelProyecto.insets = new Insets(0, 0, 5, 5);
+		gbc_lblArchivosDelProyecto.insets = insets;
 		gbc_lblArchivosDelProyecto.gridx = 1;
 		gbc_lblArchivosDelProyecto.gridy = 9;
-		panel_central.add(lblArchivosDelProyecto, gbc_lblArchivosDelProyecto);
+		add(lblArchivosDelProyecto, gbc_lblArchivosDelProyecto);
 		
 		
 		GridBagConstraints gbc_panel_archivos = new GridBagConstraints();
@@ -317,7 +382,7 @@ public class ParametrosProyecto extends JPanel {
 		gbc_panel_archivos.fill = GridBagConstraints.BOTH;
 		gbc_panel_archivos.gridx = 2;
 		gbc_panel_archivos.gridy = 9;
-		panel_central.add(panel_archivos, gbc_panel_archivos);
+		add(panel_archivos, gbc_panel_archivos);
 	}
 	
 	/**
