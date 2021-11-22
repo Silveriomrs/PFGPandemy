@@ -25,7 +25,7 @@ import modelo.Types;
 import modelo.Zona;
 import vista.About;
 import vista.Archivos;
-import vista.Leyenda;
+import vista.Paleta;
 import vista.Mapa;
 import vista.ParametrosGrupos;
 import vista.ParametrosProyecto;
@@ -44,7 +44,7 @@ import vista.VistaSIR;
 public class ControladorModulos {
 
 	
-	private Leyenda leyenda;
+	private Paleta paleta;
 	private ControladorDatosIO cio;
 	//Vistas
 	private About about;
@@ -56,7 +56,7 @@ public class ControladorModulos {
 	private TablaEditor tablaEditor;
 	private ParametrosGrupos pgrupos;
 	private ParametrosProyecto pproyecto;
-//	private Pizarra pizarra;
+	private Pizarra pizarra;
 	private HashMap<String,DCVS> modulos;										//Conexión con la parte del modelo. Almacena todos los datos de cada modelo.
 	private HashMap<Integer,Zona> zonas;
 	//
@@ -66,13 +66,13 @@ public class ControladorModulos {
 	Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
 
 	
-	/** LEYENDA referencia una paleta de colores o leyenda*/  
+	/** LEYENDA referencia una paleta de colores o paleta*/  
 	public final static String LEYENDA = "paleta";
 	/** MAPA referencia a el módulo de mapa*/  
 	public final static String MAPA = "mapa";
 	/** REPRODUCTOR referencia al player o módulo del reproductor*/  
 	public final static String REPRODUCTOR = "player";
-	//"reproductor", "leyenda", "mapa"
+	//"reproductor", "paleta", "mapa"
 	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/  
 	public final static Dimension FrameDim = new Dimension(1024, 768);
 	/** PanelCentralDim Dimensión del panel central para estandarizar el aspecto de los diferentes paneles de toda la aplicación */  
@@ -102,12 +102,12 @@ public class ControladorModulos {
 		pgrupos = new ParametrosGrupos(this);
 		pproyecto = new ParametrosProyecto(archivos);
 		about = new About();
-		leyenda = new Leyenda(100, 205, false);
-		mapa = new Mapa(w,h, leyenda);
+		paleta = new Paleta(100, 205, false);
+		mapa = new Mapa(w,h, this);
 		principal = new Principal(this);
 		player = new Player(400, 400, true);
 		vistaSIR = new VistaSIR(this);
-//		pizarra = new Pizarra(mapa.getZonas());
+		pizarra = new Pizarra(this);
 		//Inicio de los parsers.
 		parserPoly = new ParserPoly();
 		parserPoly.setEscala(2.18);
@@ -170,6 +170,13 @@ public class ControladorModulos {
 		return nz;
 	}
 	
+	/**
+	 * <p>Title: getLevelColor</p>  
+	 * <p>Description: Devuelve el color correspondiente a un nivel de contagio.</p> 
+	 * @param n Nivel de contagio del 0 al 9. Siendo el 0 el más bajo y el 9 el más alto.
+	 * @return Color representante de dicho nivel.
+	 */
+	public Color getLevelColor(int n) {return this.paleta.getColor(n);}
 	
 	/**
 	 * <p>Title: setPoligonos</p>  
@@ -184,9 +191,15 @@ public class ControladorModulos {
 			if(z != null) zonas.put(z.getID(), z);
 		}
 	
-		if(!zonas.isEmpty()) mapa.setZonas(zonas);
+		if(!zonas.isEmpty()) mapa.reset();
 	}
 	
+	/**
+	 * <p>Title: getZonas</p>  
+	 * <p>Description: Función para facilitar el acceso al conjuto de 
+	 * zonas desde otros módulos.</p> 
+	 * @return Conjunto de zonas actualmente almacenados.
+	 */
 	public HashMap<Integer,Zona> getZonas() { return this.zonas;}
 	
 	/**
@@ -226,7 +239,7 @@ public class ControladorModulos {
 			player.setPosicion(posX, posY);
 			break;
 		case LEYENDA:
-			leyenda.setPosicion(posX, posY);
+			paleta.setPosicion(posX, posY);
 			break;
 		case MAPA:
 			mapa.setPosicion(posX, posY);
@@ -247,7 +260,7 @@ public class ControladorModulos {
 	public boolean isPlayable() {
 		boolean OK = historico != null && historico.getRowCount()>0;
 		if(OK) {
-			OK = mapa.getNumZones() > 0;
+			OK = getNumberZonas() > 0;
 			if(!OK) {System.out.println("No hay cargadas zonas en la representación");}
 		}else {System.out.println("No hay cargado un historico");}
 		return OK;
@@ -300,8 +313,8 @@ public class ControladorModulos {
 			//establecimiento de la paleta
 			colores.add(c);
 		}
-		//leyenda.setPaleta(leyenda.getPaleta());
-		leyenda.setPaleta(colores);
+		//paleta.setPaleta(paleta.getPaleta());
+		paleta.setPaleta(colores);
 	}
 		
 	
@@ -317,25 +330,19 @@ public class ControladorModulos {
 		//
 		switch(nombre){
 			case "Reproductor":
-				//Pasar mapa de módulos al controlar de mapa.
-				if(isPlayable()) {
-					play();
-					situarVentana(ControladorModulos.REPRODUCTOR, principal.getX() - 350, principal.getY() + h/3);
-					mostrarPanel("Mapa");
-				}
+				situarVentana(ControladorModulos.REPRODUCTOR, principal.getX() - 350, principal.getY() + h/3);
+				play();
+				mostrarPanel("Mapa");
 				break;
-			case "Editor Gráfico":		
-			new Pizarra(mapa.getZonas());
-				//pizarra.toogleVisible();
-				break;
-			case "Mapa":
-				//getMapa().verFrame(true);
-				mostrarPanel(nombre);
+			case "Editor Gráfico":
+				this.pizarra.reset();
+				this.pizarra.toogleVisible();
 				break;
 			case "Paleta":
 				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
-				leyenda.toggleVisible();
+				paleta.toggleFrameVisible();
 				break;
+			case "Mapa":
 			case "Grupos":
 			case "Tabla":
 			case "Parámetros SIR":
@@ -371,26 +378,21 @@ public class ControladorModulos {
 			default:
 				System.out.println("Controlador Modulos > doPrincipal: " + nombre + ", tipo no reconocido");
 		}
-		
-		mostrarPanel(nombre);
 	}
 	
+	
+	/**
+	 * <p>Title: mostrarPanel</p>  
+	 * <p>Description: Establece la vista que debe ser visible.</p> 
+	 * @param nombre Nombre de la vista a hacer visible.
+	 */
 	private void mostrarPanel(String nombre) {		
-		switch(nombre){
-		case "Grupos":
-//			pgrupos.setZonas(getZonas());
-		case "Mapa":
-		case "Tabla":
-		case "Parámetros SIR":
-		case "Proyecto":
-		case "NONE":
-			//Mostrar panel correspondiente y ocultación del resto.
-			mapa.setVisible(nombre.equals("Mapa"));							
-			tablaEditor.setVisible(nombre.equals("Tabla"));
-			pgrupos.setVisible(nombre.equals("Grupos"));
-			pproyecto.setVisible(nombre.equals("Proyecto"));
-			vistaSIR.setVisible(nombre.equals("Parámetros SIR"));
-		}
+		//Mostrar panel correspondiente y ocultación del resto.
+		mapa.setVisible(nombre.equals("Mapa"));					
+		tablaEditor.setVisible(nombre.equals("Tabla"));
+		pgrupos.setVisible(nombre.equals("Grupos"));
+		pproyecto.setVisible(nombre.equals("Proyecto"));
+		vistaSIR.setVisible(nombre.equals("Parámetros SIR"));
 	}
 	
 	/**
@@ -480,19 +482,24 @@ public class ControladorModulos {
 
 	}
 	
+	/**
+	 * <p>Title: clearProject</p>  
+	 * <p>Description: Elimina los datos del proyecto y reinicia las vistas. </p>
+	 */
 	private void clearProject() {
 		//Borrado de todos los módulos.
 		modulos.clear();
+		//Borrado de las zonas cargadas.
+		zonas.clear();
 		//Limpieza de las etiquetas de las vistas de diferentes módulos.
-		archivos.clearJTFields();
+		archivos.reset();
 		vistaSIR.reset();
 		pproyecto.reset();
 		tablaEditor.reset();
 		mapa.reset();
 		pgrupos.reset();
-//		pizarra.reset();
-//		principal.reset();
-		
+		pizarra.reset();
+		principal.reset();
 	}
 	
 	/**
@@ -519,10 +526,6 @@ public class ControladorModulos {
 				establecerDatos(mAux);											//Establecer el módulo.
 			}else if(etiq.equals(Labels.NG)){									//Crea tantas zonas iniciales como indiqué el proyecto.
 				pproyecto.setField(etiq, dato);
-				int NG = Integer.parseInt(dato);
-				/* hay que asegurar que si no hay zonas definidas, se generen en base
-				 * a este parámetro, en alguna parte de CM */
-//				pgrupos.setNumeroZonas(NG);
 			}else pproyecto.setField(etiq, dato);								//Etiquetas de la vista -> mostrar en la vista.
 		}
 		
@@ -530,7 +533,7 @@ public class ControladorModulos {
 		archivos.disableAllSavers();
 		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
 		modulos.put(dcvs.getTipo(), dcvs);
-		//Forzar a todas las vistas a actualizar sus datos.
+		//Forzar a todas las vistas a actualizar sus datos. La función setZonas se encarga.
 		setZonas(zonas);
 	}
 	
@@ -567,15 +570,39 @@ public class ControladorModulos {
 				break;
 			case (Types.HST):
 				setHistorico(datos);
-				break;		
+				break;
+			case (Types.DEF):
+				vistaSIR.reset();
+				break;
 			default:			
 		}
 		
 		//Actualización de las opciones de Principal.
 		principal.reset();
-		
 	}
+	
+	/* En progreso de implementación acciones Pizarra*/
 
+	/**
+	 * <p>Title: doActionPizarra</p>  
+	 * <p>Description: Realizas las acciones oportundas pertenecientes a esta vista</p>
+	 * La vista de pizarra solo ejerce una opción, aplicar cambios de las representaciones
+	 *  gráficas de los grupos de población o zonas.
+	 * <p>Dichos cambios son efectuados en las referencias de las zonas por tanto 
+	 * quedan establecidas directamente en el grupo en el que están almacenadas.
+	 * Si bien, es necesario detectar tales cambios a efectos de actualizar los
+	 *  controles.</p>
+	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
+	 */
+	public boolean doActionPizarra() {
+		boolean done = true;
+		//Actualiza el mapa.
+		mapa.reset();
+		//Actualizar Grupos.
+		pgrupos.reset();
+		return done;
+	}
+	
 	
 	/* En progreso de implementación acciones Archivos */
 	
@@ -661,15 +688,17 @@ public class ControladorModulos {
 	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
 	 */
 	private void setZonas(HashMap<Integer,Zona> zonas) {
-		//Actualiza el mapa.
 		this.zonas = zonas;
-		mapa.setZonas(zonas);
+		//Actualiza el mapa.
+		mapa.reset();
 		//Actualizar Grupos.
 		pgrupos.reset();
 		//Actualizar en vista del proyecto en valor de NG.
 		pproyecto.setField(Labels.NG,"" + zonas.size());
 		//Actualización de la vista principal.
 		principal.reset();
+		//Actualización de la pizarra.
+		pizarra.reset();
 	}
 	
 	private void setDatosProyecto(DCVS dcvs, int NG) {
@@ -691,14 +720,15 @@ public class ControladorModulos {
 	private void importarProyectoVS(DCVS prjV) {
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
 		// impediría modularidad e independencia de módulos.
-		clearProject();
 		ParserProyectoVS parser = new ParserProyectoVS(prjV);
-		//Establecer las zonas en las vistas correspondientes.
-		zonas = parser.getZonas();
-		//Establecer los datos del proyecto en la vista.
+		//Establecer los datos del proyecto primero (provoca clear). 
 		setDatosProyecto(prjV,parser.getNG());
+		//Establecer las zonas en las vistas correspondientes.
+		setZonas(parser.getZonas());
 		//Establecer el historico de niveles.
 		establecerDatos(parser.getHistorico());
+		//Establecer datos propios de la enfermedad.
+		establecerDatos(parser.getmDefENF());
 		//Establecer matriz de relaciones.
 		tablaEditor.setModelo(parser.getMContactos());
 	}
@@ -714,18 +744,19 @@ public class ControladorModulos {
 	private void importarHistoricoVS(DCVS prjV) {
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues 
 		// impediría modularidad e independencia de módulos.
-		clearProject();
 		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
-		//Establecer las zonas en las vistas correspondientes.
-		zonas = parser.getZonas();
-		//Establecer los datos del proyecto en la vista.
+		//Establecer los datos del proyecto primero (provoca clear). 
 		setDatosProyecto(prjV,parser.getNG());
+		//Establecer las zonas en las vistas correspondientes.
+		setZonas(zonas = parser.getZonas());
 		//Establecer el historico de niveles.
-		
+
+		//Establecer datos propios de la enfermedad.
+		establecerDatos(parser.getmDefENF());
 		//Establecer matriz de relaciones.
 		tablaEditor.setModelo(parser.getMContactos());
 		//Establecer los parámetros de la enfermedad.
-		
+
 	}
 	
 	/* Funciones para pruebas */

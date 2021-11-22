@@ -8,6 +8,7 @@
 */  
 package modelo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -24,13 +25,14 @@ public class ParserHistoricoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados desde VenSim.
 	private DCVS mContactos;													//Matriz de contactos (relaciones).
+	private DCVS mDefSIR;														//Módulo definición de la enfermedad (SIR)
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
 	private int FT;																//Tiempo final de la simulación.
-	private boolean traza = false;
+	private boolean traza = true;
 
 	/**
 	 * <p>Title: Constructor del parser</p>  
@@ -40,6 +42,7 @@ public class ParserHistoricoVS {
 	public ParserHistoricoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
 		this.mContactos = new DCVS();
+		this.mDefSIR = new DCVS();
 		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
@@ -72,8 +75,11 @@ public class ParserHistoricoVS {
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
 		if(traza) System.out.println("Creadas " + zonas.size() + " zonas");
-		//Leer tabla de relaciones.
+		//Leer y crear tabla de relaciones.
 		crearMatriz();
+		
+		//Crear contenedor de definición de enfermedad (Parámetros SIR).
+		crearMDefEnf();
 		
 		//Leer R,S,I
 		readXs("R");
@@ -101,6 +107,110 @@ public class ParserHistoricoVS {
 		readXenZ("TCS");
 		readXenZ("CAB");	
 	}
+		
+	
+	/**
+	 * <p>Title: crearMDefEnf</p>  
+	 * <p>Description: Genera el módulo definición de la enfermedad.</p>
+	 * Para ello genera una lista con las etiquetas que deben estár incluidas,
+	 *  por tanto si se quiere incluir nuevas etiquetas, este es el lugar donde deberá
+	 *   hacerser.
+	 *  <p>Las etiquetas incluidas son: </> PTE,DME,DMIP,IP, IT e TI. para más 
+	 *   información {@link Labels Clase Etiquetas.}
+	 *  <P>La Inmunidad Permanente IP, aunque no esté específicada de forma explícita, 
+	 *   puede estar implicita en la presencía de las etiquetas CVS o TVS. Por
+	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
+	 */
+	private void crearMDefEnf(){
+		//Establecer atributos propios del módulo.
+		mDefSIR.setTipo(Types.DEF);
+		//Crear nombre con extensión DEF a partir del nombre del archivo original.
+		String nombreNuevo = dcvs.getNombre();
+		//Quitamos la extensión.
+		int size = nombreNuevo.length() -3;
+		//Añadimos la extensión nueva.
+		nombreNuevo = nombreNuevo.substring(0, size) + Types.DEF.toLowerCase();
+		//Guardar dato.
+		mDefSIR.setName(nombreNuevo);
+		//Crear cabecera
+		String[] cabecera = {"tipo","dato"};
+		//Añadir cabecera.
+		mDefSIR.addCabecera(cabecera);
+		
+		//Añadir etiquetas requeridas a la lista.
+		ArrayList<String> lista = new ArrayList<String>();
+		lista.add(Labels.PTE);
+		lista.add(Labels.DME);
+		
+		//Procesar la lista añadiendo dichos campos al módulo mDefSIR.
+		for(int i = 0; i<lista.size(); i++) {
+			String etiqueta = lista.get(i);
+			String value = "0";													//En caso de no estar, se configurará a 0.
+			int pos = dcvs.getFilaItem(etiqueta);		
+			if(pos > -1) {
+				value = (String) dcvs.getValueAt(pos, 1);
+				mDefSIR.addFila(new String[]{etiqueta,value});
+			}
+			else mDefSIR.addFila(new String[]{etiqueta,value});
+		}
+		
+		//IT Leído previamente
+		mDefSIR.addFila(new String[]{Labels.IT,"" + IT});
+		//FT Leído previamente
+		mDefSIR.addFila(new String[]{Labels.FT,"" + FT});
+		//Búsqueda de la IP específica.
+		mDefSIR.addFila(new String[]{Labels.IP,hasIP()});
+		//Búsqueda de DMIP o su inversa = 1/TVS
+		mDefSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
+		
+		if(traza) System.out.println( mDefSIR.toString() );		
+	}
+	
+	/**
+	 * <p>Title: getDMIP</p>  
+	 * <p>Description: Devuelve la Duración Media de la Inmunidad Permanente.</p>
+	 * Para ello, realiza una búsqueda primero de la propia etiqueta DMIP, si esta
+	 * incluida, devolverá dicho valor. En otro caso, proseguiría con la búsqueda 
+	 *  de la etiqueta TVS (Tasa de vuelta a la Susceptibilidad) pues esta es su
+	 *   inversa. En caso de no encontrar ninguna de las dos, devolverá el valor 0.
+	 * @return El valor de la etiqueta DMIP o TVS en su ausencia, 0 en otro caso.
+	 */
+	private String getDMIP() {
+		String value = "0";
+		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
+		int pos = dcvs.getFilaItem(Labels.DMIP);
+		if( pos > -1) {	value = (String) dcvs.getValueAt(pos,1);	}
+		else if(getPosOp(Labels.TVS) > 0) {
+			//En este caso hay que realizar la operación matemática inversa a su valor.
+			pos =  getPosOp(Labels.TVS);
+			value = (String) dcvs.getValueAt(pos,1);
+			double d = Double.parseDouble(value);
+			value = "" +  1/d;
+		}	
+		return value;
+	}
+	
+	/**
+	 * <p>Title: hasIP</p>  
+	 * <p>Description: Indica si existe la Inmunidad Permanente o no.</p>
+	 * Para ello, realiza una búsqueda muy específica de las etiquetas IP, CVS y
+	 *  TVS, de existir alguna de ellas se entenderá que si existe dicha inmunidad.
+	 *   La búsqueda se realiza en corte, búscando primero la propia etiqueta, de
+	 *   existir, será la que indique su valor, en otro caso realiza una búsqueda de
+	 *    las otras etiquetas, si encuentra alguna, se supondrá que existe IP.
+	 * @return 1 Si existe IP, 0 en otro caso.
+	 */
+	private String hasIP() {
+		String has = "0";
+		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
+		int pos = dcvs.getFilaItem(Labels.IP);
+		if( pos > -1) {	has = (String) dcvs.getValueAt(pos, 1);	}
+		else if(dcvs.getFilaItem(Labels.TVS) > -1) has = "1";						//Se presumira que si existe esta tasa, hay IP.
+		else if(getPosOp(Labels.CVS)> 0) has = "1";							//Se presume lo mismo.
+		return has;
+	}
+	
+	
 	
 	/**
 	 * <p>Title: getPs</p>  
@@ -465,5 +575,11 @@ public class ParserHistoricoVS {
 	 * @return Número de grupos de población.
 	 */
 	public int getNG() {return this.NG;}
+
+	/**
+	 * @return Definición de la enfermedad, sus parámetros.
+	 */
+	public DCVS getmDefENF() {return mDefSIR;}	
+	
 	
 }

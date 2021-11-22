@@ -9,6 +9,7 @@
 package modelo;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,14 +22,17 @@ import vista.GraficasChart;
  * La clase obtiene mediante un sistema de etiquetas todos los datos necesarios
  * de un proyecto VenSim y configura los módulos correspondientes con esos datos.
  * Esta clase es usada para lectura de datos, no guarda datos.
+ * <P>La fuente de datos tiene las etiquetas en la primera fila, es decir, 
+ *  la información esta ordenada en columnas.</P>
  * @author Silverio Manuel Rosales Santana
  * @date 11 nov. 2021
- * @version versión 1.0
+ * @version versión 1.2
  */
 public class ParserProyectoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
 	private DCVS mContactos;													//Matriz de contactos (relaciones).
+	private DCVS mDefSIR;														//Módulo definición de la enfermedad (SIR)
 	private DCVS historico;														//Matriz de contactos (relaciones).
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
@@ -36,7 +40,7 @@ public class ParserProyectoVS {
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
 	private int FT;																//Tiempo final de la simulación.
-	private boolean traza = false;
+	private boolean traza = true;
 
 	/**
 	 * <p>Title: Constructor del parser</p>  
@@ -46,6 +50,7 @@ public class ParserProyectoVS {
 	public ParserProyectoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
 		this.mContactos = new DCVS();
+		this.mDefSIR = new DCVS();
 		this.historico = new DCVS();
 		this.labels = new Labels();
 		this.NG = 0;
@@ -84,29 +89,135 @@ public class ParserProyectoVS {
 		//Leer tabla de relaciones.
 		crearMatriz();
 		
+		//Crear contenedor de definición de enfermedad (Parámetros SIR).
+		//Depende de lectura previa de TIMES.
+		crearMDefEnf();
+		
 		//Leer R,S,I y P
-		readXs("R");
-		readXs("S");
-		readXs("I");
-		readXs("P");
+		readXs(Labels.R);
+		readXs(Labels.S);
+		readXs(Labels.I);
+		readXs(Labels.P);
 		
 		//Leer casos de CC,CVS,CI
-		readXs("CC");
-		readXs("CVS");
-		readXs("CI");
+		readXs(Labels.CC);
+		readXs(Labels.CVS);
+		readXs(Labels.CI);
 		
-		//Leer tasas TC, TCONTAGIO
-		readXs("TC");
-		readXs("TCONTAGIO");
+		//Leer tasas de contacto y contagio.
+		readXs(Labels.TC);
+		readXs(Labels.TCONTAGIO);
 		
 		//Leer casos de contactos de A con B y tasas de A con B
-		readXenZ("TCS");
-		readXenZ("CAB");
+		readXenZ(Labels.TCS);
+		readXenZ(Labels.CAB);
 		
 		//Cálcular niveles en base al número de incidentes por cada 100 mil habitantes.
 		generateLevels();
 	
 	}
+	
+	/**
+	 * <p>Title: crearMDefEnf</p>  
+	 * <p>Description: Genera el módulo definición de la enfermedad.</p>
+	 * Para ello genera una lista con las etiquetas que deben estár incluidas,
+	 *  por tanto si se quiere incluir nuevas etiquetas, este es el lugar donde deberá
+	 *   hacerser.
+	 *  <p>Las etiquetas incluidas son: </> PTE,DME,DMIP,IP, IT e TI. para más 
+	 *   información {@link Labels Clase Etiquetas.}
+	 *  <P>La Inmunidad Permanente IP, aunque no esté específicada de forma explícita, 
+	 *   puede estar implicita en la presencía de las etiquetas CVS o TVS. Por
+	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
+	 */
+	private void crearMDefEnf(){
+		//Establecer atributos propios del módulo.
+		mDefSIR.setTipo(Types.DEF);
+		//Crear nombre con extensión DEF a partir del nombre del archivo original.
+		String nombreNuevo = dcvs.getNombre();
+		//Quitamos la extensión.
+		int size = nombreNuevo.length() -3;
+		//Añadimos la extensión nueva.
+		nombreNuevo = nombreNuevo.substring(0, size) + Types.DEF.toLowerCase();
+		//Guardar dato.
+		mDefSIR.setName(nombreNuevo);
+		//Crear cabecera		
+		String[] cabecera = {"tipo","dato"};
+		//Añadir cabecera.
+		mDefSIR.addCabecera(cabecera);
+		
+		//Añadir etiquetas requeridas a la lista.
+		ArrayList<String> lista = new ArrayList<String>();
+		lista.add(Labels.PTE);
+		lista.add(Labels.DME);
+		
+		//Procesar la lista añadiendo dichos campos al módulo mDefSIR.
+		for(int i = 0; i<lista.size(); i++) {
+			String etiqueta = lista.get(i);
+			String value = "0";													//En caso de no estar, se configurará a 0.
+			int pos = dcvs.getColItem(etiqueta);		
+			if(pos > -1) {
+				value = (String) dcvs.getValueAt(0, pos);
+				mDefSIR.addFila(new String[]{etiqueta,value});
+			}
+			else mDefSIR.addFila(new String[]{etiqueta,value});
+		}
+		
+		//IT Leído previamente
+		mDefSIR.addFila(new String[]{Labels.IT,"" + IT});
+		//FT Leído previamente
+		mDefSIR.addFila(new String[]{Labels.FT,"" + FT});
+		//Búsqueda de la IP específica.
+		mDefSIR.addFila(new String[]{Labels.IP,hasIP()});
+		//Búsqueda de DMIP o su inversa = 1/TVS
+		mDefSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
+		
+		if(traza) System.out.println( mDefSIR.toString() );		
+	}
+	
+	/**
+	 * <p>Title: getDMIP</p>  
+	 * <p>Description: Devuelve la Duración Media de la Inmunidad Permanente.</p>
+	 * Para ello, realiza una búsqueda primero de la propia etiqueta DMIP, si esta
+	 * incluida, devolverá dicho valor. En otro caso, proseguiría con la búsqueda 
+	 *  de la etiqueta TVS (Tasa de vuelta a la Susceptibilidad) pues esta es su
+	 *   inversa. En caso de no encontrar ninguna de las dos, devolverá el valor 0.
+	 * @return El valor de la etiqueta DMIP o TVS en su ausencia, 0 en otro caso.
+	 */
+	private String getDMIP() {
+		String value = "0";
+		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
+		int pos = dcvs.getColItem(Labels.DMIP);
+		if( pos > -1) {	value = (String) dcvs.getValueAt(0, pos);	}
+		else if(getPosOp(Labels.TVS) > 0) {
+			//En este caso hay que realizar la operación matemática inversa a su valor.
+			pos =  getPosOp(Labels.TVS);
+			value = (String) dcvs.getValueAt(0, pos);
+			double d = Double.parseDouble(value);
+			value = "" +  1/d;
+		}	
+		return value;
+	}
+	
+	/**
+	 * <p>Title: hasIP</p>  
+	 * <p>Description: Indica si existe la Inmunidad Permanente o no.</p>
+	 * Para ello, realiza una búsqueda muy específica de las etiquetas IP, CVS y
+	 *  TVS, de existir alguna de ellas se entenderá que si existe dicha inmunidad.
+	 *   La búsqueda se realiza en corte, búscando primero la propia etiqueta, de
+	 *   existir, será la que indique su valor, en otro caso realiza una búsqueda de
+	 *    las otras etiquetas, si encuentra alguna, se supondrá que existe IP.
+	 * @return 1 Si existe IP, 0 en otro caso.
+	 */
+	private String hasIP() {
+		String has = "0";
+		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
+		int pos = dcvs.getColItem(Labels.IP);
+		if( pos > -1) {	has = (String) dcvs.getValueAt(0, pos);	}
+		else if(dcvs.getColItem(Labels.TVS) > -1) has = "1";						//Se presumira que si existe esta tasa, hay IP.
+		else if(getPosOp(Labels.CVS)> 0) has = "1";							//Se presume lo mismo.
+		return has;
+	}
+	
 	
 	/**
 	 * <p>Title: setUpHistorico</p>  
@@ -137,6 +248,11 @@ public class ParserProyectoVS {
 		
 	}
 	
+	/* Funciones internas necesarias para el proceso ya depuradas */
+	
+	
+	
+	
 	/**
 	 * <p>Title: generateLevels</p>  
 	 * <p>Description: Cálcula los niveles de contagio.</p>
@@ -156,10 +272,10 @@ public class ParserProyectoVS {
 			Zona z = zonas.get(col);
 			//Se recorre para cada tipo de dato todos los registros.
 			while(correcto && (contador < FT)) {
-				double ci = z.getGrafica().getYValue(labels.getWord("CI"), contador);
-				double s = z.getGrafica().getYValue(labels.getWord("S"), contador);
-				double i = z.getGrafica().getYValue(labels.getWord("I"), contador);
-				double r = z.getGrafica().getYValue(labels.getWord("R"), contador);
+				double ci = z.getGrafica().getYValue(labels.getWord(Labels.CI), contador);
+				double s = z.getGrafica().getYValue(labels.getWord(Labels.S), contador);
+				double i = z.getGrafica().getYValue(labels.getWord(Labels.I), contador);
+				double r = z.getGrafica().getYValue(labels.getWord(Labels.R), contador);
 				if(ci > -1 && s > -1 && i > -1 && r > -1 ) {
 					double nivel = 100000*(ci/(s+i+r));
 					//z.addNivel("Nivel", contador,nivel);
@@ -254,7 +370,7 @@ public class ParserProyectoVS {
 				String etiqueta = labels.getWord(op);							//Obtener el valor de la etiqueta.	
 				//Caso especial para etiquetas con dos operandos.
 				if( op.equals("CAB") || op.equals("TCS")) {
-					if(traza) System.out.println(et + " > col: " + col + " fila: " + contador + " - "+ etiqueta + ", Valor: " + valor);
+//					if(traza) System.out.println("ParserProyecto > addSerieXs: " + et + " > col: " + col +	" fila: " + contador + " - " + etiqueta + ", Valor: " + valor);
 					etiqueta = etiqueta.replaceFirst("Z",getSecondID(et));
 				}
 				//Si etiqueta es nulo usar el pasado por parámetro.
@@ -342,7 +458,7 @@ public class ParserProyectoVS {
 	
 	
 	private String[] getNombresGrupos() {	
-		int col0 = getColOp("C");
+		int col0 = getPosOp("C");
 		String parte;
 		// Encontrar el número de grupos total.
 		int NG = getNumberGroups();
@@ -377,7 +493,7 @@ public class ParserProyectoVS {
 		String OP = "C";
 		int ncols = dcvs.getColumnCount();
 		//Primero encontramos la posición de la primera etiqueta C perteneciente a la matriz de contactos.
-		int col = getColOp(OP);		
+		int col = getPosOp(OP);		
 		//Si se ha encontrado (col1 != -1)
 		if(col > -1) {
 			//Encontrada primera coincidencia, se incrementa el contador.
@@ -396,23 +512,6 @@ public class ParserProyectoVS {
 		return contador;														//Devolver número de coincidencias == número de grupos.
 	}
 	
-	
-	/**
-	 * @return El INITIAL TIME o tiempo de inicio de la simulación.
-	 */
-	public int getIT() {return IT;}	
-
-	/**
-	 * @return El FINAL TIME o tiempo final de la simulación.
-	 */
-	public int getFT() {return FT;}
-
-
-	/**
-	 * @return El número de grupos de población.
-	 */
-	public int getNG() {return NG;}
-
 
 	private String getFirstID(String parte) {return parte.split(" ")[1];}
 	
@@ -420,20 +519,20 @@ public class ParserProyectoVS {
 	private String getSecondID(String parte) {return parte.split(" ")[2];}
 	
 	
-	private int getColOp(String op) {
-		int col = -1;
+	private int getPosOp(String op) {
+		int pos = -1;
 		int contador = 0;
 		boolean encontrado = false;
-		int ncols = dcvs.getColumnCount();
+		int nslots = dcvs.getColumnCount();
 		
-		while(!encontrado && contador < ncols) {
+		while(!encontrado && contador < nslots) {
 			if(hasOperator(op,dcvs.getColumnName(contador))) {
 				encontrado = true;
-				col = contador;
+				pos = contador;
 			}else contador++;
 		}
 		
-		return col;
+		return pos;
 	}
 	
 	
@@ -452,13 +551,35 @@ public class ParserProyectoVS {
 	}
 
 
+	/* Funciones para extraer la información recolectada y calculada */
+	
+	
+	/**
+	 * @return El INITIAL TIME o tiempo de inicio de la simulación.
+	 */
+	public int getIT() {return IT;}	
+
+	/**
+	 * @return El FINAL TIME o tiempo final de la simulación.
+	 */
+	public int getFT() {return FT;}
+
+	/**
+	 * @return El número de grupos de población.
+	 */
+	public int getNG() {return NG;}
 	
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getMContactos() {return mContactos;}
-
-
+	public DCVS getMContactos() {return this.mContactos;}
+	
+	/**
+	 * @return Definición de la enfermedad, sus parámetros.
+	 */
+	public DCVS getmDefENF() {return mDefSIR;}	
+	
+	
 	/**
 	 * <p>Title: getZonas</p>  
 	 * <p>Description: </p> 
@@ -471,7 +592,7 @@ public class ParserProyectoVS {
 	 * @return El historico con la representación de nivel de contagio.
 	 */
 	public DCVS getHistorico() {
-		System.out.println(historico.toString());
+//		System.out.println(historico.toString());
 		return historico;}
 	
 }

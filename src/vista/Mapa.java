@@ -11,7 +11,6 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.JPanel;
@@ -28,7 +27,7 @@ import java.awt.ComponentOrientation;
  * poblacional (provincia o comunidad autónoma).
  * @author Silverio Manuel Rosales Santana
  * @date 10/07/2021
- * @version 1.4
+ * @version 1.6
  *
  */
 public class Mapa extends JPanel{
@@ -36,24 +35,20 @@ public class Mapa extends JPanel{
 	private static final long serialVersionUID = 6251836932416777274L;
 	/** frame Marco para dibujado del mapa en modo flotante*/
 	private JFrame frame;
-	/** zonas Conjunto con las zonas que contiene el mapa.*/
-	private HashMap<Integer,Zona> zonas;
-	/** leyenda Leyenda del mapa.*/
-	private Leyenda leyenda;
+	private ControladorModulos cm;
 
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
 	 * @param width ancho del mapa.
 	 * @param height altura del mapa.
-	 * @param leyenda Leyenda con los colores y sus valores.
+	 * @param cm Controlador de módulos. Necesario para trabajar con la parte controladora.
 	 */
-	public Mapa(int width, int height, Leyenda leyenda) {
+	public Mapa(int width, int height,ControladorModulos cm) {
 		super();
 		this.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		this.setPreferredSize(ControladorModulos.PanelCentralDim);
 		this.setMinimumSize(ControladorModulos.MinDim);
-		this.leyenda = leyenda;
-		this.zonas = new HashMap<Integer, Zona>();
+		this.cm = cm;
 		this.addMouseListener(new SelectorPoligono());
 		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
@@ -67,7 +62,6 @@ public class Mapa extends JPanel{
 	 *  Elimina los datos almacenados en el mismo.
 	 */
 	public void reset() {
-//		zonas.clear();
 		updateUI();
 	}
 	
@@ -117,34 +111,14 @@ public class Mapa extends JPanel{
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
 
-		zonas.forEach((n,z) -> {
+		cm.getZonas().forEach((n,z) -> {
 			if(z.getZona() != null) {
-				g2.setPaint(leyenda.getColor(z.getNivel()));
+				g2.setPaint(cm.getLevelColor(z.getNivel()));
 				g2.fill(z.getZona());
 				g2.setPaint(Color.BLACK);
 				g2.draw(z.getZona());
 			}
 		});
-		System.out.println("Mapa - paintComponent > refrescando");
-//		this.updateUI();														//Redibujado y actualización del panel.
-	}
-
-	/**
-	 * <p>Title: getPanel</p>
-	 * <p>Description: Obtiene el JPanel contenedor del mapa </p>
-	 * @return Mapa embebido dentro de un JPanel.
-	 */
-	public JPanel getPanel() {return this;}
-
-	/**
-	 * Devuelve el poligono que representa una zona del mapa.
-	 * @param id Identificador de la zona.
-	 * @return devuelve zona del mapa. Null en caso de no existir.
-	 */
-	public Zona getZona(int id) {
-		Zona z = null;
-		if(zonas.containsKey(id)) z = zonas.get(id);
-		return z;
 	}
 
 	/**
@@ -152,14 +126,8 @@ public class Mapa extends JPanel{
 	 * nombre, sobreescribirá la anterior.
 	 * @param z Zona que representa el poligono.
 	 */
-	public void addZona(Zona z) {if(z != null) zonas.put(z.getID(), z);}
+	public void addZona(Zona z) {if(z != null) cm.getZonas().put(z.getID(), z);}
 
-	/**
-	 * Devuelve el grado de contagio de una zona o null si esta no existe.
-	 * @param id ID de la zona.
-	 * @return Nivel asignado a una zona, null si dicha zona no existe.
-	 */
-	public int getZonaNivel(int id) {return zonas.get(id).getNivel();}
 
 	/**
 	 * Establece el grado de contagio de una zona.
@@ -168,31 +136,11 @@ public class Mapa extends JPanel{
 	 * @param n Nivel de asignación.
 	 */
 	public void addZonaNivel(int id, String serie, int n) {
-		if(zonas.containsKey(id)) {												//Comprobación de que existe.
-			zonas.get(id).addNivel(serie,0, n);									//Añadir valor a la serie que corresponda.
+		if(cm.getZonas().containsKey(id)) {												//Comprobación de que existe.
+			cm.getZonas().get(id).addNivel(serie,0, n);									//Añadir valor a la serie que corresponda.
 		}
 	}
 
-	/**
-	 * Devuelve el número de zonas que contiene el mapa.
-	 * @return número de zonas que contiene el mapa.
-	 */
-	public int getNumZones() {return zonas.size();}
-
-	/**
-	 * <p>Title: getZonas</p>
-	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya
-	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p>
-	 * @return El conjunto de zonas.
-	 */
-	public HashMap<Integer,Zona> getZonas(){return this.zonas;}
-
-	/**
-	 * <p>Title: setZonas</p>
-	 * <p>Description: Establece el conjunto de zonas</p>
-	 * @param zonas2 Mapa cuya clave es la ID de cada zona y valor la zona.
-	 */
-	public void setZonas(HashMap<Integer, Zona> zonas2) { this.zonas = zonas2;}
 
 	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
@@ -212,7 +160,7 @@ public class Mapa extends JPanel{
 	    	Zona zona = null;
 	    	Zona zAux = null;
 	        //Busqueda del poligono que contiene dicha coordenada.
-	        Iterator<Map.Entry<Integer, Zona>> it = zonas.entrySet().iterator();
+	        Iterator<Map.Entry<Integer, Zona>> it = cm.getZonas().entrySet().iterator();
 	        while (it.hasNext() && !encontrado) {
 	            zAux = it.next().getValue();									//Obtención del nuevo set sin el valor anterior.
 	            //Si se ha encontrado se termina la búsqueda.
@@ -230,7 +178,7 @@ public class Mapa extends JPanel{
 
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
-		Mapa mapa = new Mapa(500, 500, new Leyenda(100, 205, false));
+		Mapa mapa = new Mapa(500, 500, new ControladorModulos());
 		mapa.iniciarFrame(520, 520);
 		mapa.verFrame(true);
 	}

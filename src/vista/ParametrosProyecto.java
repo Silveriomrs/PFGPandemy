@@ -25,11 +25,8 @@ import javax.swing.JTextArea;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
-import modelo.DCVS;
 import modelo.IO;
 import modelo.Labels;
-import modelo.Types;
-
 import java.awt.Rectangle;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,7 +53,6 @@ public class ParametrosProyecto extends JPanel {
 	private JDateChooser dateChooser;	
 	private JTextArea textArea;
 	
-	private DCVS dcvs;
 	private JPanel panel_archivos;
 	private Archivos archivos;
 		
@@ -69,7 +65,6 @@ public class ParametrosProyecto extends JPanel {
 	public ParametrosProyecto(Archivos archivos) {
 		super();
 		this.archivos = archivos;
-//		setBackground(Color.ORANGE);
 		setAutoscrolls(true);
 		setSize(new Dimension(1024, 768));
 		setName("Propiedades_Proyecto");
@@ -117,52 +112,10 @@ public class ParametrosProyecto extends JPanel {
 		case(Labels.DATE): dateChooser.setDate(stringToDate(txt));
 			break;
 		default:
-			System.out.println("ParametrosProyecto > setField, campo no reconocido: " + fieldName);
+//			System.out.println("ParametrosProyecto > setField, campo no reconocido: " + fieldName);
 		}
 	}
 
-	/**
-	 * @return El dcvs con los datos.
-	 */
-	public DCVS getDCVS() {return dcvs;}
-
-//	/**
-//	 * @param dcvs La tabla dcvs contenedora de los parámetros del proyecto
-//	 * a establecer en la vista y proyecto.
-//	 */
-//	public void setDCVS(DCVS dcvs) {
-//		this.dcvs = dcvs;
-//		int fila = -1;
-//		//Nombre
-//		String nombre = dcvs.getNombre();
-//		if(nombre != null) {
-//			fTFNombre.setText(nombre);
-//			archivos.setLabel(Types.PRJ, dcvs.getRuta());
-//		}					
-//		//Fecha
-//		fila = dcvs.getFilaItem(Labels.DATE);
-//		Date date = new Date();													//Establece la fecha de hoy en caso de no tener una definida.
-//		if(fila > -1) {															
-//			String sdate = (String) dcvs.getValueAt(fila,1);
-//			date = stringToDate(sdate);
-//		}
-//		dateChooser.setDate(date);												//Establece el resultado.								
-//		//Autor
-//		fila = dcvs.getFilaItem(Labels.AUTHOR);
-//		if(fila > -1) fTFAutor.setText( (String) dcvs.getValueAt(fila,1));
-//		//Descripción
-//		fila = dcvs.getFilaItem(Labels.DESCRIPTION);
-//		if(fila > -1) textArea.setText( (String) dcvs.getValueAt(fila,1));
-//		//Versión
-//		fila = dcvs.getFilaItem(Labels.VERSION);
-//		if(fila > -1) fTFVersion.setText( (String) dcvs.getValueAt(fila,1));
-//		else fTFVersion.setText("1.0");											//Configura como versión la del día de hoy.
-//		//Número de grupos.
-//		fila = dcvs.getFilaItem(Labels.NG);
-//		if(fila > -1) fTFNGrupos.setText( (String) dcvs.getValueAt(fila,1));
-//		
-//	}
-	
 	
 	/**
 	 * <p>Title: stringToDate</p>  

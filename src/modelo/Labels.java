@@ -41,7 +41,7 @@ public class Labels {
 	public final static String P ="P";
 	/** TC Tasa de contactos*/  
 	public final static String TC ="TC";
-	/** TR Tasa Recuperados*/  
+	/** TR Tasa Recuperados o curación*/  
 	public final static String TR ="TR";
 	/** TVS Tasa vuelta a la susceptibilidad*/  
 	public final static String TVS ="TVS";

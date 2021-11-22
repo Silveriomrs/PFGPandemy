@@ -148,6 +148,7 @@ public class IO{
 		JFileChooser sf = new JFileChooser(".");								//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
 		sf.setFileFilter(filtro);												//Establecimiento del filtro
+		sf.setDialogTitle(Types.get(ext));
 		int seleccion;
 		//Apertura del dialogo correspondiente a la selección indicada.
 		if(sel == 1) seleccion = sf.showOpenDialog(null);

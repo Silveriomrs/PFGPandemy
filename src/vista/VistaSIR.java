@@ -22,8 +22,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import controlador.ControladorModulos;
+import modelo.DCVS;
 import modelo.IO;
 import modelo.Labels;
+import modelo.Types;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -64,7 +66,7 @@ public class VistaSIR extends JPanel{
 		super();
 		this.cm = cm;
 		this.mapaFields = new HashMap<String,JTextField>();
-		this.setIP(false);
+		this.IP = true;
 		setLayout(null);
 		panelCentral = new JPanel();
 		panelCentral.setBackground(Color.LIGHT_GRAY);
@@ -75,26 +77,39 @@ public class VistaSIR extends JPanel{
 	/**
 	 * <p>Title: reset</p>  
 	 * <p>Description: Limpia los textos mostrados en cada etiqueta, sustituyéndolos
-	 * por cadenas vacias y activa el valor de Inmunidad Permanente.</p> 
+	 * por cadenas vacias y activa el valor de Inmunidad Permanente.</p>
 	 */
 	public void reset() {
 		IP = true;
+		//Limpiar datos anteriores.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
+		//Realizar lectura de los datos en el propio módulo (si hay).
+		if(cm.getModulo(Types.DEF) != null) {updateFields();}
+		
+		refreshControls();
+		updateUI();
 	}
 	
 	/**
-	 * El estado de la opción de Inmunidad Permanente.
-	 * @return TRUE si tiene inmunidad permanente, False en otro caso.
+	 * <p>Title: updateFields</p>  
+	 * <p>Description: Actualiza los campos de la vista.</p>
+	 * Solicita al controlador los datos necesarios para actualizar la vista,
+	 *  en caso de estar disponibles, procede a la acción.
 	 */
-	public boolean isIP() {	return IP;	}
-
-	
-	/**
-	 * Establece la inmunidad permanente o la desactiva.
-	 * @param iP TRUE indica que posee inmunidad permanente, FALSE en otro caso.
-	 */
-	public void setIP(boolean iP) {	IP = iP;}
-
+	private void updateFields() {
+		DCVS dcvs = cm.getModulo(Types.DEF);
+		int nrows = dcvs.getRowCount();
+		for(int i = 0; i < nrows; i++) {
+			String label = (String) dcvs.getValueAt(i, 0);
+			String data = (String) dcvs.getValueAt(i, 1);
+			if(!label.equals(Labels.IP)) {setLabel(label,data);}
+			else {
+				//Cuando la etiqueta es IP, recibe el tratamiento específico.
+				int a = Integer.parseInt(data);									//Convertirlo a int.
+				IP = a == 1;													//Obtener el resultado si es activo o no.
+			}
+		}
+	}
 	
 	/**
 	 * <p>Title: setLabel</p>  
@@ -185,6 +200,8 @@ public class VistaSIR extends JPanel{
 		addNewControlLine(Labels.DMIP,"/vista/imagenes/Iconos/duracionMedia_64px.png");
 		addNewControlLine(Labels.IT,"/vista/imagenes/Iconos/startTime_64px.png");
 		addNewControlLine(Labels.FT,"/vista/imagenes/Iconos/stopTime_64px.png");
+		//Configuración específica para DMIP
+		mapaFields.get(Labels.DMIP).setDisabledTextColor(Color.RED);
 		//Selector de IP (Checkbox) configuración específica.
 		JLabel jl = iniciarLabels(null,"/vista/imagenes/Iconos/inmunidad_64px.png");
 		int posY = lineaBase + 30*contador;
@@ -254,8 +271,7 @@ public class VistaSIR extends JPanel{
 	
 	private void refreshControls() {
 		mapaFields.get(Labels.DMIP).setEnabled(IP);
-//		mapaFields.get(Labels.DMIP).set
-		mapaFields.get(Labels.DMIP).setDisabledTextColor(Color.RED);
+		chckbxIP.setSelected(IP);
 	}
 	
 	/* Clases privadas */
@@ -272,11 +288,13 @@ public class VistaSIR extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
-			System.out.println(op);
-			if(op.equals("IP")) {
-				setIP(chckbxIP.isSelected());
-			}
+			String llamada = "VistaSir > BotonL: " + op;
 			
+			if(op.equals("IP")) {
+				IP = chckbxIP.isSelected();
+				llamada += " : " + IP;
+			}
+			System.out.println(llamada);
 			if(cm != null) cm.doActionVistaSIR();								//Avisa al controlador de cambios.
 			refreshControls();
 		}

@@ -27,6 +27,8 @@ public class Types {
     public final static String CSV = "csv";
     /** Archivo de proyecto PRJ*/  
     public final static String PRJ = "prj";
+    /** Archivo de proyecto PRJ*/  
+    public final static String DEF = "def";
     /** Archivo historico con la salida generada HST*/  
     public final static String HST = "hst";
     /** Archivo configuración de la paleta de colores PAL*/  
@@ -59,6 +61,7 @@ public class Types {
    private static void configurar() {
     	tipos = new HashMap<String,String>();
     	tipos.put(PAL,"Paleta de colores");
+    	tipos.put(DEF,"Archivo definición de enfermedad");
     	tipos.put(CSV, "Archivo general");
     	tipos.put(HST, "Archivo historico");
     	tipos.put(MAP, "Archivo de mapa");

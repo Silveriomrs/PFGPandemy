@@ -5,7 +5,7 @@
 * <p>Aplication: UNED</p>
 * @author Silverio Manuel Rosales Santana
 * @date 22 sept. 2021
-* @version 3.0
+* @version 3.6
 */
 package vista;
 
@@ -24,6 +24,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+
+import controlador.ControladorModulos;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
@@ -42,24 +45,29 @@ import modelo.Zona;
  * <p>Description: </p>
  * @author Silverio Manuel Rosales Santana
  * @date 23 sept. 2021
- * @version versión 1.0
+ * @version versión 3.6
  */
 public class Pizarra extends JFrame {
 	/** serialVersionUID*/
 	private static final long serialVersionUID = 6537461228067301333L;
+	private ControladorModulos cm;
+	//Controles internos.
 	private JButton bLimpiar,bGuardar,bAImagen,bCerrarPoligono,bBoxAplicar;
 	private Canvas c;
 	private JToolBar toolBar;
-	private int dimX, dimY;														//Dimensiones para la zona de dibujado.
-	private Dimension dim;
+	private JComboBox<String> comboBoxAsignar;
+	private JComboBox<String> comboBoxAsignados;
+	//Dimensiones para la zona de dibujado.
+	private final int dimX;
+	private final int dimY;														
+	private final Dimension dim;
+	//Datos internos
 	private Polygon poligono;
 	private Polygon marco;
 	// listaPuntos almacena los puntos, esta manera permite implementar a posteriori funciones tipo "undo". "restore",etc.
 	private ArrayList<Point> listaPuntos;
 	private JPanel panelCentral, panelCanvas;
-	private JComboBox<String> comboBoxAsignar;
-	private JComboBox<String> comboBoxAsignados;
-	private HashMap<Integer,Zona> zonas;
+
 	private java.awt.Image fondo;
 
 	/**
@@ -68,9 +76,11 @@ public class Pizarra extends JFrame {
 	 * a cada zona</p>
 	 * En caso de obtener un valor núlo o cuyo número de zonas no sea mayor a
 	 * cero, no se iniciará el módulo.
-	 * @param zonas Conjunto de zonas.
+	 * @param cm Controlador de módulos, requisito indispensable para comunicar
+	 *  con el resto de módulos y tener actualizados los datos.
 	 */
-	public Pizarra(HashMap<Integer,Zona> zonas) {
+	public Pizarra(ControladorModulos cm) {
+		this.cm = cm;
 		this.dimX = 1024;
 		this.dimY = 768;
 		this.dim = new Dimension(dimX, dimY);
@@ -78,25 +88,32 @@ public class Pizarra extends JFrame {
 		this.panelCentral = new JPanel();
 		this.panelCanvas = new JPanel();
 		this.c = new MiCanvas();
-	
-		//Si el conjunto de zonas es correcto y mayor a 0 -> iniciar módulo.
-		if(zonas != null && zonas.size() > 0) {	this.zonas = zonas; }
 		configura();
 	}
 	
 	/**
 	 * <p>Title: reset</p>  
 	 * <p>Description: Reinicia la vista de este módulo.</p> 
-	 *  Elimina los datos almacenados en el mismo.
+	 *  Elimina los datos almacenados en el mismo y restaura el valor por defecto
+	 *   de los controles.
 	 */
 	public void reset() {
-		zonas.clear();
+		//Boorado de todos los items.
 		comboBoxAsignar.removeAllItems();
 		comboBoxAsignados.removeAllItems();
+		//Puesta de Items 0, seleccionar.
+		comboBoxAsignados.addItem("Eliminar");
+		comboBoxAsignar.addItem("Asignar a");
+		//Limpieza de datos temporales.
 		listaPuntos.clear();
-		poligono = new Polygon();
+		poligono = null;
 		fondo = null;
-		reinicioBotones();
+		//Primero actualizar los elementos de cada combo.
+		zonasToCombo();
+		//Luego los controles, pues estos depende de los elementos de los comboboxes.
+		updateControls();
+		//Refrescar pantallas.
+		c.update(c.getGraphics());
 	}
 	
 	/**
@@ -107,10 +124,9 @@ public class Pizarra extends JFrame {
 	    Dimension m = panelCentral.getPreferredSize();
 	    int y = (int) m.getHeight() + 15;										//Una altura extra para no ocultar el canvas.
 	    setPreferredSize(new Dimension(dimX, y));
-	    setResizable(false);
-	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    setResizable(true);
+	    setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	    pack();
-	    setVisible(true);	
 	}
 	
 	/**
@@ -120,21 +136,16 @@ public class Pizarra extends JFrame {
 	 */
 	public void toogleVisible() { this.setVisible(!isVisible());}
 
-	/**
-	 * <p>Title: getZonas</p>
-	 * <p>Description:Devuelve el HashMap de las zonas </p>
-	 * @return Conjunto de las zonas.
-	 */
-	public HashMap<Integer,Zona> getZonas() {return this.zonas;}
-	
+
 	private void configura() {
 		//Inicialización de los componentes en estricto orden de dependencia.
+		configuraFrame();
 		iniciarCanvas();
 		creaMarco();
-		iniciarBotones();
-		iniciarCombos();
+		crearBotones();
+		crearCombos();
         iniciarToolBar();
-        reinicioBotones();
+        updateControls();
         
         panelCentral.setPreferredSize(dim);
 		panelCentral.setSize(dim);
@@ -149,15 +160,14 @@ public class Pizarra extends JFrame {
 	    bLimpiar.addActionListener(new LimpiarListener());
 	    bCerrarPoligono.addActionListener(new ComponerListener());
 	    bBoxAplicar.addActionListener(new AsignarBoxListener() );
-	    
-	    
+	        
 	    //Conectar las partes.
 	    panelCanvas.add(c);
 	    //Añadimos al panel central y este al frame
 	    panelCentral.add(panelCanvas, BorderLayout.CENTER);
 	    this.add(panelCentral);
 
-	    configuraFrame();
+	    
 	}
 
     /**
@@ -196,6 +206,11 @@ public class Pizarra extends JFrame {
 		listaPuntos.clear();
 	}
     
+	/**
+	 * <p>Title: iniciarToolBar</p>  
+	 * <p>Description: Crea la barra de herramientas y añade los todos los 
+	 *  controles (una vez creados e inciados) a la misma.</p>
+	 */
 	private void iniciarToolBar() {
 	    toolBar = new JToolBar();
 	    toolBar.add(bLimpiar);
@@ -208,7 +223,13 @@ public class Pizarra extends JFrame {
 	    add(toolBar, BorderLayout.NORTH);
 	}
 
-	private void iniciarBotones() {
+	/**
+	 * <p>Title: crearBotones</p>  
+	 * <p>Description: Crear los elementos (botones) de la barra de herramientas.</p>
+	 * Crea los controles (botones) a mostrar en la barra de herramientas, además
+	 *  les asigna su icono.
+	 */
+	private void crearBotones() {
 		//Configuración de los botones.
 	    bLimpiar = new JButton("Limpiar");
 	    bLimpiar.setIcon(IO.getIcon("/vista/imagenes/Iconos/limpiar_64px.png",25,25));
@@ -232,7 +253,7 @@ public class Pizarra extends JFrame {
 		int maxLargo = 0;
 		String item = "Zona: XX";												//Longitud mínima a comparar
 		//Selección de la clave más larga.
-		for (Zona zona:zonas.values()) {
+		for (Zona zona:cm.getZonas().values()) {
 			int l = zona.getName().length();
 			if(maxLargo < l) {
 				maxLargo = l;
@@ -242,14 +263,29 @@ public class Pizarra extends JFrame {
 		return item;
 	}
 
+	/**
+	 * <p>Title: zonasToCombo</p>  
+	 * <p>Description: Establece los elementos a colocar en cada ComboBox.</p>
+	 * Recorre todos los grupos de población (zonas) y situa los nombres de cada
+	 *  grupo en un combobox u otro, en función de si ya disponen de un poligono
+	 *   como representación gráfica.
+	 */
 	private void zonasToCombo() {
-		zonas.forEach((k,v)->{
-			if(v.getZona() == null) {comboBoxAsignar.addItem(v.getName());}
-			else { comboBoxAsignados.addItem(v.getName());}
-		});
+		if(cm.hasZonas()) {
+			cm.getZonas().forEach((k,v)->{
+				if(v.getZona() == null) {comboBoxAsignar.addItem(v.getName());}
+				else { comboBoxAsignados.addItem(v.getName());}
+			});
+		}
 	}
 
-	private void iniciarCombos() {
+	/**
+	 * <p>Title: crearCombos</p>  
+	 * <p>Description: Crea los controles de los ComboBox</p>
+	 * Esta función no añade items a los ComboBox, para tal próposito ver
+	 *  el método {@link #zonasToCombo() zonasToCombo}.
+	 */
+	private void crearCombos() {
 		//ComboBox zonas sin asignación.
 		comboBoxAsignar = new JComboBox<String>();
 		comboBoxAsignar.setModel(new DefaultComboBoxModel<String>());
@@ -269,7 +305,13 @@ public class Pizarra extends JFrame {
 		zonasToCombo();
 	}
 
-	private void reinicioBotones() {
+	/**
+	 * <p>Title: updateControls</p>  
+	 * <p>Description: Actualiza los controles propios del módulo</p>
+	 * Detecta el estado en que se encuentra la aplicación y configura la activación
+	 *  o desactivación de los controles en función de dicho estado inicial.
+	 */
+	private void updateControls() {
         boolean hayPoligono = poligono != null;
         boolean hasItemC1 = comboBoxAsignar.getItemCount() > 1;
         boolean hasItemC2 = comboBoxAsignados.getItemCount() > 1;
@@ -289,18 +331,6 @@ public class Pizarra extends JFrame {
 
         // Desactivar cuando no hay poligonos o ya no hay más zonas sin asignar.
         c.setEnabled(!hayPoligono && hasItemC1);
-	}
-		
-	/**
-	 * <p>Title: setZonas</p>
-	 * <p>Description: Establece el conjunto de zonas contenidas dentro de un HashMAp.</p>
-	 * En caso de que no contenga elementos, no actuará.
-	 * @param zonas HashMap de zonas a establecer.
-	 */
-	public void setZonas(HashMap<Integer,Zona> zonas) {
-	   this.zonas = zonas;
-       zonasToCombo();
-	   reinicioBotones();
 	}
 	
 	/**
@@ -382,9 +412,11 @@ public class Pizarra extends JFrame {
 		dibujaPoligono(marco);
 		
 		//Lectura de las zonas y dibujado si procede.
-		zonas.forEach((k, z) -> {
-			if (z.getZona() != null) {dibujaPoligono(z.getZona());}
-		});
+		if(cm.hasZonas()) {
+			cm.getZonas().forEach((k, z) -> {
+				if (z.getZona() != null) {dibujaPoligono(z.getZona());}
+			});
+		}
 		
 		//En caso de haber un poligono pendiente de asignación, dibujarlo.
 		if(poligono != null) {
@@ -425,7 +457,7 @@ public class Pizarra extends JFrame {
             //Primero dibujado de las figuras (por si se desactiva Canvas en reinicio botones).
             dibujarZonas();
             //Reconfiguramos los estados de los botones para el nuevo contexto.
-            reinicioBotones();     
+            updateControls();     
         }
     }
 
@@ -433,21 +465,28 @@ public class Pizarra extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			//Obtener los nombres de los items seleccionados en los ComboBox
 			String item1 = comboBoxAsignar.getSelectedItem().toString();
 			String item2 = comboBoxAsignados.getSelectedItem().toString();
-			int index1 =  comboBoxAsignar.getSelectedIndex();
+			//Obtener los indices de los items seleccionados en los ComboBox
+			int index1 =  comboBoxAsignar.getSelectedIndex();		
 			int index2 =  comboBoxAsignados.getSelectedIndex();
+			//Realización de los intercambios de comboboxes pertinentes.
 			cambiarBox(item1,index1,comboBoxAsignar,comboBoxAsignados,poligono);
 			cambiarBox(item2,index2,comboBoxAsignados,comboBoxAsignar,null);
+			//Redibujar zonas (en caso de borrados o de nuevos asignados).
 			dibujarZonas();
-			reinicioBotones();
+			//Actualización de los controles en función del nuevo contexto.
+			updateControls();
+			//Avisar al controlador de que se ha producido un cambio.
+			cm.doActionPizarra();
 		}
 
 		private void cambiarBox(String item, int index, JComboBox<String> combo1, JComboBox<String> combo2, Polygon p) {
 			boolean encontrado = false;											//Bandera para salir del bucle al encontrar lo buscado.
 			combo1.setSelectedIndex(0);
 			//Búsqueda de la zona con el nombre igual al item del checkBox.
-			Iterator<Entry<Integer, Zona>> iterator = zonas.entrySet().iterator();
+			Iterator<Entry<Integer, Zona>> iterator = cm.getZonas().entrySet().iterator();
 			while (!encontrado && iterator.hasNext()) {
 			    Entry<Integer, Zona> entry = iterator.next();
 			    String nombre = entry.getValue().getName();						// Obtención del nombre de la zona.
@@ -455,8 +494,7 @@ public class Pizarra extends JFrame {
 			    if(item.equals(nombre)) {										// Si el item coincide con el nombre del Box ->
 					combo1.removeItemAt(index);									// Borrado del item excepto si es el primero (0)
 					combo2.addItem(item);										// Añadir Item al otro comboBox
-					zonas.get(ID).setPoligono(p);			  					// Asignar Poligono a la zona correspondiente al item.
-	//				cMap.setZonas(zonas); 										
+					cm.getZonas().get(ID).setPoligono(p);			  			// Asignar Poligono a la zona correspondiente al item.
 					poligono = null;											// Iniciado del poligono a null.
 					encontrado = true;
 			    }
@@ -469,7 +507,7 @@ public class Pizarra extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
             poligono = null;
             dibujarZonas();
-            reinicioBotones();
+            updateControls();
             c.update(c.getGraphics());
 		}
     }
@@ -516,7 +554,8 @@ public class Pizarra extends JFrame {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Selección de imagen de fondo.
-    		IO io = new IO();
+    		@SuppressWarnings("unused")
+			IO io = new IO();													//Sin esta ininicialización previa, no es posible cargar una imagen de fondo.
     		String ruta = IO.selFile(1, Types.IMG);
     		// En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
@@ -538,7 +577,7 @@ public class Pizarra extends JFrame {
 	 */
 	public void testModulo() {
     	configuraFrame();
-//    	toogleVisible();
+    	toogleVisible();
     }
 
 	/**
@@ -557,7 +596,7 @@ public class Pizarra extends JFrame {
     	zonas.put(z2.getID(), z2);
     	zonas.put(z3.getID(), z3);
 		
-		Pizarra pizarra = new Pizarra(zonas);
+		Pizarra pizarra = new Pizarra(new ControladorModulos());
 		pizarra.testModulo();
 	}
 }

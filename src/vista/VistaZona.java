@@ -278,12 +278,13 @@ public class VistaZona extends JPanel {
 	        }else {
 	        	lblSinPoligono.setVisible(false);
 	        	Shape p = fitPolygon();											//Ajustamos la forma.
-	  			g2.setPaint(Color.GREEN);
+	  			g2.setPaint(cm.getLevelColor(zona.getNivel()));
 	            g2.fill(p);														//Rellenar el poligono de verde.
 	            g2.setPaint(Color.RED);
 	  			g2.draw(p);														//Dibuja sus bordes.
 	            g2.setPaint(Color.BLACK);
-	            g2.draw(p.getBounds());											//Dibuja un marco encima del poligono.	
+	            g2.draw(p.getBounds());											//Dibuja un marco encima del poligono.
+	            updateUI();
 	        }
 		}
 		

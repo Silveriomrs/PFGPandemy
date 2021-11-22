@@ -93,6 +93,7 @@ public class Archivos extends JPanel {
 	private void createFieldsInMap() {
 		mapaFields.put(Types.PRJ, new JTextField());
 		mapaFields.put(Types.MAP, new JTextField());
+		mapaFields.put(Types.DEF, new JTextField());
 		mapaFields.put(Types.REL, new JTextField());
 		mapaFields.put(Types.PAL, new JTextField());
 		mapaFields.put(Types.HST, new JTextField());
@@ -100,48 +101,22 @@ public class Archivos extends JPanel {
 		// Generación de sus nombres e iconos particulares.
 		iniciarLabels("Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png");
 		iniciarLabels("Mapa","/vista/imagenes/Iconos/grupos_64px.png");
+		iniciarLabels("Enfermedad","/vista/imagenes/Iconos/grupos_64px.png");
 		iniciarLabels("Relaciones","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels("Leyenda","/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels("Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png");
 		iniciarLabels("Histórico","/vista/imagenes/Iconos/animar_128px.png");
 		
 		// generar controles y reiniciar el contardor de líneas a 0.
 		contador = 0;
 		generateControls(Types.PRJ,0);
 		generateControls(Types.MAP,0);
+		generateControls(Types.DEF,0);
 		generateControls(Types.REL,0);
 		generateControls(Types.PAL,0);
 		generateControls(Types.HST,0);
 
 	}
-	
-	/**
-	 * <p>Title: generateControls</p>  
-	 * <p>Description: Genera todos los JTextFields necesarios para cubrir
-	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
-	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
-	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
-	 * @param ext Tipo de datos al que generar el control.
-	 * @param posX Posición en las coordenadas X donde colocar el control.
-	 * @see #createFieldsInMap()
-	 */
-	private void generateControls(String ext, int posX){
-		int posY = lineaBase + 30*contador;
-		contador++;
-		JTextField jtf = mapaFields.get(ext);
-		jtf.setEditable(false);
-		jtf.setEnabled(true);
-		jtf.setBounds(129,posY,338,hi);
-		jtf.setColumns(10);
-		jtf.setToolTipText("Archivo seleccionado");
-		jtf.setHorizontalAlignment(SwingConstants.LEFT);
-		panelCentral.add(jtf);
-		
-		int xpos = 480;
-		int gap = 30;
-		iniciarBoton("Abrir",ext, iconAbrir,xpos,posY,true);
-		iniciarBoton("Guardar como",ext,iconGuardarComo,xpos + gap,posY,false);
-		iniciarBoton("Guardar cambios",ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
-	}
+
 	
 	/* Métodos públicos */
 	
@@ -229,12 +204,18 @@ public class Archivos extends JPanel {
 	}	
 	
 	/**
-	 * <p>Title: clearJTFields</p>  
+	 * <p>Title: reset</p>  
 	 * <p>Description: Limpia los textos mostrados en cada etiqueta, sustituyéndolos
-	 * por cadenas vacias.</p> 
+	 * por cadenas vacias y posteriormente realiza una lectura de los módulos
+	 *  cargados en el sistema actualizando los campos correspondientes.</p> 
 	 */
-	public void clearJTFields() {
-		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
+	public void reset() {
+		mapaFields.forEach((tipo,elemento) -> {
+			String nombre = null;
+			if(cm.getModulo(tipo) != null) nombre = cm.getModulo(tipo).getNombre();
+			elemento.setText(nombre);
+			
+		});
 	}
 		
 	
@@ -311,7 +292,7 @@ public class Archivos extends JPanel {
 		JLabel jl = new JLabel();
 		int posY = lineaBase + 30*contador;
 		contador++;
-		int w = 105;
+		int w = 110;
 		int posX = 12;
 		jl = new JLabel(nombre);
 		addIconL(jl,ruta,wi,hi);
@@ -346,7 +327,36 @@ public class Archivos extends JPanel {
 		boton.setBorder(null);
 		addBotonHM(boton,ext);
 		panelCentral.add(boton);
-	}	
+	}
+	
+	/**
+	 * <p>Title: generateControls</p>  
+	 * <p>Description: Genera todos los JTextFields necesarios para cubrir
+	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
+	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
+	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
+	 * @param ext Tipo de datos al que generar el control.
+	 * @param posX Posición en las coordenadas X donde colocar el control.
+	 * @see #createFieldsInMap()
+	 */
+	private void generateControls(String ext, int posX){
+		int posY = lineaBase + 30*contador;
+		contador++;
+		JTextField jtf = mapaFields.get(ext);
+		jtf.setEditable(false);
+		jtf.setEnabled(true);
+		jtf.setBounds(140,posY,300,hi);
+		jtf.setColumns(10);
+		jtf.setToolTipText("Archivo seleccionado");
+		jtf.setHorizontalAlignment(SwingConstants.LEFT);
+		panelCentral.add(jtf);
+		
+		int xpos = 480;
+		int gap = 30;
+		iniciarBoton("Abrir",ext, iconAbrir,xpos,posY,true);
+		iniciarBoton("Guardar como",ext,iconGuardarComo,xpos + gap,posY,false);
+		iniciarBoton("Guardar cambios",ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
+	}
 		
 	/**
 	 * <p>Title: inicializarMapas</p>  

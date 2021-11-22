@@ -19,13 +19,13 @@ import javax.swing.JColorChooser;
 
 
 /**
- * <p>Title: Leyenda</p>  
+ * <p>Title: Paleta</p>  
  * <p>Description: Clase para mostrar la leyenda de un mapa. </p>  
  * @author Silverio Manuel Rosales Santana
  * @date 29 jul. 2021
  * @version versión 1.2
  */
-public class Leyenda extends JPanel implements ActionListener{
+public class Paleta extends JPanel implements ActionListener{
 
 	/**
 	 * Frame de la leyenda para soportar modo de visualización flotante.
@@ -49,7 +49,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * @param editable Indica si los colores son editables, true si lo son,
 	 * false en otro caso.
 	 */
-	public Leyenda(int width, int height, boolean editable) {
+	public Paleta(int width, int height, boolean editable) {
 		super();
 		this.width = width;
 		this.height = height;
@@ -58,7 +58,7 @@ public class Leyenda extends JPanel implements ActionListener{
 		
 		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
-		TitledBorder tb = BorderFactory.createTitledBorder("Leyenda");
+		TitledBorder tb = BorderFactory.createTitledBorder("Paleta");
 		this.setBorder(tb);
 		this.setLayout(null);
 		
@@ -73,7 +73,7 @@ public class Leyenda extends JPanel implements ActionListener{
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
-		frame.setTitle("Leyenda");												//Establecimiento del título.
+		frame.setTitle("Paleta");												//Establecimiento del título.
 		frame.setSize(width,height);											//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
@@ -111,7 +111,7 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * Si el estado actual es Visible pasa a estar oculto, de la misma manera
 	 * cuando el estado actual es oculto pasa a estar visible.  
 	 */
-	public void toggleVisible() {setVisible(!frame.isVisible());}
+	public void toggleFrameVisible() {setFrameVisible(!frame.isVisible());}
 	
 	/**
 	 * <p>Title: setPosicion</p>  
@@ -282,10 +282,10 @@ public class Leyenda extends JPanel implements ActionListener{
 	 * @param args Nada.
 	 */
 	public static void main(String[] args) {
-		Leyenda leyenda = new Leyenda(100, 205, false);
-		leyenda.setPosicion(0, 0);
-		leyenda.setFrameVisible(true);
-		System.out.println(leyenda.toString());
+		Paleta paleta = new Paleta(100, 205, false);
+		paleta.setPosicion(0, 0);
+		paleta.setFrameVisible(true);
+		System.out.println(paleta.toString());
 	}
 
 }

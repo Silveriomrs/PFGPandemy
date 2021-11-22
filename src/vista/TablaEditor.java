@@ -175,7 +175,7 @@ public class TablaEditor extends JPanel{
 		comboBox.setName("Asignar tabla");
 		comboBox.setToolTipText("Seleccione el tipo de tabla.");
 		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Leyenda", "Relaciones"}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Paleta", "Relaciones"}));
 		//jtoolBar.add(comboBox);
 		
 		btnAsignarTabla = new JButton("Aplicar tipo");
@@ -502,7 +502,7 @@ public class TablaEditor extends JPanel{
 	 * @version versión
 	 */
 	private class BtnAplicarTablaMouseListener extends MouseAdapter {
-		//"Sin asignar", "Mapas", "Historico", "Leyenda", "Relaciones"
+		//"Sin asignar", "Mapas", "Historico", "Paleta", "Relaciones"
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -522,7 +522,7 @@ public class TablaEditor extends JPanel{
 						//nuevaTabla();
 						tipo = Types.HST;
 						break;
-					case "Leyenda":
+					case "Paleta":
 						cMap.setPaleta(modelo);
 						mostrar("Nueva paleta asignada", 1);
 						//nuevaTabla();

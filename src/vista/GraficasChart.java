@@ -56,8 +56,8 @@ public class GraficasChart{
 	/**
 	 * <p>Title: </p>  
 	 * <p>Description: Constructor del chart gráfico.</p>  
-	 * @param etqX Leyenda de la barra horizontal X.
-	 * @param etqY Leyenda de la barra vertical Y.
+	 * @param etqX Paleta de la barra horizontal X.
+	 * @param etqY Paleta de la barra vertical Y.
 	 * @param titulo Título del gráfico.
 	 * @param tituloFrame Titulo a mostrar en el marco de la ventana.
 	 */
