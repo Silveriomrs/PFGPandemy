@@ -65,7 +65,7 @@ public class TablaEditor extends JPanel{
 	private JComboBox<String> comboBox;
 	private JButton btnAsignarTabla;
 	private ControladorDatosIO cio;
-	private ControladorModulos cMap;
+	private ControladorModulos cm;
 	private JToolBar jtoolBar;
 	private JPanel boxAsignacion;
 	private JFrame frame;
@@ -78,10 +78,10 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: TablaEditor</p>  
 	 * <p>Description: Constructor principal</p> 
-	 * @param cMap Controlador de mapa.
+	 * @param cm Controlador de mapa.
 	 */
-	public TablaEditor(ControladorModulos cMap) {
-		this.cMap = cMap;
+	public TablaEditor(ControladorModulos cm) {
+		this.cm = cm;
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
 		setLayout(new BorderLayout(0, 0));
@@ -115,17 +115,8 @@ public class TablaEditor extends JPanel{
 	 * <p>Title: reset</p>  
 	 * <p>Description: Reinicia todos los datos del módulo.</p> 
 	 */
-	public void reset() {
-		nuevaTabla();
-	}
-	
-	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Retorna el panel configurado</p> 
-	 * @return Este panel.
-	 */
-	public JPanel getPanel() {return this;}
-	
+	public void reset() {nuevaTabla();}
+
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
@@ -175,15 +166,14 @@ public class TablaEditor extends JPanel{
 		comboBox.setName("Asignar tabla");
 		comboBox.setToolTipText("Seleccione el tipo de tabla.");
 		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Mapas", "Historico", "Paleta", "Relaciones"}));
-		//jtoolBar.add(comboBox);
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Modelo","Mapas","Enfermedad", "Historico", "Paleta", "Relaciones"}));
 		
 		btnAsignarTabla = new JButton("Aplicar tipo");
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAsignarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
 		//jtoolBar.add(btnAplicarTabla);
 		
-		lblAsignarTablaA = new JLabel("Asignar tipo de tabla:");
+		lblAsignarTablaA = new JLabel("Asignar a modulo:");
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
 		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
 		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -297,9 +287,18 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: setModelo</p>  
 	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
-	 * @param modelo JTableModel o modelo que se quiere establecer.
+	 * @param dcvs JTableModel o modelo que se quiere establecer.
 	 */
-	public void setModelo(DCVS modelo) {tabla.setModel(modelo);	}
+	public void setModelo(DCVS dcvs) {
+		//"Sin asignar", "Modelo", "Mapas", "Enfermedad", "Historico", "Paleta", "Relaciones".
+		this.dcvs = dcvs;
+		this.modelo = dcvs.getModelo();
+		String tipo = dcvs.getTipo();
+		//Establecer en el selector el tipo.
+		comboBox.setSelectedItem(tipo);
+		tabla.setModel(modelo);
+		estadoBotones();
+	}
 	
 	/**
 	 * <p>Title: nuevaTabla</p>  
@@ -458,8 +457,7 @@ public class TablaEditor extends JPanel{
 						estadoBotones();
 					}					
 				} else mostrar("No hay datos que guardar",0);
-				
-				
+
 			}
 		}
 	}
@@ -506,10 +504,14 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
+				boolean actuar = true;
 				//Obtener selección
 				String seleccion = (String) comboBox.getSelectedItem();
-				//Si se ha seleccionado módulo ->
-				System.out.println(seleccion);
+				//"Sin asignar", "Modelo","Mapas","Enfermedad", "Historico", "Paleta", "Relaciones"
+				
+				if(!seleccion.equals("Sin asignar")) {
+					mostrar("Cuidado, esta acción sobreescribe los datos existentes en dicho módulo.", 2);
+				}
 				
 				switch(seleccion){
 					case "Mapas":
@@ -518,12 +520,11 @@ public class TablaEditor extends JPanel{
 					case "Historico": 
 						DCVS dcvs = new DCVS();
 						dcvs.setModelo(modelo);
-						cMap.setHistorico(dcvs);
-						//nuevaTabla();
+						cm.setHistorico(dcvs);
 						tipo = Types.HST;
 						break;
 					case "Paleta":
-						cMap.setPaleta(modelo);
+						cm.setPaleta(modelo);
 						mostrar("Nueva paleta asignada", 1);
 						//nuevaTabla();
 						tipo = Types.PAL;
@@ -531,10 +532,19 @@ public class TablaEditor extends JPanel{
 					case "Relaciones":
 						tipo = Types.REL;
 						break;
+					case "Enfermedad":
+						tipo = Types.DEF;
+						break;
+					case "Modelo":
+						tipo = Types.PRJ;
+						break;
 				}
 				
-				mostrar("Nuevo tipo de tabla especificado: " + tipo, 1);
-				estadoBotones();
+				actuar = cm.doActionTableEditor(seleccion);
+				if(actuar) {
+					mostrar("Nuevo tipo de tabla especificado: " + tipo, 1);
+					estadoBotones();
+				}	
 			}
 		}
 	}

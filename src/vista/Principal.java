@@ -50,7 +50,7 @@ public class Principal extends JFrame {
 		int w = 1024;
 		int h = 768;
 		this.cm = cm;	
-		this.setTitle("Simulador de Pandemias");
+		this.setTitle("Simulación de enfermedades transmisibles en varios grupos de población");
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
 		this.setBounds(0, 0, w + 25, h + 15);
@@ -110,8 +110,8 @@ public class Principal extends JFrame {
 		mnArchivo.addSeparator();
 		addJMenuItem(mnArchivo, "Abrir Proyecto","/vista/imagenes/Iconos/carpeta_64px.png" );
 		//SubMenu VenSIM
-		addJMenuItem(mnArchivo, "Importar Proyecto Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnArchivo, "Importar Histórico Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo, "Importar Modelo A","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo, "Importar Modelo B","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
 		//
 		addJMenuItem(mnArchivo, "Guardar Proyecto","/vista/imagenes/Iconos/disquete_64px.png" );
@@ -122,24 +122,24 @@ public class Principal extends JFrame {
 		JMenu mnVer = new JMenu("Ver");
 		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
 		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
-		addJMenuItem(mnVer, "Parámetros SIR","/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnVer, "Parámetros SIR","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		addJMenuItem(mnVer, "Grupos","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		
-		//Menu Ejecutar
-		JMenu mnEjecutar = new JMenu("Ejecutar Modulo");
-		addJMenuItem(mnEjecutar, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
-		addJMenuItem(mnEjecutar, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
-		addJMenuItem(mnEjecutar, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		//Menu Herramientas
+		JMenu mnHerramientas = new JMenu("Herramientas");
+		addJMenuItem(mnHerramientas, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
+		addJMenuItem(mnHerramientas, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
+		addJMenuItem(mnHerramientas, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 		
-		//Menu Ejecutar
+		//Menu Ayuda
 		JMenu mnAyuda = new JMenu("Ayuda");
 		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
 		
 		//Añadir sub-menus a la barra de menus.
 		menuBar.add(mnArchivo);
 		menuBar.add(mnVer);
-		menuBar.add(mnEjecutar);
+		menuBar.add(mnHerramientas);
 		menuBar.add(mnAyuda);
 		
 		//Configurar estados de cada JMenuItem y/o sus menús según el contexto.

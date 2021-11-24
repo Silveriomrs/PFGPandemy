@@ -397,7 +397,7 @@ public class ParserHistoricoVS {
 		for(int i = 0; i<NG; i++) {
 			int superficie = 0;													//En este modelo VenSim no incluye superficie.	
 			int habitantes = getPeople(i);										//Obtener población inicial (si hay).
-			zonas.put(i+1,new Zona(i+1, IDs[i], habitantes, superficie, null));
+			zonas.put(i+1,new Zona(i+1, IDs[i], habitantes, superficie,0,0,0,0,0, null));
 		}	
 	}
 	

@@ -15,8 +15,11 @@ import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
@@ -141,6 +144,22 @@ public class GraficasChart{
 	            false															// Habilita urls si está configurado.
 	    );
 	    addImagen(background);													// Configuración imagen de fondo.
+	}
+	
+	/**
+	 * <p>Title: getJPanel</p>  
+	 * <p>Description: Devuelve este submódulo encapsulado dentro de un
+	 *  JPanel, de esta forma, facilita su inclusión dentro de otras vistas. </p>
+	 *  Su distribución interna es de BorderLayot e incluye su barra de menus.
+	 *   Hay que establecer sus dimensiones y posición en la clase receptora.
+	 * @return La vista del Chart en un JPanel.
+	 */
+	public JPanel getJPanel() {
+		JPanel jp = new JPanel();
+		jp.setLayout(new BorderLayout(0, 0));
+		jp.add(new ChartPanel(this.chart),BorderLayout.CENTER);
+		jp.add(this.menuBar,BorderLayout.NORTH);
+		return jp;
 	}
 	
 	/**

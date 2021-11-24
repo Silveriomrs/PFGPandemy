@@ -28,10 +28,20 @@ public class Zona {
 	private int superficie;
 	/** poligono Poligono que representa gráficamente una poligono*/
 	private Polygon poligono;
-	// Lista de puntos que componen el poligono.
-	private ArrayList<Point> puntosPoligono;
+	/** Número de recuperados iniciales.*/
+	private int R;
+	/** Número de susceptibles iniciales.*/
+	private int S;
+	/** Número de incidentes (infectados) iniciales.*/
+	private int I;
+	/** Prevalencia.*/
+	private int P;
 	/** nivel Nivel de contagio de una poligono [0-9] */
 	private int nivel;
+	
+	
+	// Lista de puntos que componen el poligono.
+	private ArrayList<Point> puntosPoligono;
 	private final String SN = "Nivel";
 	/** Indica el valor del eje X para su representación de cada nivel en el eje Y. */
 	private int contadorN;
@@ -46,73 +56,40 @@ public class Zona {
 	 * @param name Nombre del grupo de población representado.
 	 * @param nhabitantes Número de habitantes que componen la población del grupo.
 	 * @param superficie Superficie del poligono en kilometros cuadrados.
+	 * @param s Número de susceptibles iniciales.
+	 * @param i Número de incidentes iniciales (infectados).
+	 * @param r Número de recuperados iniciales.
+	 * @param p Prevalencia (sin unidad).
+	 * @param nivel Nivel inicial de contagio, equivale al número de casos por cada 100 mil habitantes.
 	 * @param poligono Poligono cerrado representación gráfica de la zona.
 	 */
-	public Zona(int ID, String name, int nhabitantes, int superficie, Polygon poligono) {
-		setNivel(0);
+	public Zona(int ID, String name, int nhabitantes, int superficie,
+			int s, int i, int r, int p,int nivel,Polygon poligono) {
 		puntosPoligono = new ArrayList<Point>();
 		this.name = name;
 		this.ID = ID;
 		this.poblacion = nhabitantes;
 		this.superficie = superficie;
+		//
+		this.S = s;
+		this.I = i;
+		this.R = r;
+		this.P = p;
+		this.nivel = nivel;
+		//
 		this.poligono = poligono;
+		//
 		this.chart = new GraficasChart("Tiempo (días)",
 				"Nivel",
 				"Zona: " + name,
 				"Evolución pandemica." + " ID: " + ID);
 		this.contadorN = 0;														//Serie de niveles.
 		chart.addSerie(SN);
+		//Añadir los valores iniciales a la gráfica. Por tanto se añaden después de crearla.
+		setNivel(nivel);
+		setSIR(s,i,r);
 	}
 
-	/**
-	 * @return devuelve el nombre de la poligono.
-	 */
-	public String getName() {return name;}
-
-	/**
-	 * @param name Nuevo nombre para el grupo de población.
-	 */
-	public void setName(String name) {this.name = name;}
-
-	
-	/**
-	 * @return devuelve ID de la poligono
-	 */
-	public int getID() {return ID;}
-
-	/**
-	 * @return El número de habitantes que componen la población de la poligono.
-	 */
-	public int getPoblacion() {	return poblacion;}
-	
-	/**
-	 * @param poblacion El número de habitantes a establecer
-	 */
-	public void setPoblacion(int poblacion) {this.poblacion = poblacion;}
-
-	/**
-	 * @return La superficie de la poligono en kilometros cuadrados.
-	 */
-	public int getSuperficie() {return superficie;}
-
-	
-	/**
-	 * @param superficie Los kilometros cuadrados de superficie a establecer
-	 */
-	public void setSuperficie(int superficie) {	this.superficie = superficie;}
-	
-	/**
-	 * Devuelve el Poligono que representa la poligono.
-	 * @return devuelve el poligono que representa la poligono
-	 */
-	public Polygon getZona() {return poligono;}
-
-	/**
-	 * <p>Title: setPoligono</p>  
-	 * <p>Description: Establece un Poligono como poligono representativa gráfica</p> 
-	 * @param poligono Figura geometrica.
-	 */
-	public void setPoligono(Polygon poligono) {this.poligono = poligono;}
 
 	/**
 	 * @return La listas de puntos que componen el poligono que representa la zona.
@@ -123,18 +100,6 @@ public class Zona {
 	 * @param listaPuntos El/la puntosPoligono a establecer
 	 */
 	public void setListaPuntos(ArrayList<Point> listaPuntos) {this.puntosPoligono = listaPuntos;}
-
-	/**
-	 * @return devuelve nivel desde 0 hasta 9.
-	 */
-	public int getNivel() {	return nivel;}
-
-	/**
-	 * Establecimiento del nivel actual de la poligono. Su valor debe estar entre 0 y 9,
-	 *  ambos inclusive. 
-	 * @param nivel Nivel a establecer.
-	 */
-	public void setNivel(int nivel) {this.nivel = nivel;}
 	
 	@Override
 	public String toString() {	
@@ -182,11 +147,115 @@ public class Zona {
 		
 		setNivel((int) valor);
 	}
+	
+	
+	/* Funciones get y set de los atributos del grupo de población o zona. */ 
+	
 
 	/**
 	 * Devuelve la representación gráfica de los datos dados.
 	 * @return El/la grafica
 	 */
 	public GraficasChart getGrafica() {return this.chart;	}
+	
+	/**
+	 * @return devuelve nivel desde 0 hasta 9.
+	 */
+	public int getNivel() {	return nivel;}
+
+	/**
+	 * Establecimiento del nivel actual de la poligono. Su valor debe estar entre 0 y 9,
+	 *  ambos inclusive. 
+	 * @param nivel Nivel a establecer.
+	 */
+	public void setNivel(int nivel) {this.nivel = nivel;}
+
+	/**
+	 * @return El número de recuperados iniciales.
+	 */
+	public int getR() {	return R;}
+
+	/**
+	 * @param r Establece el número de recuperados iniciales.
+	 */
+	public void setR(int r) {R = r;	}
+
+	/**
+	 * @return El número de susceptibles iniciales.
+	 */
+	public int getS() {	return S;}
+
+	/**
+	 * @param s Establece el número de suceptibles.
+	 */
+	public void setS(int s) {S = s;	}
+
+	/**
+	 * @return La prevalencia inicial.
+	 */
+	public int getP() {	return P;}
+
+	/**
+	 * @param p Establece la prevalencia inicial.
+	 */
+	public void setP(int p) {P = p;	}
+
+	/**
+	 * @return El número de incidentes (infectados) iniciales.
+	 */
+	public int getI() {	return I;}
+
+	/**
+	 * @param i Establece el número de Incidentes (infectados) iniciales.
+	 */
+	public void setI(int i) {I = i;}
+
+	/**
+	 * @return devuelve el nombre de la poligono.
+	 */
+	public String getName() {return name;}
+
+	/**
+	 * @param name Nuevo nombre para el grupo de población.
+	 */
+	public void setName(String name) {this.name = name;}
+	
+	/**
+	 * @return devuelve ID de la poligono
+	 */
+	public int getID() {return ID;}
+
+	/**
+	 * @return El número de habitantes que componen la población de la poligono.
+	 */
+	public int getPoblacion() {	return poblacion;}
+	
+	/**
+	 * @param poblacion El número de habitantes a establecer
+	 */
+	public void setPoblacion(int poblacion) {this.poblacion = poblacion;}
+
+	/**
+	 * @return La superficie de la poligono en kilometros cuadrados.
+	 */
+	public int getSuperficie() {return superficie;}
+	
+	/**
+	 * @param superficie Los kilometros cuadrados de superficie a establecer
+	 */
+	public void setSuperficie(int superficie) {	this.superficie = superficie;}
+	
+	/**
+	 * Devuelve el Poligono que representa la poligono.
+	 * @return devuelve el poligono que representa la poligono
+	 */
+	public Polygon getPoligono() {return poligono;}
+
+	/**
+	 * <p>Title: setPoligono</p>  
+	 * <p>Description: Establece un Poligono como poligono representativa gráfica</p> 
+	 * @param poligono Figura geometrica.
+	 */
+	public void setPoligono(Polygon poligono) {this.poligono = poligono;}
 
 }

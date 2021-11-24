@@ -83,8 +83,10 @@ public class Labels {
 	public final static String VERSION = "VERSION";
 	/** NG Número de grupos de población*/  
 	public final static String NG = "NG";
-	/** DATE Fecha de creación o modificación del proyecto*/  
+	/** DATE Fecha de modificación del proyecto*/  
 	public final static String DATE = "DATE";
+	/** DATE Fecha de creación del proyecto*/  
+	public final static String DATE0 = "DATE0";
 	
 	private HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;

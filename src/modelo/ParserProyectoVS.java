@@ -14,8 +14,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import vista.GraficasChart;
-
 /**
  * <p>Title: ParserProyectoVS</p>  
  * <p>Description: Parser para importar datos de un proyecto VenSim </p> 
@@ -31,9 +29,10 @@ import vista.GraficasChart;
 public class ParserProyectoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
-	private DCVS mContactos;													//Matriz de contactos (relaciones).
-	private DCVS mDefSIR;														//Módulo definición de la enfermedad (SIR)
+	private DCVS matrizContactos;												//Matriz de contactos (relaciones).
+	private DCVS definicionSIR;													//Módulo definición de la enfermedad (SIR)
 	private DCVS historico;														//Matriz de contactos (relaciones).
+	private DCVS proyecto;
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
@@ -49,9 +48,10 @@ public class ParserProyectoVS {
 	 */
 	public ParserProyectoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
-		this.mContactos = new DCVS();
-		this.mDefSIR = new DCVS();
+		this.matrizContactos = new DCVS();
+		this.definicionSIR = new DCVS();
 		this.historico = new DCVS();
+		this.proyecto = new DCVS();
 		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
@@ -87,11 +87,15 @@ public class ParserProyectoVS {
 		setUpHistorico();
 
 		//Leer tabla de relaciones.
-		crearMatriz();
+		setUpMatriz();
 		
 		//Crear contenedor de definición de enfermedad (Parámetros SIR).
 		//Depende de lectura previa de TIMES.
-		crearMDefEnf();
+		setUpDefEnf();
+		
+		//Por último la configuración del proyecto o modelo, pues para realizar
+		//Depende de que los otros módulos estén configurados.
+		setUpProyecto();
 		
 		//Leer R,S,I y P
 		readXs(Labels.R);
@@ -129,49 +133,40 @@ public class ParserProyectoVS {
 	 *   puede estar implicita en la presencía de las etiquetas CVS o TVS. Por
 	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
 	 */
-	private void crearMDefEnf(){
-		//Establecer atributos propios del módulo.
-		mDefSIR.setTipo(Types.DEF);
-		//Crear nombre con extensión DEF a partir del nombre del archivo original.
-		String nombreNuevo = dcvs.getNombre();
-		//Quitamos la extensión.
-		int size = nombreNuevo.length() -3;
-		//Añadimos la extensión nueva.
-		nombreNuevo = nombreNuevo.substring(0, size) + Types.DEF.toLowerCase();
-		//Guardar dato.
-		mDefSIR.setName(nombreNuevo);
+	private void setUpDefEnf(){
+		setTypeAndName(definicionSIR,Types.DEF);
 		//Crear cabecera		
 		String[] cabecera = {"tipo","dato"};
 		//Añadir cabecera.
-		mDefSIR.addCabecera(cabecera);
+		definicionSIR.addCabecera(cabecera);
 		
 		//Añadir etiquetas requeridas a la lista.
 		ArrayList<String> lista = new ArrayList<String>();
 		lista.add(Labels.PTE);
 		lista.add(Labels.DME);
 		
-		//Procesar la lista añadiendo dichos campos al módulo mDefSIR.
+		//Procesar la lista añadiendo dichos campos al módulo definicionSIR.
 		for(int i = 0; i<lista.size(); i++) {
 			String etiqueta = lista.get(i);
 			String value = "0";													//En caso de no estar, se configurará a 0.
 			int pos = dcvs.getColItem(etiqueta);		
 			if(pos > -1) {
 				value = (String) dcvs.getValueAt(0, pos);
-				mDefSIR.addFila(new String[]{etiqueta,value});
+				definicionSIR.addFila(new String[]{etiqueta,value});
 			}
-			else mDefSIR.addFila(new String[]{etiqueta,value});
+			else definicionSIR.addFila(new String[]{etiqueta,value});
 		}
 		
 		//IT Leído previamente
-		mDefSIR.addFila(new String[]{Labels.IT,"" + IT});
+		definicionSIR.addFila(new String[]{Labels.IT,"" + IT});
 		//FT Leído previamente
-		mDefSIR.addFila(new String[]{Labels.FT,"" + FT});
+		definicionSIR.addFila(new String[]{Labels.FT,"" + FT});
 		//Búsqueda de la IP específica.
-		mDefSIR.addFila(new String[]{Labels.IP,hasIP()});
+		definicionSIR.addFila(new String[]{Labels.IP,hasIP()});
 		//Búsqueda de DMIP o su inversa = 1/TVS
-		mDefSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
+		definicionSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
 		
-		if(traza) System.out.println( mDefSIR.toString() );		
+		if(traza) System.out.println( definicionSIR.toString() );		
 	}
 	
 	/**
@@ -218,6 +213,27 @@ public class ParserProyectoVS {
 		return has;
 	}
 	
+	private void setUpProyecto() {
+		//Añadir tipo y nombre
+		setTypeAndName(proyecto,Types.PRJ);
+		//Crear cabecera		
+		String[] cabecera = {"Tipo","Dato"};
+		//Añadir cabecera.
+		proyecto.addCabecera(cabecera);
+		//Añadir etiquetas generales.
+		proyecto.addFila(new String[]{Labels.NAME,dcvs.getNombre()});
+		proyecto.addFila(new String[]{Labels.NG,"" + getNG()});
+//		definicionSIR.addFila(new String[]{Labels.DATE,dcvs.getDate()});
+		proyecto.addFila(new String[]{Labels.DESCRIPTION,"Modelo obtenido de una fuente externa."});
+		
+		//Añadir ahora la ruta del resto de módulos.
+//		definicionSIR.addFila(new String[]{Types.HST,historico.getNombre()});
+//		definicionSIR.addFila(new String[]{Types.REL,matrizContactos.getNombre()});
+//		definicionSIR.addFila(new String[]{Types.DEF,definicionSIR.getNombre()});
+		System.out.println("\nProyecto: \n" + proyecto.toString());
+
+	}
+	
 	
 	/**
 	 * <p>Title: setUpHistorico</p>  
@@ -228,7 +244,8 @@ public class ParserProyectoVS {
 	 * <p>Añade también una columna para indicar la posición del tiempo<p>
 	 */
 	private void setUpHistorico() {
-		historico.setTipo(Types.HST);
+		//Añadir tipo y nombre
+		setTypeAndName(historico,Types.HST);
 		
 		String[] cabecera = new String[NG + 1];									//Una columna por cada zona y una columna para el tiempo.
 		//Generar cabecera.
@@ -245,13 +262,10 @@ public class ParserProyectoVS {
 			String[] fila = new String[NG+1];									//Cada fila tiene NG+1 Slots (columnas).
 			historico.addFila(fila);
 		}
-		
 	}
 	
 	/* Funciones internas necesarias para el proceso ya depuradas */
-	
-	
-	
+
 	
 	/**
 	 * <p>Title: generateLevels</p>  
@@ -264,7 +278,7 @@ public class ParserProyectoVS {
 	 * los valores para CI, S, R e I.</p>
 	 */
 	private void generateLevels() {
-		boolean correcto = true;												//Finaliza la lectura si hay un valor no válido.
+		boolean correcto = true;							//Finaliza la lectura si hay un valor no válido.
 		int contador = IT;
 		Date hoy = new Date();     							//Establece el día de hoy.
 		
@@ -287,8 +301,7 @@ public class ParserProyectoVS {
 						String date =  new SimpleDateFormat("dd/MM/yyyy hh:mm").format(hoy);
 						historico.setValueAt(date, contador, 0);
 						hoy = addDay(hoy);    									//Incrementar un día.
-					}
-					
+					}				
 					contador++;													//Siguiente línea.
 				} else correcto = false;		
 			}
@@ -315,8 +328,7 @@ public class ParserProyectoVS {
 			}
 			
 			if(traza) {
-				GraficasChart gc = z.getGrafica();
-				gc.setVisible(true);
+//				z.getGrafica().setVisible(true);
 			}
 		}
 		
@@ -344,7 +356,7 @@ public class ParserProyectoVS {
 		for(int i = 1; i<=NG; i++) {
 			Zona z = zonas.get(i);
 			String sID = et + " " + z.getName();
-			int col = dcvs.getColItem(sID);		
+			int col = dcvs.getColItem(sID);
 			if(col > -1) addSerieXs(et,col,z);									//Añadir la serie localizada a la zona indicada	
 		}
 	}
@@ -392,13 +404,31 @@ public class ParserProyectoVS {
 		this.FT = Integer.parseInt((String) dcvs.getValueAt(0,dcvs.getColItem("FINAL TIME")));
 	}
 	
+	/**
+	 * <p>Title: setTypeAndName</p>  
+	 * <p>Description: Establece un nombre y un tipo de datos al módulo.</p>
+	 * Usa los datos almacenados en el archivo de origen para establecer los
+	 *  nombres a los módulos particulares. 
+	 * @param modulo Módulo al que establecer los atributos de Tipo y Nombre.
+	 * @param type Tipo de datos que contiene el módulo. Ver: {@link Types Tipos de datos}.
+	 */
+	private void setTypeAndName(DCVS modulo, String type){
+		//Establecer atributos propios del módulo.
+		modulo.setTipo(type);
+		//Crear nombre con extensión DEF a partir del nombre del archivo original.
+		String newName = dcvs.getNombre();
+		//Quitamos la extensión.
+		newName = newName.substring(0, newName.length() -3);
+		//Guardar dato con nueva extensión.
+		modulo.setName(newName + type);
+	}
 	
 	/**
 	 * <p>Title: crearMatriz</p>  
 	 * <p>Description: Genera la matriz de contactos desde las etiquetas del 
 	 * conjunto de datos.</p>
 	 */
-	private void crearMatriz() {
+	private void setUpMatriz() {
 		String[] fila = new String[NG+1];
 		String[] cabecera = new String[NG+1];
 		int contadorCol = 1;
@@ -406,7 +436,7 @@ public class ParserProyectoVS {
 		cabecera[0] = "Grupos";													//Primera columna reservada.
 		//Crear resto columnas con nombres de grupos.
 		for(int i=1; i<=NG;i++) {cabecera[i] = IDs[i-1];}
-		mContactos.addCabecera(cabecera);
+		matrizContactos.addCabecera(cabecera);
 		
 		//Añadir filas
 		for(int i = 0; i<NG; i++) {
@@ -418,12 +448,15 @@ public class ParserProyectoVS {
 					fila[j] = (String) dcvs.getValueAt(0, contadorCol);
 					contadorCol++;
 				}
-				contadorCeros++;		
+				contadorCeros++;
 			}
-			mContactos.addFila(fila);
+			matrizContactos.addFila(fila);
 		}
 		
-		if(traza) System.out.println( mContactos.toString() );
+		//Añadir tipo de datos y nombre
+		setTypeAndName(matrizContactos, Types.REL);
+		
+		if(traza) System.out.println( matrizContactos.toString() );
 	}
 	
 	
@@ -438,7 +471,7 @@ public class ParserProyectoVS {
 		for(int i = 0; i<NG; i++) {
 			int superficie = 0;													//En este modelo VenSim no incluye superficie.	
 			int habitantes = getPeople(i);										//Obtener población inicial (si hay).
-			zonas.put(i+1,new Zona(i+1, IDs[i], habitantes, superficie, null));
+			zonas.put(i+1,new Zona(i+1, IDs[i], habitantes, superficie,0,0,0,0,0, null));
 		}	
 	}
 	
@@ -572,13 +605,18 @@ public class ParserProyectoVS {
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getMContactos() {return this.mContactos;}
+	public DCVS getMContactos() {return this.matrizContactos;}
 	
 	/**
 	 * @return Definición de la enfermedad, sus parámetros.
 	 */
-	public DCVS getmDefENF() {return mDefSIR;}	
+	public DCVS getmDefENF() {return definicionSIR;}	
 	
+	/**
+	 * @return Descripción del modelo (proyecto), sus parámetros.
+	 */
+	public DCVS getmProyecto() {return proyecto;}	
+
 	
 	/**
 	 * <p>Title: getZonas</p>  

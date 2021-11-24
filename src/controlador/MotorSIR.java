@@ -271,10 +271,10 @@ public class MotorSIR {
 		
 		HashMap<Integer,Zona> zonas = new HashMap<Integer,Zona>();
 		//Creación de 4 zonas con las características de la prueba.
-		zonas.put(1,new Zona(1,"G1" , 1000,0 , null));
-		zonas.put(2,new Zona(2,"G2" , 500,0 , null));
-		zonas.put(3,new Zona(3,"G3" , 200,0 , null));
-		zonas.put(4,new Zona(4,"G4" , 100,0 , null));
+		zonas.put(1,new Zona(1,"G1" , 1000,0 ,0,0,0,0,0, null));
+		zonas.put(2,new Zona(2,"G2" , 500,0 ,0,0,0,0,0, null));
+		zonas.put(3,new Zona(3,"G3" , 200,0 ,0,0,0,0,0, null));
+		zonas.put(4,new Zona(4,"G4" , 100,0 ,0,0,0,0,0, null));
 		//Configurar valores SIR iniciales.
 		zonas.get(1).setSIR(999,1,0);
 		zonas.get(2).setSIR(500,0,0);

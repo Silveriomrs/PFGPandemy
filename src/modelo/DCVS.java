@@ -23,6 +23,7 @@ public class DCVS implements TableModel{
 	private String directorio;
 	private String nombre;
 	private String tipo;
+	private String date;
 	private Object[] cabecera;
 	private Object datos[][];
 	
@@ -411,6 +412,17 @@ public class DCVS implements TableModel{
 	 * @param ruta Ruta desde el raíz hasta el directorio padre.
 	 */
 	public void setDirectorio(String ruta) {this.directorio = ruta;}
+
+
+	/**
+	 * @return La fecha del archivo en disco.
+	 */
+	public String getDate() {return date;}
+
+	/**
+	 * @param date La fecha a establecer del archivo.
+	 */
+	public void setDate(String date) {this.date = date;}
 	
 	
 }

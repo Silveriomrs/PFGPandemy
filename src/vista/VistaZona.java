@@ -29,6 +29,7 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import controlador.ControladorModulos;
 
@@ -54,15 +55,21 @@ public class VistaZona extends JPanel {
 	private static final long serialVersionUID = 2843655383959458235L;
 	//
 	private JPanel panelCentral;
-	private JPanel panel_poligono;
+	private JPanel panelChart;
+	private PanelPoligono pp;
 	//
-	private JTextField tf_Nombre;
-	private JTextField tf_Poblacion;
-	private JTextField tf_Superficie;
 	private JTextField tf_ID;
-	private JTextField tf_Nivel;
+	private JTextField tf_NAME;
+	private JTextField tf_PEOPLE;
+	private JTextField tf_AREA;
+	private JTextField tf_S;
+	private JTextField tf_R;
+	private JTextField tf_I;
+	private JTextField tf_P;
+	private JTextField tf_C100K;
 	//
-	
+	private int posXL = 15;
+	private int gap = 20;
 
 	/**
 	 * Creación del panel con la vista de una zona.
@@ -72,59 +79,73 @@ public class VistaZona extends JPanel {
 	 */
 	public VistaZona(Zona zona, ControladorModulos cm) {
 		this.cm = cm;
-		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0, null);	
+		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0,0,0,0,0,0, null);	
 		else this.zona =zona;
 		panelCentral = new JPanel();
-		panel_poligono = new JPanel();
+		panelChart = new JPanel();
+		pp = new PanelPoligono();
 		configurar();
 	}
 	
 	private void configurar() {
 		setLayout(new BorderLayout(0, 0));	
-//		setBackground(Color.RED);
 	
 		add(panelCentral);
 		panelCentral.setLayout(null);
 		
-		int gap = 20;
-		addLabel("ID:", null, 12,gap,19,15);
-		addLabel("Nombre:",null,12,2*gap,172,15);
-		addLabel("Población:",null,12,3*gap,81,15);
-		addLabel("Superficie:",null,12,4*gap,81,15);
-		addLabel("Nivel de contagio:",null,12,5*gap,175,15);
+		
+		addLabel("ID:", null, posXL,gap,19,15);
+		addLabel("Nombre:",null,posXL,2*gap,172,15);
+		addLabel("Población:",null,posXL,3*gap,81,15);
+		addLabel("Superficie:",null,posXL,4*gap,81,15);
+		//
+		addLabel("Susceptibles:",null,posXL,5*gap,100,15);
+		addLabel("Incidentes:",null,posXL,6*gap,100,15);
+		addLabel("Recuperados:",null,posXL,7*gap,100,15);
+		addLabel("Prevalencia:",null,posXL,8*gap,100,15);
+		addLabel("Nivel de contagio:",null,posXL,9*gap,175,15);
 		
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(0, 0, 139));
 		separator.setBackground(new Color(0, 0, 128));
-		separator.setBounds(12, 119, 426, 13);
+		separator.setBounds(posXL, 10*gap, 262, 13);
 		panelCentral.add(separator);
 		
 		JLabel lblRepresentacingrfica = new JLabel("Representación Gráfica");
 		lblRepresentacingrfica.setHorizontalAlignment(SwingConstants.LEFT);
-		lblRepresentacingrfica.setBounds(12, 136, 166, 15);
+		lblRepresentacingrfica.setBounds(posXL, 11*gap, 166, 15);
 		panelCentral.add(lblRepresentacingrfica);
 		
 		//
-		PanelPoligono pp = new PanelPoligono();
 		panelCentral.add(pp);
 		
 		//Iniciar los JTextFields
-		int posX = 100;
+		int posX = 120;
 		int posY = 18;
 		int alto = 19;
+		int ancho = 150;
 		tf_ID = iniciarTextField(tf_ID, "ID",posX, posY, 114, alto);
-		tf_Nombre = iniciarTextField(tf_Nombre,"Nombre",posX, posY + gap*1, 166, alto);
-		tf_Poblacion = iniciarTextField(tf_Poblacion,"Población",posX, posY + gap*2, 166, alto);
-		tf_Superficie = iniciarTextField(tf_Superficie,"Superficie",posX, posY + gap*3, 166, alto);
-		tf_Nivel = iniciarTextField(tf_Nivel,"Nivel",152, posY + gap*4, 114, 19);
+		tf_NAME = iniciarTextField(tf_NAME,"Nombre",posX, posY + gap*1, ancho, alto);
+		tf_PEOPLE = iniciarTextField(tf_PEOPLE,"Población",posX, posY + gap*2, ancho, alto);
+		tf_AREA = iniciarTextField(tf_AREA,"Superficie",posX, posY + gap*3, ancho, alto);
+		tf_S = iniciarTextField(tf_S,"Susceptibles",posX, posY + gap*4, ancho, alto);
+		tf_I = iniciarTextField(tf_I,"Infectados",posX, posY + gap*5, ancho, alto);
+		tf_R = iniciarTextField(tf_R,"Recuperados",posX, posY + gap*6, ancho, alto);
+		tf_P = iniciarTextField(tf_P,"Prevalencia",posX, posY + gap*7, ancho, alto);
+		tf_C100K = iniciarTextField(tf_C100K,"Nivel",152, posY + gap*8, 114, 19);	
 		
-		JButton btnAplicar = new JButton("Aplicar");
+		JButton btnAplicar = new JButton("Aplicar Cambios");
 		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
 		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
-		btnAplicar.setBounds(288, 20, 150, 87);
+		btnAplicar.setBounds(374, 393, 233, 74);
 		panelCentral.add(btnAplicar);
-		
+		//
+		panelChart = zona.getGrafica().getJPanel();
+		panelChart.setBounds(296, 20, 413, 340);
+		panelChart.setBorder(new  LineBorder(Color.BLACK)  );
+		panelCentral.add(panelChart,BorderLayout.CENTER);
+
 		recargarDatos();
 	}
 	
@@ -140,10 +161,16 @@ public class VistaZona extends JPanel {
 			tf_ID.setText("" + zona.getID());									//ID
 			tf_ID.setEditable(false);											//Desactivar edición del ID
 			tf_ID.setBorder(null);												//Quitamos el border a su campo.
-			tf_Nombre.setText(zona.getName());									//Establecer el campo nombre.
-			tf_Poblacion.setText("" + zona.getPoblacion());
-			tf_Superficie.setText("" + zona.getSuperficie());
-			tf_Nivel.setText("" + zona.getNivel());								//Nivel inicial de contagio.
+			tf_NAME.setText(zona.getName());									//Establecer el campo nombre.
+			tf_PEOPLE.setText("" + zona.getPoblacion());
+			tf_AREA.setText("" + zona.getSuperficie());
+			tf_S.setText("" + zona.getS());
+			tf_R.setText("" + zona.getR());
+			tf_I.setText("" + zona.getI());
+			tf_P.setText("" + zona.getP());
+			
+			
+			tf_C100K.setText("" + zona.getNivel());								//Nivel inicial de contagio.
 		}
 	}
 	
@@ -159,7 +186,7 @@ public class VistaZona extends JPanel {
 	    int y = (int)m.getHeight()+15;
 	    frame.setPreferredSize(new Dimension(x, y));
 	    frame.setMaximumSize(new Dimension(2767, 2767));
-		frame.setMinimumSize(new Dimension(650, 400));
+		frame.setMinimumSize(new Dimension(720, 550));
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);
 	    frame.getContentPane().add(this);
@@ -235,12 +262,12 @@ public class VistaZona extends JPanel {
 	private class BotonL extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			zona.setName(tf_Nombre.getText());
+			zona.setName(tf_NAME.getText());
 			//
 			try{
-				zona.setPoblacion(Integer.parseInt(tf_Poblacion.getText()));
-				zona.setSuperficie(Integer.parseInt(tf_Superficie.getText()));
-				zona.setNivel(Integer.parseInt(tf_Nivel.getText()));}
+				zona.setPoblacion(Integer.parseInt(tf_PEOPLE.getText()));
+				zona.setSuperficie(Integer.parseInt(tf_AREA.getText()));
+				zona.setNivel(Integer.parseInt(tf_C100K.getText()));}
 			catch(Exception e) {System.out.println("Valor incorrecto");}
 			cm.doActionVistaZona();
 			
@@ -251,10 +278,10 @@ public class VistaZona extends JPanel {
 		/** serialVersionUID*/  
 		private static final long serialVersionUID = 1575177244442912505L;
 		private JLabel lblSinPoligono;
-		private final int w = 290;
-		private final int h = 190;
-		private final int x = 60;
-		private final int y = 160;
+		private final int x = posXL;
+		private final int y = 12*gap;
+		private final int h = 250;
+		private final int w = 225;
 
 		public PanelPoligono() {
 			setBounds(x, y, w, h);
@@ -273,14 +300,14 @@ public class VistaZona extends JPanel {
 	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 	                            RenderingHints.VALUE_ANTIALIAS_ON);
 	        
-	        if(zona.getZona() == null) {
+	        if(zona.getPoligono() == null) {
 	        	lblSinPoligono.setVisible(true);
 	        }else {
 	        	lblSinPoligono.setVisible(false);
 	        	Shape p = fitPolygon();											//Ajustamos la forma.
 	  			g2.setPaint(cm.getLevelColor(zona.getNivel()));
 	            g2.fill(p);														//Rellenar el poligono de verde.
-	            g2.setPaint(Color.RED);
+	            g2.setPaint(new Color(0, 0, 153));
 	  			g2.draw(p);														//Dibuja sus bordes.
 	            g2.setPaint(Color.BLACK);
 	            g2.draw(p.getBounds());											//Dibuja un marco encima del poligono.
@@ -297,7 +324,7 @@ public class VistaZona extends JPanel {
 		 * @return Figura transformada para encanjar en el panel.
 		 */
 		private Shape fitPolygon() {
-			Polygon pz = zona.getZona();
+			Polygon pz = zona.getPoligono();
 			Polygon p2 = new Polygon(pz.xpoints, pz.ypoints, pz.npoints);
 			Rectangle rp = p2.getBounds();
 			int xp = rp.x;
@@ -331,9 +358,8 @@ public class VistaZona extends JPanel {
 		p.addPoint( 95, 150 );
 		p.addPoint( 170, 100 );
 		
-		this.zona = new Zona(1, "Zona_Test", 10 , 400 , p);
+		this.zona = new Zona(1, "Zona_Test", 10 , 400 ,0,0,0,0,0, p);
 		recargarDatos();
-		panel_poligono.setVisible(true);
 	}
 	
 	/**

@@ -100,7 +100,7 @@ public class ControladorModulos {
 		archivos = new Archivos(this);
 		tablaEditor = new TablaEditor(this);
 		pgrupos = new ParametrosGrupos(this);
-		pproyecto = new ParametrosProyecto(archivos);
+		pproyecto = new ParametrosProyecto(this,archivos);
 		about = new About();
 		paleta = new Paleta(100, 205, false);
 		mapa = new Mapa(w,h, this);
@@ -124,7 +124,7 @@ public class ControladorModulos {
 		addDefaultBorder(tablaEditor,"Editor General");
 		addDefaultBorder(mapa,"Visor de Mapa");
 		addDefaultBorder(pgrupos,"Visor Grupos de Poblaci\u00F3n");
-		addDefaultBorder(pproyecto,"Parámetros del Proyecto");
+		addDefaultBorder(pproyecto,"Parámetros del Modelo");
 		addDefaultBorder(vistaSIR,"Configuraci\u00F3n SIR");
 		mostrarPanel(panelActivo);
 	}
@@ -191,7 +191,10 @@ public class ControladorModulos {
 			if(z != null) zonas.put(z.getID(), z);
 		}
 	
-		if(!zonas.isEmpty()) mapa.reset();
+		if(!zonas.isEmpty()) {
+			mapa.reset();
+			pgrupos.reset();
+		}
 	}
 	
 	/**
@@ -217,8 +220,14 @@ public class ControladorModulos {
 		int id = Integer.parseInt(puntos[0]);
 		String nombre = puntos[1];
 		int habitantes =  Integer.parseInt(puntos[2]);
-		int superficie =  Integer.parseInt(puntos[3]);	
-		return new Zona(id,nombre,habitantes,superficie,parserPoly.parser(puntos));		
+		int superficie =  Integer.parseInt(puntos[3]);
+		int s =  Integer.parseInt(puntos[4]);
+		int i =  Integer.parseInt(puntos[5]);
+		int r =  Integer.parseInt(puntos[6]);
+		int p =  Integer.parseInt(puntos[7]);
+		int nivel =  Integer.parseInt(puntos[8]);
+		
+		return new Zona(id,nombre,habitantes,superficie,s,i,r,p,nivel,parserPoly.parser(puntos,9));
 	}
 
 	/*  Métodos relacionados con la reproducción  */
@@ -353,13 +362,13 @@ public class ControladorModulos {
 				DCVS prj = cio.abrirArchivo(null,Types.PRJ);
 				if(prj != null) {abrirProyecto(prj);}
 				break;
-			case "Importar Proyecto Vensim":
+			case "Importar Modelo A":
 				DCVS pVS = cio.abrirArchivo(null,Types.CSV);
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) importarProyectoVS(pVS);
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
-			case "Importar Histórico Vensim":
+			case "Importar Modelo B":
 				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
 				DCVS hVS = cio.abrirArchivo(null,Types.CSV);
 				//Si se ha abierto el archivo, procesarlo..
@@ -455,6 +464,14 @@ public class ControladorModulos {
 		if(modulos.containsKey(tipo)) dcvs = modulos.get(tipo);
 		return dcvs;
 	}
+	
+	/**
+	 * <p>Title: hasModulo</p>  
+	 * <p>Description: Indica si existe un módulo cargado en el sistema.</p> 
+	 * @param tipo Tipo de módulo {@link Types Tipo de archivos y módulos}.
+	 * @return TRUE si el sistema contiene dicho módulo, FALSE en otro caso.
+	 */
+	public boolean hasModulo(String tipo) {	return modulos.containsKey(tipo);}
 	
 	/**
 	 * <p>Title: guardarProyecto</p>  
@@ -562,7 +579,7 @@ public class ControladorModulos {
 		
 		//Guardar los datos del módulo en su conjunto.
 		modulos.put(tipo, datos);
-
+		System.out.println("CM > establecerDatos > add modulo: " + hasModulo(tipo));
 		//Operaciones extras según tipo de módulo.
 		switch(tipo) {
 			case (Types.MAP):
@@ -579,6 +596,8 @@ public class ControladorModulos {
 		
 		//Actualización de las opciones de Principal.
 		principal.reset();
+		//Actualización de la vista archivos.
+		archivos.refresh();
 	}
 	
 	/* En progreso de implementación acciones Pizarra*/
@@ -586,20 +605,30 @@ public class ControladorModulos {
 	/**
 	 * <p>Title: doActionPizarra</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a esta vista</p>
-	 * La vista de pizarra solo ejerce una opción, aplicar cambios de las representaciones
-	 *  gráficas de los grupos de población o zonas.
+	 * La vista de pizarra puede comunicar dos operaciones: 1. aplicar cambios 
+	 *  de las representaciones gráficas de los grupos de población o zonas.
+	 *   2. Guardar los cambios efectuados en un nuevo fichero de tipo Mapa.
 	 * <p>Dichos cambios son efectuados en las referencias de las zonas por tanto 
 	 * quedan establecidas directamente en el grupo en el que están almacenadas.
 	 * Si bien, es necesario detectar tales cambios a efectos de actualizar los
 	 *  controles.</p>
+	 * @param op Tipo de operación a realizar. (Guardar o Aplicar cambios de poligonos).
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
-	public boolean doActionPizarra() {
+	public boolean doActionPizarra(String op) {
 		boolean done = true;
-		//Actualiza el mapa.
-		mapa.reset();
-		//Actualizar Grupos.
-		pgrupos.reset();
+		switch(op) {
+		case("Cambios"):
+			//Actualiza el mapa.
+			mapa.reset();
+			//Actualizar Grupos.
+			pgrupos.reset();
+			break;
+		case("Guardar"):
+			System.out.println("CM > doActionPizarra: Guardar, implementación en curso...");
+			break;
+		}
+
 		return done;
 	}
 	
@@ -628,7 +657,14 @@ public class ControladorModulos {
 			ok = dcvs != null;
 			if(ok && !ext.equals(Types.PRJ)) {establecerDatos(dcvs);}
 			else if(ok) {abrirProyecto(dcvs);}
-		//Opciones de Guarga de módulo.
+		
+		}else if(op.equals("Borrar") && modulos.containsKey(ext)){
+			modulos.remove(ext);
+		}else if(op.equals("Editar")) {
+			TablaEditor te = new TablaEditor(this);
+			te.abrirFrame();
+			te.setModelo(modulos.get(ext));
+		//Opciones de Guarga de módulo.	
 		}else{
 			//Optención del módulo correspondiente
 			dcvs = getModulo(ext);
@@ -642,6 +678,27 @@ public class ControladorModulos {
 			}
 		}	
 		return ok;
+	}
+	
+	/* En progreso de implementación TableEditor */
+	
+	/**
+	 * <p>Title: doActionTable</p>  
+	 * <p>Description: Realizas las acciones oportundas pertenecientes al módulo
+	 *  editor de tablas.</p>
+	 * @param op Tipo de datos que esperan ser guardados tras modificación.
+	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
+	 */
+	public boolean doActionTableEditor(String op) {
+		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
+		//tablaEditor.enableBotonesGuardado(Types.MAP, true);
+		System.out.println("doActionTableEditor > selección: " + op);
+		
+		
+		
+		
+		
+		return true;
 	}
 
 	/* En progreso de implementación VistasZonas y Grupos */
@@ -674,7 +731,22 @@ public class ControladorModulos {
 	 */
 	public boolean doActionVistaSIR() {
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		archivos.enableBotonesGuardado(Types.MAP, true);
+		archivos.enableBotonesGuardado(Types.DEF, true);
+		return true;
+	}
+	
+	/* En progreso de implementación acciones ParametrosProyecto */
+	
+	/**
+	 * <p>Title: doPProyecto</p>  
+	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * de parámetros del modelo</p>
+	 * La vista solo ejerce una opción, aplicar cambios de los campos.
+	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
+	 */
+	public boolean doPProyecto() {
+		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
+		System.out.println("CM > doPProyecto: ok");
 		return true;
 	}
 		
@@ -699,6 +771,8 @@ public class ControladorModulos {
 		principal.reset();
 		//Actualización de la pizarra.
 		pizarra.reset();
+		//Actualización de la vista archivos.
+		archivos.refresh();
 	}
 	
 	private void setDatosProyecto(DCVS dcvs, int NG) {
@@ -722,7 +796,9 @@ public class ControladorModulos {
 		// impediría modularidad e independencia de módulos.
 		ParserProyectoVS parser = new ParserProyectoVS(prjV);
 		//Establecer los datos del proyecto primero (provoca clear). 
-		setDatosProyecto(prjV,parser.getNG());
+//		abrirProyecto(parser.getmProyecto());
+//		modulos.put(Types.PRJ, parser.getmProyecto());
+//		setDatosProyecto(prjV,parser.getNG());
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(parser.getZonas());
 		//Establecer el historico de niveles.

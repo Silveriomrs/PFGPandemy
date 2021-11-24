@@ -82,6 +82,7 @@ public class Types {
 	 * @return Texto asociado a dicha etiqueta. Null en otro caso.
 	 */
 	public static String get(String t) {
+		configurar();
 		String txt = null;
 		if(hasType(t)) txt = tipos.get(txt);
 		else System.out.println("Types > No existe tipo: " + t);

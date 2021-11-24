@@ -4,7 +4,7 @@
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 26 ago. 2021  
-* @version 1.0  
+* @version 2.6  
 */  
 package vista;
 
@@ -34,7 +34,7 @@ import java.util.HashMap;
  * <p>Description: Vista de los archivos asociados a cada módulo del proyecto</p>  
  * @author Silverio Manuel Rosales Santana
  * @date 26 ago. 2021
- * @version 2.0
+ * @version 2.5
  */
 public class Archivos extends JPanel {
 
@@ -47,21 +47,16 @@ public class Archivos extends JPanel {
 	private final String iconAbrir = "/vista/imagenes/Iconos/carpeta_64px.png";
 	private final String iconGuardarComo = "/vista/imagenes/Iconos/disquete_64px.png";
 	private final String iconGuardarCambios = "/vista/imagenes/Iconos/guardarCambios_64px.png";
-	private final int lineaBase = 100;												//Primera línea a partir de la cual se dibujan todos los elementos.
+	private final String iconEditar = "/vista/imagenes/Iconos/editarTabla_64px.png";
+	private final String iconBorrar = "/vista/imagenes/Iconos/borrar_64px.png";
+	private final int lineaBase = 100;											//Primera línea a partir de la cual se dibujan todos los elementos.
 	private int contador = 0;													//Contador de elementos que se han adjuntado de un grupo.
 	private JPanel panelCentral;
 	private ControladorModulos cm;												//Controlador de módulos.
 	private HashMap<String,JButton> mBtnAbrir;
-	private HashMap<String,JButton> mBtnGuardar;
 	private HashMap<String,JButton> mBtnGuardarCambios;
+	private HashMap<String,JButton> mBotones;
 	private HashMap<String,JTextField> mapaFields;
-
-	
-	
-	/**
-	 * @return El mapaFields donde se referencian todas las etiquetas.
-	 */
-	public HashMap<String, JTextField> getMapaFields() {return mapaFields;}
 	
 
 	/**
@@ -71,8 +66,8 @@ public class Archivos extends JPanel {
 	public Archivos(ControladorModulos cm) {
 		if(cm != null) this.cm = cm;
 		mBtnAbrir = new HashMap<String,JButton>();
-		mBtnGuardar = new HashMap<String,JButton>();
 		mBtnGuardarCambios = new HashMap<String,JButton>();
+		mBotones = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
 		panelCentral = new JPanel();
 		hi = wi =  20;
@@ -91,34 +86,24 @@ public class Archivos extends JPanel {
 	 * @see #generateControls(String ext, int posX)
 	 */
 	private void createFieldsInMap() {
-		mapaFields.put(Types.PRJ, new JTextField());
-		mapaFields.put(Types.MAP, new JTextField());
-		mapaFields.put(Types.DEF, new JTextField());
-		mapaFields.put(Types.REL, new JTextField());
-		mapaFields.put(Types.PAL, new JTextField());
-		mapaFields.put(Types.HST, new JTextField());
-		
 		// Generación de sus nombres e iconos particulares.
-		iniciarLabels("Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels("Mapa","/vista/imagenes/Iconos/grupos_64px.png");
-		iniciarLabels("Enfermedad","/vista/imagenes/Iconos/grupos_64px.png");
-		iniciarLabels("Relaciones","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels("Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels("Histórico","/vista/imagenes/Iconos/animar_128px.png");
-		
-		// generar controles y reiniciar el contardor de líneas a 0.
-		contador = 0;
-		generateControls(Types.PRJ,0);
-		generateControls(Types.MAP,0);
-		generateControls(Types.DEF,0);
-		generateControls(Types.REL,0);
-		generateControls(Types.PAL,0);
-		generateControls(Types.HST,0);
-
+		iniciarLabels(Types.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
+		iniciarLabels(Types.MAP,"Grupos","Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(Types.DEF,"Enfermedad","Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
+		iniciarLabels(Types.REL,"Relaciones","Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
+		iniciarLabels(Types.PAL,"Paleta","Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels(Types.HST,"Histórico","Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
+		contador = 0;															// Reiniciar el contardor de líneas a 0.
 	}
 
 	
 	/* Métodos públicos */
+	
+	
+	/**
+	 * @return El mapaFields donde se referencian todas las etiquetas.
+	 */
+	public HashMap<String, JTextField> getMapaFields() {return mapaFields;}
 	
 	/**
 	 * <p>Title: abrirFrame</p>  
@@ -153,53 +138,12 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: isFieldEmpty</p>  
-	 * <p>Description: Particularación de la función isEmpty de los componentes</p>
-	 * La particularización estriba en que previamente comprueba que existe dicho
-	 * campo mendiante la etiqueta (extensión) y obtiene el componente en caso 
-	 *  de exitir de su campo.
-	 * @param ext Extensión particular del campo.
-	 * @return TRUE si dicho campo esta vacio o no esta contenido. FALSE en otro caso.
-	 */
-	private boolean isFieldEmpty(String ext) {
-		boolean isEmpty = true;
-		if(mapaFields.containsKey(ext)) {
-			isEmpty =  mapaFields.get(ext).getText().isBlank();
-		}
-		return isEmpty;
-	}
-	
-	/**
-	 * <p>Title: enableBotonesGuardado</p>  
-	 * <p>Description: Configura los botones de guardado correspondientes
-	 * a la etiqueta indicada.</p>
-	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
-	 *  activados mientras no haya definida una ruta previamente en el correspondiente
-	 *  campo.
-	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos 
-	 * o módulo al que hace referencia.
-	 * @param activar TRUE si se desea habilitar, FALSE en otro caso.
-	 */
-	public void enableBotonesGuardado(String ext, boolean activar) {
-		mBtnGuardar.get(ext).setEnabled(activar);
-		mBtnGuardarCambios.get(ext).setEnabled(activar && !isFieldEmpty(ext));
-	}
-	
-	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Devuelve el panelCentral con su estado actual.</p> 
-	 * @return Panel actual.
-	 */
-	public JPanel getPanel() {return this;}	
-
-	/**
 	 * <p>Title: disableAllSavers</p>  
 	 * <p>Description: Desactiva todos los botones de guardado</p> 
 	 */
 	public void disableAllSavers() {
 		//Desactivar todos los botones de guardado.
 		//Para evitar que se activen al cargar algún módulo del proyecto, se desactivan al final.
-		mBtnGuardar.forEach((tipo,elemento) -> {elemento.setEnabled(false);	});
 		mBtnGuardarCambios.forEach((tipo,elemento) -> {elemento.setEnabled(false);});
 	}	
 	
@@ -210,14 +154,10 @@ public class Archivos extends JPanel {
 	 *  cargados en el sistema actualizando los campos correspondientes.</p> 
 	 */
 	public void reset() {
-		mapaFields.forEach((tipo,elemento) -> {
-			String nombre = null;
-			if(cm.getModulo(tipo) != null) nombre = cm.getModulo(tipo).getNombre();
-			elemento.setText(nombre);
-			
-		});
-	}
-		
+		//En esta vista, no se almacenan datos => actualización de componentes.
+		//Principalmente: Campos y controles.
+		refresh();
+	}	
 	
 	/* Métodos privados */
 	
@@ -230,7 +170,7 @@ public class Archivos extends JPanel {
 		setToolTipText("Visulación de los ficheros asignados a cada módulo.");
 		setSize(new Dimension(650, 400));
 		setName("Vista de módulos cargados");
-		setMinimumSize(new Dimension(650, 400));
+		setMinimumSize(new Dimension(650, 500));
 		setMaximumSize(new Dimension(1024, 768));
 		setBorder(new EtchedBorder(EtchedBorder.RAISED, Color.BLACK, Color.GRAY));
 		setAutoscrolls(true);
@@ -249,8 +189,7 @@ public class Archivos extends JPanel {
 		labelLogo.setBounds(12, 12, 70, 75);
 		panelCentral.add(labelLogo);
 	}
-		
-	
+			
 	/**
 	 * <p>Title: addIconL</p>  
 	 * <p>Description: Añade un icono a una etiqueta</p>
@@ -280,21 +219,23 @@ public class Archivos extends JPanel {
 		componente.setIconTextGap(0);
 		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
-	
-	
+		
 	/**
 	 * <p>Title: iniciarLabels</p>  
 	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
+	 * @param ext Tipo de archivos que controla. Ver {@link Types Tipos de archivo}.
 	 * @param nombre Nombre en la etiqueta.
+	 * @param tt Tooltip mensaje emergente.
 	 * @param ruta Ruta al icono de la etiqueta.
 	 */
-	private void iniciarLabels(String nombre, String ruta) {
-		JLabel jl = new JLabel();
+	private void iniciarLabels(String ext, String nombre, String tt, String ruta) {
+		JLabel jl = new JLabel(nombre);
 		int posY = lineaBase + 30*contador;
+		generateControls(ext,0);
 		contador++;
 		int w = 110;
 		int posX = 12;
-		jl = new JLabel(nombre);
+		jl.setToolTipText(tt);
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
 		panelCentral.add(jl);
@@ -317,7 +258,6 @@ public class Archivos extends JPanel {
 	private void iniciarBoton(String nombre, String ext, String ruta, int posX, int posY, boolean activado) {
 		JButton boton = new JButton();
 		String tt = nombre + " .";
-		boton = new JButton();
 		boton.setActionCommand(nombre);
 		boton.addMouseListener(new ArchivoML());
 		boton.setToolTipText(tt + ext);
@@ -340,9 +280,8 @@ public class Archivos extends JPanel {
 	 * @see #createFieldsInMap()
 	 */
 	private void generateControls(String ext, int posX){
+		JTextField jtf =  new JTextField();
 		int posY = lineaBase + 30*contador;
-		contador++;
-		JTextField jtf = mapaFields.get(ext);
 		jtf.setEditable(false);
 		jtf.setEnabled(true);
 		jtf.setBounds(140,posY,300,hi);
@@ -350,12 +289,15 @@ public class Archivos extends JPanel {
 		jtf.setToolTipText("Archivo seleccionado");
 		jtf.setHorizontalAlignment(SwingConstants.LEFT);
 		panelCentral.add(jtf);
+		mapaFields.put(ext,jtf);
 		
 		int xpos = 480;
 		int gap = 30;
 		iniciarBoton("Abrir",ext, iconAbrir,xpos,posY,true);
 		iniciarBoton("Guardar como",ext,iconGuardarComo,xpos + gap,posY,false);
 		iniciarBoton("Guardar cambios",ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
+		iniciarBoton("Editar",ext,iconEditar,xpos + 3*gap,posY,false);
+		iniciarBoton("Borrar",ext,iconBorrar,xpos + 4*gap,posY,false);
 	}
 		
 	/**
@@ -370,16 +312,92 @@ public class Archivos extends JPanel {
 		case ("Abrir"):
 			mBtnAbrir.put(ext, btn);
 			break;
-		case ("Guardar como"):
-			mBtnGuardar.put(ext, btn);
-			break;
 		case ("Guardar cambios"):
 			mBtnGuardarCambios.put(ext, btn);
 			break;
+		case ("Guardar como"):
+		case ("Editar"):
+		case ("Borrar"):
+			//Estos botones ya tienen configurado su Command, se aprovecha para añadir distincción.
+			mBotones.put(btn.getActionCommand() + " " + ext, btn);
+			break;
 		}	
 	}
-
-
+	
+	/**
+	 * <p>Title: isFieldEmpty</p>  
+	 * <p>Description: Particularación de la función isEmpty de los componentes</p>
+	 * La particularización estriba en que previamente comprueba que existe dicho
+	 * campo mendiante la etiqueta (extensión) y obtiene el componente en caso 
+	 *  de exitir de su campo.
+	 * @param ext Extensión particular del campo.
+	 * @return TRUE si dicho campo esta vacio o no esta contenido. FALSE en otro caso.
+	 */
+	private boolean isFieldEmpty(String ext) {
+		boolean isEmpty = true;
+		if(mapaFields.containsKey(ext)) {
+			isEmpty =  mapaFields.get(ext).getText().isBlank();
+		}
+		return isEmpty;
+	}
+	
+	/**
+	 * <p>Title: enableBotonesGuardado</p>  
+	 * <p>Description: Configura los botones de guardado correspondientes
+	 * a la etiqueta indicada.</p>
+	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
+	 *  activados mientras no haya definida una ruta previamente en el correspondiente
+	 *  campo.
+	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos 
+	 * o módulo al que hace referencia.
+	 * @param activar TRUE si se desea habilitar, FALSE en otro caso.
+	 */
+	public void enableBotonesGuardado(String ext, boolean activar) {
+		mBtnGuardarCambios.get(ext).setEnabled(activar && !isFieldEmpty(ext));
+	}
+	
+	/**
+	 * <p>Title: refreshEditarBorrar</p>  
+	 * <p>Description: Actualiza el estado de los botones Editar y Borrar de cada
+	 *  tipo de fichero.</p> 
+	 */
+	private void refreshEditarBorrar() {
+		mBotones.forEach((key,btn) -> {
+			//Extrar su extensión.
+			String ext = key.substring(key.length() -3,key.length());
+			btn.setEnabled(cm.hasModulo(ext));
+//			System.out.println("Archivos > refreshEditarBorar: " + ext + " = " + cm.hasModulo(ext));
+		});
+	}
+	
+	/**
+	 * <p>Title: refreshFields</p>  
+	 * <p>Description: Actualiza el estado de los campos de cada
+	 *  tipo de fichero.</p> 
+	 */
+	private void refreshFields() {
+		//Reasignación de cada campo de los módulos existentes en el Controlador.
+		mapaFields.forEach((tipo,elemento) -> {
+			//Sin nombre en principio.
+			String nombre = null;
+			//Si existe el módulo, obtiene el nombre del mismo.
+			if(cm.getModulo(tipo) != null) nombre = cm.getModulo(tipo).getNombre();
+			//Asigna el nombre al campo correspondiente.
+			elemento.setText(nombre);		
+		});
+	}
+	
+	/**
+	 * <p>Title: refresh</p>  
+	 * <p>Description: Actualiza el estado de todos los componentes de la vista </p>
+	 * La actualización de los componentes se basa en los datos relacionados con
+	 *  el controlador. No elimina datos. 
+	 */
+	public void refresh() {
+		refreshFields();														//Primero actualizar los campos.
+		refreshEditarBorrar();													//Actualizar estados de botones.
+		updateUI();
+	}
 	
 	/* Clases privadas */
 	
@@ -395,22 +413,20 @@ public class Archivos extends JPanel {
 			//Identificador de operación (abrir o guardar).
 			String op = btn.getActionCommand();
 			
-			if(traza) System.out.println("Archivos  > AL: " + btn.getActionCommand() + " Ext: " + ext);
+			if(traza) System.out.println("Archivos  > AL: " + btn.getActionCommand() + " : " + ext);
 			
 			//Opciones de Carga de módulo, NO módulo PRJ.
-			if(op.equals("Abrir") ) {
-				realizado = cm.doActionArchivos(op, ext);
-			}
+			if(op.equals("Abrir") ) {realizado = cm.doActionArchivos(op, ext);}
 			//Opciones de Guarga de módulo.
 			else if(btn.isEnabled()){											//Comprobación de guardado activado.		
 				//Optención del módulo correspondiente
 				realizado = cm.doActionArchivos(op, ext);
 				//Desactivar sus botones.
 				if(realizado) enableBotonesGuardado(ext,false);
-				if(traza) System.out.println("Archivos  > AL: Opción de guardado.");
 			}
 			
-			if(op.equals("Abrir") && realizado) enableBotonesGuardado(Types.PRJ, true); 
+			refresh();
+			if(op.equals("Abrir") && realizado) enableBotonesGuardado(Types.PRJ, true);
 		}
 	}
 	

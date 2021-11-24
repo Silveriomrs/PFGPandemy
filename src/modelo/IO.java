@@ -34,16 +34,15 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
- 
+	private String WorkingDirectory;
+	
     /**
      * Constructor de la clase IO
      */
     public IO(){
-
+    	this.WorkingDirectory = "";
     }
     
-
-
 	/**
 	 * Metodo que lee un archivo del disco en formato CVS con separación de comas
 	 * ',' almacenandolos en un Objeto del tipo DCVS.
@@ -57,7 +56,7 @@ public class IO{
 	public DCVS abrirArchivo(String ruta, String ext) {
 		DCVS dcvs = null;
 		String ruta2 = ruta;
-		File f = getFile(1,ruta,ext);	
+		File f = getFile(1,ruta,ext);
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
 				CSVReader lectorCSV =  new CSVReader(new FileReader(f));		//Abrir el archivo.
@@ -69,7 +68,11 @@ public class IO{
 				dcvs.setRuta(ruta2);
 				dcvs.setTipo(ext);
 				dcvs.setName(f.getName());
-				dcvs.setDirectorio(f.getParent());
+				if(ext.equals(Types.PRJ))  WorkingDirectory = f.getParent();
+				dcvs.setDirectorio(WorkingDirectory);
+				dcvs.setDate("" + f.lastModified());
+				
+				System.out.println("IO Abrir > " + WorkingDirectory);
 			}
 			catch (IOException e) {e.printStackTrace();}
 			catch (CsvException e) {e.printStackTrace();}

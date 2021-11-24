@@ -64,6 +64,7 @@ public class Pizarra extends JFrame {
 	//Datos internos
 	private Polygon poligono;
 	private Polygon marco;
+	private boolean modificado;
 	// listaPuntos almacena los puntos, esta manera permite implementar a posteriori funciones tipo "undo". "restore",etc.
 	private ArrayList<Point> listaPuntos;
 	private JPanel panelCentral, panelCanvas;
@@ -84,11 +85,15 @@ public class Pizarra extends JFrame {
 		this.dimX = 1024;
 		this.dimY = 768;
 		this.dim = new Dimension(dimX, dimY);
+		this.modificado = false;
 		this.listaPuntos = new ArrayList<Point>();
 		this.panelCentral = new JPanel();
 		this.panelCanvas = new JPanel();
 		this.c = new MiCanvas();
 		configura();
+		//Sus propiedades dependen del canvas, por tanto debe
+        // ejecutarse después de esta.
+		configuraFrame();
 	}
 	
 	/**
@@ -107,6 +112,7 @@ public class Pizarra extends JFrame {
 		//Limpieza de datos temporales.
 		listaPuntos.clear();
 		poligono = null;
+		modificado = false;
 		fondo = null;
 		//Primero actualizar los elementos de cada combo.
 		zonasToCombo();
@@ -122,9 +128,10 @@ public class Pizarra extends JFrame {
 	 */
 	public void configuraFrame() {
 	    Dimension m = panelCentral.getPreferredSize();
-	    int y = (int) m.getHeight() + 15;										//Una altura extra para no ocultar el canvas.
-	    setPreferredSize(new Dimension(dimX, y));
-	    setResizable(true);
+	    int y = (int) m.getHeight() + 50;										//Una altura extra para no ocultar el canvas.
+	    int x = (int) m.getWidth() + 15;
+	    setPreferredSize(new Dimension(x, y));
+	    setResizable(false);
 	    setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	    pack();
 	}
@@ -137,15 +144,19 @@ public class Pizarra extends JFrame {
 	public void toogleVisible() { this.setVisible(!isVisible());}
 
 
+	/**
+	 * <p>Title: configura</p>  
+	 * <p>Description: Configura los parámetros iniciales, datos y controles 
+	 * 	generales de este módulo</p>
+	 */
 	private void configura() {
 		//Inicialización de los componentes en estricto orden de dependencia.
-		configuraFrame();
 		iniciarCanvas();
 		creaMarco();
 		crearBotones();
 		crearCombos();
         iniciarToolBar();
-        updateControls();
+        updateControls();       
         
         panelCentral.setPreferredSize(dim);
 		panelCentral.setSize(dim);
@@ -165,9 +176,7 @@ public class Pizarra extends JFrame {
 	    panelCanvas.add(c);
 	    //Añadimos al panel central y este al frame
 	    panelCentral.add(panelCanvas, BorderLayout.CENTER);
-	    this.add(panelCentral);
-
-	    
+	    this.add(panelCentral);  
 	}
 
     /**
@@ -241,6 +250,7 @@ public class Pizarra extends JFrame {
 	    bGuardar = new JButton("Guardar");
 	    bGuardar.setIcon(IO.getIcon("/vista/imagenes/Iconos/disquete_64px.png",25,25));
 	    bGuardar.setToolTipText("Guardar los cambios realizados.");
+	    bGuardar.addMouseListener(new GuardarListener());
         bCerrarPoligono = new JButton("Componer");
         bCerrarPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/nodos_64px.png",25,25));
         bCerrarPoligono.setToolTipText("Cierra la figura y crea el poligono.\nUna vez creado debe asignarse a una zona.");
@@ -273,7 +283,7 @@ public class Pizarra extends JFrame {
 	private void zonasToCombo() {
 		if(cm.hasZonas()) {
 			cm.getZonas().forEach((k,v)->{
-				if(v.getZona() == null) {comboBoxAsignar.addItem(v.getName());}
+				if(v.getPoligono() == null) {comboBoxAsignar.addItem(v.getName());}
 				else { comboBoxAsignados.addItem(v.getName());}
 			});
 		}
@@ -322,7 +332,7 @@ public class Pizarra extends JFrame {
        	comboBoxAsignados.setEnabled(hasItemC2);
        	bCerrarPoligono.setEnabled(listaPuntos.size() > 0);
         bBoxAplicar.setEnabled(hayPoligono || hasItemC2);
-        bGuardar.setEnabled(false);
+        bGuardar.setEnabled(modificado);
         bCerrarPoligono.setEnabled(listaPuntos.size() > 2);
 
         //Establecer valor por defecto de los comboBox
@@ -414,7 +424,7 @@ public class Pizarra extends JFrame {
 		//Lectura de las zonas y dibujado si procede.
 		if(cm.hasZonas()) {
 			cm.getZonas().forEach((k, z) -> {
-				if (z.getZona() != null) {dibujaPoligono(z.getZona());}
+				if (z.getPoligono() != null) {dibujaPoligono(z.getPoligono());}
 			});
 		}
 		
@@ -449,6 +459,15 @@ public class Pizarra extends JFrame {
 		}
 	}
 
+	/**
+	 * <p>Title: ComponerListener</p>  
+	 * <p>Description: Clase específica para el botón componer</p>
+	 * Esta clase compone un poligono con los datos actuales, lo dibuja y actualiza 
+	 *  los controles.  
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 22 nov. 2021
+	 * @version versión 1.2
+	 */
     private class ComponerListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -461,10 +480,24 @@ public class Pizarra extends JFrame {
         }
     }
 
+    /**
+     * <p>Title: AsignarBoxListener</p>  
+     * <p>Description: Efectua los cambios de cada combo box cuando es activado
+     *  el control correspondiente.</p>
+     *  Implica que eliminará o añadirá los poligonos a los grupos de población
+     *   o zonas correspondientes, activa el botón de guardado y actualiza el
+     *    estado de los controles.  
+     * @author Silverio Manuel Rosales Santana
+     * @date 22 nov. 2021
+     * @version versión 1.4
+     */
     private class AsignarBoxListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			//Activamos el botón de guardado en cuanto ha habido un cambio.
+			String op = "Cambios";
+			modificado = true;
 			//Obtener los nombres de los items seleccionados en los ComboBox
 			String item1 = comboBoxAsignar.getSelectedItem().toString();
 			String item2 = comboBoxAsignados.getSelectedItem().toString();
@@ -479,7 +512,7 @@ public class Pizarra extends JFrame {
 			//Actualización de los controles en función del nuevo contexto.
 			updateControls();
 			//Avisar al controlador de que se ha producido un cambio.
-			cm.doActionPizarra();
+			cm.doActionPizarra(op);
 		}
 
 		private void cambiarBox(String item, int index, JComboBox<String> combo1, JComboBox<String> combo2, Polygon p) {
@@ -502,6 +535,15 @@ public class Pizarra extends JFrame {
 		}
     }
 
+    /**
+     * <p>Title: LimpiarListener</p>  
+     * <p>Description: Limpia la pizarra.</p>
+     * Los datos de poligonos o líneas pendientes serán borrados. Los datos de
+     *  los poligonos asignados permanecerán.  
+     * @author Silverio Manuel Rosales Santana
+     * @date 22 nov. 2021
+     * @version versión
+     */
     private class LimpiarListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -550,6 +592,14 @@ public class Pizarra extends JFrame {
         }
     }
 
+    /**
+     * <p>Title: AbrirListener</p>  
+     * <p>Description: Realiza la acción de cargar una imagen de fondo que sirva
+     *  como guía para el dibujado de los poligonos.</p>  
+     * @author Silverio Manuel Rosales Santana
+     * @date 22 nov. 2021
+     * @version versión 1.2
+     */
     private class AbrirListener extends MouseAdapter {
     	@Override
     	public void mouseClicked(MouseEvent e) {
@@ -565,6 +615,27 @@ public class Pizarra extends JFrame {
     		}
     	}
     }
+    
+    /**
+     * <p>Title: GuardarListener</p>  
+     * <p>Description: Realiza la acción de guardado de las figuras modificadas.</p>  
+     * @author Silverio Manuel Rosales Santana
+     * @date 22 nov. 2021
+     * @version versión 1.2
+     */
+    private class GuardarListener extends MouseAdapter {
+    	@Override
+    	public void mouseClicked(MouseEvent e) {
+    		// Llamada al controlador para efectuar la acción pertinente.
+    		boolean resultado = cm.doActionPizarra("Guardar");
+    		if(resultado) {
+    			//Si se ha guardado, desactivar modificado => desactivar botón guardado.
+    			modificado = !resultado;
+        		updateControls();
+    		}
+    		
+    	}
+    }
 
 
     /* Funciones para pruebas */
@@ -576,7 +647,6 @@ public class Pizarra extends JFrame {
 	 * zonas internas por esta propia función a efecto de pruebas.
 	 */
 	public void testModulo() {
-    	configuraFrame();
     	toogleVisible();
     }
 
@@ -589,9 +659,9 @@ public class Pizarra extends JFrame {
 		HashMap<Integer, Zona> zonas;
 		zonas = new HashMap<Integer, Zona>();
     	Zona z1,z2,z3;
-    	z1 = new Zona(1, "Zona 1",0,0, null);
-    	z2 = new Zona(2, "Zona 2",0,0, null);
-    	z3 = new Zona(3, "Zona 3",0,0, null);
+    	z1 = new Zona(1, "Zona 1",0,0,0,0,0,0,0, null);
+    	z2 = new Zona(2, "Zona 2",0,0,0,0,0,0,0, null);
+    	z3 = new Zona(3, "Zona 3",0,0,0,0,0,0,0, null);
     	zonas.put(z1.getID(), z1);
     	zonas.put(z2.getID(), z2);
     	zonas.put(z3.getID(), z3);

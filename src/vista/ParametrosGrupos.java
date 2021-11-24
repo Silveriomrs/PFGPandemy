@@ -216,7 +216,7 @@ public class ParametrosGrupos extends JPanel {
 		ParametrosGrupos parametrosGrupos = new ParametrosGrupos(new ControladorModulos());
 		HashMap<Integer, Zona> zonas = new HashMap<Integer,Zona>();
 		for(int i=1; i<=4 ;i++) {
-			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),null));
+			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),0,0,0,0,0,null));
 		}
 
 		parametrosGrupos.setZonasTest(zonas);

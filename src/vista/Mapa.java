@@ -112,11 +112,11 @@ public class Mapa extends JPanel{
                             RenderingHints.VALUE_ANTIALIAS_ON);
 
 		cm.getZonas().forEach((n,z) -> {
-			if(z.getZona() != null) {
+			if(z.getPoligono() != null) {
 				g2.setPaint(cm.getLevelColor(z.getNivel()));
-				g2.fill(z.getZona());
+				g2.fill(z.getPoligono());
 				g2.setPaint(Color.BLACK);
-				g2.draw(z.getZona());
+				g2.draw(z.getPoligono());
 			}
 		});
 	}
@@ -164,7 +164,7 @@ public class Mapa extends JPanel{
 	        while (it.hasNext() && !encontrado) {
 	            zAux = it.next().getValue();									//Obtención del nuevo set sin el valor anterior.
 	            //Si se ha encontrado se termina la búsqueda.
-	            if(zAux.getZona() != null && zAux.getZona().contains(p)) {		//Evita evaluar valores nulos
+	            if(zAux.getPoligono() != null && zAux.getPoligono().contains(p)) {		//Evita evaluar valores nulos
 	        		zona = zAux;												//Valor final a devolver.
 	        		encontrado = true;											//Detenemos la búsqueda para ahorrar recursos.
 	            }
