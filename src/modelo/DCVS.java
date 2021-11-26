@@ -78,7 +78,6 @@ public class DCVS implements TableModel{
 		int n = cabecera.length;												//Obtenemos la longitud actual.
 		Object[] c = new Object[n+1];											//Instancia para el nuevo tamaño.
 		for(int i=0;i<n;i++) { c[i] = cabecera[i];}								//Copia de los datos.
-		cabecera[n+1] = nombre;													//Añade el nuevo nombre al array cabecera.
 		modelo.addColumn(nombre);												//Añade la nueva columna al modelo.
 		cabecera = c;															//Actualiza la nueva cabecera.
 	}
@@ -234,9 +233,9 @@ public class DCVS implements TableModel{
 	 */
 	public void nuevoModelo() {
 		//Cuerpo de datos
-		Object[][] datos = new Object[][]{};	
+		datos = new Object[][]{};	
 		//Cabecera de datos.		
-		String[] cabecera = new String[] {};
+		cabecera = new String[] {};
 		this.modelo = new DefaultTableModel(datos,cabecera){
 			/** serialVersionUID*/  
 			private static final long serialVersionUID = -2383558100131841835L;

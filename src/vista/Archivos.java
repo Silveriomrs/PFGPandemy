@@ -13,14 +13,17 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorModulos;
 import modelo.IO;
-import modelo.Types;
+import modelo.TypesFiles;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
@@ -41,6 +44,8 @@ public class Archivos extends JPanel {
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 5320403899683788073L;	
 	private TitledBorder tb;
+	private Image imagen;
+	private String ruta = "/vista/imagenes/lineasAzules.png";
 	//
 	private final int hi;														//Altura de los elementos (principalmente iconos).
 	private final int wi;														//Anchura de los iconos.
@@ -70,9 +75,21 @@ public class Archivos extends JPanel {
 		mBotones = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
 		panelCentral = new JPanel();
+		panelCentral.setOpaque(false);
 		hi = wi =  20;
 		configuracion();
 	}
+	
+	@Override
+	public void paint(Graphics g) {
+		if(ruta != null) {
+			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
+			setOpaque(false);
+			super.paint(g);
+		}
+	}
+	
 	
 	/* Métodos principales para añadir nuevos elementos y sus controles */
 	
@@ -87,12 +104,12 @@ public class Archivos extends JPanel {
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
-		iniciarLabels(Types.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(Types.MAP,"Grupos","Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
-		iniciarLabels(Types.DEF,"Enfermedad","Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
-		iniciarLabels(Types.REL,"Relaciones","Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels(Types.PAL,"Paleta","Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels(Types.HST,"Histórico","Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
+		iniciarLabels(TypesFiles.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
+		iniciarLabels(TypesFiles.MAP,"Grupos","Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.DEF,"Enfermedad","Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
+		iniciarLabels(TypesFiles.REL,"Relaciones","Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
+		iniciarLabels(TypesFiles.PAL,"Paleta","Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels(TypesFiles.HST,"Histórico","Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
 		contador = 0;															// Reiniciar el contardor de líneas a 0.
 	}
 
@@ -223,7 +240,7 @@ public class Archivos extends JPanel {
 	/**
 	 * <p>Title: iniciarLabels</p>  
 	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
-	 * @param ext Tipo de archivos que controla. Ver {@link Types Tipos de archivo}.
+	 * @param ext Tipo de archivos que controla. Ver {@link TypesFiles Tipos de archivo}.
 	 * @param nombre Nombre en la etiqueta.
 	 * @param tt Tooltip mensaje emergente.
 	 * @param ruta Ruta al icono de la etiqueta.
@@ -426,7 +443,7 @@ public class Archivos extends JPanel {
 			}
 			
 			refresh();
-			if(op.equals("Abrir") && realizado) enableBotonesGuardado(Types.PRJ, true);
+			if(op.equals("Abrir") && realizado) enableBotonesGuardado(TypesFiles.PRJ, true);
 		}
 	}
 	

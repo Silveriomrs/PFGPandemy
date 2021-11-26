@@ -123,13 +123,13 @@ public class ParserHistoricoVS {
 	 */
 	private void crearMDefEnf(){
 		//Establecer atributos propios del módulo.
-		mDefSIR.setTipo(Types.DEF);
+		mDefSIR.setTipo(TypesFiles.DEF);
 		//Crear nombre con extensión DEF a partir del nombre del archivo original.
 		String nombreNuevo = dcvs.getNombre();
 		//Quitamos la extensión.
 		int size = nombreNuevo.length() -3;
 		//Añadimos la extensión nueva.
-		nombreNuevo = nombreNuevo.substring(0, size) + Types.DEF.toLowerCase();
+		nombreNuevo = nombreNuevo.substring(0, size) + TypesFiles.DEF.toLowerCase();
 		//Guardar dato.
 		mDefSIR.setName(nombreNuevo);
 		//Crear cabecera

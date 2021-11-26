@@ -68,7 +68,7 @@ public class IO{
 				dcvs.setRuta(ruta2);
 				dcvs.setTipo(ext);
 				dcvs.setName(f.getName());
-				if(ext.equals(Types.PRJ))  WorkingDirectory = f.getParent();
+				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
 				dcvs.setDirectorio(WorkingDirectory);
 				dcvs.setDate("" + f.lastModified());
 				
@@ -99,7 +99,7 @@ public class IO{
 		if(ruta != null && !checkExt(ruta,ext)) {												//Si son diferentes
 			ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 			//Comprobación de que es una extensión registrada
-			if (!Types.hasType(ext2)) {										//Sino esta registrada, tomar como no añadida.
+			if (!TypesFiles.hasType(ext2)) {										//Sino esta registrada, tomar como no añadida.
 				ruta2 = ruta + ext;												//Añade la extensión.
 			}else {																//En otro caso remover la que tiene por la nueva.
 				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
@@ -142,16 +142,16 @@ public class IO{
 		String ruta  = null;
 		FileNameExtensionFilter filtro = null;
 		//Comprobación de filtro para imagenes soportadas u otros tipos.
-		if(!ext.equals(Types.IMG)) {
-			filtro = new FileNameExtensionFilter(Types.get(ext),ext);
+		if(!ext.equals(TypesFiles.IMG)) {
+			filtro = new FileNameExtensionFilter(TypesFiles.get(ext),ext);
 		}else {
-			filtro = new FileNameExtensionFilter(Types.get(ext), Types.PNG, Types.JPG, Types.JPEG, Types.GIF);
+			filtro = new FileNameExtensionFilter(TypesFiles.get(ext), TypesFiles.PNG, TypesFiles.JPG, TypesFiles.JPEG, TypesFiles.GIF);
 		}
 		
 		JFileChooser sf = new JFileChooser(".");								//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
 		sf.setFileFilter(filtro);												//Establecimiento del filtro
-		sf.setDialogTitle(Types.get(ext));
+		sf.setDialogTitle(TypesFiles.get(ext));
 		int seleccion;
 		//Apertura del dialogo correspondiente a la selección indicada.
 		if(sel == 1) seleccion = sf.showOpenDialog(null);
@@ -182,10 +182,10 @@ public class IO{
 		boolean ok = true;
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
-		if(ext.equals(Types.IMG) && !(ext2.equals(Types.JPG) || ext2.equals(Types.PNG) || ext2.equals(Types.JPEG) || ext2.equals(Types.GIF))) {
+		if(ext.equals(TypesFiles.IMG) && !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
 			System.out.println("Tipo de imagen incorrecto: " + ext2);
 			ok = false;
-		}else if(!ext.equals(Types.IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
+		}else if(!ext.equals(TypesFiles.IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
 			System.out.println("Tipo de fichero sin extensión conocida: " + ext2);
 			ok = false;
 		}

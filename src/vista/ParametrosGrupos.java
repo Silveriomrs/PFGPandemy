@@ -37,9 +37,7 @@ public class ParametrosGrupos extends JPanel {
 	JFrame frame;
 	private ControladorModulos cm;
 	private JTabbedPane paneles;	
-//	private int numeroZonas;
 	private int contadorPaneles;
-//	private HashMap<Integer, Zona> zonas;
 	private HashMap<Integer, VistaZona> vistasZonas;
 	
 	/**
@@ -55,10 +53,8 @@ public class ParametrosGrupos extends JPanel {
 		this.cm = cm;
 		setMaximumSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(800, 600));
-		this.setPreferredSize(new Dimension(800, 600));
+		this.setPreferredSize(new Dimension(1000, 700));
 		this.contadorPaneles = 0;
-//		this.numeroZonas = 0;
-//		this.zonas = new HashMap<Integer,Zona>();
 		this.vistasZonas = new HashMap<Integer,VistaZona>();
 		this.setEnabled(false);
 		setLayout(new BorderLayout(0, 0));

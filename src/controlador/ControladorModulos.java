@@ -21,7 +21,7 @@ import modelo.Labels;
 import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
 import modelo.ParserProyectoVS;
-import modelo.Types;
+import modelo.TypesFiles;
 import modelo.Zona;
 import vista.About;
 import vista.Archivos;
@@ -93,7 +93,7 @@ public class ControladorModulos {
 		modulos = new HashMap<String, DCVS>();
 		zonas = new HashMap<Integer,Zona>();
 		@SuppressWarnings("unused")
-		Types types = new Types();												//Necesario para inicializar las funciones correctamente de la clase Types.
+		TypesFiles typesFiles = new TypesFiles();												//Necesario para inicializar las funciones correctamente de la clase TypesFiles.
 		//Inicio de los controladores
 		cio = new ControladorDatosIO();
 		//Inicio de las vistas
@@ -205,6 +205,18 @@ public class ControladorModulos {
 	 */
 	public HashMap<Integer,Zona> getZonas() { return this.zonas;}
 	
+	
+	public boolean isNumeric(String cadena) {
+        boolean resultado = false;
+        try {
+            Integer.parseInt(cadena);
+            resultado = true;
+        } catch (NumberFormatException excepcion) {
+            resultado = false;
+        }
+        return resultado;
+    }
+	
 	/**
 	 * Realiza la conversión de datos de texto a un poligono cerrado. En el array
 	 * de datos debe estar conforme a ID, Nombre, Px;y... donde Px;y son las
@@ -221,6 +233,7 @@ public class ControladorModulos {
 		String nombre = puntos[1];
 		int habitantes =  Integer.parseInt(puntos[2]);
 		int superficie =  Integer.parseInt(puntos[3]);
+		System.out.println(puntos[3]);
 		int s =  Integer.parseInt(puntos[4]);
 		int i =  Integer.parseInt(puntos[5]);
 		int r =  Integer.parseInt(puntos[6]);
@@ -309,7 +322,7 @@ public class ControladorModulos {
 	 * la lista de colores en formato Color.</p> 
 	 * @param modelo Modelo con los datos de la nueva paleta.
 	 */
-	public void setPaleta(DefaultTableModel modelo) {
+	public void setPaleta(DCVS modelo) {
 		int filas = modelo.getRowCount();
 		ArrayList<Color> colores = new ArrayList<Color>();
 		//Leer colores.
@@ -359,18 +372,18 @@ public class ControladorModulos {
 				mostrarPanel(nombre);
 				break;
 			case "Abrir Proyecto":
-				DCVS prj = cio.abrirArchivo(null,Types.PRJ);
+				DCVS prj = cio.abrirArchivo(null,TypesFiles.PRJ);
 				if(prj != null) {abrirProyecto(prj);}
 				break;
 			case "Importar Modelo A":
-				DCVS pVS = cio.abrirArchivo(null,Types.CSV);
+				DCVS pVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) importarProyectoVS(pVS);
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
 			case "Importar Modelo B":
 				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
-				DCVS hVS = cio.abrirArchivo(null,Types.CSV);
+				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) importarHistoricoVS(hVS);
 				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
@@ -468,7 +481,7 @@ public class ControladorModulos {
 	/**
 	 * <p>Title: hasModulo</p>  
 	 * <p>Description: Indica si existe un módulo cargado en el sistema.</p> 
-	 * @param tipo Tipo de módulo {@link Types Tipo de archivos y módulos}.
+	 * @param tipo Tipo de módulo {@link TypesFiles Tipo de archivos y módulos}.
 	 * @return TRUE si el sistema contiene dicho módulo, FALSE en otro caso.
 	 */
 	public boolean hasModulo(String tipo) {	return modulos.containsKey(tipo);}
@@ -483,18 +496,14 @@ public class ControladorModulos {
 	 */
 	public void guardarProyecto(DCVS dcvsIn) {
 		DCVS dcvs = dcvsIn;
-		//Si se llama con null a la función crear nuevo módulo proyecto.	
-//		if(dcvs == null) dcvs = creaModuloProyecto();
-		
 		//Guardado del fichero:
 		String ruta = cio.guardarArchivo(dcvs);
 		if(dcvs != null && ruta != null) {
 			//Configuración de la ruta
 			dcvs.setRuta(ruta);
 			//Mostrar ruta en Field.
-			archivos.setLabel(Types.PRJ,ruta);
-//			mapaFields.get(IO.PRJ).setText(ruta);
-			modulos.put(Types.PRJ, dcvs);
+			archivos.setLabel(TypesFiles.PRJ,ruta);
+			modulos.put(TypesFiles.PRJ, dcvs);
 		}
 
 	}
@@ -538,7 +547,7 @@ public class ControladorModulos {
 			String dato = m[1];
 			String etiq = m[0];
 			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
-			if(!etiq.equals(Types.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
+			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
 				DCVS mAux = cio.abrirArchivo(dato,etiq);						//Carga el módulo desde el sistema de archivos.
 				establecerDatos(mAux);											//Establecer el módulo.
 			}else if(etiq.equals(Labels.NG)){									//Crea tantas zonas iniciales como indiqué el proyecto.
@@ -560,35 +569,36 @@ public class ControladorModulos {
 	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
 	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
 	 * @param datos Conjunto de datos y cabecera encapsulados.
+	 * @return TRUE si la operación se ha realizado. FALSE en otro caso.
 	 */
-	public void establecerDatos(DCVS datos) {
+	public boolean establecerDatos(DCVS datos) {
+		boolean isDone = true;
 		String tipo = datos.getTipo();
 		//Actualizar etiqueta correspondiente con la ruta del archivo.
 		archivos.setLabel(tipo,datos.getNombre());
 		
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
-		if(modulos.containsKey(Types.PRJ)) {
-			String[] nuevaEntrada = {tipo,datos.getRuta()};
-			int linea = modulos.get(Types.PRJ).getFilaItem(tipo);
+		if(modulos.containsKey(TypesFiles.PRJ)) {
+			String[] nuevaEntrada = {tipo,datos.getNombre()};
+			int linea = modulos.get(TypesFiles.PRJ).getFilaItem(tipo);
 			boolean lineaDuplicada = linea > -1;
 			//Si hay un módulo ya cargado, hay que sustituirlo.
-			if(lineaDuplicada) {modulos.get(Types.PRJ).delFila(linea);}			//Eliminar entrada duplicada.
-			modulos.get(Types.PRJ).addFila(nuevaEntrada);						//Añadir nueva entrada.
+			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}			//Eliminar entrada duplicada.
+			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);						//Añadir nueva entrada.
 		}
 		
 		//Guardar los datos del módulo en su conjunto.
 		modulos.put(tipo, datos);
-		System.out.println("CM > establecerDatos > add modulo: " + hasModulo(tipo));
 		//Operaciones extras según tipo de módulo.
 		switch(tipo) {
-			case (Types.MAP):
+			case (TypesFiles.MAP):
 				setPoligonos(datos);
 				break;
-			case (Types.HST):
+			case (TypesFiles.HST):
 				setHistorico(datos);
 				break;
-			case (Types.DEF):
+			case (TypesFiles.DEF):
 				vistaSIR.reset();
 				break;
 			default:			
@@ -598,6 +608,8 @@ public class ControladorModulos {
 		principal.reset();
 		//Actualización de la vista archivos.
 		archivos.refresh();
+		
+		return isDone;
 	}
 	
 	/* En progreso de implementación acciones Pizarra*/
@@ -655,7 +667,7 @@ public class ControladorModulos {
 		if(op.equals("Abrir")) {
 			dcvs = cio.abrirArchivo(null,ext);
 			ok = dcvs != null;
-			if(ok && !ext.equals(Types.PRJ)) {establecerDatos(dcvs);}
+			if(ok && !ext.equals(TypesFiles.PRJ)) {establecerDatos(dcvs);}
 			else if(ok) {abrirProyecto(dcvs);}
 		
 		}else if(op.equals("Borrar") && modulos.containsKey(ext)){
@@ -673,7 +685,7 @@ public class ControladorModulos {
 				//Si es guardar como, poner ruta a null. En otro caso guardará con la ruta que contiene.
 				if(op.equals("Guardar como")) { dcvs.setRuta(null); }
 				//
-				if(ext.equals(Types.PRJ)) guardarProyecto(dcvs);
+				if(ext.equals(TypesFiles.PRJ)) guardarProyecto(dcvs);
 				else guardarModulo(dcvs);
 			}
 		}	
@@ -686,19 +698,16 @@ public class ControladorModulos {
 	 * <p>Title: doActionTable</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes al módulo
 	 *  editor de tablas.</p>
-	 * @param op Tipo de datos que esperan ser guardados tras modificación.
+	 * @param modulo Módulo con los datos que esperan ser guardados tras modificación.
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
-	public boolean doActionTableEditor(String op) {
+	public boolean doActionTableEditor(DCVS modulo) {
+		boolean ok = true;
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		//tablaEditor.enableBotonesGuardado(Types.MAP, true);
-		System.out.println("doActionTableEditor > selección: " + op);
-		
-		
-		
-		
-		
-		return true;
+		System.out.println("doActionTableEditor > módulo:\n" + modulo.toString());
+		ok = establecerDatos(modulo);
+
+		return ok;
 	}
 
 	/* En progreso de implementación VistasZonas y Grupos */
@@ -716,7 +725,7 @@ public class ControladorModulos {
 	 */
 	public boolean doActionVistaZona() {
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		archivos.enableBotonesGuardado(Types.MAP, true);
+		archivos.enableBotonesGuardado(TypesFiles.MAP, true);
 		return true;
 	}
 	
@@ -731,7 +740,7 @@ public class ControladorModulos {
 	 */
 	public boolean doActionVistaSIR() {
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		archivos.enableBotonesGuardado(Types.DEF, true);
+		archivos.enableBotonesGuardado(TypesFiles.DEF, true);
 		return true;
 	}
 	
@@ -778,7 +787,7 @@ public class ControladorModulos {
 	private void setDatosProyecto(DCVS dcvs, int NG) {
 		dcvs.addFila(new String[] {Labels.NG,"" + NG});
 		//Cambiamos la etiqueta de tipo de módulo a PRJ para poder procesarla correctamente.
-		dcvs.setTipo(Types.PRJ);
+		dcvs.setTipo(TypesFiles.PRJ);
 		//Llamamos a la función correspondiente.
 		abrirProyecto(dcvs);
 	}
@@ -797,7 +806,7 @@ public class ControladorModulos {
 		ParserProyectoVS parser = new ParserProyectoVS(prjV);
 		//Establecer los datos del proyecto primero (provoca clear). 
 //		abrirProyecto(parser.getmProyecto());
-//		modulos.put(Types.PRJ, parser.getmProyecto());
+//		modulos.put(TypesFiles.PRJ, parser.getmProyecto());
 //		setDatosProyecto(prjV,parser.getNG());
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(parser.getZonas());

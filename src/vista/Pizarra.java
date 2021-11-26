@@ -37,7 +37,7 @@ import java.util.Map.Entry;
 import java.awt.event.MouseAdapter;
 
 import modelo.IO;
-import modelo.Types;
+import modelo.TypesFiles;
 import modelo.Zona;
 
 /**
@@ -606,7 +606,7 @@ public class Pizarra extends JFrame {
     		// Selección de imagen de fondo.
     		@SuppressWarnings("unused")
 			IO io = new IO();													//Sin esta ininicialización previa, no es posible cargar una imagen de fondo.
-    		String ruta = IO.selFile(1, Types.IMG);
+    		String ruta = IO.selFile(1, TypesFiles.IMG);
     		// En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && ruta != "") {
     			fondo = new ImageIcon(ruta).getImage();

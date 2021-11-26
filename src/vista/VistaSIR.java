@@ -25,7 +25,7 @@ import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
 import modelo.Labels;
-import modelo.Types;
+import modelo.TypesFiles;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -84,7 +84,7 @@ public class VistaSIR extends JPanel{
 		//Limpiar datos anteriores.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
 		//Realizar lectura de los datos en el propio módulo (si hay).
-		if(cm.getModulo(Types.DEF) != null) {updateFields();}
+		if(cm.getModulo(TypesFiles.DEF) != null) {updateFields();}
 		
 		refreshControls();
 		updateUI();
@@ -97,7 +97,7 @@ public class VistaSIR extends JPanel{
 	 *  en caso de estar disponibles, procede a la acción.
 	 */
 	private void updateFields() {
-		DCVS dcvs = cm.getModulo(Types.DEF);
+		DCVS dcvs = cm.getModulo(TypesFiles.DEF);
 		int nrows = dcvs.getRowCount();
 		for(int i = 0; i < nrows; i++) {
 			String label = (String) dcvs.getValueAt(i, 0);

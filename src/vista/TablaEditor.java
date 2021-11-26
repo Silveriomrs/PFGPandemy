@@ -29,12 +29,15 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import controlador.ControladorDatosIO;
 import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
-import modelo.Types;
+import modelo.ModuleType;
+import modelo.TypesFiles;
 
 
 /**
@@ -50,7 +53,6 @@ public class TablaEditor extends JPanel{
 
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -3765555595448024955L;
-
 	//
 	private final String IVentana = "/vista/imagenes/Iconos/editorGrafico_128px.png";
 	//
@@ -59,19 +61,18 @@ public class TablaEditor extends JPanel{
 	private JScrollPane scrollPane;
 	private JTable tabla;
 
-	private DefaultTableModel modelo;
 	private DCVS dcvs;
 	private JLabel lblAsignarTablaA;
-	private JComboBox<String> comboBox;
+	private JComboBox<ModuleType> comboBox;
 	private JButton btnAsignarTabla;
 	private ControladorDatosIO cio;
 	private ControladorModulos cm;
 	private JToolBar jtoolBar;
 	private JPanel boxAsignacion;
 	private JFrame frame;
+	private Image imagen;
+	private String ruta = "/vista/imagenes/degradado.png";
 	
-	private String ruta;
-	private String tipo;
 	private boolean modificado;
 
 	
@@ -88,10 +89,18 @@ public class TablaEditor extends JPanel{
 		setBorder(null);
 		setOpaque(false);
 		this.cio = new ControladorDatosIO();
-		this.ruta = null;
-		this.tipo = null;
 		this.modificado = false;
 		initialize();
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		if(ruta != null) {
+			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
+			setOpaque(false);
+			super.paint(g);
+		}
 	}
 
 	/**
@@ -117,6 +126,20 @@ public class TablaEditor extends JPanel{
 	 */
 	public void reset() {nuevaTabla();}
 
+	/**
+	 * <p>Title: setUpComboBox</p>  
+	 * <p>Description: Configuración del JComboBox con las opciones posibles</p>
+	 */
+	private void setUpComboBox() {
+		comboBox = new JComboBox<ModuleType>();
+		comboBox.setMaximumSize(new Dimension(102, 25));
+		comboBox.setMinimumSize(new Dimension(102, 25));
+		comboBox.setName("Asignar tabla");
+		comboBox.setToolTipText("Seleccione el tipo de tabla.");
+		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		comboBox.setModel(new DefaultComboBoxModel<ModuleType>(ModuleType.values()));
+	}
+	
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
@@ -160,13 +183,7 @@ public class TablaEditor extends JPanel{
 		boxAsignacion.setBorder(null);
 		boxAsignacion.setBackground(Color.ORANGE);
 		
-		comboBox = new JComboBox<String>();
-		comboBox.setMaximumSize(new Dimension(102, 25));
-		comboBox.setMinimumSize(new Dimension(102, 25));
-		comboBox.setName("Asignar tabla");
-		comboBox.setToolTipText("Seleccione el tipo de tabla.");
-		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sin asignar", "Modelo","Mapas","Enfermedad", "Historico", "Paleta", "Relaciones"}));
+		setUpComboBox();
 		
 		btnAsignarTabla = new JButton("Aplicar tipo");
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
@@ -177,7 +194,7 @@ public class TablaEditor extends JPanel{
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
 		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
 		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		lblAsignarTablaA.setBackground(Color.WHITE);
+		lblAsignarTablaA.setBackground(Color.BLUE);
 
 		boxAsignacion.add(lblAsignarTablaA);
 		boxAsignacion.add(comboBox);
@@ -209,15 +226,15 @@ public class TablaEditor extends JPanel{
 	private void estadoBotones() {
 		//Botones de guardado.
 		btnGuardarArchivo.setEnabled(modificado);
-		btnGuardarCambios.setEnabled(modificado && ruta != null && tipo != null);
+		btnGuardarCambios.setEnabled(modificado && dcvs.getRuta() != null && dcvs.getTipo() != null);
 		//Botones nueva tabla, fila, borrarTabla
-		boolean tieneColumna = modelo.getColumnCount() > 0;
+		boolean tieneColumna = dcvs.getColumnCount() > 0;
 		btnBorrarTabla.setEnabled(tieneColumna);
 		btnNuevaTabla.setEnabled(tieneColumna);
 		btnAddRow.setEnabled(tieneColumna);
 		btnBorrarColumna.setEnabled(tieneColumna);
 		//Botón borrar fila => debe tener alguna fila.
-		boolean tieneFila = modelo.getRowCount() > 0;
+		boolean tieneFila = dcvs.getRowCount() > 0;
 		btnBorrarFila.setEnabled(tieneFila);
 		
 		//Controles especiales.
@@ -287,16 +304,20 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: setModelo</p>  
 	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
+	 * El tipo de módulo debe estar definido en: {@link ModuleType Tipos de módulos}.
 	 * @param dcvs JTableModel o modelo que se quiere establecer.
 	 */
 	public void setModelo(DCVS dcvs) {
-		//"Sin asignar", "Modelo", "Mapas", "Enfermedad", "Historico", "Paleta", "Relaciones".
-		this.dcvs = dcvs;
-		this.modelo = dcvs.getModelo();
-		String tipo = dcvs.getTipo();
+		//Obtener valor Enúmerado.
+		String tipo = dcvs.getTipo().toUpperCase();
+		ModuleType mt = ModuleType.valueOf(tipo); 
 		//Establecer en el selector el tipo.
-		comboBox.setSelectedItem(tipo);
-		tabla.setModel(modelo);
+		comboBox.setSelectedItem(mt);
+		//Si el tipo no es General (CVS) bloquearlo para impedir inconsistencias por error de asignación.
+		comboBox.setEnabled(dcvs.getTipo().equals(TypesFiles.CSV));
+		//Prueba...
+		tabla.setModel(dcvs);
+//		tabla.setModel(modelo);
 		estadoBotones();
 	}
 	
@@ -309,18 +330,15 @@ public class TablaEditor extends JPanel{
 		Object[][] datos = new Object[][]{};
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {};
-		modelo = new DefaultTableModel(datos,cabecera){
-			private static final long serialVersionUID = 5615251971828569240L;
-	//		@SuppressWarnings("rawtypes")
-	//		Class[] columnTypes = new Class[] {Object.class, Object.class, Object.class, Object.class, Object.class};
-	//		public Class<?> getColumnClass(int columnIndex) {return columnTypes[columnIndex];}  //Si deseo fijar el número de columnas.
-		};
-		
-		tabla.setModel(modelo);
 		dcvs = new DCVS();
-		dcvs.setModelo(modelo);
-		this.ruta = null;
-		this.tipo = null;
+		dcvs.setTipo(TypesFiles.CSV);
+		dcvs.setModelo(new DefaultTableModel(datos,cabecera){
+			private static final long serialVersionUID = 5615251971828569240L;
+		});
+		//Listener que avisará de cambios en la tabla -> activa botón de guardado.
+		dcvs.addTableModelListener(new TableUpdateListener());
+		tabla.setModel(dcvs);
+		
 		this.modificado = false;
 		estadoBotones();
 	}
@@ -332,26 +350,37 @@ public class TablaEditor extends JPanel{
 	 * 
 	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un 
 	 * mensaje tipo 1. 
-	 * @param txt Texto a mostrar.
+	 * @param mensaje Texto a mostrar.
 	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
-	 *  0 JOptionPane.ERROR_MESSAGE
-	 *  1 JOptionPane.INFORMATION_MESSAGE
-	 *  2 JOptionPane.WARNING_MESSAGE
-	 *  3 JOptionPane.QUESTION_MESSAGE  
-	 *  4 JOptionPane.PLAIN_MESSAGE
+	 *  <p>0 JOptionPane.ERROR_MESSAGE</p>
+	 *  <p>1 JOptionPane.INFORMATION_MESSAGE</p>
+	 *  <p>2 JOptionPane.WARNING_MESSAGE</p>
+	 *  <p>3 JOptionPane.QUESTION_MESSAGE</p>
+	 *  <p>4 JOptionPane.PLAIN_MESSAGE</p>
+	 *  <p>10 JOptionPane.showConfirmDialog OK_CANCEL_OPTION</p>
+	 * @return Devuelve el valor de la opción elegida para ShowConfirmDialog, 0 en otro caso.
+	 * @see JOptionPane
 	 */
-	private void mostrar(String txt, int tipo ) {
+	private int mostrar(String mensaje, int tipo ) {
 		String titulo = "";
+		int eleccion = 0;
 		switch(tipo) {
 		case 0: titulo = "Error";break;
 		case 1: titulo = "Información"; break;
 		case 2: titulo = "¡Antención!"; break;
 		case 3: titulo = "Consulta"; break;
 		case 4: titulo = "Acerca de..."; tipo = 1; break;
+		case 10: titulo = "Atención";break;
 		default:
-			titulo = "";
 		}
-		JOptionPane.showMessageDialog(null, txt, titulo, tipo);
+		
+		if(tipo == 10) {
+			eleccion = JOptionPane.showConfirmDialog(null, mensaje, titulo, JOptionPane.OK_CANCEL_OPTION);
+		}else {
+			JOptionPane.showMessageDialog(null, mensaje, titulo, tipo);
+		}
+		
+		return eleccion;
 	}
 	
 	private class BtnImprimirMouseListener extends MouseAdapter {
@@ -369,8 +398,9 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-				if(txt != null && !txt.equals("")){									//Si no se ha cancelado o no se ha introducido texto -> procede
-					modelo.addColumn(txt);											//Añade la columna.
+				//Si no se ha cancelado o no se ha introducido texto -> procede
+				if(txt != null && !txt.equals("")){									
+					dcvs.addColumna(txt);										//Añade la columna.
 					modificado = true;
 					estadoBotones();
 				}
@@ -382,10 +412,10 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				int ncols = modelo.getColumnCount();								//Obtención del número de columnas.
-				if(ncols > 0) {														//Comprobación de que existe al menos una columna.
-					Object[] o = new Object[ncols];
-					modelo.addRow(o);
+				int ncols = dcvs.getColumnCount();							//Obtención del número de columnas.
+				if(ncols > 0) {													//Comprobación de que existe al menos una columna.
+					Object[] row = new Object[ncols];							//Generar una fila con tantos campos como columnas tiene la tabla.
+					dcvs.addFila(row);											//Se añade.
 					modificado = true;
 				}else {
 					mostrar("Debe añadir alguna columna.", 0);
@@ -399,15 +429,12 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				if(tipo == null) tipo = Types.CSV;
-				DCVS dcvs2 = cio.abrirArchivo(null,tipo);			
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
+				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());			
 				if(dcvs2 != null) {
 					dcvs = dcvs2;
-					ruta = dcvs.getRuta();
-					tipo = dcvs.getTipo();
 					modificado = false;
-					modelo = dcvs.getModelo();
-					tabla.setModel(modelo);										//Estabece el nuevo modelo en el scroll tabla.
+					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
 					mostrar("Archivo Cargado", 1);
 					estadoBotones();
 				}
@@ -419,10 +446,9 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
-				if(tipo == null || tipo.equals("")) tipo = Types.CSV;
-				dcvs.setModelo(tabla.getModel());
-				dcvs.setRuta(ruta);
-				dcvs.setTipo(tipo);			
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
+//				dcvs.setModelo(tabla.getModel());
+//				* Ver si se realizan los cambios en dvs sin necesidad de establecer sobre si mismo el modelo en dcvs
 				if(dcvs.getRowCount() >0) {
 					String rutaF = cio.guardarArchivo(dcvs);
 					if(rutaF != null) {
@@ -436,23 +462,18 @@ public class TablaEditor extends JPanel{
 		}
 	}
 	
-	
 	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				DCVS bd = new DCVS();
-				bd.setModelo(tabla.getModel());
 				String rutaF;
 				//Sino tiene de un tipo se le asigna el tipo general.
-				if(tipo == null || tipo.equals("")) {tipo = Types.CSV;	}			
-				bd.setTipo(tipo);
-				if(bd.getRowCount() >0) {
-					rutaF = cio.guardarArchivo(bd);
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
+				if(dcvs.getRowCount() >0) {
+					rutaF = cio.guardarArchivo(dcvs);
 					if(rutaF != null) {
 						mostrar("Archivo guardado", 1);
-						bd.setRuta(rutaF);
-						ruta = rutaF;
+						dcvs.setRuta(rutaF);
 						modificado = false;
 						estadoBotones();
 					}					
@@ -466,10 +487,7 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				DCVS dcvs = new DCVS();
-				dcvs.setModelo(modelo);
 				dcvs.delFilas(tabla.getSelectedRows());
-				tabla.setModel(modelo);
 				modificado = true;
 				estadoBotones();
 			}
@@ -481,10 +499,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				int[] cols = tabla.getSelectedColumns();						//Obtención de las columnas a eliminar.
-				DCVS dcvs = new DCVS();
-				dcvs.setModelo(modelo);
-				dcvs.delColumnas(cols);				
-				tabla.setModel(dcvs.getModelo());								//Establecemos el nuevo modelo en la tabla.
+				dcvs.delColumnas(cols);											//Establecemos el nuevo modelo en la tabla.
 				modificado = true;
 				estadoBotones();
 			}
@@ -500,52 +515,80 @@ public class TablaEditor extends JPanel{
 	 * @version versión
 	 */
 	private class BtnAplicarTablaMouseListener extends MouseAdapter {
-		//"Sin asignar", "Mapas", "Historico", "Paleta", "Relaciones"
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				boolean actuar = true;
+				int respuesta = 0;
 				//Obtener selección
-				String seleccion = (String) comboBox.getSelectedItem();
-				//"Sin asignar", "Modelo","Mapas","Enfermedad", "Historico", "Paleta", "Relaciones"
+				ModuleType seleccion = (ModuleType) comboBox.getSelectedItem();
 				
-				if(!seleccion.equals("Sin asignar")) {
-					mostrar("Cuidado, esta acción sobreescribe los datos existentes en dicho módulo.", 2);
+				if(seleccion != ModuleType.CSV) {
+					respuesta = mostrar("Atención, esta acción sobreescribe los datos existentes en el módulo " + seleccion, 10);
 				}
 				
-				switch(seleccion){
-					case "Mapas":
-						tipo = Types.MAP;
-						break;
-					case "Historico": 
-						DCVS dcvs = new DCVS();
-						dcvs.setModelo(modelo);
-						cm.setHistorico(dcvs);
-						tipo = Types.HST;
-						break;
-					case "Paleta":
-						cm.setPaleta(modelo);
-						mostrar("Nueva paleta asignada", 1);
-						//nuevaTabla();
-						tipo = Types.PAL;
-						break;
-					case "Relaciones":
-						tipo = Types.REL;
-						break;
-					case "Enfermedad":
-						tipo = Types.DEF;
-						break;
-					case "Modelo":
-						tipo = Types.PRJ;
-						break;
-				}
+				System.out.println(seleccion);
 				
-				actuar = cm.doActionTableEditor(seleccion);
+				// Si se acepta ...
+				if(respuesta == JOptionPane.OK_OPTION) {
+					// Establecer tipo.
+					dcvs.setTipo(setTipo(seleccion));
+					// Mandarlo a procesar al CM.	
+					actuar = cm.doActionTableEditor(dcvs);			
+				}
+				//En caso de haber aceptado, mensaje al usuario y actualizar estado de los controles.
 				if(actuar) {
-					mostrar("Nuevo tipo de tabla especificado: " + tipo, 1);
+					mostrar("Datos aplicados al módulo: " + seleccion, 1);
 					estadoBotones();
 				}	
 			}
+		}
+		
+		/**
+		 * <p>Title: setTipo</p>  
+		 * <p>Description: Realiza una conversión de tipos de archivos definidos
+		 *  en la clase {@link TypesFiles} a tipos enumerados de {@link ModuleType}.</p> 
+		 * @param seleccion Tipo enumerado de la clase {@link ModuleType}
+		 * @return Valor correspondiente a los tipos de la clase {@link TypesFiles}.
+		 * @see ModuleType
+		 */
+		private String setTipo(ModuleType seleccion) {
+			String tipo = "CVS";
+			switch(seleccion){
+			case MAP:
+				tipo = TypesFiles.MAP;
+				break;
+			case HST: 
+				cm.setHistorico(dcvs);
+				tipo = TypesFiles.HST;
+				break;
+			case PAL:
+				//Cambiado, esto recibía el modelo de la tabla.
+				cm.setPaleta(dcvs);
+				mostrar("Nueva paleta asignada", 1);
+				tipo = TypesFiles.PAL;
+				break;
+			case REL:
+				tipo = TypesFiles.REL;
+				break;
+			case DEF:
+				tipo = TypesFiles.DEF;
+				break;
+			case PRJ:
+				tipo = TypesFiles.PRJ;
+				break;
+			case CSV:
+				tipo = TypesFiles.CSV;
+				break;
+			case GRP:
+				tipo = TypesFiles.GRP;
+				break;
+			default:
+				break;
+			}
+			
+			return tipo;
 		}
 	}
 	
@@ -573,6 +616,16 @@ public class TablaEditor extends JPanel{
 			}
 		}
 	}
+	
+	private class TableUpdateListener implements TableModelListener {
+            @Override
+            public void tableChanged(TableModelEvent tme) {
+                if (tme.getType() == TableModelEvent.UPDATE) {
+                    modificado = true;
+                }
+            }
+	    }
+	
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {

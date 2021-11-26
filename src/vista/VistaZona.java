@@ -185,7 +185,7 @@ public class VistaZona extends JPanel {
 	    int x = (int)m.getWidth();
 	    int y = (int)m.getHeight()+15;
 	    frame.setPreferredSize(new Dimension(x, y));
-	    frame.setMaximumSize(new Dimension(2767, 2767));
+	    frame.setMaximumSize(new Dimension(1024, 768));
 		frame.setMinimumSize(new Dimension(720, 550));
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);

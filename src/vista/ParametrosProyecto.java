@@ -9,6 +9,8 @@
 package vista;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -35,6 +37,7 @@ import java.util.Date;
 import javax.swing.border.LineBorder;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 /**
@@ -48,6 +51,8 @@ public class ParametrosProyecto extends JPanel {
 	
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -73292561581668096L;
+	private Image imagen;
+	private String ruta = "/vista/imagenes/agua_800px.png";
 	private ControladorModulos cm;
 	private JFormattedTextField fTFNombre;
 	private JFormattedTextField fTFAutor;
@@ -71,7 +76,75 @@ public class ParametrosProyecto extends JPanel {
 		setAutoscrolls(true);
 		setSize(new Dimension(1024, 768));
 		setName("Propiedades_Proyecto");
+		archivos.setBounds(275, 323, 640, 347);
+		add(archivos);	
+		configurar();
 
+	}
+	
+	
+	@Override
+	public void paint(Graphics g) {
+		if(ruta != null) {
+			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
+			setOpaque(true);
+			super.paint(g);
+		}
+	}
+	
+
+	/* Clases privadas */
+	
+	
+	
+	
+	private class BotonL extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent evt) {
+			//Si no puede se puede convertir a int, no es un número.
+			int NG = -1;
+			try{NG = Integer.parseInt(fTFNGrupos.getText());}
+			catch(Exception e) {
+				fTFNGrupos.setText(null);										//Le borramos texto.
+				System.out.println("Valor incorrecto: " + fTFNGrupos.getText() );
+			}
+			String nombre = fTFNombre.getText();
+			if(nombre == null) nombre = "";
+			String autor = fTFAutor.getText();
+			if(autor == null) autor = "";
+			String descripcion = textArea.getText();
+			if(descripcion == null) descripcion = "";
+			String version = fTFVersion.getText();
+			if(version == null) version = "";
+			Date date = dateChooser.getDate();
+			if(date == null) date = new Date();
+//			cm.doActionPProyecto();
+			System.out.println("En proceso de integración de la función");
+			System.out.println("Leído > nombre: " + nombre +
+					", Autor: " + autor + ", descripción: " + descripcion +
+					", versión: " + version + ", NG: " + NG + ", date: " + date.toString());
+			cm.doPProyecto();
+		}
+	}
+	
+	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * por cadenas vacias y reinicia el resto de valores.
+	 */
+	public void reset() {
+		fTFNombre.setText(null);		
+		fTFAutor.setText(null);
+		textArea.setText(null);
+		fTFVersion.setText(null);
+		fTFNGrupos.setText(null);
+		dateChooser.setDate(new Date());
+	}
+
+
+	private void configurar() {
 		fTFNombre = setUpTextField(null,"Nombre del modelo, se usará para dar nombre a los archivos que lo componen.", SwingConstants.LEFT);
 		fTFAutor = setUpTextField(null,"Autor del modelo.",SwingConstants.LEFT);
 		fTFVersion = setUpTextField("1.0","Número de versión del modelo.",SwingConstants.CENTER);	
@@ -82,20 +155,19 @@ public class ParametrosProyecto extends JPanel {
 		fTFAutor.setBounds(275, 110, 235, 19);
 		fTFVersion.setBounds(715, 155, 63, 19);
 		fTFNGrupos.setBounds(275, 277, 63, 19);
-		archivos.setBounds(275, 323, 640, 347);
+
 		//
 		setName("Módulos");
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setBackground(Color.LIGHT_GRAY);
 		setAutoscrolls(true);
-		configurar();
 		setLayout(null);
 		
 		add(fTFNombre);
 		add(fTFAutor);
 		add(fTFVersion);	
 		add(fTFNGrupos);
-		add(archivos);	
+		
 
 		JLabel lblAutor = new JLabel("Autor/a:");
 		lblAutor.setBounds(53, 112, 57, 15);
@@ -168,7 +240,6 @@ public class ParametrosProyecto extends JPanel {
 		date0.setColumns(10);
 		add(date0);
 		
-		
 		JSeparator separator = new JSeparator();
 		separator.setBackground(Color.BLUE);
 		separator.setBounds(28, 305, 903, 19);
@@ -181,57 +252,6 @@ public class ParametrosProyecto extends JPanel {
 		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
 		btnAplicar.setBounds(682, 201, 233, 74);
 		add(btnAplicar);
-		
-	}
-	
-	/* Clases privadas */
-	
-	private class BotonL extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent evt) {
-			//Si no puede se puede convertir a int, no es un número.
-			int NG = -1;
-			try{NG = Integer.parseInt(fTFNGrupos.getText());}
-			catch(Exception e) {
-				fTFNGrupos.setText(null);										//Le borramos texto.
-				System.out.println("Valor incorrecto: " + fTFNGrupos.getText() );
-			}
-			String nombre = fTFNombre.getText();
-			if(nombre == null) nombre = "";
-			String autor = fTFAutor.getText();
-			if(autor == null) autor = "";
-			String descripcion = textArea.getText();
-			if(descripcion == null) descripcion = "";
-			String version = fTFVersion.getText();
-			if(version == null) version = "";
-			Date date = dateChooser.getDate();
-			if(date == null) date = new Date();
-//			cm.doActionPProyecto();
-			System.out.println("En proceso de integración de la función");
-			System.out.println("Leído > nombre: " + nombre +
-					", Autor: " + autor + ", descripción: " + descripcion +
-					", versión: " + version + ", NG: " + NG + ", date: " + date.toString());
-			cm.doPProyecto();
-		}
-	}
-	
-	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
-	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
-	 * por cadenas vacias y reinicia el resto de valores.
-	 */
-	public void reset() {
-		fTFNombre.setText(null);		
-		fTFAutor.setText(null);
-		textArea.setText(null);
-		fTFVersion.setText(null);
-		fTFNGrupos.setText(null);
-		dateChooser.setDate(new Date());
-	}
-
-
-	private void configurar() {
 		
 
 	}

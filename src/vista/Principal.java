@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import controlador.ControladorModulos;
 import modelo.FondoPanel;
 import modelo.IO;
+import modelo.TypesFiles;
 
 import java.awt.BorderLayout;
 import javax.swing.JMenuItem;
@@ -28,15 +29,18 @@ import java.awt.Dimension;
  * que sean necesarias.
  * @author Silverio Manuel Rosales Santana.
  * @date 2021/04/10
- * @version 2.8
+ * @version 2.9
  *
  */
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
+	/** FRAME Configuración del tamaño en pixels de la aplicación con el marco.*/  
+	public static Dimension FRAME = new Dimension(1024,768);
 	
 	private HashMap<String, JMenuItem> jmitems;
-	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
+//	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
+	private FondoPanel fondo = new FondoPanel("/vista/imagenes/agua_800px.png");
 	private JPanel panelCentral;
 	private ControladorModulos cm;
 	//
@@ -53,9 +57,9 @@ public class Principal extends JFrame {
 		this.setTitle("Simulación de enfermedades transmisibles en varios grupos de población");
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
-		this.setBounds(0, 0, w + 25, h + 15);
+		this.setBounds(0, 0, w, h + 45);
 		this.setLocationRelativeTo(null);
-		this.setResizable(true);
+		this.setResizable(false);
 		configurar();
 		this.setVisible(true);
 		//Clase privada para salir controlando guardar o no los cambios realizados.
@@ -171,6 +175,8 @@ public class Principal extends JFrame {
 		jmitems.get("Editor Gráfico").setEnabled(hasZonas);
 		//Desactivar vistas de grupos.
 		jmitems.get("Grupos").setEnabled(hasZonas);
+		//Desactivar vista de Parámetros de la enfermedad.
+		jmitems.get("Parámetros SIR").setEnabled(cm.hasModulo(TypesFiles.DEF));
 
 //		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
 		jmitems.get("Reproductor").setEnabled(hasZonas);
@@ -240,8 +246,8 @@ public class Principal extends JFrame {
 	 * @param args no usado.
 	 */
 	public static void main(String[] args) {
-		Principal ventana = new Principal(new ControladorModulos());
-		ventana.setVisible(true);
+		new ControladorModulos();
+		
 	}
 }
 

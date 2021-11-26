@@ -134,7 +134,7 @@ public class ParserProyectoVS {
 	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
 	 */
 	private void setUpDefEnf(){
-		setTypeAndName(definicionSIR,Types.DEF);
+		setTypeAndName(definicionSIR,TypesFiles.DEF);
 		//Crear cabecera		
 		String[] cabecera = {"tipo","dato"};
 		//Añadir cabecera.
@@ -215,7 +215,7 @@ public class ParserProyectoVS {
 	
 	private void setUpProyecto() {
 		//Añadir tipo y nombre
-		setTypeAndName(proyecto,Types.PRJ);
+		setTypeAndName(proyecto,TypesFiles.PRJ);
 		//Crear cabecera		
 		String[] cabecera = {"Tipo","Dato"};
 		//Añadir cabecera.
@@ -227,9 +227,9 @@ public class ParserProyectoVS {
 		proyecto.addFila(new String[]{Labels.DESCRIPTION,"Modelo obtenido de una fuente externa."});
 		
 		//Añadir ahora la ruta del resto de módulos.
-//		definicionSIR.addFila(new String[]{Types.HST,historico.getNombre()});
-//		definicionSIR.addFila(new String[]{Types.REL,matrizContactos.getNombre()});
-//		definicionSIR.addFila(new String[]{Types.DEF,definicionSIR.getNombre()});
+//		definicionSIR.addFila(new String[]{TypesFiles.HST,historico.getNombre()});
+//		definicionSIR.addFila(new String[]{TypesFiles.REL,matrizContactos.getNombre()});
+//		definicionSIR.addFila(new String[]{TypesFiles.DEF,definicionSIR.getNombre()});
 		System.out.println("\nProyecto: \n" + proyecto.toString());
 
 	}
@@ -245,7 +245,7 @@ public class ParserProyectoVS {
 	 */
 	private void setUpHistorico() {
 		//Añadir tipo y nombre
-		setTypeAndName(historico,Types.HST);
+		setTypeAndName(historico,TypesFiles.HST);
 		
 		String[] cabecera = new String[NG + 1];									//Una columna por cada zona y una columna para el tiempo.
 		//Generar cabecera.
@@ -410,7 +410,7 @@ public class ParserProyectoVS {
 	 * Usa los datos almacenados en el archivo de origen para establecer los
 	 *  nombres a los módulos particulares. 
 	 * @param modulo Módulo al que establecer los atributos de Tipo y Nombre.
-	 * @param type Tipo de datos que contiene el módulo. Ver: {@link Types Tipos de datos}.
+	 * @param type Tipo de datos que contiene el módulo. Ver: {@link TypesFiles Tipos de datos}.
 	 */
 	private void setTypeAndName(DCVS modulo, String type){
 		//Establecer atributos propios del módulo.
@@ -454,7 +454,7 @@ public class ParserProyectoVS {
 		}
 		
 		//Añadir tipo de datos y nombre
-		setTypeAndName(matrizContactos, Types.REL);
+		setTypeAndName(matrizContactos, TypesFiles.REL);
 		
 		if(traza) System.out.println( matrizContactos.toString() );
 	}

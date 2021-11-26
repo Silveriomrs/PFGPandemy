@@ -54,7 +54,7 @@ public class GraficasChart{
 	private JMenu mnVer;
 	private JMenu mnCasos;
 	private JMenu mnTasas;
-	private final String background = "/vista/imagenes/histograma1.jpg";
+	private final String background = "/vista/imagenes/degradado.png";
 	
 	/**
 	 * <p>Title: </p>  

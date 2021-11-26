@@ -1,5 +1,5 @@
 /**  
-* <p>Title: Types.java</p>  
+* <p>Title: TypesFiles.java</p>  
 * <p>Description: </p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
@@ -11,7 +11,7 @@ package modelo;
 import java.util.HashMap;
 
 /**
- * <p>Title: Types</p>  
+ * <p>Title: TypesFiles</p>  
  * <p>Description: Clase coordinadora de los tipos de archivos, módulos, 
  * extensiones y cualquie otra vicisitud que sea requerida por el sistema.</p>
  * Usa etiquetas para la relación con extensiones y archivos.
@@ -19,7 +19,7 @@ import java.util.HashMap;
  * @date 17 nov. 2021
  * @version versión 1.0
  */
-public class Types {
+public class TypesFiles {
 	
 	private static HashMap<String,String> tipos;
     
@@ -56,18 +56,18 @@ public class Types {
 	 * <p>Description: Inicializa los valores aceptables para los tipos de
 	 * archivos soportados por el sistema.</p>  
 	 */
-	public Types() {configurar();}
+	public TypesFiles() {configurar();}
 	
    private static void configurar() {
     	tipos = new HashMap<String,String>();
-    	tipos.put(PAL,"Paleta de colores");
-    	tipos.put(DEF,"Archivo definición de enfermedad");
+    	tipos.put(PAL, "Paleta");
+    	tipos.put(DEF, "Enfermedad");
     	tipos.put(CSV, "Archivo general");
-    	tipos.put(HST, "Archivo historico");
-    	tipos.put(MAP, "Archivo de mapa");
-    	tipos.put(GRP, "Archivo definición de grupos");
-    	tipos.put(PRJ, "Archivo de proyecto");
-    	tipos.put(REL, "Archivo de relaciones");
+    	tipos.put(HST, "Historico");
+    	tipos.put(MAP, "Mapas");
+    	tipos.put(GRP, "Grupos");
+    	tipos.put(PRJ, "Proyecto");
+    	tipos.put(REL, "Relaciones");
     	tipos.put(PNG, "Archivos de imagen PNG");
     	tipos.put(JPG, "Archivos de imagen JPG");
     	tipos.put(JPEG,"Archivos de imagen JPEG");
@@ -85,7 +85,7 @@ public class Types {
 		configurar();
 		String txt = null;
 		if(hasType(t)) txt = tipos.get(txt);
-		else System.out.println("Types > No existe tipo: " + t);
+		else System.out.println("TypesFiles > No existe tipo: " + t);
 		return txt;
 		
 	}
