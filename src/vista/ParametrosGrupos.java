@@ -157,7 +157,7 @@ public class ParametrosGrupos extends JPanel {
 		vistasZonas.put(ID, panelVZ);
         // Configurar Icono para la pestaña particular
 //		if(icono != null && !icono.equals("")) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
-		if(icono.isBlank()) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
+		if(!icono.isBlank()) paneles.setIconAt(contadorPaneles, IO.getIcon(icono,15,15));
 		contadorPaneles++;
 	}
 	

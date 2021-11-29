@@ -148,11 +148,7 @@ public class Mapa extends JPanel{
 	    	//Obtención del punto del mapa que ha recibido la pulsación.
 	        Point p = e.getPoint();
 	        Zona z = getZona(p);
-	        if(z != null) {
-	        	GraficasChart chart = z.getGrafica();
-        		chart.genera();
-        		chart.setVisible(true);
-	        }
+	        if(z != null) { z.getGrafica().setVisible(true);}
 	    }
 
 	    private Zona getZona(Point p) {

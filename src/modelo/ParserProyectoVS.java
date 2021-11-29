@@ -221,7 +221,7 @@ public class ParserProyectoVS {
 		//Añadir cabecera.
 		proyecto.addCabecera(cabecera);
 		//Añadir etiquetas generales.
-		proyecto.addFila(new String[]{Labels.NAME,dcvs.getNombre()});
+		proyecto.addFila(new String[]{Labels.NAME, dcvs.getNombre()});
 		proyecto.addFila(new String[]{Labels.NG,"" + getNG()});
 //		definicionSIR.addFila(new String[]{Labels.DATE,dcvs.getDate()});
 		proyecto.addFila(new String[]{Labels.DESCRIPTION,"Modelo obtenido de una fuente externa."});
@@ -233,8 +233,7 @@ public class ParserProyectoVS {
 		System.out.println("\nProyecto: \n" + proyecto.toString());
 
 	}
-	
-	
+		
 	/**
 	 * <p>Title: setUpHistorico</p>  
 	 * <p>Description: Genera la cabecera y filas legibles por la aplicación.</p>
@@ -333,8 +332,7 @@ public class ParserProyectoVS {
 		}
 		
 	}
-	
-	
+		
 	@SuppressWarnings("unused")
 	private String changeXY(String et, int id1, int id2) {
 		String label = et;

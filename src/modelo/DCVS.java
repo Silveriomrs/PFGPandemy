@@ -39,13 +39,24 @@ public class DCVS implements TableModel{
 		nuevoModelo();
 	}
 
-
+	
+	/**
+	 * Elimina los datos de la fila referenciada.
+	 * @param f fila a leer.
+	 */
+	public void clearRow(int f) {
+		int columnas = getColumnCount();
+		for(int i = 0; i<columnas;i++) {
+			modelo.setValueAt(null,f, i);
+		}
+	}
+	
 	/**
 	 * Devuelve la fila referenciada.
 	 * @param f fila a leer.
 	 * @return devuelve un array Object[] con los datos de una fila
 	 */
-	public String[] getFila(int f) {
+	public String[] getRow(int f) {
 		int columnas = getColumnCount();
 		String[] fila = new String[columnas];
 		for(int i = 0; i<columnas;i++) {
@@ -119,7 +130,7 @@ public class DCVS implements TableModel{
 	public boolean delFila(int fila) {
 		boolean done = false;
 		if (fila > -1 && fila < modelo.getRowCount()) {
-			System.out.println("DCVS delFila ->\nFila: " + fila + " > " + getFila(fila)[0]);
+			System.out.println("DCVS delFila ->\nFila: " + fila + " > " + getRow(fila)[0]);
 			modelo.removeRow(fila);
 			done = true;
 		}
@@ -174,8 +185,7 @@ public class DCVS implements TableModel{
 		}
 		return encontrado;
 	}
-	
-	
+		
 	/**
 	 * Devuelve la el modelo da la JTable
 	 * @return  DefaultTableModel modelo con los datos de la tabla.
@@ -271,6 +281,25 @@ public class DCVS implements TableModel{
 		return texto;
 	}
 	
+	/**
+	 * <p>Title: setDataToLabel</p>  
+	 * <p>Description: Asigna un valor a una etiqueta.</p>
+	 * Realiza una búsqueda por las filas buscando una etiqueta (que están situadas
+	 *  en la primera fila (indice 0) hasta encontrarla, el valor de dicha etiqueta
+	 *   esta almacenado en el segundo campo, y este dato será sobre escrito por
+	 *    el nuevo valor. En otro caso no realiza acción alguna. 
+	 * @param label Etiqueta a buscar.
+	 * @param data Dato a insertar en la tabla.
+	 * @return TRUE si la operación se ha realizado correctamente, FALSE en otro caso.
+	 */
+	public boolean setDataToLabel(String label, String data) {
+		boolean done = true;
+		int index = getFilaItem(label);
+		if( index >= 0) setValueAt(data,index,1);
+		else {done = false;}
+		return done;
+	}
+	
 	
 	/**
 	 * <p>Title: getFilaItem</p>  
@@ -302,7 +331,7 @@ public class DCVS implements TableModel{
 	 * @param v Valor a encontrar.
 	 * @return Número de la columna que contiene dicho valor (nombre). -1 En otro caso.
 	 */
-	public int getColItem(String v) { /* Función no probada. */
+	public int getColItem(String v) {
 		int cols = getColumnCount();
 		int col = -1;
 		int indexC = 0;
@@ -351,12 +380,21 @@ public class DCVS implements TableModel{
 	
 	/**
 	 * Establece el dato en la posición indicada dentro de la tabla.
+	 *  Si no existe la columna o la fila, mostrará el mensaje de aviso correspondiente
+	 *   y no realizará acción alguna.
 	 * @param arg0 Objeto o dato a establecer.
 	 * @param arg1 Número de fila.
 	 * @param arg2 Número de columna.
 	 */
 	@Override
-	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
+	public void setValueAt(Object arg0, int arg1, int arg2) {
+		if(arg1 >= this.getRowCount()) {
+			System.out.println("DCVS > setValueAt > Valor de número de fila incorrecto: " + arg1 + "/" + this.getRowCount());
+		}else if (arg2 >= this.getColumnCount() ) {
+			System.out.println("DCVS > setValueAt > Valor de número de columna incorrecto: " + arg2 + "/" + this.getColumnCount());
+		}else {this.modelo.setValueAt(arg0, arg1, arg2);}
+		
+	}
 	
 
 	/**
@@ -422,6 +460,5 @@ public class DCVS implements TableModel{
 	 * @param date La fecha a establecer del archivo.
 	 */
 	public void setDate(String date) {this.date = date;}
-	
 	
 }

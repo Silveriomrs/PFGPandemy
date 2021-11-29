@@ -33,12 +33,13 @@ import modelo.Labels;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.border.LineBorder;
-import javax.swing.JTextField;
 import javax.swing.JSeparator;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import java.util.Locale;
 
 /**
  * <p>Title: ParametrosProyecto</p>  
@@ -58,10 +59,11 @@ public class ParametrosProyecto extends JPanel {
 	private JFormattedTextField fTFAutor;
 	private JFormattedTextField fTFNGrupos;
 	private JFormattedTextField fTFVersion;
-	private JDateChooser dateChooser;	
+	private JDateChooser dateChooser0;
+	private JDateChooser dateChooser1;
 	private JTextArea textArea;
 
-	private JTextField date0;
+	
 		
 	/**
 	 * <p>Title: Constructor de la clase</p>  
@@ -79,7 +81,6 @@ public class ParametrosProyecto extends JPanel {
 		archivos.setBounds(275, 323, 640, 347);
 		add(archivos);	
 		configurar();
-
 	}
 	
 	
@@ -97,34 +98,58 @@ public class ParametrosProyecto extends JPanel {
 	/* Clases privadas */
 	
 	
-	
-	
 	private class BotonL extends MouseAdapter {
+		private HashMap<String,String> datos;
+		private int NG;
+		private String name;
+		
+		public BotonL() {
+			datos = new HashMap<String,String>();
+		}
+		
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			//Si no puede se puede convertir a int, no es un número.
-			int NG = -1;
+			boolean continuar = true;
+			//Primer valor obligatorio.
 			try{NG = Integer.parseInt(fTFNGrupos.getText());}
 			catch(Exception e) {
-				fTFNGrupos.setText(null);										//Le borramos texto.
-				System.out.println("Valor incorrecto: " + fTFNGrupos.getText() );
+				String s = "Número de grupos de estudio incorrecto: " + fTFNGrupos.getText();
+				cm.showMessage(s, 0);
+				fTFNGrupos.setText(null);										//Le borramos texto introducido.
+				continuar = false;
 			}
-			String nombre = fTFNombre.getText();
-			if(nombre == null) nombre = "";
-			String autor = fTFAutor.getText();
-			if(autor == null) autor = "";
-			String descripcion = textArea.getText();
-			if(descripcion == null) descripcion = "";
+			
+			//Siguiente valor obligatorio.
+			if(continuar) name = fTFNombre.getText();
+
+			//Comprobación de valores obligatorios y emisión si procede de mensaje de error.
+			if(continuar && NG == 0) cm.showMessage("El número de grupos debe ser mayor de cero.", 0);
+			else if(continuar && name == null || name.equals("")) cm.showMessage("El campo nombre no puede estar vacio.", 0);
+			//Si no hubieron errores -> proceder con la actualización de los datos.
+			else if(continuar){
+				proceed();
+				cm.doActionPProyecto(datos);
+			}
+		}
+		
+		private void proceed() {
+			//Si se ha pulsado el botón de aplicar... recolectar datos.
+			datos.clear();
+			datos.put(Labels.NAME, name);
+			datos.put(Labels.AUTHOR,"" + fTFAutor.getText());
+			datos.put(Labels.NG, "" + NG);		
+			datos.put(Labels.DESCRIPTION,"" + textArea.getText());
+			//Versión, sino hay datos, coloca una versión inicial.
 			String version = fTFVersion.getText();
-			if(version == null) version = "";
-			Date date = dateChooser.getDate();
-			if(date == null) date = new Date();
-//			cm.doActionPProyecto();
-			System.out.println("En proceso de integración de la función");
-			System.out.println("Leído > nombre: " + nombre +
-					", Autor: " + autor + ", descripción: " + descripcion +
-					", versión: " + version + ", NG: " + NG + ", date: " + date.toString());
-			cm.doPProyecto();
+			if(version != null) datos.put(Labels.VERSION,version);
+			else datos.put(Labels.VERSION,"1.0");
+			//Fechas, si no hay datos, coloca fecha actual.
+			Date d = dateChooser0.getDate();
+			if(d != null) datos.put(Labels.DATE0, dateToString( d));
+			else datos.put(Labels.DATE0, dateToString( new Date()));
+			d =  dateChooser1.getDate();
+			if(d != null) datos.put(Labels.DATE1, dateToString(d));
+			else datos.put(Labels.DATE1, dateToString( new Date()));
 		}
 	}
 	
@@ -140,7 +165,8 @@ public class ParametrosProyecto extends JPanel {
 		textArea.setText(null);
 		fTFVersion.setText(null);
 		fTFNGrupos.setText(null);
-		dateChooser.setDate(new Date());
+		dateChooser0.setDate(new Date());
+		dateChooser0.setDate(new Date());
 	}
 
 
@@ -193,13 +219,16 @@ public class ParametrosProyecto extends JPanel {
 		
 		
 		textArea = new JTextArea();
+		textArea.setLocale(new Locale("es", "ES"));
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
 		textArea.setBounds(275, 141, 235, 88);
 		textArea.setMinimumSize(new Dimension(200, 100));
 		textArea.setMaximumSize(new Dimension(2147, 2147));
 		textArea.setToolTipText("Introduzca cualquier texto descriptivo que crea necesario acerca del modelo.");
 		textArea.setBorder(new LineBorder(Color.BLACK, 1, true));
 		textArea.setBackground(Color.WHITE);
-		textArea.setColumns(10);
+
 		textArea.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		add(textArea);
 		
@@ -207,14 +236,23 @@ public class ParametrosProyecto extends JPanel {
 		lblNombreDelProyecto.setBounds(53, 85, 153, 15);
 		add(lblNombreDelProyecto);		
 		
-		dateChooser = new JDateChooser();
-		dateChooser.setBounds(721, 108, 194, 19);
-		dateChooser.setToolTipText("Puede dejar indicado la última fecha de modificación o creación.");
-		dateChooser.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		dateChooser1 = new JDateChooser();
+		dateChooser1.setBounds(721, 108, 194, 19);
+		dateChooser1.setToolTipText("Indica la última fecha de modificación.");
+		dateChooser1.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		//Desactivar la edición de fechas de forma manual.
-		JTextFieldDateEditor editor = (JTextFieldDateEditor) dateChooser.getDateEditor();
+		JTextFieldDateEditor editor = (JTextFieldDateEditor) dateChooser1.getDateEditor();
 		editor.setEditable(false);
-		add(dateChooser);
+		add(dateChooser1);
+		
+		dateChooser0 = new JDateChooser();
+		dateChooser0.setToolTipText("Indica la fecha de creación.");
+		dateChooser0.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		dateChooser0.setBounds(724, 83, 191, 19);
+		//Desactivar la edición de fechas de forma manual.
+		editor = (JTextFieldDateEditor) dateChooser0.getDateEditor();
+		editor.setEditable(false);
+		add(dateChooser0);
 		
 		
 		JLabel lblDescripcin = new JLabel("Descripción del modelo:");
@@ -234,11 +272,7 @@ public class ParametrosProyecto extends JPanel {
 		JLabel lblFechaDeCreacin = new JLabel("Fecha de creación: ");
 		lblFechaDeCreacin.setBounds(556, 85, 137, 15);
 		add(lblFechaDeCreacin);
-		
-		date0 = new JTextField();
-		date0.setBounds(724, 83, 191, 19);
-		date0.setColumns(10);
-		add(date0);
+
 		
 		JSeparator separator = new JSeparator();
 		separator.setBackground(Color.BLUE);
@@ -276,9 +310,10 @@ public class ParametrosProyecto extends JPanel {
 			break;
 		case(Labels.NG): fTFNGrupos.setText(txt);
 			break;
-		case(Labels.DATE): dateChooser.setDate(stringToDate(txt));
+		case(Labels.DATE0): dateChooser0.setDate(stringToDate(txt));
 			break;
-		case(Labels.DATE0): date0.setText(txt);
+		case(Labels.DATE1): dateChooser1.setDate(stringToDate(txt));
+			break;
 		default:
 		}
 	}
@@ -291,15 +326,26 @@ public class ParametrosProyecto extends JPanel {
 	 * @param fecha Grupo fecha/hora en formato: "dd/MM/yyyy hh:mm"
 	 * @return Date con los valores leidos almacenados.
 	 */
-	@SuppressWarnings("finally")
 	private Date stringToDate(String fecha){
-		 System.out.println("ParametrosProyecto > stringToDate: " + fecha);
-		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");			//Formato de la fecha.
-		 Date date = null;
-		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
-		 catch (ParseException ex) { ex.printStackTrace(); }
-		 finally {return date;} 
+		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
+		 Date date = new Date();
+		 if(fecha != null) {
+			 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
+			 catch (ParseException ex) { 
+				 System.out.println("ParametrosProyecto > Error de parser de fechas: " + fecha);
+				 return date;
+			 }
+		 }
+		 return date;
 	}
+	
+	private String dateToString(Date date) {
+		String fecha = null;
+		SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
+		fecha = formato.format(date);
+		return fecha;
+	}
+	
 	
 	/**
 	 * <p>Title: setUpTextField</p>  

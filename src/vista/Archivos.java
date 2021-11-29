@@ -382,7 +382,7 @@ public class Archivos extends JPanel {
 		mBotones.forEach((key,btn) -> {
 			//Extrar su extensión.
 			String ext = key.substring(key.length() -3,key.length());
-			btn.setEnabled(cm.hasModulo(ext));
+			btn.setEnabled(cm.hasModule(ext));
 //			System.out.println("Archivos > refreshEditarBorar: " + ext + " = " + cm.hasModulo(ext));
 		});
 	}
@@ -398,7 +398,7 @@ public class Archivos extends JPanel {
 			//Sin nombre en principio.
 			String nombre = null;
 			//Si existe el módulo, obtiene el nombre del mismo.
-			if(cm.getModulo(tipo) != null) nombre = cm.getModulo(tipo).getNombre();
+			if(cm.getModule(tipo) != null) nombre = cm.getModule(tipo).getRuta();
 			//Asigna el nombre al campo correspondiente.
 			elemento.setText(nombre);		
 		});
@@ -421,17 +421,13 @@ public class Archivos extends JPanel {
 	private class ArchivoML extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			boolean traza = true;
 			boolean realizado = false;
 			JButton btn = (JButton) e.getSource();								//Identificar botón.
 			String tt = btn.getToolTipText();
 			//Los valores de tipos van en minúscula.
 			String ext = tt.substring(tt.length() -3, tt.length()).toLowerCase();
 			//Identificador de operación (abrir o guardar).
-			String op = btn.getActionCommand();
-			
-			if(traza) System.out.println("Archivos  > AL: " + btn.getActionCommand() + " : " + ext);
-			
+			String op = btn.getActionCommand();		
 			//Opciones de Carga de módulo, NO módulo PRJ.
 			if(op.equals("Abrir") ) {realizado = cm.doActionArchivos(op, ext);}
 			//Opciones de Guarga de módulo.

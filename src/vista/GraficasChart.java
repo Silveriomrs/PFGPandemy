@@ -77,14 +77,14 @@ public class GraficasChart{
 		iniciarMenu();
 	}
 	
-	private void iniciarMenu() {
-		cframe.getContentPane().add(menuBar, BorderLayout.NORTH);
+	private void iniciarMenu() {	
 		mnVer = new JMenu("Ver");
 		mnCasos = new JMenu("Casos");
 		mnTasas = new JMenu("Tasas");
 		menuBar.add(mnVer);
 		menuBar.add(mnCasos);
 		menuBar.add(mnTasas);
+		cframe.getContentPane().add(menuBar, BorderLayout.NORTH);
 	}
 	
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
@@ -266,20 +266,7 @@ public class GraficasChart{
 		this.chart.setBackgroundImage(img);										//Establecimiento del fondo.
 	}
 
-	/**
-	 * <p>Title: genera</p>  
-	 * <p>Description: Genera la gráfica con los datos contenidos y establecidos</p> 
-	 */
-	public void genera() {	
-		//Si cframe no está inicializado crear.
-	    if(cframe == null) {
-		    System.out.println("Graficas Chart - Genera > frame era nulo y se reinicia");
-	    	iniciarFrame();
-	    }else if(cframe != null && !cframe.isVisible()) {						// En caso de estar oculto, mostrar.
-	    	cframe.setVisible(true);
-	    }
-	}
-
+	
 	/* FUNCIONES SOLO PARA PRUEBAS */
 	
 	/**

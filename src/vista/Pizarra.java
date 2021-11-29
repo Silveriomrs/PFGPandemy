@@ -118,6 +118,8 @@ public class Pizarra extends JFrame {
 		zonasToCombo();
 		//Luego los controles, pues estos depende de los elementos de los comboboxes.
 		updateControls();
+		//Redibujado de las zonas.
+		dibujarZonas();
 		//Refrescar pantallas.
 		c.update(c.getGraphics());
 	}
@@ -128,8 +130,8 @@ public class Pizarra extends JFrame {
 	 */
 	public void configuraFrame() {
 	    Dimension m = panelCentral.getPreferredSize();
-	    int y = (int) m.getHeight() + 50;										//Una altura extra para no ocultar el canvas.
-	    int x = (int) m.getWidth() + 15;
+	    int y = (int) m.getHeight() + 15;										//Una altura extra para no ocultar el canvas.
+	    int x = (int) m.getWidth();
 	    setPreferredSize(new Dimension(x, y));
 	    setResizable(false);
 	    setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);

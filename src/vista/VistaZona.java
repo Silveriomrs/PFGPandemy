@@ -80,7 +80,7 @@ public class VistaZona extends JPanel {
 	public VistaZona(Zona zona, ControladorModulos cm) {
 		this.cm = cm;
 		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0,0,0,0,0,0, null);	
-		else this.zona =zona;
+		else this.zona = zona;
 		panelCentral = new JPanel();
 		panelChart = new JPanel();
 		pp = new PanelPoligono();
@@ -167,9 +167,7 @@ public class VistaZona extends JPanel {
 			tf_S.setText("" + zona.getS());
 			tf_R.setText("" + zona.getR());
 			tf_I.setText("" + zona.getI());
-			tf_P.setText("" + zona.getP());
-			
-			
+			tf_P.setText("" + zona.getP());		
 			tf_C100K.setText("" + zona.getNivel());								//Nivel inicial de contagio.
 		}
 	}
@@ -237,23 +235,11 @@ public class VistaZona extends JPanel {
 		panelCentral.add(jl);
 	}
 
-	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Devuelve el panel con su configuración actual</p> 
-	 * @return JPanel con toda la información que contiene.
-	 */
-	public JPanel getPanel() {return this;}
-	
-	/**
-	 * @return La zona con sus atributos.
-	 */
-	public Zona getZona() {	return zona;}
 
 	/**
 	 * @param zona La zona a establecer
 	 */
 	public void setZona(Zona zona) {
-		this.zona = zona;
 		recargarDatos();
 	}
 	
@@ -262,15 +248,20 @@ public class VistaZona extends JPanel {
 	private class BotonL extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			zona.setName(tf_NAME.getText());
+			
 			//
 			try{
+				zona.setName(tf_NAME.getText());
 				zona.setPoblacion(Integer.parseInt(tf_PEOPLE.getText()));
 				zona.setSuperficie(Integer.parseInt(tf_AREA.getText()));
-				zona.setNivel(Integer.parseInt(tf_C100K.getText()));}
-			catch(Exception e) {System.out.println("Valor incorrecto");}
-			cm.doActionVistaZona();
-			
+				zona.setS(Double.parseDouble(tf_S.getText()));
+				zona.setI(Double.parseDouble(tf_I.getText()));
+				zona.setR(Double.parseDouble(tf_R.getText()));
+				zona.setP(Double.parseDouble(tf_P.getText()));
+				zona.setNivel(Integer.parseInt(tf_C100K.getText()));
+				
+			}catch(Exception e) {System.out.println("Valor incorrecto");}
+			cm.doActionVistaZona(zona.getID());
 		}
 	}
 	
@@ -358,7 +349,8 @@ public class VistaZona extends JPanel {
 		p.addPoint( 95, 150 );
 		p.addPoint( 170, 100 );
 		
-		this.zona = new Zona(1, "Zona_Test", 10 , 400 ,0,0,0,0,0, p);
+		this.zona = new Zona(0, "1_Test",2 , 3 ,4,5,6,7,8, p);
+		System.out.println( this.zona.toString() + "\nNivel: " + zona.getNivel());
 		recargarDatos();
 	}
 	

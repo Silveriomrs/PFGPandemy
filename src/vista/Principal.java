@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 /**
  * Clase de la vista principal donde se modelan las tablas
@@ -39,7 +40,6 @@ public class Principal extends JFrame {
 	public static Dimension FRAME = new Dimension(1024,768);
 	
 	private HashMap<String, JMenuItem> jmitems;
-//	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
 	private FondoPanel fondo = new FondoPanel("/vista/imagenes/agua_800px.png");
 	private JPanel panelCentral;
 	private ControladorModulos cm;
@@ -51,6 +51,7 @@ public class Principal extends JFrame {
 	 * @param cm Controlador de las vistas y módulos.
 	 */
 	public Principal(ControladorModulos cm) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
 		int w = 1024;
 		int h = 768;
 		this.cm = cm;	
@@ -161,6 +162,14 @@ public class Principal extends JFrame {
 	}
 	
 	/**
+	 * <p>Title: refresh</p>  
+	 * <p>Description: Refresca la vista con los datos del módulo.  </p> 
+	 */
+	public void refresh() {
+		actualizarJMItems();
+	}
+	
+	/**
 	 * <p>Title: actualizarJMItems</p>  
 	 * <p>Description: Actualiza los JMenuItems en función del contexto de la aplicación</p>
 	 * Actua leyendo el estado de la aplicación y activando o desactivado las funciones
@@ -176,14 +185,12 @@ public class Principal extends JFrame {
 		//Desactivar vistas de grupos.
 		jmitems.get("Grupos").setEnabled(hasZonas);
 		//Desactivar vista de Parámetros de la enfermedad.
-		jmitems.get("Parámetros SIR").setEnabled(cm.hasModulo(TypesFiles.DEF));
-
+		jmitems.get("Parámetros SIR").setEnabled(cm.hasModule(TypesFiles.DEF));
 //		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
 		jmitems.get("Reproductor").setEnabled(hasZonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
 		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);
-		jmitems.get("Parámetros SIR").setEnabled(hasZonas);
 	}
 
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
@@ -214,7 +221,6 @@ public class Principal extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
-			System.out.println("Principal AL: " + name);
 			cm.doActionPrincipal(name);
 			actualizarJMItems();
 		}

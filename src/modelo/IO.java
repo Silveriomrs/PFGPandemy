@@ -34,13 +34,13 @@ import com.opencsv.exceptions.CsvException;
  *
  */
 public class IO{
-	private String WorkingDirectory;
+	/** WorkingDirectory Directorio de trabajo del proyecto actual*/  
+	public static String WorkingDirectory = "";
 	
     /**
      * Constructor de la clase IO
      */
     public IO(){
-    	this.WorkingDirectory = "";
     }
     
 	/**
@@ -96,10 +96,10 @@ public class IO{
 		String ruta2 = ruta;
 		String ext2 = ext;
 		//Comprobación de extensión coincida con extensión de la ruta.
-		if(ruta != null && !checkExt(ruta,ext)) {												//Si son diferentes
+		if(ruta != null && !checkExt(ruta,ext)) {								//Si son diferentes
 			ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 			//Comprobación de que es una extensión registrada
-			if (!TypesFiles.hasType(ext2)) {										//Sino esta registrada, tomar como no añadida.
+			if (!TypesFiles.hasType(ext2)) {									//Sino esta registrada, tomar como no añadida.
 				ruta2 = ruta + ext;												//Añade la extensión.
 			}else {																//En otro caso remover la que tiene por la nueva.
 				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
@@ -113,8 +113,10 @@ public class IO{
 		if(f != null){
 		    try(FileWriter fw = new FileWriter(f)){	 
 		    	ruta2 = f.getPath();
+		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
+//		    	ruta2 = f.getName();											//Ahora devolvemos el nombre del fichero.
 		    } catch (IOException e1) {e1.printStackTrace();}
 		}
 		return ruta2;

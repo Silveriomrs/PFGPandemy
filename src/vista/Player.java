@@ -221,7 +221,7 @@ public class Player extends JPanel implements ActionListener{
 	 * @param linea Número de línea a leer de la entrada de datos.
 	 */
 	private void play(int linea) {
-		String fila[] = historico.getFila(linea);								//Obtener fila.
+		String fila[] = historico.getRow(linea);								//Obtener fila.
 		int columnas = historico.getColumnCount();
 		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
 		//Actualizar fecha

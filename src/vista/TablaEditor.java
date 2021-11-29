@@ -106,12 +106,13 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: abrirFrame</p>  
 	 * <p>Description: Abre el módulo en un frame particular</p> 
+	 * @param nombre Nombre a mostrar en el marco. El nombre del módulo.
 	 */
-	public void abrirFrame() {
+	public void abrirFrame(String nombre) {
 		frame = new JFrame("Editor de tablas");
-		frame.setTitle("Editor CSV");
+		frame.setTitle(nombre);
 		frame.getContentPane().setBackground(Color.GRAY);
-		frame.setBounds(0, 0, 914, 610);
+		frame.setBounds(40, 50, 914, 610);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().add(this);
@@ -630,7 +631,7 @@ public class TablaEditor extends JPanel{
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
 		TablaEditor te = new TablaEditor(new ControladorModulos());
-		te.abrirFrame();
+		te.abrirFrame("Testing");
 	}
 
 }

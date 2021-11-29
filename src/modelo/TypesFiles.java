@@ -58,22 +58,22 @@ public class TypesFiles {
 	 */
 	public TypesFiles() {configurar();}
 	
-   private static void configurar() {
+    private static void configurar() {
     	tipos = new HashMap<String,String>();
     	tipos.put(PAL, "Paleta");
-    	tipos.put(DEF, "Enfermedad");
-    	tipos.put(CSV, "Archivo general");
-    	tipos.put(HST, "Historico");
-    	tipos.put(MAP, "Mapas");
-    	tipos.put(GRP, "Grupos");
-    	tipos.put(PRJ, "Proyecto");
-    	tipos.put(REL, "Relaciones");
-    	tipos.put(PNG, "Archivos de imagen PNG");
-    	tipos.put(JPG, "Archivos de imagen JPG");
-    	tipos.put(JPEG,"Archivos de imagen JPEG");
-    	tipos.put(GIF, "Archivos de imagen GIF");
-    	tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
-   }
+		tipos.put(DEF, "Enfermedad");
+		tipos.put(CSV, "Archivo general");
+		tipos.put(HST, "Historico");
+		tipos.put(MAP, "Mapas");
+		tipos.put(GRP, "Grupos");
+		tipos.put(PRJ, "Proyecto");
+		tipos.put(REL, "Relaciones");
+		tipos.put(PNG, "Archivos de imagen PNG");
+		tipos.put(JPG, "Archivos de imagen JPG");
+		tipos.put(JPEG,"Archivos de imagen JPEG");
+		tipos.put(GIF, "Archivos de imagen GIF");
+		tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
+    }
    
 	   /**
 	 * <p>Title: get</p>  
@@ -82,9 +82,9 @@ public class TypesFiles {
 	 * @return Texto asociado a dicha etiqueta. Null en otro caso.
 	 */
 	public static String get(String t) {
-		configurar();
+		if(tipos.isEmpty())  configurar();
 		String txt = null;
-		if(hasType(t)) txt = tipos.get(txt);
+		if(hasType(t)) txt = tipos.get(t);
 		else System.out.println("TypesFiles > No existe tipo: " + t);
 		return txt;
 		

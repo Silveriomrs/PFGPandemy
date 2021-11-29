@@ -30,10 +30,10 @@ public class Labels {
 	/** CI Casos de incidentes*/  
 	public final static String CI ="CI";
 	//Básicas
-	/** I Incidentes*/  
-	public final static String I ="I";
 	/** S Susceptibles*/  
 	public final static String S ="S";
+	/** I Incidentes*/  
+	public final static String I ="I";
 	/** R Recuperados*/  
 	public final static String R ="R";	
 	//Tasas
@@ -53,12 +53,16 @@ public class Labels {
 	/** TCS Tasa de contactos de X con sintomáticos en Z*/  
 	public final static String TCS ="TCS";		
 	//Iniciales y constantes.
-	/** I0 Incidentes iniciales*/  
-	public final static String I0 ="I0";
 	/** S0 Sintomáticos iniciales*/  
 	public final static String S0 ="S0";
+	/** I0 Incidentes iniciales*/
+	public final static String I0 ="I0";
+	/** R0 Recuperados iniciales*/  
+	public final static String R0 ="R0";
 	/** PT0 Población inicial*/  
 	public final static String PT0 ="PT0";
+	/** C100K Casos por cada 100 mil habitantes*/  
+	public final static String C100K ="C100K";
 	/** FT Tiempo final*/  
 	public final static String FT ="FINAL TIME";
 	/** IT Tiempo inicial*/  
@@ -83,10 +87,10 @@ public class Labels {
 	public final static String VERSION = "VERSION";
 	/** NG Número de grupos de población*/  
 	public final static String NG = "NG";
-	/** DATE Fecha de modificación del proyecto*/  
-	public final static String DATE = "DATE";
 	/** DATE Fecha de creación del proyecto*/  
 	public final static String DATE0 = "DATE0";
+	/** DATE Fecha de modificación del proyecto*/  
+	public final static String DATE1 = "DATE1";
 	
 	private HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;
@@ -99,22 +103,23 @@ public class Labels {
 	public Labels(){
 		dic = new HashMap<String,String>();
 //		nparametros = new HashMap<String,Integer>();
-		addLabelss();
+		addLabels();
 	}
 	
 	/**
-	 * <p>Title: addLabelss</p>  
+	 * <p>Title: addLabels</p>  
 	 * <p>Description: Añade las etiquetas y sus correspondientes palabras en
 	 * el idioma destino. </p>
 	 */
-	private void addLabelss(){
+	private void addLabels(){
 		//Casos de.
 		dic.put(CC, "Casos de curación");
 		dic.put(CVS, "Casos de vuelta a la suceptibilidad");
 		dic.put(CI, "Casos incidentes");
+		dic.put(C100K, "Casos por cada 100 mil habitantes");
 		//Básicas
-		dic.put(I, "Incidencias");
 		dic.put(S, "Susceptibles");
+		dic.put(I, "Incidencias");
 		dic.put(R, "Recuperados");	
 		//Tasas
 		dic.put(P, "Prevalencia");
@@ -126,23 +131,25 @@ public class Labels {
 		dic.put(CAB, "Contactos con Z");										//X y Z serán sustituidos por el ID o el nombre de los grupos correspondientes.
 		dic.put(TCS, "Tasa de contactos con sintomáticos en Z");		
 		//Iniciales y constantes.
-		dic.put(I0, "Incidentes iniciales");
 		dic.put(S0, "Susceptibles iniciales");
+		dic.put(I0, "Incidentes iniciales");
+		dic.put(R0, "Recuperados iniciales");
 		dic.put(PT0, "Población inicial");
 		dic.put("FINAL TIME", "Tiempo final");
 		dic.put("INITIAL TIME", "Tiempo inicial");
 		//Parámetros de la enfermedad
 		dic.put(PTE,"Probabilidad de transmisión de la enfermedad");
-		dic.put(DME,"Duración media de la enfermedad (en días)");
+		dic.put(DME,"Duración media de la enfermedad");
 		dic.put(IP,"Inmunidad permanente");
-		dic.put(DMIP,"Duración media de la inmunidad permanente (en días)");
+		dic.put(DMIP,"Duración media de la inmunidad permanente");
 		//Etiquetas de propiedades del proyecto.
 		dic.put(NAME,"Nombre del proyecto" );
 		dic.put(AUTHOR,"Autor del proyecto");
 		dic.put(DESCRIPTION,"Descripción del proyecto" );
 		dic.put(VERSION,"Versión del proyecto" );
 		dic.put(NG,"Número de grupos de población" );
-		dic.put(DATE,"Fecha del proyecto");
+		dic.put(DATE0,"Fecha creación del proyecto");
+		dic.put(DATE1,"Fecha modificación del proyecto");
 	}
 	
 	/**
@@ -168,6 +175,7 @@ public class Labels {
 	 */
 	public String getWord(String label) {
 		String word = null;
+		if(dic.isEmpty()) addLabels();
 		if(existLabel(label)) word = dic.get(label);
 		else System.out.println("No está agregada al diccionario: " + label);
 		return word;

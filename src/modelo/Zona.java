@@ -11,7 +11,7 @@ import vista.GraficasChart;
 /**
  * Clase inicial que almacena los datos significativos de una poligono representada
  * por el poligono en cuestión, como su identificador, nombre y figura. También
- * el nivel de contagio de la poligono.
+ * el C100K de contagio de la poligono.
  * @author Silverio Manuel Rosales Santana
  * @date 23707/2021
  * @version 1.0
@@ -29,21 +29,21 @@ public class Zona {
 	/** poligono Poligono que representa gráficamente una poligono*/
 	private Polygon poligono;
 	/** Número de recuperados iniciales.*/
-	private int R;
+	private double R0;
 	/** Número de susceptibles iniciales.*/
-	private int S;
+	private double S0;
 	/** Número de incidentes (infectados) iniciales.*/
-	private int I;
+	private double I0;
 	/** Prevalencia.*/
-	private int P;
-	/** nivel Nivel de contagio de una poligono [0-9] */
-	private int nivel;
+	private double P;
+	/** C100K Nivel de contagio de una poligono [0-9] */
+	private int C100K;
 	
 	
 	// Lista de puntos que componen el poligono.
 	private ArrayList<Point> puntosPoligono;
 	private final String SN = "Nivel";
-	/** Indica el valor del eje X para su representación de cada nivel en el eje Y. */
+	/** Indica el valor del eje X para su representación de cada C100K en el eje Y. */
 	private int contadorN;
 	
 	private GraficasChart chart;
@@ -60,22 +60,22 @@ public class Zona {
 	 * @param i Número de incidentes iniciales (infectados).
 	 * @param r Número de recuperados iniciales.
 	 * @param p Prevalencia (sin unidad).
-	 * @param nivel Nivel inicial de contagio, equivale al número de casos por cada 100 mil habitantes.
+	 * @param C100K Nivel inicial de contagio, equivale al número de casos por cada 100 mil habitantes.
 	 * @param poligono Poligono cerrado representación gráfica de la zona.
 	 */
 	public Zona(int ID, String name, int nhabitantes, int superficie,
-			int s, int i, int r, int p,int nivel,Polygon poligono) {
+			double s, double i, double r, double p, int C100K, Polygon poligono) {
 		puntosPoligono = new ArrayList<Point>();
 		this.name = name;
 		this.ID = ID;
 		this.poblacion = nhabitantes;
 		this.superficie = superficie;
 		//
-		this.S = s;
-		this.I = i;
-		this.R = r;
+		this.S0 = s;
+		this.I0 = i;
+		this.R0 = r;
 		this.P = p;
-		this.nivel = nivel;
+		this.C100K = C100K;
 		//
 		this.poligono = poligono;
 		//
@@ -86,7 +86,7 @@ public class Zona {
 		this.contadorN = 0;														//Serie de niveles.
 		chart.addSerie(SN);
 		//Añadir los valores iniciales a la gráfica. Por tanto se añaden después de crearla.
-		setNivel(nivel);
+		setNivel(C100K);
 		setSIR(s,i,r);
 	}
 
@@ -103,14 +103,15 @@ public class Zona {
 	
 	@Override
 	public String toString() {	
-		String txt = getID() + ", " + getName() + ", " + getPoblacion() + ", " + getSuperficie();
+		String txt = getID() + "," + getName() + "," + getPoblacion() + "," + getSuperficie() +
+				"," + this.S0 + "," + this.I0 +  "," + this.R0 + "," + this.P + "," + this.C100K;
 		//Si contiene un poligono obtenemos sus coordenadas:
 		if(poligono != null) {
 			int npuntos = poligono.npoints;
 			int[] Px = poligono.xpoints;
 			int[] Py = poligono.ypoints;
 			for(int i = 0; i<npuntos; i++) {
-				txt += "(" + Px[i] + ";" + Py[i] + ")";
+				txt += "," + Px[i] + ";" + Py[i];
 			}
 		}
 		return txt;
@@ -126,26 +127,26 @@ public class Zona {
 	 * @param r Número de recuperados o curados.
 	 */
 	public void setSIR(double s, double i, double r) {
-		addNivel("Susceptibles",0,s);
-		addNivel("Incidencias",0,i);
-		addNivel("Recuperados",0,r);
+		Labels labels = new Labels();
+		addNivel(labels.getWord(Labels.S),0,s);
+		addNivel(labels.getWord(Labels.I),0,i);
+		addNivel(labels.getWord(Labels.R),0,r);
 	}
 	
 	/**
 	 * <p>Title: addNivel</p>  
-	 * <p>Description: Añade un nuevo nivel a su hisstorico y establece el 
-	 * nivel añadido como nivel actual.</p>
-	 * @param name Nombre de la serie de datos al que añadir el nuevo nivel..
+	 * <p>Description: Añade un nuevo C100K a su hisstorico y establece el 
+	 * C100K añadido como C100K actual.</p>
+	 * @param name Nombre de la serie de datos al que añadir el nuevo C100K..
 	 * @param t Variable tiempo, indica el valor en el eje X de tiempo al que corresponderá el valor de la función.
-	 * @param valor Valor o nivel a añadir a dicha serie.
+	 * @param valor Valor o C100K a añadir a dicha serie.
 	 */
 	public void addNivel(String name, int t, double valor) {
 		if(name.equals(SN)) {
 			chart.addPunto(name, contadorN, valor);
+			setNivel((int) valor);
 			contadorN++;			
 		}else chart.addPunto(name, t, valor);
-		
-		setNivel((int) valor);
 	}
 	
 	
@@ -159,56 +160,56 @@ public class Zona {
 	public GraficasChart getGrafica() {return this.chart;	}
 	
 	/**
-	 * @return devuelve nivel desde 0 hasta 9.
+	 * @return devuelve C100K desde 0 hasta 9.
 	 */
-	public int getNivel() {	return nivel;}
+	public int getNivel() {	return C100K;}
 
 	/**
-	 * Establecimiento del nivel actual de la poligono. Su valor debe estar entre 0 y 9,
+	 * Establecimiento del C100K actual de la poligono. Su valor debe estar entre 0 y 9,
 	 *  ambos inclusive. 
-	 * @param nivel Nivel a establecer.
+	 * @param C100K Nivel a establecer.
 	 */
-	public void setNivel(int nivel) {this.nivel = nivel;}
+	public void setNivel(int C100K) {this.C100K = C100K;}
 
 	/**
 	 * @return El número de recuperados iniciales.
 	 */
-	public int getR() {	return R;}
+	public double getR() {	return R0;}
 
 	/**
 	 * @param r Establece el número de recuperados iniciales.
 	 */
-	public void setR(int r) {R = r;	}
+	public void setR(double r) {this.R0 = r;	}
 
 	/**
 	 * @return El número de susceptibles iniciales.
 	 */
-	public int getS() {	return S;}
+	public double getS() {	return S0;}
 
 	/**
-	 * @param s Establece el número de suceptibles.
+	 * @param d Establece el número de suceptibles.
 	 */
-	public void setS(int s) {S = s;	}
+	public void setS(double d) {this.S0 = d;	}
 
 	/**
 	 * @return La prevalencia inicial.
 	 */
-	public int getP() {	return P;}
+	public double getP() {	return P;}
 
 	/**
 	 * @param p Establece la prevalencia inicial.
 	 */
-	public void setP(int p) {P = p;	}
+	public void setP(double p) {this.P = p;	}
 
 	/**
 	 * @return El número de incidentes (infectados) iniciales.
 	 */
-	public int getI() {	return I;}
+	public double getI() {	return I0;}
 
 	/**
 	 * @param i Establece el número de Incidentes (infectados) iniciales.
 	 */
-	public void setI(int i) {I = i;}
+	public void setI(double i) {this.I0 = i;}
 
 	/**
 	 * @return devuelve el nombre de la poligono.

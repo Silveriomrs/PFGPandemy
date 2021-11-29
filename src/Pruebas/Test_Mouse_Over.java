@@ -130,7 +130,7 @@ class PolygonSelector extends MouseAdapter {
         		chart.addSerie("serie1");
         		chart.addSerie("serie2");
         		chart.addPuntos();
-        		chart.genera();
+//        		chart.genera();
         		chart.setVisible(true);
                 break;
             }

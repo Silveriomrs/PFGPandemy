@@ -84,7 +84,7 @@ public class VistaSIR extends JPanel{
 		//Limpiar datos anteriores.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
 		//Realizar lectura de los datos en el propio módulo (si hay).
-		if(cm.getModulo(TypesFiles.DEF) != null) {updateFields();}
+		if(cm.getModule(TypesFiles.DEF) != null) {updateFields();}
 		
 		refreshControls();
 		updateUI();
@@ -97,7 +97,7 @@ public class VistaSIR extends JPanel{
 	 *  en caso de estar disponibles, procede a la acción.
 	 */
 	private void updateFields() {
-		DCVS dcvs = cm.getModulo(TypesFiles.DEF);
+		DCVS dcvs = cm.getModule(TypesFiles.DEF);
 		int nrows = dcvs.getRowCount();
 		for(int i = 0; i < nrows; i++) {
 			String label = (String) dcvs.getValueAt(i, 0);
@@ -105,7 +105,7 @@ public class VistaSIR extends JPanel{
 			if(!label.equals(Labels.IP)) {setLabel(label,data);}
 			else {
 				//Cuando la etiqueta es IP, recibe el tratamiento específico.
-				int a = Integer.parseInt(data);									//Convertirlo a int.
+				int a = (data == null)? 1 : Integer.parseInt(data);				//Convertirlo a int sino es null, en otro caso dar valor 1 (activo).
 				IP = a == 1;													//Obtener el resultado si es activo o no.
 			}
 		}
@@ -122,6 +122,21 @@ public class VistaSIR extends JPanel{
 			mapaFields.get(label).setText(text);
 		}
 	}
+	
+	/**
+	 * <p>Title: getLabel</p>  
+	 * <p>Description: Devuelve el texto al campo que se le indique.</p>
+	 * @param label Etiqueta o campo a leer.
+	 * @return El dato almacenado en tal campo.
+	 */
+	public String getLabel(String label) {
+		String data = null;
+		if(mapaFields.containsKey(label)) {
+			data = mapaFields.get(label).getText() ;
+		}else if(label.equals(Labels.IP)) data = "" + ((IP == true)? 1:0);
+		return data;
+	}
+	
 	
 	/**
 	 * <p>Title: addIconL</p>  
@@ -150,8 +165,8 @@ public class VistaSIR extends JPanel{
 		Labels labels = new Labels();
 		JLabel jl = new JLabel();
 		int posY = lineaBase + 30*contador;
-		int w = 140;
-		int posX = 30;
+		int w = 360;
+		int posX = 150;
 		jl = new JLabel(nombre);
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
@@ -176,7 +191,7 @@ public class VistaSIR extends JPanel{
 		JTextField jtf = mapaFields.get(ext);
 		jtf.setEditable(true);
 		jtf.setEnabled(true);
-		jtf.setBounds(170,posY,100,hi);
+		jtf.setBounds(30,posY,100,hi);
 		jtf.setColumns(10);
 		jtf.setToolTipText(labels.getWord(ext));
 		jtf.setHorizontalAlignment(SwingConstants.LEFT);
@@ -228,8 +243,9 @@ public class VistaSIR extends JPanel{
 	 * @see #generateControls(String ext, int posX)
 	 */
 	private void addNewControlLine(String et, String rutaIcon) {
+		Labels label = new Labels();
 		mapaFields.put(et, new JTextField());
-		iniciarLabels(et,rutaIcon);
+		iniciarLabels(label.getWord(et),rutaIcon);
 		generateControls(et,0);
 		contador++;
 	}
@@ -240,7 +256,7 @@ public class VistaSIR extends JPanel{
 		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
 		btnAplicar.setToolTipText("Aplica los cambios efectuados.");
-		btnAplicar.setBounds(366, 152, 150, 87);
+		btnAplicar.setBounds(334, 252, 150, 87);
 		btnAplicar.setActionCommand("Aplicar");
 		panelCentral.add(btnAplicar);
 			
@@ -288,14 +304,11 @@ public class VistaSIR extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
-			String llamada = "VistaSir > BotonL: " + op;
-			
-			if(op.equals("IP")) {
-				IP = chckbxIP.isSelected();
-				llamada += " : " + IP;
-			}
-			System.out.println(llamada);
-			if(cm != null) cm.doActionVistaSIR();								//Avisa al controlador de cambios.
+			//Si se ha pulsado sobre el selector, se actualiza su vista.
+			if(op.equals("IP")) {IP = chckbxIP.isSelected();}
+			//Avisa al controlador de cambios.
+			if(cm != null && op.equals("Aplicar") ) cm.doActionVistaSIR();
+			//Actualiza los controles.
 			refreshControls();
 		}
 	}
