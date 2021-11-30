@@ -71,8 +71,6 @@ public class IO{
 				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
 				dcvs.setDirectorio(WorkingDirectory);
 				dcvs.setDate("" + f.lastModified());
-				
-				System.out.println("IO Abrir > " + WorkingDirectory);
 			}
 			catch (IOException e) {e.printStackTrace();}
 			catch (CsvException e) {e.printStackTrace();}
@@ -116,7 +114,7 @@ public class IO{
 		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
 		    	fw.close();	 													//Cierre del escritor de fichero.
-//		    	ruta2 = f.getName();											//Ahora devolvemos el nombre del fichero.
+		    	ruta2 = f.getName();											//Ahora devolvemos el nombre del fichero.
 		    } catch (IOException e1) {e1.printStackTrace();}
 		}
 		return ruta2;

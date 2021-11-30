@@ -64,9 +64,9 @@ public class Labels {
 	/** C100K Casos por cada 100 mil habitantes*/  
 	public final static String C100K ="C100K";
 	/** FT Tiempo final*/  
-	public final static String FT ="FINAL TIME";
+	public final static String FT ="FT";
 	/** IT Tiempo inicial*/  
-	public final static String IT ="INITIAL TIME";
+	public final static String IT ="IT";
 	//Parámetros de la enfermedad
 	/** PTE Probabilidad de transmisión de la enfermedad*/  
 	public final static String PTE ="PTE";
@@ -87,10 +87,18 @@ public class Labels {
 	public final static String VERSION = "VERSION";
 	/** NG Número de grupos de población*/  
 	public final static String NG = "NG";
-	/** DATE Fecha de creación del proyecto*/  
+	/** DATE0 Fecha de creación del proyecto*/  
 	public final static String DATE0 = "DATE0";
-	/** DATE Fecha de modificación del proyecto*/  
+	/** DATE1 Fecha de modificación del proyecto*/  
 	public final static String DATE1 = "DATE1";
+	/* Etiquetas campos de los grupos de población */
+
+	/** ID Identificador de un grupo de población.*/  
+	public final static String ID = "ID";
+	/** PEOPLE Número de habitantes de una zona.*/  
+	public final static String PEOPLE = "PEOPLE";
+	/** AREA Superficie de una zona.*/  
+	public final static String AREA = "AREA";
 	
 	private HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;
@@ -135,8 +143,8 @@ public class Labels {
 		dic.put(I0, "Incidentes iniciales");
 		dic.put(R0, "Recuperados iniciales");
 		dic.put(PT0, "Población inicial");
-		dic.put("FINAL TIME", "Tiempo final");
-		dic.put("INITIAL TIME", "Tiempo inicial");
+		dic.put(FT, "Tiempo final");
+		dic.put(IT, "Tiempo inicial");
 		//Parámetros de la enfermedad
 		dic.put(PTE,"Probabilidad de transmisión de la enfermedad");
 		dic.put(DME,"Duración media de la enfermedad");
@@ -150,6 +158,10 @@ public class Labels {
 		dic.put(NG,"Número de grupos de población" );
 		dic.put(DATE0,"Fecha creación del proyecto");
 		dic.put(DATE1,"Fecha modificación del proyecto");
+		//Etiquetas particulares de las zonas.
+		dic.put(ID, "Indentificador");
+		dic.put(PEOPLE, "Número de habitantes");
+		dic.put(AREA, "Superficie de la zona");
 	}
 	
 	/**

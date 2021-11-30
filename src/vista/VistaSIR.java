@@ -84,10 +84,22 @@ public class VistaSIR extends JPanel{
 		//Limpiar datos anteriores.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
 		//Realizar lectura de los datos en el propio módulo (si hay).
-		if(cm.getModule(TypesFiles.DEF) != null) {updateFields();}
-		
-		refreshControls();
-		updateUI();
+		if(cm.getModule(TypesFiles.DEF) != null) refresh();
+	}
+	
+	
+	/**
+	 * <p>Title: refresh</p>  
+	 * <p>Description: Actualiza los campos de la vista. No realiza borrado previo.</p>
+	 * Una vez actualizados, actualiza los controles y refresca el dibujado. En caso
+	 *  de no disponer del módulo correspondiente en el sistema, no realiza acción alguna.
+	 */
+	public void refresh() {
+		if(cm.getModule(TypesFiles.DEF) != null) {
+			updateFields();
+			refreshControls();
+			updateUI();
+		}
 	}
 	
 	/**
@@ -156,21 +168,21 @@ public class VistaSIR extends JPanel{
 	/**
 	 * <p>Title: iniciarLabels</p>  
 	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
-	 * @param nombre Nombre en la etiqueta.
+	 * @param label Nombre en la etiqueta.
 	 * @param ruta Ruta al icono de la etiqueta.
 	 * @return La propia etiqueta configurada a efectos de permitir modificaciones
 	 * particulares.
 	 */
-	private JLabel iniciarLabels(String nombre, String ruta) {
+	private JLabel iniciarLabels(String label, String ruta) {
 		Labels labels = new Labels();
 		JLabel jl = new JLabel();
 		int posY = lineaBase + 30*contador;
 		int w = 360;
 		int posX = 150;
-		jl = new JLabel(nombre);
+		jl = new JLabel(labels.getWord(label));
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
-		if(nombre != null) jl.setToolTipText(labels.getWord(nombre));
+		if(label != null) jl.setToolTipText(labels.getWord(label));
 		panelCentral.add(jl);
 		return jl;
 	}
@@ -243,13 +255,16 @@ public class VistaSIR extends JPanel{
 	 * @see #generateControls(String ext, int posX)
 	 */
 	private void addNewControlLine(String et, String rutaIcon) {
-		Labels label = new Labels();
 		mapaFields.put(et, new JTextField());
-		iniciarLabels(label.getWord(et),rutaIcon);
+		iniciarLabels(et,rutaIcon);
 		generateControls(et,0);
 		contador++;
 	}
 	
+	/**
+	 * <p>Title: configurar</p>  
+	 * <p>Description: Función general para crear la vista y sus controles.</p>
+	 */
 	private void configurar() {
 		//Botón aplicar.
 		btnAplicar = new JButton("Aplicar");
@@ -285,6 +300,10 @@ public class VistaSIR extends JPanel{
 		refreshControls();
 	}
 	
+	/**
+	 * <p>Title: refreshControls</p>  
+	 * <p>Description: Actualiza los controles de la vista.</p>
+	 */
 	private void refreshControls() {
 		mapaFields.get(Labels.DMIP).setEnabled(IP);
 		chckbxIP.setSelected(IP);

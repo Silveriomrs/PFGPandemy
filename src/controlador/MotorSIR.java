@@ -248,6 +248,11 @@ public class MotorSIR {
 		
 	}
 	
+	/**
+	 * <p>Title: abrirGraficas</p>  
+	 * <p>Description: Para pruebas, abre la/s gráfica de cada zona
+	 *  para comprobar valores.</p> 
+	 */
 	public void abrirGraficas() {
 		zonas.forEach((k,z) -> {
 			z.getGrafica().setVisible(true);

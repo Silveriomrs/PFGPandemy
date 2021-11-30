@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextArea;
@@ -29,6 +30,7 @@ import com.toedter.calendar.JTextFieldDateEditor;
 import controlador.ControladorModulos;
 import modelo.IO;
 import modelo.Labels;
+import modelo.TypesFiles;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -110,6 +112,7 @@ public class ParametrosProyecto extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			boolean continuar = true;
+			String aviso = "El siguiente paso eliminará parcial o toltamente los datos almacenados previamente ¿desea continuar?";
 			//Primer valor obligatorio.
 			try{NG = Integer.parseInt(fTFNGrupos.getText());}
 			catch(Exception e) {
@@ -123,15 +126,24 @@ public class ParametrosProyecto extends JPanel {
 			if(continuar) name = fTFNombre.getText();
 
 			//Comprobación de valores obligatorios y emisión si procede de mensaje de error.
-			if(continuar && NG == 0) cm.showMessage("El número de grupos debe ser mayor de cero.", 0);
-			else if(continuar && name == null || name.equals("")) cm.showMessage("El campo nombre no puede estar vacio.", 0);
-			//Si no hubieron errores -> proceder con la actualización de los datos.
-			else if(continuar){
+			if(continuar && NG == 0) {
+				cm.showMessage("El número de grupos debe ser mayor de cero.", 0);
+				continuar = false;
+			//Comprobación de nombre válido.
+			}else if(continuar && name == null || name.equals("")) {
+				cm.showMessage("El campo nombre no puede estar vacio.", 0);
+				continuar = false;
+			//Si no hubieron errores y hay confirmación -> proceder con la actualización de los datos.
+			}else if(continuar && cm.showMessage(aviso,3) == JOptionPane.OK_OPTION ){
 				proceed();
 				cm.doActionPProyecto(datos);
 			}
 		}
 		
+		/**
+		 * <p>Title: proceed</p>  
+		 * <p>Description: Recolecta los datos de los campos dentro del HashMap</p>
+		 */
 		private void proceed() {
 			//Si se ha pulsado el botón de aplicar... recolectar datos.
 			datos.clear();
@@ -164,9 +176,26 @@ public class ParametrosProyecto extends JPanel {
 		fTFAutor.setText(null);
 		textArea.setText(null);
 		fTFVersion.setText(null);
-		fTFNGrupos.setText(null);
+		fTFNGrupos.setText("" + cm.getNumberZonas());
 		dateChooser0.setDate(new Date());
 		dateChooser0.setDate(new Date());
+	}
+	
+	/**
+	 * <p>Title: refresh</p>  
+	 * <p>Description: Actualiza los controles pertinentes de la vista.</p> 
+	 */
+	public void refresh() {
+		String tipo = TypesFiles.PRJ;
+		if(cm.hasModule(tipo)) {
+			fTFNombre.setText(cm.getValueFromLabel(tipo,Labels.NAME));		
+			fTFAutor.setText(cm.getValueFromLabel(tipo,Labels.AUTHOR));
+			textArea.setText(cm.getValueFromLabel(tipo,Labels.DESCRIPTION));
+			fTFVersion.setText(cm.getValueFromLabel(tipo,Labels.VERSION));
+			dateChooser0.setDate(stringToDate(cm.getValueFromLabel(tipo,Labels.DATE0)));
+			dateChooser0.setDate(stringToDate(cm.getValueFromLabel(tipo,Labels.DATE0)));
+		}
+		fTFNGrupos.setText("" + cm.getNumberZonas());
 	}
 
 
@@ -291,32 +320,32 @@ public class ParametrosProyecto extends JPanel {
 	}
 	
 	
-	/**
-	 * <p>Title: setField</p>  
-	 * <p>Description: Modifica el contenido mostrado por un campo</p>
-	 * @see Labels
-	 * @param fieldName Nombre de la etiqueta que representa el campo.
-	 * @param txt Texto a introducir en el campo.
-	 */
-	public void setField(String fieldName, String txt) {
-		switch(fieldName) {
-		case(Labels.NAME): fTFNombre.setText(txt);
-			break;
-		case(Labels.AUTHOR): fTFAutor.setText(txt);
-			break;
-		case(Labels.DESCRIPTION): textArea.setText(txt);
-			break;
-		case(Labels.VERSION): fTFVersion.setText(txt);
-			break;
-		case(Labels.NG): fTFNGrupos.setText(txt);
-			break;
-		case(Labels.DATE0): dateChooser0.setDate(stringToDate(txt));
-			break;
-		case(Labels.DATE1): dateChooser1.setDate(stringToDate(txt));
-			break;
-		default:
-		}
-	}
+//	/**
+//	 * <p>Title: setField</p>  
+//	 * <p>Description: Modifica el contenido mostrado por un campo</p>
+//	 * @see Labels
+//	 * @param fieldName Nombre de la etiqueta que representa el campo.
+//	 * @param txt Texto a introducir en el campo.
+//	 */
+//	private void setField(String fieldName, String txt) {
+//		switch(fieldName) {
+//		case(Labels.NAME): fTFNombre.setText(txt);
+//			break;
+//		case(Labels.AUTHOR): fTFAutor.setText(txt);
+//			break;
+//		case(Labels.DESCRIPTION): textArea.setText(txt);
+//			break;
+//		case(Labels.VERSION): fTFVersion.setText(txt);
+//			break;
+//		case(Labels.NG): fTFNGrupos.setText(txt);
+//			break;
+//		case(Labels.DATE0): dateChooser0.setDate(stringToDate(txt));
+//			break;
+//		case(Labels.DATE1): dateChooser1.setDate(stringToDate(txt));
+//			break;
+//		default:
+//		}
+//	}
 
 	
 	/**

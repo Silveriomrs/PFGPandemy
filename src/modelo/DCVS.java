@@ -14,7 +14,7 @@ import javax.swing.table.TableModel;
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 2021.04.12
- * @version 2.7
+ * @version 2.8
  *
  */
 public class DCVS implements TableModel{
@@ -24,6 +24,7 @@ public class DCVS implements TableModel{
 	private String nombre;
 	private String tipo;
 	private String date;
+	private boolean editLabels;
 	private Object[] cabecera;
 	private Object datos[][];
 	
@@ -34,6 +35,7 @@ public class DCVS implements TableModel{
 	 */
 	public DCVS() {
 		super();
+		setEditLabels(true);
 		ruta = null;
 		tipo = "";
 		nuevoModelo();
@@ -66,13 +68,16 @@ public class DCVS implements TableModel{
 	}
 
 	/**
-	 * Añade una nueva fila a la tabla.
-	 * @param f Array de objetos de la fila a añadir al modelo.
+	 * Añade una nueva fila a la tabla. Si la función recibe un array de datos
+	 *  este será usado para añadir a la nueva fila, en otro caso crea una fila vacia
+	 *   con referencias null en cada columna de la fila.
+	 * @param f Array de objetos de la fila a añadir al modelo. NULL para añadir una fila
+	 *  vacia.
 	 * @return TRUE si ha tenido exito la operación, FALSE en otro caso.
 	 */
 	public boolean addFila(Object[] f) {
 		boolean ok = false;
-		if(modelo != null && f != null) {
+		if(modelo != null) {
 			modelo.addRow(f);
 			ok = true;
 		}
@@ -103,6 +108,22 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
+	 * Función que elimina una fila de la tabla. Para ello se le debe pasar
+	 * el índice de la fila a eliminar.
+	 * @param fila Indice de la fila a eliminar.
+	 * @return done TRUE si se ha realizado con exito la operación,
+	 * false en otro caso.
+	 */
+	public boolean delFila(int fila) {
+		boolean done = false;
+		if (fila > -1 && fila < modelo.getRowCount()) {
+			modelo.removeRow(fila);
+			done = true;
+		}
+		return done;
+	}
+	
+	/**
 	 * Función que elimina las filas indicadas en un arreglo de números indice.
 	 * @param filas arreglo de los indeces de filas a eliminar.
 	 * @return done TRUE si se ha realizado con exito la operación,
@@ -121,23 +142,6 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * Función que elimina una fila de la tabla. Para ello se le debe pasar
-	 * el índice de la fila a eliminar.
-	 * @param fila Indice de la fila a eliminar.
-	 * @return done TRUE si se ha realizado con exito la operación,
-	 * false en otro caso.
-	 */
-	public boolean delFila(int fila) {
-		boolean done = false;
-		if (fila > -1 && fila < modelo.getRowCount()) {
-			System.out.println("DCVS delFila ->\nFila: " + fila + " > " + getRow(fila)[0]);
-			modelo.removeRow(fila);
-			done = true;
-		}
-		return done;
-	}
-	
-	/**
 	 * Elimina las columnas indicadas en un arreglo con los indices de las
 	 * columnas a eliminar del modelo.
 	 * @param cols arreglo de los indices de comlumnas a eliminar.
@@ -145,7 +149,7 @@ public class DCVS implements TableModel{
 	 */
 	public DefaultTableModel delColumnas(int[] cols) {
 		int ncols = cols.length;												//Número de columnas a borrar.
-		int ncols2 = modelo.getColumnCount();									//Número de columnas en origen.
+		int ncols2 = getColumnCount();									//Número de columnas en origen.
 		int nfilas = getRowCount();
 		Object datos[][] = new Object[nfilas][ncols2 - ncols];
 		Object cabecera[] = new Object[ncols2 - ncols];
@@ -154,10 +158,10 @@ public class DCVS implements TableModel{
 			for(int j = 0; j<ncols2; j++) {
 				if(!isListed(cols,j)) {
 					//Copiar cabecera.
-					cabecera[contCols] = modelo.getColumnName(j);
+					cabecera[contCols] = getColumnName(j);
 					//Copiar los datos.
 					for(int i=0; i<nfilas;i++) {
-						datos[i][contCols] = modelo.getValueAt(i,j);	
+						datos[i][contCols] = getValueAt(i,j);	
 					}
 					contCols++;
 				}
@@ -371,8 +375,18 @@ public class DCVS implements TableModel{
 	@Override
 	public Object getValueAt(int arg0, int arg1) {return modelo.getValueAt(arg0, arg1);}
 
+	/**
+	 * Permite conocer si una celda es editable o no lo es.
+	 * En caso de que el módulo tenga desactivado la función de editar las etiquetas
+	 *  la primera columna no será editable.
+	 *  @see #setEditLabels
+	 */
 	@Override
-	public boolean isCellEditable(int arg0, int arg1) {return modelo.isCellEditable(arg0, arg1);}
+	public boolean isCellEditable(int arg0, int arg1) {
+		boolean is = modelo.isCellEditable(arg0, arg1);
+		if(arg1 == 0 && !editLabels) is = false;
+		return is;		
+	}
 
 	@Override
 	public void removeTableModelListener(TableModelListener arg0) { modelo.removeTableModelListener(arg0);}
@@ -388,9 +402,9 @@ public class DCVS implements TableModel{
 	 */
 	@Override
 	public void setValueAt(Object arg0, int arg1, int arg2) {
-		if(arg1 >= this.getRowCount()) {
+		if(arg1 > this.getRowCount()) {
 			System.out.println("DCVS > setValueAt > Valor de número de fila incorrecto: " + arg1 + "/" + this.getRowCount());
-		}else if (arg2 >= this.getColumnCount() ) {
+		}else if (arg2 > this.getColumnCount() ) {
 			System.out.println("DCVS > setValueAt > Valor de número de columna incorrecto: " + arg2 + "/" + this.getColumnCount());
 		}else {this.modelo.setValueAt(arg0, arg1, arg2);}
 		
@@ -460,5 +474,15 @@ public class DCVS implements TableModel{
 	 * @param date La fecha a establecer del archivo.
 	 */
 	public void setDate(String date) {this.date = date;}
+
+
+	/**
+	 *  <P> Activa o desactiva la edición de la primera columna </P>
+	 * La primera columna es la columna donde van identificadas las filas por etiquetas. En general,
+	 *  al editar un archivo CSV es deseable permitir edición, no así cuando
+	 *   se editan los módulos del proyecto a fin de mantener la consistencia de datos.
+	 * @param editLabels TRUE si se desea permitir edición para la primera columna. FALSE en otro caso.
+	 */
+	public void setEditLabels(boolean editLabels) {this.editLabels = editLabels;}
 	
 }

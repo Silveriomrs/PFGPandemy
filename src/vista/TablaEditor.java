@@ -74,6 +74,7 @@ public class TablaEditor extends JPanel{
 	private String ruta = "/vista/imagenes/degradado.png";
 	
 	private boolean modificado;
+	private boolean editable; 													//Habilita la edición del número de columnas y filas.
 
 	
 	/**
@@ -83,6 +84,7 @@ public class TablaEditor extends JPanel{
 	 */
 	public TablaEditor(ControladorModulos cm) {
 		this.cm = cm;
+		this.editable = true;
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
 		setLayout(new BorderLayout(0, 0));
@@ -225,24 +227,22 @@ public class TablaEditor extends JPanel{
 	}
 	
 	private void estadoBotones() {
+		boolean tieneColumna = dcvs.getColumnCount() > 0;
+		boolean tieneFila = dcvs.getRowCount() > 0;
 		//Botones de guardado.
 		btnGuardarArchivo.setEnabled(modificado);
 		btnGuardarCambios.setEnabled(modificado && dcvs.getRuta() != null && dcvs.getTipo() != null);
-		//Botones nueva tabla, fila, borrarTabla
-		boolean tieneColumna = dcvs.getColumnCount() > 0;
-		btnBorrarTabla.setEnabled(tieneColumna);
-		btnNuevaTabla.setEnabled(tieneColumna);
-		btnAddRow.setEnabled(tieneColumna);
-		btnBorrarColumna.setEnabled(tieneColumna);
-		//Botón borrar fila => debe tener alguna fila.
-		boolean tieneFila = dcvs.getRowCount() > 0;
-		btnBorrarFila.setEnabled(tieneFila);
-		
-		//Controles especiales.
-		//comboBox;
-		btnAsignarTabla.setEnabled(tieneColumna && tieneFila);
-		//boxAsignacion;
-		
+		if(editable) {
+			//Botones nueva tabla, fila, borrarTabla	
+			btnBorrarTabla.setEnabled(tieneColumna);							//Botón borrar columna => debe tener alguna columna.
+			btnNuevaTabla.setEnabled(tieneColumna);
+			btnAddRow.setEnabled(tieneColumna);
+			btnBorrarColumna.setEnabled(tieneColumna);
+			//Botón borrar fila => debe tener alguna fila.		
+			btnBorrarFila.setEnabled(tieneFila);	
+			//Controles especiales.
+			btnAsignarTabla.setEnabled(tieneColumna && tieneFila);
+		}
 	}
 
 	/**
@@ -306,19 +306,23 @@ public class TablaEditor extends JPanel{
 	 * <p>Title: setModelo</p>  
 	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
 	 * El tipo de módulo debe estar definido en: {@link ModuleType Tipos de módulos}.
-	 * @param dcvs JTableModel o modelo que se quiere establecer.
+	 * @param dcvsIn JTableModel o modelo que se quiere establecer.
+	 * @param editable TRUE si se quiere permitir la edición del número de columnas y filas.
+	 *  FALSE en otro caso.
 	 */
-	public void setModelo(DCVS dcvs) {
+	public void setModelo(DCVS dcvsIn, boolean editable) {
+		this.editable = editable;
+		this.dcvs = dcvsIn;
 		//Obtener valor Enúmerado.
-		String tipo = dcvs.getTipo().toUpperCase();
-		ModuleType mt = ModuleType.valueOf(tipo); 
+		String tipo = dcvs.getTipo();
+		ModuleType mt = ModuleType.valueOf(tipo.toUpperCase());
 		//Establecer en el selector el tipo.
 		comboBox.setSelectedItem(mt);
 		//Si el tipo no es General (CVS) bloquearlo para impedir inconsistencias por error de asignación.
-		comboBox.setEnabled(dcvs.getTipo().equals(TypesFiles.CSV));
-		//Prueba...
+		comboBox.setEnabled(tipo.equals(TypesFiles.CSV));
+		//Añadir listener para los controles.
+		dcvs.addTableModelListener(new TableUpdateListener());
 		tabla.setModel(dcvs);
-//		tabla.setModel(modelo);
 		estadoBotones();
 	}
 	
@@ -499,8 +503,7 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				int[] cols = tabla.getSelectedColumns();						//Obtención de las columnas a eliminar.
-				dcvs.delColumnas(cols);											//Establecemos el nuevo modelo en la tabla.
+				tabla.setModel( dcvs.delColumnas(tabla.getSelectedColumns()));											//Establecemos el nuevo modelo en la tabla.
 				modificado = true;
 				estadoBotones();
 			}
@@ -619,13 +622,14 @@ public class TablaEditor extends JPanel{
 	}
 	
 	private class TableUpdateListener implements TableModelListener {
-            @Override
-            public void tableChanged(TableModelEvent tme) {
-                if (tme.getType() == TableModelEvent.UPDATE) {
-                    modificado = true;
-                }
+		
+        @Override
+        public void tableChanged(TableModelEvent tme) {
+            if (tme.getType() == TableModelEvent.UPDATE) {
+                modificado = true;
             }
-	    }
+        }
+    }
 	
 	
 	@SuppressWarnings("javadoc")

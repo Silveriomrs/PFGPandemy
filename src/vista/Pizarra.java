@@ -364,7 +364,7 @@ public class Pizarra extends JFrame {
 				iniciarCanvas();
 				g = c.getGraphics();
 			} else {
-				/* El que queda dibujado es el último impreso */
+				//queda dibujado es el último impreso
 				g.setColor(Color.BLUE);
 				g.drawPolygon(poligono);
 			}

@@ -282,6 +282,8 @@ public class Archivos extends JPanel {
 		boton.setBounds(posX, posY, 27, hi);
 		boton.setEnabled(activado);
 		boton.setBorder(null);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
 		addBotonHM(boton,ext);
 		panelCentral.add(boton);
 	}
@@ -397,10 +399,20 @@ public class Archivos extends JPanel {
 		mapaFields.forEach((tipo,elemento) -> {
 			//Sin nombre en principio.
 			String nombre = null;
+			boolean hasModule = cm.hasModule(tipo);
+			boolean hasName = true;
 			//Si existe el módulo, obtiene el nombre del mismo.
-			if(cm.getModule(tipo) != null) nombre = cm.getModule(tipo).getRuta();
+			if(hasModule) nombre = cm.getModule(tipo).getNombre();
+			//En caso de que no tenga nombre definido mostrar texto al respecto.
+			hasName = nombre != null;
+			if(hasModule && !hasName) {
+				nombre = "Datos sin destino definido.";
+				elemento.setBackground(Color.LIGHT_GRAY);
+			}else if(hasModule && hasName) elemento.setBackground(elemento.getSelectionColor());
+			else elemento.setBackground(elemento.getCaretColor());
 			//Asigna el nombre al campo correspondiente.
-			elemento.setText(nombre);		
+			elemento.setText(nombre);
+			
 		});
 	}
 	
