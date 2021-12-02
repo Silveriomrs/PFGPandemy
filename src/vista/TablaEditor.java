@@ -232,6 +232,10 @@ public class TablaEditor extends JPanel{
 		//Botones de guardado.
 		btnGuardarArchivo.setEnabled(modificado);
 		btnGuardarCambios.setEnabled(modificado && dcvs.getRuta() != null && dcvs.getTipo() != null);
+		//Por ser primer boton en ejecutarse por defecto aparece activo,
+		//Colocado fuera del condicional permite que se desactive al primer cambio
+		//en caso de no estar habilitada la opción de edición.
+		btnAddCol.setEnabled(editable);
 		if(editable) {
 			//Botones nueva tabla, fila, borrarTabla	
 			btnBorrarTabla.setEnabled(tieneColumna);							//Botón borrar columna => debe tener alguna columna.

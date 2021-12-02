@@ -224,11 +224,11 @@ public class VistaSIR extends JPanel{
 		// Generación de sus nombres e iconos particulares.
 		addNewControlLine(Labels.PTE,"/vista/imagenes/Iconos/probabilidad_64px.png");
 		addNewControlLine(Labels.DME,"/vista/imagenes/Iconos/duracion_64px.png");
-		addNewControlLine(Labels.DMIP,"/vista/imagenes/Iconos/duracionMedia_64px.png");
+		addNewControlLine(Labels.DMI,"/vista/imagenes/Iconos/duracionMedia_64px.png");
 		addNewControlLine(Labels.IT,"/vista/imagenes/Iconos/startTime_64px.png");
 		addNewControlLine(Labels.FT,"/vista/imagenes/Iconos/stopTime_64px.png");
 		//Configuración específica para DMIP
-		mapaFields.get(Labels.DMIP).setDisabledTextColor(Color.RED);
+		mapaFields.get(Labels.DMI).setDisabledTextColor(Color.RED);
 		//Selector de IP (Checkbox) configuración específica.
 		JLabel jl = iniciarLabels(null,"/vista/imagenes/Iconos/inmunidad_64px.png");
 		int posY = lineaBase + 30*contador;
@@ -305,7 +305,7 @@ public class VistaSIR extends JPanel{
 	 * <p>Description: Actualiza los controles de la vista.</p>
 	 */
 	private void refreshControls() {
-		mapaFields.get(Labels.DMIP).setEnabled(IP);
+		mapaFields.get(Labels.DMI).setEnabled(IP);
 		chckbxIP.setSelected(IP);
 	}
 	
@@ -324,7 +324,7 @@ public class VistaSIR extends JPanel{
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
-			if(op.equals("IP")) {IP = chckbxIP.isSelected();}
+			if(op.equals("IP")) {IP = !chckbxIP.isSelected();}
 			//Avisa al controlador de cambios.
 			if(cm != null && op.equals("Aplicar") ) cm.doActionVistaSIR();
 			//Actualiza los controles.

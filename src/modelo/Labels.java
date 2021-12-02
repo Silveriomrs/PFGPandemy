@@ -74,8 +74,8 @@ public class Labels {
 	public final static String DME ="DME";
 	/** IP Inmunidad permanente*/  
 	public final static String IP ="IP";
-	/** DMIP Duración de la inmunidad permanente*/  
-	public final static String DMIP ="DMIP";
+	/** DMIP Duración de la inmunidad*/  
+	public final static String DMI ="DMI";
 	/* Etiquetas propiedades proyecto */
 	/** NAME Nombre del proyecto*/
 	public final static String NAME = "NAME";
@@ -149,7 +149,7 @@ public class Labels {
 		dic.put(PTE,"Probabilidad de transmisión de la enfermedad");
 		dic.put(DME,"Duración media de la enfermedad");
 		dic.put(IP,"Inmunidad permanente");
-		dic.put(DMIP,"Duración media de la inmunidad permanente");
+		dic.put(DMI,"Duración media de la inmunidad");
 		//Etiquetas de propiedades del proyecto.
 		dic.put(NAME,"Nombre del proyecto" );
 		dic.put(AUTHOR,"Autor del proyecto");

@@ -320,34 +320,6 @@ public class ParametrosProyecto extends JPanel {
 	}
 	
 	
-//	/**
-//	 * <p>Title: setField</p>  
-//	 * <p>Description: Modifica el contenido mostrado por un campo</p>
-//	 * @see Labels
-//	 * @param fieldName Nombre de la etiqueta que representa el campo.
-//	 * @param txt Texto a introducir en el campo.
-//	 */
-//	private void setField(String fieldName, String txt) {
-//		switch(fieldName) {
-//		case(Labels.NAME): fTFNombre.setText(txt);
-//			break;
-//		case(Labels.AUTHOR): fTFAutor.setText(txt);
-//			break;
-//		case(Labels.DESCRIPTION): textArea.setText(txt);
-//			break;
-//		case(Labels.VERSION): fTFVersion.setText(txt);
-//			break;
-//		case(Labels.NG): fTFNGrupos.setText(txt);
-//			break;
-//		case(Labels.DATE0): dateChooser0.setDate(stringToDate(txt));
-//			break;
-//		case(Labels.DATE1): dateChooser1.setDate(stringToDate(txt));
-//			break;
-//		default:
-//		}
-//	}
-
-	
 	/**
 	 * <p>Title: stringToDate</p>  
 	 * <p>Description: Convierte una cadena de texto que contiene una fecha

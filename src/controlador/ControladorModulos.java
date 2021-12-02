@@ -148,7 +148,7 @@ public class ControladorModulos {
 		pSIR.addCabecera(cabecera);
 		pSIR.addFila(new String[]{Labels.PTE, null});
 		pSIR.addFila(new String[]{Labels.DME, null});
-		pSIR.addFila(new String[]{Labels.DMIP, null});
+		pSIR.addFila(new String[]{Labels.DMI, null});
 		pSIR.addFila(new String[]{Labels.IP, null});
 		pSIR.addFila(new String[]{Labels.IT,null});
 		pSIR.addFila(new String[]{Labels.FT,null});
@@ -690,7 +690,7 @@ public class ControladorModulos {
 				String ruta = wd + dato;
 				DCVS mAux = cio.abrirArchivo(ruta,etiq);						//Carga el módulo desde el sistema de archivos.
 				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
-				else showMessage("Archivo de proyecto incorrecto. Referencia un módulo que no está contenido en la misma carpeta: " + dato + "." + etiq,0);
+				else showMessage("Archivo de proyecto incorrecto. \nReferencia un módulo que no está contenido en la misma carpeta:\n " + dato + "." + etiq,0);
 			}else if(etiq.equals(Labels.NG)){									
 				//Guardar el número de zonas que debe contener el proyecto.
 				NG = Integer.parseInt(dato);
@@ -1094,7 +1094,7 @@ public class ControladorModulos {
 		//IP
 		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.IP ,vistaSIR.getLabel(Labels.IP));
 		//DMIP
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.DMIP ,vistaSIR.getLabel(Labels.DMIP));
+		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.DMI ,vistaSIR.getLabel(Labels.DMI));
 		//IT
 		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.IT ,vistaSIR.getLabel(Labels.IT));
 		//FT
