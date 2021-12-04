@@ -130,7 +130,7 @@ public class ParametrosProyecto extends JPanel {
 				cm.showMessage("El número de grupos debe ser mayor de cero.", 0);
 				continuar = false;
 			//Comprobación de nombre válido.
-			}else if(continuar && name == null || name.equals("")) {
+			}else if(continuar && (name == null || name.equals(""))) {
 				cm.showMessage("El campo nombre no puede estar vacio.", 0);
 				continuar = false;
 			//Si no hubieron errores y hay confirmación -> proceder con la actualización de los datos.

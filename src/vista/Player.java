@@ -57,6 +57,9 @@ import java.awt.Font;
  * @version versión
  */
 public class Player extends JPanel implements ActionListener{
+	/** serialVersionUID*/  
+	private static final long serialVersionUID = 1L;
+	
 	private JFrame frame;
 	private JButton btnPlayPause;
 	private Timer timer;
@@ -74,20 +77,16 @@ public class Player extends JPanel implements ActionListener{
 	private DCVS historico;
 	private boolean activo;														//Establece si el reproducctor esta activo o pausado.
 	
-	/** serialVersionUID*/  
-	private static final long serialVersionUID = 1L;
-
 
 	/**
 	 * <p>Title: </p>  
 	 * <p>Description: </p>  
 	 * @param width Ancho del panel de reproductor.
 	 * @param height Alto del panel de reproductor.
-	 * @param editable Indica cuando las propiedades de visualización como
 	 * dimensiones u otras son editables o no lo son, true si lo son,
 	 * false en otro caso.
 	 */
-	public Player(int width, int height, boolean editable) {
+	public Player(int width, int height) {
 		super();
 		activo = false;
 		//Border: configuración de estilo

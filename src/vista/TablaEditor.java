@@ -60,6 +60,7 @@ public class TablaEditor extends JPanel{
 	private JButton btnAddRow,btnAddCol,btnNuevaTabla,btnBorrarFila,btnBorrarColumna;
 	private JScrollPane scrollPane;
 	private JTable tabla;
+	private CellRenderTableEditor cellRender;
 
 	private DCVS dcvs;
 	private JLabel lblAsignarTablaA;
@@ -85,6 +86,7 @@ public class TablaEditor extends JPanel{
 	public TablaEditor(ControladorModulos cm) {
 		this.cm = cm;
 		this.editable = true;
+		this.cellRender = new CellRenderTableEditor(editable);
 		setName("panel_tabla");
 		setMaximumSize(new Dimension(1024, 768));
 		setLayout(new BorderLayout(0, 0));
@@ -210,11 +212,13 @@ public class TablaEditor extends JPanel{
 		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tabla.setBorder(null);
 		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tabla.setCellSelectionEnabled(false);
-		tabla.setRowSelectionAllowed(true);	
+		tabla.setCellSelectionEnabled(true);
+		//
+		tabla.setShowHorizontalLines(true);
+		tabla.setRowSelectionAllowed(true);
 		tabla.setColumnSelectionAllowed(false);
-		tabla.setBackground(new Color(224, 255, 255));
 		tabla.getTableHeader().setReorderingAllowed(false);
+		tabla.setDefaultRenderer(Object.class,cellRender);
 		scrollPane.getViewport().setOpaque(false);
 
 		//Genera el cuerpo de datos y establace.
@@ -246,6 +250,9 @@ public class TablaEditor extends JPanel{
 			btnBorrarFila.setEnabled(tieneFila);	
 			//Controles especiales.
 			btnAsignarTabla.setEnabled(tieneColumna && tieneFila);
+		}else {
+			btnAsignarTabla.setEnabled(true);
+			btnAsignarTabla.setText("Actualizar");
 		}
 	}
 
@@ -326,6 +333,7 @@ public class TablaEditor extends JPanel{
 		comboBox.setEnabled(tipo.equals(TypesFiles.CSV));
 		//Añadir listener para los controles.
 		dcvs.addTableModelListener(new TableUpdateListener());
+		tabla.setDefaultRenderer(Object.class,new CellRenderTableEditor(editable));
 		tabla.setModel(dcvs);
 		estadoBotones();
 	}
@@ -347,49 +355,10 @@ public class TablaEditor extends JPanel{
 		//Listener que avisará de cambios en la tabla -> activa botón de guardado.
 		dcvs.addTableModelListener(new TableUpdateListener());
 		tabla.setModel(dcvs);
-		
+		//Al ser tabla nueva en principio es completamente editable.
+		this.editable = true;
 		this.modificado = false;
 		estadoBotones();
-	}
-	
-	/**
-	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
-	 * no están enlazados con un hilo padre (null). Un número no definido se 
-	 * mostrará como información.
-	 * 
-	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un 
-	 * mensaje tipo 1. 
-	 * @param mensaje Texto a mostrar.
-	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
-	 *  <p>0 JOptionPane.ERROR_MESSAGE</p>
-	 *  <p>1 JOptionPane.INFORMATION_MESSAGE</p>
-	 *  <p>2 JOptionPane.WARNING_MESSAGE</p>
-	 *  <p>3 JOptionPane.QUESTION_MESSAGE</p>
-	 *  <p>4 JOptionPane.PLAIN_MESSAGE</p>
-	 *  <p>10 JOptionPane.showConfirmDialog OK_CANCEL_OPTION</p>
-	 * @return Devuelve el valor de la opción elegida para ShowConfirmDialog, 0 en otro caso.
-	 * @see JOptionPane
-	 */
-	private int mostrar(String mensaje, int tipo ) {
-		String titulo = "";
-		int eleccion = 0;
-		switch(tipo) {
-		case 0: titulo = "Error";break;
-		case 1: titulo = "Información"; break;
-		case 2: titulo = "¡Antención!"; break;
-		case 3: titulo = "Consulta"; break;
-		case 4: titulo = "Acerca de..."; tipo = 1; break;
-		case 10: titulo = "Atención";break;
-		default:
-		}
-		
-		if(tipo == 10) {
-			eleccion = JOptionPane.showConfirmDialog(null, mensaje, titulo, JOptionPane.OK_CANCEL_OPTION);
-		}else {
-			JOptionPane.showMessageDialog(null, mensaje, titulo, tipo);
-		}
-		
-		return eleccion;
 	}
 	
 	private class BtnImprimirMouseListener extends MouseAdapter {
@@ -427,7 +396,7 @@ public class TablaEditor extends JPanel{
 					dcvs.addFila(row);											//Se añade.
 					modificado = true;
 				}else {
-					mostrar("Debe añadir alguna columna.", 0);
+					cm.showMessage("Debe añadir alguna columna.", 0);
 				}
 				estadoBotones();
 			}
@@ -444,7 +413,7 @@ public class TablaEditor extends JPanel{
 					dcvs = dcvs2;
 					modificado = false;
 					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
-					mostrar("Archivo Cargado", 1);
+					cm.showMessage("Archivo Cargado", 1);
 					estadoBotones();
 				}
 			}
@@ -461,12 +430,12 @@ public class TablaEditor extends JPanel{
 				if(dcvs.getRowCount() >0) {
 					String rutaF = cio.guardarArchivo(dcvs);
 					if(rutaF != null) {
-						mostrar("Archivo guardado", 1);
+						cm.showMessage("Archivo guardado", 1);
 						dcvs.setRuta(rutaF);
 						modificado = false;
 						estadoBotones();
 					}
-				} else mostrar("No hay datos que guardar",0);
+				} else cm.showMessage("No hay datos que guardar",0);
 			}
 		}
 	}
@@ -481,12 +450,12 @@ public class TablaEditor extends JPanel{
 				if(dcvs.getRowCount() >0) {
 					rutaF = cio.guardarArchivo(dcvs);
 					if(rutaF != null) {
-						mostrar("Archivo guardado", 1);
+						cm.showMessage("Archivo guardado", 1);
 						dcvs.setRuta(rutaF);
 						modificado = false;
 						estadoBotones();
 					}					
-				} else mostrar("No hay datos que guardar",0);
+				} else cm.showMessage("No hay datos que guardar",0);
 
 			}
 		}
@@ -526,14 +495,15 @@ public class TablaEditor extends JPanel{
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
+			boolean activo = ((JButton) e.getSource()).isEnabled();
+			if(activo) {
 				boolean actuar = true;
 				int respuesta = 0;
 				//Obtener selección
 				ModuleType seleccion = (ModuleType) comboBox.getSelectedItem();
 				
 				if(seleccion != ModuleType.CSV) {
-					respuesta = mostrar("Atención, esta acción sobreescribe los datos existentes en el módulo " + seleccion, 10);
+					respuesta = cm.showMessage("Atención, esta acción sobreescribe los datos existentes en el módulo " + seleccion, 3);
 				}
 				
 				System.out.println(seleccion);
@@ -547,9 +517,11 @@ public class TablaEditor extends JPanel{
 				}
 				//En caso de haber aceptado, mensaje al usuario y actualizar estado de los controles.
 				if(actuar) {
-					mostrar("Datos aplicados al módulo: " + seleccion, 1);
+					cm.showMessage("Datos aplicados al módulo: " + seleccion, 1);
 					estadoBotones();
 				}	
+			} else {
+				cm.doActionTableEditor(null);
 			}
 		}
 		
@@ -562,19 +534,15 @@ public class TablaEditor extends JPanel{
 		 * @see ModuleType
 		 */
 		private String setTipo(ModuleType seleccion) {
-			String tipo = "CVS";
+			String tipo;
 			switch(seleccion){
 			case MAP:
 				tipo = TypesFiles.MAP;
 				break;
 			case HST: 
-				cm.setHistorico(dcvs);
 				tipo = TypesFiles.HST;
 				break;
 			case PAL:
-				//Cambiado, esto recibía el modelo de la tabla.
-				cm.setPaleta(dcvs);
-				mostrar("Nueva paleta asignada", 1);
 				tipo = TypesFiles.PAL;
 				break;
 			case REL:
@@ -593,6 +561,7 @@ public class TablaEditor extends JPanel{
 				tipo = TypesFiles.GRP;
 				break;
 			default:
+				tipo = TypesFiles.CSV;
 				break;
 			}
 			
@@ -605,7 +574,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = JOptionPane.showConfirmDialog(null, "¿Desea eliminar la tabla actual con sus datos?", "Aviso", JOptionPane.YES_NO_OPTION);
+				int opt = cm.showMessage("¿Desea eliminar la tabla actual con sus datos?",3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
 			}
@@ -618,7 +587,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = JOptionPane.showConfirmDialog(null, "Eliminará la tabla actual con sus datos ¿Desea continuar?", "Aviso", JOptionPane.YES_NO_OPTION);
+				int opt = cm.showMessage("Eliminará la tabla actual con sus datos ¿Desea continuar?", 3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
 			}

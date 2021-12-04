@@ -385,7 +385,6 @@ public class Archivos extends JPanel {
 			//Extrar su extensión.
 			String ext = key.substring(key.length() -3,key.length());
 			btn.setEnabled(cm.hasModule(ext));
-//			System.out.println("Archivos > refreshEditarBorar: " + ext + " = " + cm.hasModulo(ext));
 		});
 	}
 	

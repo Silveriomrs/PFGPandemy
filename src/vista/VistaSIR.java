@@ -84,7 +84,7 @@ public class VistaSIR extends JPanel{
 		//Limpiar datos anteriores.
 		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
 		//Realizar lectura de los datos en el propio módulo (si hay).
-		if(cm.getModule(TypesFiles.DEF) != null) refresh();
+		refresh();
 	}
 	
 	
@@ -106,7 +106,9 @@ public class VistaSIR extends JPanel{
 	 * <p>Title: updateFields</p>  
 	 * <p>Description: Actualiza los campos de la vista.</p>
 	 * Solicita al controlador los datos necesarios para actualizar la vista,
-	 *  en caso de estar disponibles, procede a la acción.
+	 *  en caso de estar disponibles, procede a la acción. No actualiza aquellas
+	 *   partes que no estén definidas. Es decir, no elimina datos previos, los 
+	 *    sobreescribe si hay un nuevo dato disponible.
 	 */
 	private void updateFields() {
 		DCVS dcvs = cm.getModule(TypesFiles.DEF);
@@ -117,7 +119,8 @@ public class VistaSIR extends JPanel{
 			if(!label.equals(Labels.IP)) {setLabel(label,data);}
 			else {
 				//Cuando la etiqueta es IP, recibe el tratamiento específico.
-				int a = (data == null)? 1 : Integer.parseInt(data);				//Convertirlo a int sino es null, en otro caso dar valor 1 (activo).
+				//Convertirlo a int sino es null, en otro caso dar valor 1 (activo).
+				int a = (data == null || data.equals(""))? 1 : Integer.parseInt(data);				
 				IP = a == 1;													//Obtener el resultado si es activo o no.
 			}
 		}
@@ -305,7 +308,7 @@ public class VistaSIR extends JPanel{
 	 * <p>Description: Actualiza los controles de la vista.</p>
 	 */
 	private void refreshControls() {
-		mapaFields.get(Labels.DMI).setEnabled(IP);
+		mapaFields.get(Labels.DMI).setEnabled(!IP);
 		chckbxIP.setSelected(IP);
 	}
 	
@@ -324,7 +327,7 @@ public class VistaSIR extends JPanel{
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
-			if(op.equals("IP")) {IP = !chckbxIP.isSelected();}
+			if(op.equals("IP")) {IP = chckbxIP.isSelected();}
 			//Avisa al controlador de cambios.
 			if(cm != null && op.equals("Aplicar") ) cm.doActionVistaSIR();
 			//Actualiza los controles.

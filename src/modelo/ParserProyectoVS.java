@@ -164,7 +164,7 @@ public class ParserProyectoVS {
 		//Búsqueda de la IP específica.
 		definicionSIR.addFila(new String[]{Labels.IP,hasIP()});
 		//Búsqueda de DMIP o su inversa = 1/TVS
-		definicionSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
+		definicionSIR.addFila(new String[]{Labels.DMI,getDMIP()});
 		
 		if(traza) System.out.println( definicionSIR.toString() );		
 	}
@@ -181,7 +181,7 @@ public class ParserProyectoVS {
 	private String getDMIP() {
 		String value = "0";
 		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
-		int pos = dcvs.getColItem(Labels.DMIP);
+		int pos = dcvs.getColItem(Labels.DMI);
 		if( pos > -1) {	value = (String) dcvs.getValueAt(0, pos);	}
 		else if(getPosOp(Labels.TVS) > 0) {
 			//En este caso hay que realizar la operación matemática inversa a su valor.

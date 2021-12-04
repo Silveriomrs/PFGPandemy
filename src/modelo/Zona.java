@@ -212,7 +212,7 @@ public class Zona {
 	public void setI(double i) {this.I0 = i;}
 
 	/**
-	 * @return devuelve el nombre de la poligono.
+	 * @return devuelve el nombre del grupo de población.
 	 */
 	public String getName() {return name;}
 

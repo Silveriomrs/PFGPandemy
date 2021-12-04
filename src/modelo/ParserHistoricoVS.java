@@ -42,7 +42,7 @@ public class ParserHistoricoVS {
 	public ParserHistoricoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
 		this.mContactos = new DCVS();
-		this.mDefSIR = new DCVS();
+		this.mDefSIR = DCVSFactory.newModule(TypesFiles.DEF);
 		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
@@ -123,7 +123,7 @@ public class ParserHistoricoVS {
 	 */
 	private void crearMDefEnf(){
 		//Establecer atributos propios del módulo.
-		mDefSIR.setTipo(TypesFiles.DEF);
+//		mDefSIR.setTipo(TypesFiles.DEF);
 		//Crear nombre con extensión DEF a partir del nombre del archivo original.
 		String nombreNuevo = dcvs.getNombre();
 		//Quitamos la extensión.
@@ -133,9 +133,9 @@ public class ParserHistoricoVS {
 		//Guardar dato.
 		mDefSIR.setName(nombreNuevo);
 		//Crear cabecera
-		String[] cabecera = {"tipo","dato"};
-		//Añadir cabecera.
-		mDefSIR.addCabecera(cabecera);
+//		String[] cabecera = {"tipo","dato"};
+//		//Añadir cabecera.
+//		mDefSIR.addCabecera(cabecera);
 		
 		//Añadir etiquetas requeridas a la lista.
 		ArrayList<String> lista = new ArrayList<String>();
@@ -147,38 +147,35 @@ public class ParserHistoricoVS {
 			String etiqueta = lista.get(i);
 			String value = "0";													//En caso de no estar, se configurará a 0.
 			int pos = dcvs.getFilaItem(etiqueta);		
-			if(pos > -1) {
-				value = (String) dcvs.getValueAt(pos, 1);
-				mDefSIR.addFila(new String[]{etiqueta,value});
-			}
-			else mDefSIR.addFila(new String[]{etiqueta,value});
+			if(pos > -1) {value = (String) dcvs.getValueAt(pos, 1);}
+			mDefSIR.setDataToLabel(etiqueta, value);
 		}
 		
 		//IT Leído previamente
-		mDefSIR.addFila(new String[]{Labels.IT,"" + IT});
+		mDefSIR.setDataToLabel(Labels.IT,"" + IT);
 		//FT Leído previamente
-		mDefSIR.addFila(new String[]{Labels.FT,"" + FT});
+		mDefSIR.setDataToLabel(Labels.FT,"" + FT);
 		//Búsqueda de la IP específica.
-		mDefSIR.addFila(new String[]{Labels.IP,hasIP()});
+		mDefSIR.setDataToLabel(Labels.IP,hasIP());
 		//Búsqueda de DMIP o su inversa = 1/TVS
-		mDefSIR.addFila(new String[]{Labels.DMIP,getDMIP()});
+		mDefSIR.setDataToLabel(Labels.DMI,getDMI());
 		
 		if(traza) System.out.println( mDefSIR.toString() );		
 	}
 	
 	/**
-	 * <p>Title: getDMIP</p>  
-	 * <p>Description: Devuelve la Duración Media de la Inmunidad Permanente.</p>
+	 * <p>Title: getDMI</p>  
+	 * <p>Description: Devuelve la Duración Media de la Inmunidad.</p>
 	 * Para ello, realiza una búsqueda primero de la propia etiqueta DMIP, si esta
 	 * incluida, devolverá dicho valor. En otro caso, proseguiría con la búsqueda 
 	 *  de la etiqueta TVS (Tasa de vuelta a la Susceptibilidad) pues esta es su
 	 *   inversa. En caso de no encontrar ninguna de las dos, devolverá el valor 0.
 	 * @return El valor de la etiqueta DMIP o TVS en su ausencia, 0 en otro caso.
 	 */
-	private String getDMIP() {
+	private String getDMI() {
 		String value = "0";
 		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
-		int pos = dcvs.getFilaItem(Labels.DMIP);
+		int pos = dcvs.getFilaItem(Labels.DMI);
 		if( pos > -1) {	value = (String) dcvs.getValueAt(pos,1);	}
 		else if(getPosOp(Labels.TVS) > 0) {
 			//En este caso hay que realizar la operación matemática inversa a su valor.

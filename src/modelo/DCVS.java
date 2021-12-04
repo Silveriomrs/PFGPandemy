@@ -99,6 +99,20 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
+	 * <p>Title: setColumnName</p>  
+	 * <p>Description: Establece un nuevo nombre a una posición de la cebcera</p>
+	 * La función en si misma realiza una copia de la antigua cabecera y sustituye
+	 *  el valor de la posición indicada por el nuevo valor.
+	 * @param index Posición de la columna cuyo nombre se quiere cambiar.
+	 * @param name Nuevo nombre a establecer en la columna.
+	 */
+	public void setColumnName(int index, String name) {
+		//Modificación del valor de la columna especificado.
+		cabecera[index] = name;				
+		addCabecera(cabecera);													//Añade la nueva columna al modelo.
+	}
+	
+	/**
 	 * Añade una nueva cabecera completa.
 	 * @param c array de objetos que van a sustituir a la cabecera actual.
 	 */
@@ -302,6 +316,23 @@ public class DCVS implements TableModel{
 		if( index >= 0) setValueAt(data,index,1);
 		else {done = false;}
 		return done;
+	}
+	
+	/**
+	 * <p>Title: getDataFromRowLabel</p>  
+	 * <p>Description: Devuelve el valor asignado a una etiqueta horizontal.</p>
+	 * Las estiquetas en los módulos pueden estar orientadas de forma vertical
+	 *  (una columna) u horizontal (en filas). Este método realiza el indexado
+	 *   en modo horizontal, cuando encuentra dicha etiqueta devuelve el valor
+	 *    asociado. En caso de no existir dicha etiqueta, devolverá NULL.
+	 * @param label Etiqueta a buscar.
+	 * @return El valor asociado a la etiqueta, NULL en otro caso.
+	 */
+	public Object getDataFromRowLabel(String label) {
+		Object data = null;
+		int index = getFilaItem(label);
+		if(index > -1) data = getValueAt(index,1);
+		return data;
 	}
 	
 	

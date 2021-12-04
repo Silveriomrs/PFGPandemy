@@ -85,6 +85,16 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
+	 * <p>Title: refresh</p>  
+	 * <p>Description: Refresca los datos de las vistas.</p> 
+	 */
+	public void refresh() {
+		vistasZonas.forEach((k,vista)->{
+			vista.refresh();
+		});
+	}
+	
+	/**
 	 * <p>Title: abrirFrame</p>  
 	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
 	 */

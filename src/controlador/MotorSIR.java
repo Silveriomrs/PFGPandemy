@@ -245,7 +245,6 @@ public class MotorSIR {
 		System.out.println("DME: " + DME);
 		System.out.println("IP: " + IP);
 		System.out.println("DMIP: " + DMIP);		
-		
 	}
 	
 	/**

@@ -146,16 +146,16 @@ public class VistaZona extends JPanel {
 		panelChart.setBorder(new  LineBorder(Color.BLACK)  );
 		panelCentral.add(panelChart,BorderLayout.CENTER);
 
-		recargarDatos();
+		refresh();
 	}
 	
 	/**
-	 * <p>Title: recargarDatos</p>  
+	 * <p>Title: refresh</p>  
 	 * <p>Description: Recarga los campos de los TextFields con los datos del modelo</p>
 	 * Realiza una nueva lectura de cada campo del modelo (zona) e introduciendo
 	 *  sus valores en los correspondientes JTextFields. 
 	 */
-	private void recargarDatos() {
+	public void refresh() {
 		//Si no es nulo actúa.
 		if(zona != null) {
 			tf_ID.setText("" + zona.getID());									//ID
@@ -240,7 +240,7 @@ public class VistaZona extends JPanel {
 	 * @param zona La zona a establecer
 	 */
 	public void setZona(Zona zona) {
-		recargarDatos();
+		refresh();
 	}
 	
 	/* Clases privadas */
@@ -351,7 +351,7 @@ public class VistaZona extends JPanel {
 		
 		this.zona = new Zona(0, "1_Test",2 , 3 ,4,5,6,7,8, p);
 		System.out.println( this.zona.toString() + "\nNivel: " + zona.getNivel());
-		recargarDatos();
+		refresh();
 	}
 	
 	/**

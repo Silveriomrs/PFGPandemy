@@ -7,7 +7,6 @@ package controlador;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JOptionPane;
@@ -15,8 +14,12 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import modelo.DCVS;
+import modelo.DCVSFactory;
 import modelo.IO;
 import modelo.Labels;
 import modelo.ParserHistoricoVS;
@@ -87,7 +90,7 @@ public class ControladorModulos {
 	
 	
 	/**
-	 * Constructor de la clase.
+	 * Constructor de la clase controladora.
 	 */
 	public ControladorModulos() {
 		//Inicio del mapa de módulos.
@@ -103,10 +106,10 @@ public class ControladorModulos {
 		pgrupos = new ParametrosGrupos(this);
 		pproyecto = new ParametrosProyecto(this,archivos);
 		about = new About();
-		paleta = new Paleta(100, 205, false);
+		paleta = new Paleta(this,100, 205);
 		mapa = new Mapa(w,h, this);
 		principal = new Principal(this);
-		player = new Player(400, 400, true);
+		player = new Player(400, 400);
 		vistaSIR = new VistaSIR(this);
 		pizarra = new Pizarra(this);
 		//Inicio de los parsers.
@@ -123,39 +126,17 @@ public class ControladorModulos {
 	 * Estos son los del proyecto y los parámetros de la enfermedad.
 	 */
 	private void generarModulosBasicos() {
-		DCVS proyecto = new DCVS();
-		proyecto.setTipo(TypesFiles.PRJ);
-		//Crear cabecera		
-		String[] cabecera = {"Tipo","Dato"};
-		//Añadir cabecera.
-		proyecto.addCabecera(cabecera);
-		//Añadir etiquetas generales.
-		proyecto.addFila(new String[]{Labels.NAME, null});
-		proyecto.addFila(new String[]{Labels.AUTHOR, null});
-		proyecto.addFila(new String[]{Labels.DESCRIPTION,null});
-		proyecto.addFila(new String[]{Labels.DATE0,null});
-		proyecto.addFila(new String[]{Labels.DATE1,null});
-		proyecto.addFila(new String[]{Labels.VERSION,"1.0"});
-		proyecto.addFila(new String[]{Labels.NG,"0"});
-		//Desactivar edición de columna de etiquetas.
-		proyecto.setEditLabels(false);
+		DCVS proyecto = DCVSFactory.newModule(TypesFiles.PRJ);
 		//Procesarlo.
 		abrirProyecto(proyecto);
-		
 		//Módulo de parámetros SIR.
-		DCVS pSIR = new DCVS();
-		pSIR.setTipo(TypesFiles.DEF);
-		pSIR.addCabecera(cabecera);
-		pSIR.addFila(new String[]{Labels.PTE, null});
-		pSIR.addFila(new String[]{Labels.DME, null});
-		pSIR.addFila(new String[]{Labels.DMI, null});
-		pSIR.addFila(new String[]{Labels.IP, null});
-		pSIR.addFila(new String[]{Labels.IT,null});
-		pSIR.addFila(new String[]{Labels.FT,null});
-		pSIR.setEditLabels(false);
+		DCVS pSIR = DCVSFactory.newModule(TypesFiles.DEF);
 		//Procesarlo.
 		establecerDatos(pSIR);
-	
+		//Módulo de paleta de colores.
+		DCVS paleta = DCVSFactory.newModule(TypesFiles.PAL);
+		establecerDatos(paleta);
+		
 	}
 	
 	/**
@@ -165,24 +146,14 @@ public class ControladorModulos {
 	 *  grupos de población añadidos.
 	 */
 	private void generarModuloZonas() {
-		DCVS moduloZonas = new DCVS();
+		DCVS moduloZonas = DCVSFactory.newModule(TypesFiles.MAP);
 		//Añadir datos para el guardado  e identifación.
-		setProjectParameters(TypesFiles.MAP,moduloZonas);
-
-		//Crear cabecera.
-		String[] cabecera = {Labels.ID,Labels.NAME,Labels.PEOPLE,
-				Labels.AREA,Labels.S,Labels.I,Labels.R,Labels.P,Labels.C100K};
-		//Añadir cabecera.
-		moduloZonas.addCabecera(cabecera);
-		moduloZonas.setEditLabels(false);
+		setProjectParameters(moduloZonas);
 		//añadir el módulo al conjunto de módulos.
 		modulos.put(moduloZonas.getTipo(),moduloZonas);
 		//Procesarlo.
 		establecerDatos(moduloZonas);
 	}
-	
-	
-	
 	
 	
 	/**
@@ -192,29 +163,30 @@ public class ControladorModulos {
 	 *  Debe existir previamente un módulo de proyecto creado y con dichos parámetros.
 	 *  <P>En caso de que el módulo posea nombre este se respetará. Los demás serán
 	 *   adaptados a la ubicación del proyecto.</P>
-	 * @param type Tipo de módulo a específicar.
 	 * @param module Módulo DCVS al que añadir los parámetros.
 	 */
-	private void setProjectParameters(String type, DCVS module) {
-		//Tipo
-		module.setTipo(type);
+	private void setProjectParameters(DCVS module) {
 		//Directorio de trabajo
 		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
-		module.setDirectorio(wd);
-		//Nombre con el nombre del proyecto sino posee propio.
-		if(module.getNombre() == null || module.getNombre().equals("") ) {
-			String name = modulos.get(TypesFiles.PRJ).getNombre();
-			//Quitar extensión
-			int size = name.length();
-			name = name.substring(0,size -4);
-			//Añadir nueva extensión.
-			name = name + "." + type;
-			module.setName(name);
+		if(wd != null && !wd.equals("")) {
+			//Tipo
+			String type = module.getTipo();
+			module.setDirectorio(wd);
+			//Nombre con el nombre del proyecto sino posee propio.
+			if(module.getNombre() == null || module.getNombre().equals("") ) {
+				String name = modulos.get(TypesFiles.PRJ).getNombre();
+				//Quitar extensión
+				int size = name.length();
+				name = name.substring(0,size -4);
+				//Añadir nueva extensión.
+				name = name + "." + type;
+				module.setName(name);
+			}
+	
+			//Ruta absoluta.
+			module.setRuta(module.getDirectorio() +
+					System.getProperty("file.separator") + module.getNombre());
 		}
-
-		//Ruta absoluta.
-		module.setRuta(module.getDirectorio() +
-				System.getProperty("file.separator") + module.getNombre());	
 	}
 	
 
@@ -223,8 +195,11 @@ public class ControladorModulos {
 	 * <p>Description: Llama a cada una de las vistas para que actualicen sus datos</p>
 	 */
 	private void refreshViews() {
+		archivos.refresh();
 		principal.refresh();
+		paleta.refresh();
 		vistaSIR.reset();
+		pgrupos.refresh();
 	}
 	
 	/**
@@ -289,7 +264,22 @@ public class ControladorModulos {
 	 * @param n Nivel de contagio del 0 al 9. Siendo el 0 el más bajo y el 9 el más alto.
 	 * @return Color representante de dicho nivel.
 	 */
-	public Color getLevelColor(int n) {return this.paleta.getColor(n);}
+	public Color getLevelColor(int n) {
+		Color c = Color.GRAY;
+		if(hasModule(TypesFiles.PAL)) {
+			String label = "L" + String.valueOf(n);
+			//Obtener línea
+			int index = getModule(TypesFiles.PAL).getFilaItem(label);
+			if(index > -1) {
+				//Obtener colores
+				int r = Integer.parseInt((String) getModule(TypesFiles.PAL).getValueAt(index, 1));
+				int g = Integer.parseInt((String) getModule(TypesFiles.PAL).getValueAt(index, 2));
+				int b = Integer.parseInt((String) getModule(TypesFiles.PAL).getValueAt(index, 3));
+				c = new Color(r,g,b);
+			}
+		}
+		return c;		
+	}
 	
 	/**
 	 * <p>Title: setPoligonos</p>  
@@ -429,30 +419,7 @@ public class ControladorModulos {
 	 */
 	public void setHistorico(DCVS historico) {	this.historico = historico.getModelo();	}
 			
-
-	/**
-	 * <p>Title: crearPaleta</p>  
-	 * <p>Description: Lee los datos pasados por un TableModel y los almacena en
-	 * la lista de colores en formato Color.</p> 
-	 * @param modelo Modelo con los datos de la nueva paleta.
-	 */
-	public void setPaleta(DCVS modelo) {
-		int filas = modelo.getRowCount();
-		ArrayList<Color> colores = new ArrayList<Color>();
-		//Leer colores.
-		for(int i = 0; i<filas; i++) {
-			//Lectura de valores.
-			int r = Integer.parseInt((String) modelo.getValueAt(i, 0));
-			int g = Integer.parseInt((String) modelo.getValueAt(i, 1));
-			int b = Integer.parseInt((String) modelo.getValueAt(i, 2));
-			Color c = new Color(r,g,b);
-			//establecimiento de la paleta
-			colores.add(c);
-		}
-		//paleta.setPaleta(paleta.getPaleta());
-		paleta.setPaleta(colores);
-	}
-		
+	
 	
 	/* Progreso de implementación control Principal */
 	
@@ -474,8 +441,14 @@ public class ControladorModulos {
 				this.pizarra.reset();
 				this.pizarra.toogleVisible();
 				break;
+			case "Editor Paleta":
+				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
+				paleta.setEditable(true);
+				paleta.setFrameVisible(true);
+				break;
 			case "Paleta":
 				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
+				paleta.setEditable(false);
 				paleta.toggleFrameVisible();
 				break;
 			case "Mapa":
@@ -633,7 +606,7 @@ public class ControladorModulos {
 	private void saveAllTogether() {
 		modulos.forEach((type,module)->{
 			if(!type.equals(TypesFiles.PRJ)) {
-				setProjectParameters(type, module);;
+				setProjectParameters(module);;
 				//Re-integrar el módulo en el entorno.
 				establecerDatos(module);
 				//Guardar en el directorio de trabajo.
@@ -660,6 +633,7 @@ public class ControladorModulos {
 		pgrupos.reset();
 		pizarra.reset();
 		principal.reset();
+		paleta.reset();
 	}
 	
 	/**
@@ -740,34 +714,45 @@ public class ControladorModulos {
 	private boolean establecerDatos(DCVS datos) {
 		boolean isDone = true;
 		String tipo = datos.getTipo();
-		//Actualizar etiqueta correspondiente con la ruta del archivo.
-//		archivos.setLabel(tipo,datos.getNombre());
 		
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
 		insertInProjectModule(datos);
+//		//En caso de mapa o de relaciones, el módulo debe tener definidos tantos grupos
+//		// como haiga definido en el proyecto.
+//		int NG = getNumberZonas();
+//		
+//		if((tipo.equals(TypesFiles.REL) || tipo.equals(TypesFiles.MAP))
+//				&& datos.getRowCount() < NG ) {
+//			showMessage("No se puede cargar el módulo: " + datos.getRuta() + "\n" + 
+//				", dicho módulo no tiene definido suficientes parámetros para el\n" + 
+//					"número de grupos de población indicados en el modelo",0);
+//			isDone = false;
+//			
+//			System.out.println("CM > establecer datos > Tipo: " + tipo + ", NG: " + NG + " / filas de datos: " + datos.getRowCount());
+//		}
 		
 		//Guardar los datos del módulo en su conjunto.
-		modulos.put(tipo, datos);
+		if(isDone) modulos.put(tipo, datos);
+		
 		//Operaciones extras según tipo de módulo.
 		switch(tipo) {
-			case (TypesFiles.MAP):
-				setPoligonos(datos);
-				break;
-			case (TypesFiles.HST):
-				setHistorico(datos);
-				break;
-			case (TypesFiles.DEF):
-				vistaSIR.reset();
-				break;
-			default:			
+		case (TypesFiles.REL):		
+			break;
+		case (TypesFiles.MAP):	
+			if(isDone) setPoligonos(datos);
+			break;
+		case (TypesFiles.HST):
+			setHistorico(datos);
+			break;
+		case (TypesFiles.DEF):
+			break;
+		case (TypesFiles.PAL):
+			break;
+		default:
 		}
 		
-		//Actualización de las opciones de Principal.
-		principal.refresh();
-		//Actualización de la vista archivos.
-		archivos.refresh();
-		
+		refreshViews();
 		return isDone;
 	}
 	
@@ -817,7 +802,21 @@ public class ControladorModulos {
 	private boolean openModule(String ext) {
 		DCVS dcvs = cio.abrirArchivo(null,ext);
 		boolean ok = dcvs != null;
-		if(ok && !ext.equals(TypesFiles.PRJ)) {establecerDatos(dcvs);}
+		if(ok && !ext.equals(TypesFiles.PRJ)) {
+			//En caso de mapa o de relaciones, el módulo debe tener definidos tantos grupos
+			// como haiga definido en el proyecto.
+			int NG = getNumberZonas();
+			
+			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP))
+					&& dcvs.getRowCount() < NG ) {
+				showMessage("No se puede cargar el módulo: " + dcvs.getRuta() + "\n" + 
+					", dicho módulo no tiene definido suficientes parámetros para el\n" + 
+						"número de grupos de población indicados en el modelo",0);
+				ok = false;	
+				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
+			}	
+			establecerDatos(dcvs);	
+		}
 		else if(ok) {abrirProyecto(dcvs);}
 		return ok;
 	}
@@ -926,8 +925,14 @@ public class ControladorModulos {
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
 	public boolean doActionTableEditor(DCVS modulo) {
-		boolean as = modulo.getNombre() == null;
-		return saveModule(modulo.getTipo(),as);
+		boolean done = true;
+		if(modulo != null) {done = establecerDatos(modulo);}
+		//indicar al módulo de archivos que modulo se ha modificado para activar 
+		//El botón de guardar correspondiente.
+		archivos.enableBotonesGuardado(modulo.getTipo(), true);
+		refreshViews();
+		
+		return done;
 	}
 
 	/* En progreso de implementación VistasZonas y Grupos */
@@ -952,29 +957,6 @@ public class ControladorModulos {
 			for(int i = nCols +1; i<=needNCols ; i++) {
 				modulos.get(type).addColumna(head + (i -10));					//Se restan el número de etiquetas que conforman el grupo.
 			}
-		}
-		return done;
-	}
-	
-	private boolean upgradePolygonZone(int ID) {
-		boolean done = true;
-		//Obtener zona del grupo con su ID y separar datos usando el separador tipo ','
-		String[] valores = zonas.get(ID).toString().split(",");
-		int sizeV = valores.length;
-		//Recalibrar número de columnas si es necesario (necesario por longitud del poligono)
-		done = resizeDCVS(TypesFiles.MAP, sizeV, "Px;y");
-		//Localizar la posición en el módulo DCVS
-		int index = modulos.get(TypesFiles.MAP).getFilaItem("" + ID);
-		//Limpiar los datos anteriores de poligono que hubiera en la fila.
-		if(index > -1) {
-			modulos.get(TypesFiles.MAP).clearRow(index);
-		}else {
-			//No debería entrar aquí, puesto que debería existir siempre la entrada.
-			System.out.println("CM > upgradePolygonZone > Atención! incoherencia de datos.");
-		}
-		//Escribir datos.
-		for(int i = 9; i<sizeV; i++) {
-			modulos.get(TypesFiles.MAP).setValueAt(valores[i], index, i);
 		}
 		return done;
 	}
@@ -1005,7 +987,8 @@ public class ControladorModulos {
 		if(index > -1) modulos.get(TypesFiles.MAP).clearRow(index);		
 		else {
 			//Sino existe tal entrada hay que crearla.
-/* No debería ser necesario crearla. Debería estar ya creada aunque fuera la primera vez. */
+			//No debería ser necesario crearla. Debería estar ya creada aunque
+			//fuera la primera vez. 
 			modulos.get(TypesFiles.MAP).addFila(null);
 			index = modulos.get(TypesFiles.MAP).getRowCount();
 			//Si el mensaje se dispara, es que se ha dado el caso de incoherencia de datos.
@@ -1017,12 +1000,55 @@ public class ControladorModulos {
 			modulos.get(TypesFiles.MAP).setValueAt(valores[i], index, i);
 		}
 		
+		//Ajustar nombre de la zona con el de la relaciones por si se han realizado cambios.
+		setNameMAPinREL(ID);
 		
 		archivos.enableBotonesGuardado(TypesFiles.MAP, true);
 		return done;
 	}
 	
-	/* En progreso de implementación acciones VistaSIR */
+	
+	private void setNameMAPinREL(int ID) {
+		String name = zonas.get(ID).getName();
+		//Cambiar el nombre de la fila (su etiqueta)
+		getModule(TypesFiles.REL).setValueAt(name, ID-1, 0);					//IDs empiezan por 1, las filas por 0.
+		//Cambiar el nombre de la columnna.
+		getModule(TypesFiles.REL).setColumnName(ID, name);
+	}
+	
+	/* Acciones VistaPaleta */
+	
+	/**
+	 * <p>Title: doActionPAL</p>  
+	 * <p>Description: Realiza las acciones de actualización de datos de la vista
+	 *  correspondiente a la paleta de colores o representación gráfica por colores 
+	 *   de los niveles de contagio.</p>
+	 *   El nivel de contagio es igual al número de casos por cada cien mil hábitantes. 
+	 * @param level Nivel de contagio. Letra 'L' en mayúsculas seguida del nivel del [0 al 9],
+	 *  ambos inclusive.
+	 * @param r Valor del componente rojo.
+	 * @param g Valor del componente verde.
+	 * @param b Valor del componente azul.
+	 * @return TRUE si la operación se ha realizado correctamente, false en otro caso.
+	 */
+	public boolean doActionPAL(String level, int r, int g, int b) {
+		boolean done = true;
+		int index = getModule(TypesFiles.PAL).getFilaItem(level);
+		if(index > -1) {
+			//Variamos sus valores.
+			getModule(TypesFiles.PAL).setValueAt(String.valueOf(r), index, 1);
+			getModule(TypesFiles.PAL).setValueAt(String.valueOf(g), index, 2);
+			getModule(TypesFiles.PAL).setValueAt(String.valueOf(b), index, 3);
+			
+		} else done = false;
+		
+		if(done) System.out.println("VistaPaleta > Color cambiado: Nivel: " + level + " (" +
+				r + "," + g + "," + b + ")");
+		return done;
+	}
+	
+	
+	/* Acciones VistaSIR */
 	
 	/**
 	 * <p>Title: setDataToLabel</p>  
@@ -1039,6 +1065,7 @@ public class ControladorModulos {
 		}
 		return done;
 	}
+	
 	
 	/**
 	 * <p>Title: getValueFromLabel</p>  
@@ -1058,6 +1085,7 @@ public class ControladorModulos {
 		return resultado;
 	}
 	
+	
 	/**
 	 * <p>Title: setValueAtLabel</p>  
 	 * <p>Description: Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea.</p>
@@ -1076,6 +1104,7 @@ public class ControladorModulos {
 		}
 		return done;
 	}
+	
 	
 	/**
 	 * <p>Title: doActionVistaSIR</p>  
@@ -1107,7 +1136,8 @@ public class ControladorModulos {
 		return realizado;
 	}
 	
-	/* En progreso de implementación acciones ParametrosProyecto */
+	
+	/* Acciones ParametrosProyecto */
 	
 	/**
 	 * <p>Title: addNewZones</p>  
@@ -1189,8 +1219,12 @@ public class ControladorModulos {
 		if(getNumberZonas() != NG) { 
 			done = resizeZonas(NG);
 			setZonas(zonas);
+			//Añadimos nueva matriz de contactos.
+			DCVS relaciones = DCVSFactory.newREL(zonas);
+			setProjectParameters(relaciones);
+			establecerDatos(relaciones);
 		}
-		
+
 		return done;
 	}
 		

@@ -125,17 +125,21 @@ public class Principal extends JFrame {
 		
 		//Menu Ver
 		JMenu mnVer = new JMenu("Ver");
-		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
-		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );	
 		addJMenuItem(mnVer, "Parámetros SIR","/vista/imagenes/Iconos/portapapeles_64px.png" );
 		addJMenuItem(mnVer, "Grupos","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		mnVer.addSeparator();
+		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
+		addJMenuItem(mnVer, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
+		addJMenuItem(mnVer, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+			
 		
 		//Menu Herramientas
 		JMenu mnHerramientas = new JMenu("Herramientas");
-		addJMenuItem(mnHerramientas, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
+		addJMenuItem(mnHerramientas, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		mnHerramientas.addSeparator();
 		addJMenuItem(mnHerramientas, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
-		addJMenuItem(mnHerramientas, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		addJMenuItem(mnHerramientas, "Editor Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 		
 		//Menu Ayuda
 		JMenu mnAyuda = new JMenu("Ayuda");
