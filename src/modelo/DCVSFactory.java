@@ -67,7 +67,6 @@ public class DCVSFactory {
 		case(TypesFiles.MAP): setMAP(module); break;
 		case(TypesFiles.DEF): setDEF(module); break;
 		case(TypesFiles.PAL): setPAL(module); break;
-//		case(TypesFiles.REL): setREL(module); break;
 		default:
 			System.out.println("DCVSFactory > type not implemented yet: " + module.getTipo());
 		}
@@ -127,6 +126,30 @@ public class DCVSFactory {
 		module.addFila(new String[]{Labels.IT,null});
 		module.addFila(new String[]{Labels.FT,null});
 	}
+	
+	
+	/**
+	 * <p>Title: newHST</p>  
+	 * <p>Description: Genera una tabla de Histórico con la cabecera adecuada
+	 *  y ajustada al time slot definido por el parámetro FT (final time o tiempo
+	 *   final).</p> 
+	 * @param FT Tiempo final del histórico. Número de slots (en días) que contendrá
+	 *  el histórico.
+	 * @return Módulo histórico configurado con las estiquetas (sin datos).
+	 */
+	public static DCVS newHST(int FT) {
+		DCVS module = new DCVS();
+		//Crear cabecera		
+		String[] cabecera = new String[FT + 2];
+		cabecera[0] = "TIME";
+		
+		//Añadir resto de etiquetas de la cabecera (Times Slots en unidades).
+		for(int i = 0; i <= FT;i++)	cabecera[i + 1] = "" + i;
+		//Añadir cabecera.
+		module.addCabecera(cabecera);
+		return module;
+	}
+	
 	
 	/**
 	 * <p>Title: newREL</p>  

@@ -29,7 +29,7 @@ import java.util.HashMap;
 public class ParserProyectoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
-	private DCVS matrizContactos;												//Matriz de contactos (relaciones).
+	private DCVS mREL;												//Matriz de contactos (relaciones).
 	private DCVS definicionSIR;													//Módulo definición de la enfermedad (SIR)
 	private DCVS historico;														//Matriz de contactos (relaciones).
 	private DCVS proyecto;
@@ -48,7 +48,7 @@ public class ParserProyectoVS {
 	 */
 	public ParserProyectoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
-		this.matrizContactos = new DCVS();
+		this.mREL = new DCVS();
 		this.definicionSIR = new DCVS();
 		this.historico = new DCVS();
 		this.proyecto = new DCVS();
@@ -228,7 +228,7 @@ public class ParserProyectoVS {
 		
 		//Añadir ahora la ruta del resto de módulos.
 //		definicionSIR.addFila(new String[]{TypesFiles.HST,historico.getNombre()});
-//		definicionSIR.addFila(new String[]{TypesFiles.REL,matrizContactos.getNombre()});
+//		definicionSIR.addFila(new String[]{TypesFiles.REL,mREL.getNombre()});
 //		definicionSIR.addFila(new String[]{TypesFiles.DEF,definicionSIR.getNombre()});
 		System.out.println("\nProyecto: \n" + proyecto.toString());
 
@@ -427,34 +427,26 @@ public class ParserProyectoVS {
 	 * conjunto de datos.</p>
 	 */
 	private void setUpMatriz() {
-		String[] fila = new String[NG+1];
-		String[] cabecera = new String[NG+1];
-		int contadorCol = 1;
-		//Crear cabeceras.
-		cabecera[0] = "Grupos";													//Primera columna reservada.
-		//Crear resto columnas con nombres de grupos.
-		for(int i=1; i<=NG;i++) {cabecera[i] = IDs[i-1];}
-		matrizContactos.addCabecera(cabecera);
-		
-		//Añadir filas
-		for(int i = 0; i<NG; i++) {
-			fila[0] = IDs[i];													//Dar nombre a la fila 0 del grupo que representa.
-			for(int j = 1; j<=NG; j++) {										//Saltamos la columna de indentificadores verticales.
-				int contadorCeros = i;											//Indica los ceros que hay que dejar al comienzo de cada fila.
-				if(contadorCeros > (j-1))  fila[j] = "0";
-				else {
-					fila[j] = (String) dcvs.getValueAt(0, contadorCol);
-					contadorCol++;
+		mREL = DCVSFactory.newREL(zonas);
+
+		int index = getPosOp("C");
+		boolean hasMC = index > -1;
+		if(hasMC) {
+			for(int i = 0; i<NG;i++) {
+				String label = "C " + IDs[i] + " ";
+				for(int j = 0; j<NG;j++) {
+					index = dcvs.getColItem(label + IDs[j]);
+					hasMC = index > -1;
+					if(hasMC) {
+						//Leer valor.
+						String valor = (String) dcvs.getValueAt(0, index);
+						//escribir valor en tabla
+						mREL.setValueAt(valor,i,j+1);
+					}
 				}
-				contadorCeros++;
 			}
-			matrizContactos.addFila(fila);
 		}
-		
-		//Añadir tipo de datos y nombre
-		setTypeAndName(matrizContactos, TypesFiles.REL);
-		
-		if(traza) System.out.println( matrizContactos.toString() );
+		if(traza) System.out.println( mREL.toString() );
 	}
 	
 	
@@ -603,7 +595,7 @@ public class ParserProyectoVS {
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getMContactos() {return this.matrizContactos;}
+	public DCVS getMContactos() {return this.mREL;}
 	
 	/**
 	 * @return Definición de la enfermedad, sus parámetros.

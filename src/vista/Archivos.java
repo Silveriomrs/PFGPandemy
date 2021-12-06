@@ -316,7 +316,11 @@ public class Archivos extends JPanel {
 		iniciarBoton("Guardar como",ext,iconGuardarComo,xpos + gap,posY,false);
 		iniciarBoton("Guardar cambios",ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
 		iniciarBoton("Editar",ext,iconEditar,xpos + 3*gap,posY,false);
-		iniciarBoton("Borrar",ext,iconBorrar,xpos + 4*gap,posY,false);
+		//Para los módulos esenciales de cualquier proyecto, no incluir botones de borrado.
+		if(!ext.equals(TypesFiles.PRJ) && !ext.equals(TypesFiles.DEF) && !ext.equals(TypesFiles.MAP)) {
+			iniciarBoton("Borrar",ext,iconBorrar,xpos + 4*gap,posY,false);
+		}
+		
 	}
 		
 	/**
@@ -382,7 +386,7 @@ public class Archivos extends JPanel {
 	 */
 	private void refreshEditarBorrar() {
 		mBotones.forEach((key,btn) -> {
-			//Extrar su extensión.
+			//Extraer su extensión.
 			String ext = key.substring(key.length() -3,key.length());
 			btn.setEnabled(cm.hasModule(ext));
 		});
@@ -439,18 +443,13 @@ public class Archivos extends JPanel {
 			String ext = tt.substring(tt.length() -3, tt.length()).toLowerCase();
 			//Identificador de operación (abrir o guardar).
 			String op = btn.getActionCommand();		
-			//Opciones de Carga de módulo, NO módulo PRJ.
-			if(op.equals("Abrir") ) {realizado = cm.doActionArchivos(op, ext);}
-			//Opciones de Guarga de módulo.
-			else if(btn.isEnabled()){											//Comprobación de guardado activado.		
-				//Optención del módulo correspondiente
+			if(btn.isEnabled()){	
 				realizado = cm.doActionArchivos(op, ext);
-				//Desactivar sus botones.
-				if(realizado) enableBotonesGuardado(ext,false);
 			}
 			
 			refresh();
-			if(op.equals("Abrir") && realizado) enableBotonesGuardado(TypesFiles.PRJ, true);
+			if(op.equals("Abrir") && realizado) enableBotonesGuardado(TypesFiles.PRJ, realizado);
+			else if(realizado) enableBotonesGuardado(ext,false);
 		}
 	}
 	

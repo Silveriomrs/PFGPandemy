@@ -212,8 +212,9 @@ public class DCVS implements TableModel{
 	
 	/**
 	 * Establece una matriz de objetos como la matriz de datos de la instancia
-	 * DCVS. Recibirá un array bidimensional de objetos.
+	 * DCVS. Requiere un array bidimensional de objetos.
 	 * @param datos Array Bidimensional de datos.
+	 * @see #crearModelo()
 	 */
 	public void setDatos(Object[][] datos) {this.datos = datos;}
 	

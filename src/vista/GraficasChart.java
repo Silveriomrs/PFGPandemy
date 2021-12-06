@@ -26,6 +26,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import modelo.IO;
+import modelo.Labels;
 
 import java.awt.BorderLayout;
 import javax.swing.JCheckBox;
@@ -87,9 +88,9 @@ public class GraficasChart{
 		cframe.getContentPane().add(menuBar, BorderLayout.NORTH);
 	}
 	
-	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
+	private void addJMenuItem(JMenu padre, String nombre, boolean selected, String rutaIcon) {
 		JCheckBox JCBox = new JCheckBox(new VerMenuListener(nombre));
-		JCBox.setSelected(false);
+		JCBox.setSelected(selected);
 		if(rutaIcon != null)  JCBox.setIcon(IO.getIcon(rutaIcon,20,20));
 		padre.add(JCBox);
 	}
@@ -186,9 +187,16 @@ public class GraficasChart{
 			//Añadir una nueva serie al mapa de series.
 			seriesMap.put(nombre, new XYSeries(nombre));
 			//Nueva serie -> nueva opción de visualizar en el menú.
-			if(nombre.startsWith("Casos")) addJMenuItem(mnCasos,nombre,null);
-			else if(nombre.startsWith("Tasa")) addJMenuItem(mnTasas,nombre,null);
-			else addJMenuItem(mnVer,nombre,null);
+			if(nombre.startsWith("Casos")) addJMenuItem(mnCasos,nombre,false,null);
+			else if(nombre.startsWith("Tasa")) addJMenuItem(mnTasas,nombre,false,null);
+			else if(nombre.equals(new Labels().getWord( Labels.C100K ) )) {
+				//Añadir serie al menú
+				addJMenuItem(mnVer,nombre,true,null);
+				//Añadir nueva serie al dataset desde el hashmap seriesMap.
+				dataset.addSeries(seriesMap.get(nombre));
+			}else{
+				addJMenuItem(mnVer,nombre,false,null);
+			}
 		}
 	}
 	
@@ -234,19 +242,40 @@ public class GraficasChart{
 	
 	
 	/**
-	 * <p>Title: printSerie</p>  
-	 * <p>Description: Imprime por consola los valores X e Y pertenecientes a la serie.</p> 
-	 * @param serie Nombre de la serie.
+	 * <p>Title: getSerie</p>  
+	 * <p>Description: Devuelve los valores almanceados de una serie dentro de un Array de Strings.</p> 
+	 * Cada posición se corresponde con el tiempo o valor en el eje X.
+	 * @param nombre Nombre de la serie.
+	 * @return Cadena de valores almancenados como textos.
 	 */
-	public void printSerie(String serie) {
-		if(seriesMap.containsKey(serie)) {
-			double tmp[][] = seriesMap.get(serie).toArray();
+	public String[] getSerie(String nombre) {
+		String[] serie = null;
+		
+		if(seriesMap.containsKey(nombre)) {
+			double tmp[][] = seriesMap.get(nombre).toArray();
+			serie = new String[tmp[0].length +1];								//Primera posición para el nombre de la serie.
+			serie[0] = nombre;
 			for(int j = 0; j<tmp[0].length ; j++) {
-				double x = tmp[0][j];
+//				double x = tmp[0][j];
 				double y = tmp[1][j];
-				System.out.println("(" + x +  "," + y + ")");
+				serie[j+1] = "" + y;											//Sumar una posción más respecto a la primera columna (nombres)
 			}	
+		}	
+		return serie;
+	}
+	
+	public String[][] getAllSeries(int nRegistros){
+		int nSeries = seriesMap.size();
+		int contador = 0;
+		String[][] todo = new String[nSeries][nRegistros];
+		
+		for (String clave:seriesMap.keySet()) {
+			String[] fila = getSerie(clave);
+			todo[contador] = fila;
+			contador++;
 		}
+
+		return todo;
 	}
 
 	/**
@@ -284,6 +313,7 @@ public class GraficasChart{
 	    addPunto("serie2",2, 6);
 	    addPunto("serie2",3, 8);
 	    addPunto("serie2",4, 12);
+//	    dataset.addSeries(seriesMap.get("serie2"));
 	}
 	
 	/**
@@ -293,8 +323,8 @@ public class GraficasChart{
 	 */
 	public static void main(String[] args) {
 		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Título","Ejemplo Grafica Lineal");
-		chart.addSerie("serie1");
-		chart.addSerie("serie2");
+//		chart.addSerie("serie1");
+//		chart.addSerie("serie2");
 		chart.addPuntos();
 		chart.setVisible(true);
 		//Pruebas

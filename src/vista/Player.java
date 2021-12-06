@@ -36,6 +36,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JFormattedTextField;
@@ -43,8 +44,10 @@ import javax.swing.border.EtchedBorder;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
+import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.FondoPanel;
+import modelo.Labels;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -59,11 +62,12 @@ import java.awt.Font;
 public class Player extends JPanel implements ActionListener{
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = 1L;
+	private ControladorModulos cm;
 	
 	private JFrame frame;
 	private JButton btnPlayPause;
 	private Timer timer;
-	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/histograma2.png");
+	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/degradado.png");
 	private TitledBorder tb;
 	private JSlider slider;
 	private JProgressBar progressBar;
@@ -80,14 +84,12 @@ public class Player extends JPanel implements ActionListener{
 
 	/**
 	 * <p>Title: </p>  
-	 * <p>Description: </p>  
-	 * @param width Ancho del panel de reproductor.
-	 * @param height Alto del panel de reproductor.
-	 * dimensiones u otras son editables o no lo son, true si lo son,
-	 * false en otro caso.
+	 * <p>Description: Reproductor de secuencias en línea de tiempo </p>  
+	 * @param cm Controlador de módulos, necesario para integrarse con el resto de la aplicación.
 	 */
-	public Player(int width, int height) {
+	public Player(ControladorModulos cm) {
 		super();
+		this.cm = cm;
 		activo = false;
 		//Border: configuración de estilo
 		setOpaque(false);
@@ -206,8 +208,13 @@ public class Player extends JPanel implements ActionListener{
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(ultima);
 		//Configuración del rango de fechas.
-		Date d1 = stringToDate((String) historico.getValueAt(0, 0));			//Obtener primera fecha.
-		Date d2 = stringToDate((String) historico.getValueAt(ultima, 0));		//Obtener segunda fecha.
+		Date d1 = stringToDate(historico.getColumnName(1));						//Obtener primera fecha.
+        Date d2 = new Date();
+		Calendar c = Calendar.getInstance();
+        c.setTime(d2);
+        c.add(Calendar.DATE, ultima);
+        d2 = c.getTime();
+//		Date d2 = stringToDate(historico.getColumnName(ultima));				//Obtener segunda fecha.
 		activo = true;															//Activación temporal del player para evitar activación erronéa del búscador.
 		dateChooser.setSelectableDateRange(d1, d2);								//Establece rango de fechas.
 		dateChooser.setDate(d1);												//Establece la fecha de comienzo.
@@ -217,14 +224,14 @@ public class Player extends JPanel implements ActionListener{
 	/**
 	 * <p>Title: play</p>  
 	 * <p>Description: Reproduce los datos almacenados en una línea de datos</p> 
-	 * @param linea Número de línea a leer de la entrada de datos.
+	 * @param pos Número de columna a leer de la entrada de datos.
 	 */
-	private void play(int linea) {
-		String fila[] = historico.getRow(linea);								//Obtener fila.
+	private void play(int pos) {
+		String fila[] = historico.getRow(pos);								//Obtener fila.
 		int columnas = historico.getColumnCount();
 		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
 		//Actualizar fecha
-		String f = (String) historico.getValueAt(linea, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
+		String f = (String) historico.getValueAt(pos, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
 		Date d = stringToDate(f);	
 		frmtdtxtfldHoraMinuto.setText(formato.format(d));
 		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
@@ -232,19 +239,19 @@ public class Player extends JPanel implements ActionListener{
 		for(int j = 1; j < columnas; j++) {		
 			int id = getID(historico.getColumnName(j));							//Obtener ID columna
 			int nivel = getValor(fila[j]);										//Obtener valor									
-			mapa.addZonaNivel(id, "Nivel", nivel);								//Otorgar nivel al mapa/zona
+			mapa.addZonaNivel(id, Labels.C100K, nivel);							//Otorgar nivel al mapa/zona
 			this.updateUI();
 		}
 		
 		//Si es la última línea -> parar reproducción.
-		if(linea == ultima) {
+		if(pos == ultima) {
 			timer.stop();
 			btnPlayPause.setText("Repetir");
 			activo = !activo;
 			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
 		}
 		
-		progressBar.setValue(linea);											//Actualización del la barra de progreso.
+		progressBar.setValue(pos);											//Actualización del la barra de progreso.
 		
 		//En caso de cierre del reproductor, pausar la reproducción y dejarlo listo para reanudar.
 		if(!frame.isVisible()) {
@@ -301,8 +308,11 @@ public class Player extends JPanel implements ActionListener{
 		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
 		 Date date = null;
 		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
-		 catch (ParseException ex) { ex.printStackTrace(); }
-		 finally {return date;} 
+		 catch (ParseException ex) {
+			System.out.println("Player > stringToDate > Valor de fecha incorrecto: " + fecha );
+		 	date = new Date();
+		 }
+		 finally {return date;}
 	}
 
 	/**

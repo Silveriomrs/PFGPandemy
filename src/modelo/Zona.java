@@ -42,7 +42,7 @@ public class Zona {
 	
 	// Lista de puntos que componen el poligono.
 	private ArrayList<Point> puntosPoligono;
-	private final String SN = "Nivel";
+//	private final String SN = "Nivel";
 	/** Indica el valor del eje X para su representación de cada C100K en el eje Y. */
 	private int contadorN;
 	
@@ -84,9 +84,7 @@ public class Zona {
 				"Zona: " + name,
 				"Evolución pandemica." + " ID: " + ID);
 		this.contadorN = 0;														//Serie de niveles.
-		chart.addSerie(SN);
 		//Añadir los valores iniciales a la gráfica. Por tanto se añaden después de crearla.
-		setNivel(C100K);
 		setSIR(s,i,r);
 	}
 
@@ -131,6 +129,7 @@ public class Zona {
 		addNivel(labels.getWord(Labels.S),0,s);
 		addNivel(labels.getWord(Labels.I),0,i);
 		addNivel(labels.getWord(Labels.R),0,r);
+		addNivel(labels.getWord(Labels.C100K),0,C100K);
 	}
 	
 	/**
@@ -142,7 +141,7 @@ public class Zona {
 	 * @param valor Valor o C100K a añadir a dicha serie.
 	 */
 	public void addNivel(String name, int t, double valor) {
-		if(name.equals(SN)) {
+		if(name.equals(Labels.C100K)) {
 			chart.addPunto(name, contadorN, valor);
 			setNivel((int) valor);
 			contadorN++;			
@@ -157,7 +156,7 @@ public class Zona {
 	 * Devuelve la representación gráfica de los datos dados.
 	 * @return El/la grafica
 	 */
-	public GraficasChart getGrafica() {return this.chart;	}
+	public GraficasChart getGrafica() {return this.chart;}
 	
 	/**
 	 * @return devuelve C100K desde 0 hasta 9.

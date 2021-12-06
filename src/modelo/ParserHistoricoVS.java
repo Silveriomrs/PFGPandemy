@@ -24,8 +24,11 @@ import java.util.HashMap;
 public class ParserHistoricoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados desde VenSim.
-	private DCVS mContactos;													//Matriz de contactos (relaciones).
-	private DCVS mDefSIR;														//Módulo definición de la enfermedad (SIR)
+	private DCVS mREL;															//Matriz de contactos (relaciones).
+	private DCVS mDEF;															//Módulo definición de la enfermedad (SIR)
+	private DCVS mPRJ;															//Módulo proyecto.
+	private DCVS mHST;															//Módulo histórico
+	private DCVS mMAP;
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
@@ -41,8 +44,11 @@ public class ParserHistoricoVS {
 	 */
 	public ParserHistoricoVS(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
-		this.mContactos = new DCVS();
-		this.mDefSIR = DCVSFactory.newModule(TypesFiles.DEF);
+		this.mREL = new DCVS();
+		this.mDEF = DCVSFactory.newModule(TypesFiles.DEF);
+		this.mPRJ = DCVSFactory.newModule(TypesFiles.PRJ);
+		this.mMAP = DCVSFactory.newModule(TypesFiles.MAP);
+			
 		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
@@ -68,18 +74,28 @@ public class ParserHistoricoVS {
 		for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
 		if(traza) System.out.println(nombres);
 		
+		//Establecer módulo proyecto.
+		setUpProyecto();
+		
 		//Obtención de los tiempos inicial y final.
 	    readTimes();
 	    if(traza) System.out.println("IT: " + IT + " FT: " + FT);
 	    
+	    //Crea la tabla histórico (SIN DATOS).
+	    crearHST();
+	    
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
 		if(traza) System.out.println("Creadas " + zonas.size() + " zonas");
+		
+		//Crear tabla de grupos de población (MAP).
+		crearMMAP();
+		
 		//Leer y crear tabla de relaciones.
-		crearMatriz();
+		crearMREL();
 		
 		//Crear contenedor de definición de enfermedad (Parámetros SIR).
-		crearMDefEnf();
+		crearMDEF();
 		
 		//Leer R,S,I
 		readXs("R");
@@ -105,12 +121,58 @@ public class ParserHistoricoVS {
 		
 		//Leer casos de contactos de A con B y tasas de A con B
 		readXenZ("TCS");
-		readXenZ("CAB");	
-	}
+		readXenZ("CAB");
 		
+		
+	}
 	
 	/**
-	 * <p>Title: crearMDefEnf</p>  
+	 * <p>Title: setTypeAndName</p>  
+	 * <p>Description: Establece un nombre y un tipo de datos al módulo.</p>
+	 * Usa los datos almacenados en el archivo de origen para establecer los
+	 *  nombres a los módulos particulares. 
+	 * @param modulo Módulo al que establecer los atributos de Tipo y Nombre.
+	 * @param type Tipo de datos que contiene el módulo. Ver: {@link TypesFiles Tipos de datos}.
+	 */
+	private void setTypeAndName(DCVS modulo, String type){
+		//Establecer atributos propios del módulo.
+		modulo.setTipo(type);
+		//Crear nombre con extensión DEF a partir del nombre del archivo original.
+		String newName = dcvs.getNombre();
+		//Quitamos la extensión.
+		newName = newName.substring(0, newName.length() -3);
+		//Guardar dato con nueva extensión.
+		modulo.setName(newName + type);
+	}
+	
+	
+	private void setUpProyecto() {
+		//Añadir tipo y nombre
+		setTypeAndName(mPRJ,TypesFiles.PRJ);
+
+		//Añadir etiquetas generales.
+		mPRJ.setDataToLabel(Labels.NAME, dcvs.getNombre());
+		mPRJ.setDataToLabel(Labels.NG,"" + getNG());
+		mPRJ.setDataToLabel(Labels.DESCRIPTION,"Modelo obtenido de una fuente externa.");		
+		System.out.println("\nProyecto: \n" + mPRJ.toString());
+	}
+
+	/**
+	 * <p>Title: crearHST</p>  
+	 * <p>Description: Crea la tabla con las etiquetas mínimas</p>
+	 * No guarda datos. Los datos se añaden posteriormente desde las funciones
+	 *  que a continuación se indican.
+	 * @see #readXs(String)
+	 * @see #readXenZ(String)
+	 */
+	private void crearHST() {
+		mHST = DCVSFactory.newHST(FT);
+		setTypeAndName(mHST,TypesFiles.HST);
+	}
+	
+	
+	/**
+	 * <p>Title: crearMDEF</p>  
 	 * <p>Description: Genera el módulo definición de la enfermedad.</p>
 	 * Para ello genera una lista con las etiquetas que deben estár incluidas,
 	 *  por tanto si se quiere incluir nuevas etiquetas, este es el lugar donde deberá
@@ -121,47 +183,79 @@ public class ParserHistoricoVS {
 	 *   puede estar implicita en la presencía de las etiquetas CVS o TVS. Por
 	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
 	 */
-	private void crearMDefEnf(){
-		//Establecer atributos propios del módulo.
-//		mDefSIR.setTipo(TypesFiles.DEF);
-		//Crear nombre con extensión DEF a partir del nombre del archivo original.
-		String nombreNuevo = dcvs.getNombre();
-		//Quitamos la extensión.
-		int size = nombreNuevo.length() -3;
-		//Añadimos la extensión nueva.
-		nombreNuevo = nombreNuevo.substring(0, size) + TypesFiles.DEF.toLowerCase();
-		//Guardar dato.
-		mDefSIR.setName(nombreNuevo);
-		//Crear cabecera
-//		String[] cabecera = {"tipo","dato"};
-//		//Añadir cabecera.
-//		mDefSIR.addCabecera(cabecera);
-		
+	private void crearMDEF(){
+		setTypeAndName(mDEF,TypesFiles.DEF);	
 		//Añadir etiquetas requeridas a la lista.
 		ArrayList<String> lista = new ArrayList<String>();
 		lista.add(Labels.PTE);
 		lista.add(Labels.DME);
 		
-		//Procesar la lista añadiendo dichos campos al módulo mDefSIR.
+		//Procesar la lista añadiendo dichos campos al módulo mDEF.
 		for(int i = 0; i<lista.size(); i++) {
 			String etiqueta = lista.get(i);
 			String value = "0";													//En caso de no estar, se configurará a 0.
 			int pos = dcvs.getFilaItem(etiqueta);		
 			if(pos > -1) {value = (String) dcvs.getValueAt(pos, 1);}
-			mDefSIR.setDataToLabel(etiqueta, value);
+			mDEF.setDataToLabel(etiqueta, value);
 		}
 		
 		//IT Leído previamente
-		mDefSIR.setDataToLabel(Labels.IT,"" + IT);
+		mDEF.setDataToLabel(Labels.IT,"" + IT);
 		//FT Leído previamente
-		mDefSIR.setDataToLabel(Labels.FT,"" + FT);
+		mDEF.setDataToLabel(Labels.FT,"" + FT);
 		//Búsqueda de la IP específica.
-		mDefSIR.setDataToLabel(Labels.IP,hasIP());
+		mDEF.setDataToLabel(Labels.IP,hasIP());
 		//Búsqueda de DMIP o su inversa = 1/TVS
-		mDefSIR.setDataToLabel(Labels.DMI,getDMI());
+		mDEF.setDataToLabel(Labels.DMI,getDMI());
 		
-		if(traza) System.out.println( mDefSIR.toString() );		
+		if(traza) System.out.println( mDEF.toString() );		
 	}
+	
+	/**
+	 * <p>Title: crearMMAP</p>  
+	 * <p>Description: Genera el módulo de los grupos de población (MAP).</p>
+	 * Después de realizar la lectura de las zonas y sus valores, se debe ejecutar
+	 * este método para generar el modulo de mapa. (sin representaciones gráficas).
+	 */
+	private void crearMMAP() {
+		setTypeAndName(mMAP,TypesFiles.MAP);
+		for(int i = 1; i <= NG; i++) {
+			Zona z = zonas.get(i);
+			String[] datos = z.toString().split(",");
+			mMAP.addFila(datos);
+		}
+	}
+
+	
+	/**
+	 * <p>Title: crearMREL</p>  
+	 * <p>Description: Genera la matriz de contactos desde las etiquetas del 
+	 * conjunto de datos.</p>
+	 */
+	private void crearMREL() {
+		mREL = DCVSFactory.newREL(zonas);
+		setTypeAndName(mREL,TypesFiles.REL);
+		int index = getPosOp("C");
+		boolean hasMC = index > -1;
+		
+		if(hasMC) {
+			for(int i = 0; i<NG;i++) {
+				String label = "C " + IDs[i] + " ";
+				for(int j = 0; j<NG;j++) {
+					index = dcvs.getFilaItem(label + IDs[j]);
+					hasMC = index > -1;
+					if(hasMC) {
+						//Leer valor.
+						String valor = (String) dcvs.getValueAt(index, 1);
+						//escribir valor en tabla
+						mREL.setValueAt(valor,i,j+1);
+					}
+				}
+			}
+		}	
+		if(traza) System.out.println( mREL.toString() );
+	}
+	
 	
 	/**
 	 * <p>Title: getDMI</p>  
@@ -202,8 +296,6 @@ public class ParserHistoricoVS {
 		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
 		int pos = dcvs.getFilaItem(Labels.IP);
 		if( pos > -1) {	has = (String) dcvs.getValueAt(pos, 1);	}
-		else if(dcvs.getFilaItem(Labels.TVS) > -1) has = "1";						//Se presumira que si existe esta tasa, hay IP.
-		else if(getPosOp(Labels.CVS)> 0) has = "1";							//Se presume lo mismo.
 		return has;
 	}
 	
@@ -217,30 +309,42 @@ public class ParserHistoricoVS {
 	 */
 	private void getPs() {
 		for(int i = 1; i<=NG; i++) {
+			
 			Zona z = zonas.get(i);
+			String[] filaP = new String[FT + 1];
+			filaP[0] = "P " + z.getID();
+			String[] filaC100K = new String[FT + 1];
+			filaC100K[0] = "C100K " + z.getID();
+			
 			String ns = labels.getWord("P");									//Nombre de la serie.
 			//Obtener los valores S,R e I correspondientes al mismo tiempo.
 			for(int j = IT; j < FT; j++) {
 				String name = z.getName();
-				double vs = z.getGrafica().getYValue(labels.getWord("S"), j);	//valor Sj.
-				double vr = z.getGrafica().getYValue(labels.getWord("R"), j);	//valor Rj.
-				double vi = z.getGrafica().getYValue(labels.getWord("I"), j);	//valor Ij.
+				double vs = z.getGrafica().getYValue(labels.getWord("S"), j+1);	//valor Sj.
+				double vr = z.getGrafica().getYValue(labels.getWord("R"), j+1);	//valor Rj.
+				double vi = z.getGrafica().getYValue(labels.getWord("I"), j+1);	//valor Ij.
 
 				//Cálculo de la prevalencia instantánea. P = I/(R+I+S)
 				double pj = vi/(vs+vi+vr);
 				//Guardado de la prevalencia.
 				z.addNivel(ns, j, pj);
+				filaP[j+1] = "" + pj;
 				
 				//Calculo casos incidentes por cada 100 mil habitantes = 100000*(CI/(S+I+R))
 				double vci = z.getGrafica().getYValue(labels.getWord("CI"), j);	//valor Ij.
-				double ci10K = 100000*vci/(vs+vi+vr);							//Cálculo
-				z.addNivel("Nivel", j, ci10K);									//Guardado del Nivel de contagio.
+				double ci100K = 100000*vci/(vs+vi+vr);							//Cálculo
+				z.addNivel(labels.getWord(Labels.C100K), j, ci100K);									//Guardado del Nivel de contagio.
+				filaC100K[j+1] = "" + ci100K;
 				
 				if(j==0) {
 					if(traza) System.out.println(ns + " inicial " + name + " : " + pj);
-					if(traza) System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci10K);
+					if(traza) System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci100K);
 				}
 			}
+			//Añadir las nuevas filas con los datos al módulo histórico.
+			mHST.addFila(filaC100K);
+			mHST.addFila(filaP);
+			
 		}
 	}
 	
@@ -275,6 +379,8 @@ public class ParserHistoricoVS {
 		return label;
 	}
 	
+	
+	
 	/**
 	 * <p>Title: readXs</p>  
 	 * <p>Description: Realiza una lectura de la columna indicada por la etiqueta
@@ -288,10 +394,12 @@ public class ParserHistoricoVS {
 		for(int i = 1; i<=NG; i++) {
 			Zona z = zonas.get(i);
 			String sID = et + " " + z.getName();
-			int row = dcvs.getFilaItem(sID);		
+			int row = dcvs.getFilaItem(sID);
 			if(row > -1) addSerieXs(et,row,z);									//Añadir la serie localizada a la zona indicada	
 		}
 	}
+	
+	
 	
 	/**
 	 * <p>Title: addXs</p>  
@@ -305,6 +413,10 @@ public class ParserHistoricoVS {
 		double valor;															//Almacena cada valor de la serie en lectura.
 		boolean correcto = true;												//Finaliza la lectura si hay un valor no válido.
 		int contador = IT;
+		String[] fila = new String[FT + 1];
+		fila[0] = et + " " + z.getName();
+		// OP + " " + NombreZ  == et
+		System.out.println(fila[0]);
 		//Se recorre para cada tipo de dato todos los registros.
 		while(correcto && (contador < FT)) {
 			String s = (String) dcvs.getValueAt(pos, contador +1);
@@ -321,13 +433,17 @@ public class ParserHistoricoVS {
 				if(etiqueta == null ) etiqueta = et;
 				//Guardar el valor en la gráfica de la zona.
 				z.addNivel(etiqueta, contador,valor);
-				
+				fila[contador +1] = "" + valor;
 			}else { correcto = false; }											//Si un valor leído no es válido no continuar con la lectura.
 			//Siguiente línea.
 			contador++;
 		}
+		
+		mHST.addFila(fila);
 
 	}
+	
+	
 	
 	/**
 	 * <p>Title: readTimes</p>  
@@ -344,42 +460,6 @@ public class ParserHistoricoVS {
 		fila = dcvs.getFilaItem("FINAL TIME");
 		if(fila > -1) FT = fila;
 		else FT = dcvs.getColumnCount() - 1;									//Restar la columna de las estiquetas.
-	}
-	
-	
-	/**
-	 * <p>Title: crearMatriz</p>  
-	 * <p>Description: Genera la matriz de contactos desde las etiquetas del 
-	 * conjunto de datos.</p>
-	 */
-	private void crearMatriz() {
-		String[] fila = new String[NG+1];
-		String[] cabecera = new String[NG+1];
-		int contadorCol = 1;
-		//Crear cabeceras.
-		cabecera[0] = "Grupos";													//Primera columna reservada.
-		//Crear resto columnas con nombres de grupos.
-		for(int i=1; i<=NG;i++) {cabecera[i] = IDs[i-1];}
-		mContactos.addCabecera(cabecera);
-		//Detectar si tiene etiqueta de Matriz de contactos.
-		boolean hasMC = getPosOp("C") > -1;
-		//Añadir filas
-		for(int i = 0; i<NG; i++) {
-			fila[0] = IDs[i];													//Dar nombre a la fila 0 del grupo que representa.
-			for(int j = 1; j<=NG; j++) {										//Saltamos la columna de indentificadores verticales.
-				int contadorCeros = i;											//Indica los ceros que hay que dejar al comienzo de cada fila.
-				if(contadorCeros > (j-1))  fila[j] = "0";
-				else {
-					if(hasMC) fila[j] = (String) dcvs.getValueAt(0, contadorCol);
-					else fila[j] = "0";											//Sino tiene Matriz de contactos indicar valor 0.
-					contadorCol++;
-				}
-				contadorCeros++;		
-			}
-			mContactos.addFila(fila);
-		}
-		
-		if(traza) System.out.println( mContactos.toString() );
 	}
 	
 	
@@ -557,7 +637,7 @@ public class ParserHistoricoVS {
 	/**
 	 * @return Matriz de contactos.
 	 */
-	public DCVS getMContactos() {return mContactos;}
+	public DCVS getMContactos() {return mREL;}
 
 
 	/**
@@ -565,6 +645,12 @@ public class ParserHistoricoVS {
 	 */
 	public HashMap<Integer, Zona> getZonas() {return zonas;	}
 
+
+	/**
+	 * @return Obtiene el módulo de grupos de población.
+	 */
+	public DCVS getMAP() {return mMAP;}
+	
 
 	/**
 	 * <p>Title: getNG</p>  
@@ -576,7 +662,19 @@ public class ParserHistoricoVS {
 	/**
 	 * @return Definición de la enfermedad, sus parámetros.
 	 */
-	public DCVS getmDefENF() {return mDefSIR;}	
+	public DCVS getmDefENF() {return mDEF;}	
 	
+	/**
+	 * <p>Title: getMPRJ</p>  
+	 * <p>Description: Devuelve el módulo del proyecto configurado.</p> 
+	 * @return Módulo Proyecto.
+	 */
+	public DCVS getMPRJ() {return mPRJ;}
 	
+	/**
+	 * <p>Title: getMHST</p>  
+	 * <p>Description: Devuelve el módulo histórico con los valores obtenidos</p> 
+	 * @return Módulo histórico, con los datos leídos y los calculados a partir de estos.
+	 */
+	public DCVS getMHST() {return mHST;}
 }

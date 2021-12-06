@@ -13,11 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
 import modelo.DCVS;
 import modelo.DCVSFactory;
 import modelo.IO;
@@ -64,7 +59,6 @@ public class ControladorModulos {
 	private HashMap<String,DCVS> modulos;										//Conexión con la parte del modelo. Almacena todos los datos de cada modelo.
 	private HashMap<Integer,Zona> zonas;
 	//
-	private DefaultTableModel historico;
 	private ParserPoly parserPoly;
 	//Obtener dimensiones de la pantalla para controlar donde aparecen los módulos.
 	Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -109,7 +103,7 @@ public class ControladorModulos {
 		paleta = new Paleta(this,100, 205);
 		mapa = new Mapa(w,h, this);
 		principal = new Principal(this);
-		player = new Player(400, 400);
+		player = new Player(this);
 		vistaSIR = new VistaSIR(this);
 		pizarra = new Pizarra(this);
 		//Inicio de los parsers.
@@ -130,22 +124,30 @@ public class ControladorModulos {
 		//Procesarlo.
 		abrirProyecto(proyecto);
 		//Módulo de parámetros SIR.
-		DCVS pSIR = DCVSFactory.newModule(TypesFiles.DEF);
-		//Procesarlo.
-		establecerDatos(pSIR);
+		generarModuloDEF();
 		//Módulo de paleta de colores.
-		DCVS paleta = DCVSFactory.newModule(TypesFiles.PAL);
-		establecerDatos(paleta);
+		generarModuloPAL();
 		
 	}
 	
+	private void generarModuloDEF() {
+		DCVS pSIR = DCVSFactory.newModule(TypesFiles.DEF);
+		//Procesarlo.
+		establecerDatos(pSIR);
+	}
+	
+	private void generarModuloPAL() {
+		DCVS paleta = DCVSFactory.newModule(TypesFiles.PAL);
+		establecerDatos(paleta);
+	}
+	
 	/**
-	 * <p>Title: generarModuloZonass</p>  
+	 * <p>Title: generarModuloMAP</p>  
 	 * <p>Description: Genera el módulo de grupos de población o zonas.</p>
 	 * El módulo es añadido al conjunto de módulos sin datos de los propios
 	 *  grupos de población añadidos.
 	 */
-	private void generarModuloZonas() {
+	private void generarModuloMAP() {
 		DCVS moduloZonas = DCVSFactory.newModule(TypesFiles.MAP);
 		//Añadir datos para el guardado  e identifación.
 		setProjectParameters(moduloZonas);
@@ -155,7 +157,13 @@ public class ControladorModulos {
 		establecerDatos(moduloZonas);
 	}
 	
-	
+	private void generarModuloREL(){
+		//Añadimos nueva matriz de contactos.
+		DCVS relaciones = DCVSFactory.newREL(zonas);
+		setProjectParameters(relaciones);
+		establecerDatos(relaciones);
+	}
+			
 	/**
 	 * <p>Title: setProjectParameters</p>  
 	 * <p>Description: Añade los tres parámetros básicos del proyecto al módulo</p>
@@ -387,8 +395,8 @@ public class ControladorModulos {
 	 * @return True si el reproductor puede ejecutarse, False en otro caso.
 	 */
 	public boolean isPlayable() {
-		return historico != null &&
-				historico.getRowCount()>0 &&
+		return hasModule(TypesFiles.HST) &&
+				getModule(TypesFiles.HST).getRowCount()>0 &&
 				getNumberZonas() > 0;
 	}
 	
@@ -404,22 +412,11 @@ public class ControladorModulos {
 	 */
 	private void play() {
 		if(isPlayable()) {
-			DCVS h = new DCVS();
-			h.setModelo(historico);
-			player.setPlay(mapa,h);
+			player.setPlay(mapa,getModule(TypesFiles.HST));
 			player.setVisible(true);
 		}
 	}
-	
-	/**
-	 * <p>Title: setHistorico</p>  
-	 * <p>Description: Actualiza el historico de un cálculo realizado, permitiendo
-	 * su reproducción.</p> 
-	 * @param historico Historico con los datos de la evolución calculada.
-	 */
-	public void setHistorico(DCVS historico) {	this.historico = historico.getModelo();	}
-			
-	
+
 	
 	/* Progreso de implementación control Principal */
 	
@@ -718,19 +715,6 @@ public class ControladorModulos {
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
 		insertInProjectModule(datos);
-//		//En caso de mapa o de relaciones, el módulo debe tener definidos tantos grupos
-//		// como haiga definido en el proyecto.
-//		int NG = getNumberZonas();
-//		
-//		if((tipo.equals(TypesFiles.REL) || tipo.equals(TypesFiles.MAP))
-//				&& datos.getRowCount() < NG ) {
-//			showMessage("No se puede cargar el módulo: " + datos.getRuta() + "\n" + 
-//				", dicho módulo no tiene definido suficientes parámetros para el\n" + 
-//					"número de grupos de población indicados en el modelo",0);
-//			isDone = false;
-//			
-//			System.out.println("CM > establecer datos > Tipo: " + tipo + ", NG: " + NG + " / filas de datos: " + datos.getRowCount());
-//		}
 		
 		//Guardar los datos del módulo en su conjunto.
 		if(isDone) modulos.put(tipo, datos);
@@ -743,7 +727,6 @@ public class ControladorModulos {
 			if(isDone) setPoligonos(datos);
 			break;
 		case (TypesFiles.HST):
-			setHistorico(datos);
 			break;
 		case (TypesFiles.DEF):
 			break;
@@ -808,10 +791,10 @@ public class ControladorModulos {
 			int NG = getNumberZonas();
 			
 			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP))
-					&& dcvs.getRowCount() < NG ) {
+					&& dcvs.getRowCount() != NG ) {
 				showMessage("No se puede cargar el módulo: " + dcvs.getRuta() + "\n" + 
-					", dicho módulo no tiene definido suficientes parámetros para el\n" + 
-						"número de grupos de población indicados en el modelo",0);
+							"dicho módulo no tiene definido suficientes parámetros para\n" + 
+							"el número de grupos de población indicados en el modelo",0);
 				ok = false;	
 				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
 			}	
@@ -819,6 +802,24 @@ public class ControladorModulos {
 		}
 		else if(ok) {abrirProyecto(dcvs);}
 		return ok;
+	}
+	
+	/**
+	 * <p>Title: regenerarModuloBasico</p>  
+	 * <p>Description: Recrea el módulo especificado con los parámetros básicos</p>
+	 * Método diseñado para restablecer valroes por defecto cuando se elimina un 
+	 *  módulo considerado básico.
+	 *  <P>En función de las dependencias entre módulos, la función dispara la 
+	 *   regeneración de otros módulos o su actualización dado el caso.</P> 
+	 * @param type Tipo de módulo a volver a generar con valores por defecto.
+	 */
+	private void regenerarModuloBasico(String type) {
+		switch(type) {
+		case(TypesFiles.MAP): generarModuloMAP();								//Generar un mapa => generar Relaciones también.
+		case(TypesFiles.REL): generarModuloREL(); break;
+		case(TypesFiles.DEF): generarModuloDEF(); break;
+		case(TypesFiles.PAL): generarModuloPAL(); break;						//Efecto de restablecer valores por defecto.
+		}
 	}
 	
 	/**
@@ -836,13 +837,16 @@ public class ControladorModulos {
 			modulos.remove(ext);
 			//Eliminar si hay entrada, de la propiedades del proyecto.
 			//Garantizar de que hay un módulo de proyecto antes de tratar de eliminar una entrada del mismo.
-			if(hasModule(TypesFiles.PRJ)) {
+			if(!ext.equals(TypesFiles.PRJ) && hasModule(TypesFiles.PRJ)) {
 				DCVS dcvs = modulos.get(TypesFiles.PRJ);
 				int index = dcvs.getFilaItem(ext);
 				//Si hay entrada en el módulo del proyecto, eliminar dicha entrada.
 				done = index > -1;
 				if(done) dcvs.delFila(index);
 			}
+			
+			//Si es un módulo básico hay que generarlo de nuevo.
+			regenerarModuloBasico(ext);
 		}
 		return done;
 	}
@@ -901,7 +905,7 @@ public class ControladorModulos {
 			ok = saveModule(ext,as);
 		}
 		return ok;
-	}
+	} 
 	
 	/* En progreso de implementación TableEditor */
 	
@@ -1153,7 +1157,7 @@ public class ControladorModulos {
 			zonas.put(i+1,z);
 			//Añadir nueva entrada al módulo de grupos (zonas).
 			String[] datos = z.toString().split(",");
-			modulos.get(TypesFiles.MAP).addFila(datos);
+			if(hasModule(TypesFiles.MAP)) modulos.get(TypesFiles.MAP).addFila(datos);
 		}
 	}
 	
@@ -1213,16 +1217,14 @@ public class ControladorModulos {
 		saveProjectAs(getModule(TypesFiles.PRJ));
 		
 		//En caso de no haber un módulo de grupos de población, generar y agregarlo.
-		if(!modulos.containsKey(TypesFiles.MAP)) generarModuloZonas();
+		if(!modulos.containsKey(TypesFiles.MAP)) generarModuloMAP();
 		
 		//Ajustar el número de zonas o crearlas si es necesario.
 		if(getNumberZonas() != NG) { 
 			done = resizeZonas(NG);
 			setZonas(zonas);
 			//Añadimos nueva matriz de contactos.
-			DCVS relaciones = DCVSFactory.newREL(zonas);
-			setProjectParameters(relaciones);
-			establecerDatos(relaciones);
+			generarModuloREL();
 		}
 
 		return done;
@@ -1253,14 +1255,6 @@ public class ControladorModulos {
 		archivos.refresh();
 	}
 	
-	private void setDatosProyecto(DCVS dcvs, int NG) {
-		dcvs.addFila(new String[] {Labels.NG,"" + NG});
-		//Cambiamos la etiqueta de tipo de módulo a PRJ para poder procesarla correctamente.
-		dcvs.setTipo(TypesFiles.PRJ);
-		//Llamamos a la función correspondiente.
-		abrirProyecto(dcvs);
-	}
-	
 	/**
 	 * <p>Title: importarProyectoVS</p>  
 	 * <p>Description: Importa los datos de un archivo de proyecto generado con VenSim.</p>
@@ -1273,10 +1267,7 @@ public class ControladorModulos {
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
 		// impediría modularidad e independencia de módulos.
 		ParserProyectoVS parser = new ParserProyectoVS(prjV);
-		//Establecer los datos del proyecto primero (provoca clear). 
-//		abrirProyecto(parser.getmProyecto());
-//		modulos.put(TypesFiles.PRJ, parser.getmProyecto());
-//		setDatosProyecto(prjV,parser.getNG());
+
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(parser.getZonas());
 		//Establecer el historico de niveles.
@@ -1284,7 +1275,7 @@ public class ControladorModulos {
 		//Establecer datos propios de la enfermedad.
 		establecerDatos(parser.getmDefENF());
 		//Establecer matriz de relaciones.
-		tablaEditor.setModelo(parser.getMContactos(),false);
+		establecerDatos(parser.getMContactos());
 	}
 	
 	/**
@@ -1300,16 +1291,18 @@ public class ControladorModulos {
 		// impediría modularidad e independencia de módulos.
 		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
 		//Establecer los datos del proyecto primero (provoca clear). 
-		setDatosProyecto(prjV,parser.getNG());
+		generarModuloMAP();
+		abrirProyecto(parser.getMPRJ());
+		//Establecer datos de los grupos (Mapa)
+		establecerDatos(parser.getMAP());
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(zonas = parser.getZonas());
-		//Establecer el historico de niveles.
-
 		//Establecer datos propios de la enfermedad.
 		establecerDatos(parser.getmDefENF());
 		//Establecer matriz de relaciones.
-		tablaEditor.setModelo(parser.getMContactos(),false);
-		//Establecer los parámetros de la enfermedad.
+		establecerDatos(parser.getMContactos());
+		//Establecer el historico de niveles.
+		establecerDatos(parser.getMHST());
 
 	}
 	

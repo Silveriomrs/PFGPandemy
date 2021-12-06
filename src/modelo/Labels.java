@@ -124,7 +124,7 @@ public class Labels {
 		dic.put(CC, "Casos de curación");
 		dic.put(CVS, "Casos de vuelta a la suceptibilidad");
 		dic.put(CI, "Casos incidentes");
-		dic.put(C100K, "Casos por cada 100 mil habitantes");
+		dic.put(C100K, "Nivel de contagio");
 		//Básicas
 		dic.put(S, "Susceptibles");
 		dic.put(I, "Incidencias");
@@ -162,6 +162,10 @@ public class Labels {
 		dic.put(ID, "Indentificador");
 		dic.put(PEOPLE, "Número de habitantes");
 		dic.put(AREA, "Superficie de la zona");
+		
+		///
+
+		
 	}
 	
 	/**
@@ -191,6 +195,16 @@ public class Labels {
 		if(existLabel(label)) word = dic.get(label);
 		else System.out.println("No está agregada al diccionario: " + label);
 		return word;
+	}
+
+	
+	public String getKey(String word) {
+		String label = null;
+		for (String clave:dic.keySet()) {
+			String valor = getWord(clave);
+			if(word.equals(word)) {return clave;}
+		}
+		return label;
 	}
 	
 	
