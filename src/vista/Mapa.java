@@ -133,11 +133,13 @@ public class Mapa extends JPanel{
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
 	 * @param serie Nombre de la serie asociada al nivel almacenado.
+	 * @param time Instante de tiempo en el que encuadrar dicho valor. Tiene equivalencia
+	 *  con la posición en el eje de coordenadas X de la gráfica.
 	 * @param n Nivel de asignación.
 	 */
-	public void addZonaNivel(int id, String serie, int n) {
-		if(cm.getZonas().containsKey(id)) {												//Comprobación de que existe.
-			cm.getZonas().get(id).addNivel(serie,0, n);									//Añadir valor a la serie que corresponda.
+	public void addZonaNivel(int id, String serie,int time, double n) {
+		if(cm.getZonas().containsKey(id)) {										//Comprobación de que existe.
+			cm.getZonas().get(id).addNivel(serie,time, n);						//Añadir valor a la serie que corresponda.
 		}
 	}
 
@@ -148,7 +150,7 @@ public class Mapa extends JPanel{
 	    	//Obtención del punto del mapa que ha recibido la pulsación.
 	        Point p = e.getPoint();
 	        Zona z = getZona(p);
-	        if(z != null) { z.getGrafica().setVisible(true);}
+	        if(z != null) z.getGrafica().setVisible(true);
 	    }
 
 	    private Zona getZona(Point p) {

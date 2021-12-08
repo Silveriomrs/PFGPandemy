@@ -156,6 +156,8 @@ public class VistaZona extends JPanel {
 	 *  sus valores en los correspondientes JTextFields. 
 	 */
 	public void refresh() {
+		if(cm.getNumberZonas() > 0) zona = cm.getZonas().get(zona.getID());
+		
 		//Si no es nulo actúa.
 		if(zona != null) {
 			tf_ID.setText("" + zona.getID());									//ID

@@ -27,7 +27,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import modelo.IO;
 import modelo.Labels;
-
 import java.awt.BorderLayout;
 import javax.swing.JCheckBox;
 
@@ -148,6 +147,19 @@ public class GraficasChart{
 	}
 	
 	/**
+	 * <p>Title: reset</p>  
+	 * <p>Description: Reinicia los datos de todas las series borrandolos</p>
+	 * El objetivo es limpiar la gráfica para permitir que reproduzca desde el punto
+	 *  inicial. 
+	 */
+	public void reset() {
+//		dataset.removeAllSeries();
+		seriesMap.forEach((k,v) ->{
+			v.clear();
+		});
+	}
+	
+	/**
 	 * <p>Title: getJPanel</p>  
 	 * <p>Description: Devuelve este submódulo encapsulado dentro de un
 	 *  JPanel, de esta forma, facilita su inclusión dentro de otras vistas. </p>
@@ -189,7 +201,7 @@ public class GraficasChart{
 			//Nueva serie -> nueva opción de visualizar en el menú.
 			if(nombre.startsWith("Casos")) addJMenuItem(mnCasos,nombre,false,null);
 			else if(nombre.startsWith("Tasa")) addJMenuItem(mnTasas,nombre,false,null);
-			else if(nombre.equals(new Labels().getWord( Labels.C100K ) )) {
+			else if(nombre.equals(Labels.getWord( Labels.C100K ) )) {
 				//Añadir serie al menú
 				addJMenuItem(mnVer,nombre,true,null);
 				//Añadir nueva serie al dataset desde el hashmap seriesMap.
@@ -211,8 +223,8 @@ public class GraficasChart{
 	public void addPunto(String serie, double x, double y) {
 		//Comprobación previa si existe dicha serie, en caso contrario la crea.
 		if(!seriesMap.containsKey(serie)) {	addSerie(serie);}
-		//Añade el valor a la serie.
-		seriesMap.get(serie).add(x,y);
+		//Añade el valor a la serie o actualiza el valor si no existe.
+		seriesMap.get(serie).addOrUpdate(x, y);
 	}
 	
 	
@@ -264,6 +276,12 @@ public class GraficasChart{
 		return serie;
 	}
 	
+	/**
+	 * <p>Title: getAllSeries</p>  
+	 * <p>Description: Devuelve en un array bidimensional todas las series.</p> 
+	 * @param nRegistros El indice del último registro a incluir en la matriz.
+	 * @return Matriz bidimensional (array) con las series y sus datos hasta el índice indicado.
+	 */
 	public String[][] getAllSeries(int nRegistros){
 		int nSeries = seriesMap.size();
 		int contador = 0;

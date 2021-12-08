@@ -76,7 +76,8 @@ public class ParametrosGrupos extends JPanel {
 		if(paneles.getTabCount() > 0) {
 			paneles.removeAll();
 			contadorPaneles = 0;
-		}
+		}		
+		
 		vistasZonas.clear();															//Para correcto funcionamiento este valor inciial no puede ser 0.
 		
 		this.setEnabled(cm.hasZonas());

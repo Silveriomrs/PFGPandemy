@@ -139,12 +139,13 @@ public class DCVSFactory {
 	 */
 	public static DCVS newHST(int FT) {
 		DCVS module = new DCVS();
+		module.setTipo(TypesFiles.HST);
 		//Crear cabecera		
-		String[] cabecera = new String[FT + 2];
+		String[] cabecera = new String[FT + 1];
 		cabecera[0] = "TIME";
 		
 		//Añadir resto de etiquetas de la cabecera (Times Slots en unidades).
-		for(int i = 0; i <= FT;i++)	cabecera[i + 1] = "" + i;
+		for(int i = 1; i <= FT;i++)	cabecera[i] = "" + (i -1);
 		//Añadir cabecera.
 		module.addCabecera(cabecera);
 		return module;

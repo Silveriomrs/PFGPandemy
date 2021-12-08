@@ -10,7 +10,7 @@ import java.awt.Polygon;
  * poligono.
  * @author Silverio Manuel Rosales Santana
  * @date 16/07/2021
- * @version 1.2
+ * @version 1.3
  *
  */
 public class ParserPoly {
@@ -28,9 +28,8 @@ public class ParserPoly {
 	 * @return poligono creado a partir de los puntos dados.
 	 */
 	public Polygon parser(String[] zona,int first) {
-//		int inicio = first;															//Saltamos las posiciones del resto de atributos del grupo/zona.
+		int contador = 0;															//Saltamos las posiciones del resto de atributos del grupo/zona.
 		Polygon pol = new Polygon();
-//		int size = zona.length - inicio;
 		//Lectura y almacenamiento de coordenadas.
 		for(int i=first; i<zona.length;i++) {												
 			//Separación coordenadas.
@@ -40,8 +39,10 @@ public class ParserPoly {
 				int x = (int) (Double.valueOf(coordenadas[0])/escala);			//Conversión coordenada X
 				int y = (int) (Double.valueOf(coordenadas[1])/escala);			//Conversión coordenada Y
 				pol.addPoint(x,y);
+				contador++;
 			}
 		}
+		if(first > zona.length || contador == 0) pol = null;
 		return pol;
 		
 	}

@@ -30,12 +30,11 @@ public class ParserHistoricoVS {
 	private DCVS mHST;															//Módulo histórico
 	private DCVS mMAP;
 	private String[] IDs;														//Almacena los nombres de los grupos.
-	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
 	private int FT;																//Tiempo final de la simulación.
-	private boolean traza = true;
+	private boolean traza = false;
 
 	/**
 	 * <p>Title: Constructor del parser</p>  
@@ -49,7 +48,6 @@ public class ParserHistoricoVS {
 		this.mPRJ = DCVSFactory.newModule(TypesFiles.PRJ);
 		this.mMAP = DCVSFactory.newModule(TypesFiles.MAP);
 			
-		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
 		if(prjV != null) importarVensim(prjV);
@@ -108,12 +106,9 @@ public class ParserHistoricoVS {
 		readXs("CI");
 		
 		//Leer o calcular Prevalencia.
+		//Debe realizarse después de haber obtenido R,S,I e CI.
 		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
 		else {getPs();}															//En otro caso calcular las prevalencias.
-		
-		//Leer o calcular nivel de contagio por cada 100 mil habitantes			//Equivale al nivel de contagio.
-//		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
-//		else {getPs();}															//Sino están, calcular las prevalencias.
 		
 		//Leer tasas TC, TCONTAGIO
 		readXs("TC");
@@ -145,7 +140,12 @@ public class ParserHistoricoVS {
 		modulo.setName(newName + type);
 	}
 	
-	
+	/**
+	 * <p>Title: setUpProyecto</p>  
+	 * <p>Description: Inicia y establece los valores iniciales para el módulo
+	 *  del proyecto.</p>
+	 *  Esta función debe ejecutarse después de haber obtenido el valor de NG.
+	 */
 	private void setUpProyecto() {
 		//Añadir tipo y nombre
 		setTypeAndName(mPRJ,TypesFiles.PRJ);
@@ -300,7 +300,6 @@ public class ParserHistoricoVS {
 	}
 	
 	
-	
 	/**
 	 * <p>Title: getPs</p>  
 	 * <p>Description: Calcula las prevalencias instantaneas para cada una de
@@ -309,36 +308,51 @@ public class ParserHistoricoVS {
 	 */
 	private void getPs() {
 		for(int i = 1; i<=NG; i++) {
-			
+			//obtener zona
 			Zona z = zonas.get(i);
+			String name = z.getName();
+			//Crear arrays para contener los datos.
 			String[] filaP = new String[FT + 1];
-			filaP[0] = "P " + z.getID();
 			String[] filaC100K = new String[FT + 1];
-			filaC100K[0] = "C100K " + z.getID();
-			
-			String ns = labels.getWord("P");									//Nombre de la serie.
-			//Obtener los valores S,R e I correspondientes al mismo tiempo.
+			//Añadir etiquetas.
+			filaP[0] = Labels.P + " " + name;	
+			filaC100K[0] = Labels.C100K + " " + name;
+			//Obtener datos
+			//Proceso para todos los slots de tiempo.
 			for(int j = IT; j < FT; j++) {
-				String name = z.getName();
-				double vs = z.getGrafica().getYValue(labels.getWord("S"), j+1);	//valor Sj.
-				double vr = z.getGrafica().getYValue(labels.getWord("R"), j+1);	//valor Rj.
-				double vi = z.getGrafica().getYValue(labels.getWord("I"), j+1);	//valor Ij.
+				//Obtener los valores S,R e I correspondientes al mismo tiempo.
+				//valor Sj.
+				int index = mHST.getFilaItem(Labels.S + " " + name);
+				double vs = Double.parseDouble((String) mHST.getValueAt(index, j+1));
+				//valor Ij.
+				index = mHST.getFilaItem(Labels.I + " " + name);
+				double vi = Double.parseDouble((String) mHST.getValueAt(index, j+1));
+				//valor Rj.
+				index = mHST.getFilaItem(Labels.R + " " + name);
+				double vr = Double.parseDouble((String) mHST.getValueAt(index, j+1));
 
 				//Cálculo de la prevalencia instantánea. P = I/(R+I+S)
 				double pj = vi/(vs+vi+vr);
 				//Guardado de la prevalencia.
-				z.addNivel(ns, j, pj);
+				z.addNivel(Labels.P, j, pj);
 				filaP[j+1] = "" + pj;
 				
-				//Calculo casos incidentes por cada 100 mil habitantes = 100000*(CI/(S+I+R))
-				double vci = z.getGrafica().getYValue(labels.getWord("CI"), j);	//valor Ij.
+				//Cálculo casos incidentes por cada 100 mil habitantes = 
+				// 100000*(CI/(S+I+R))
+				index = mHST.getFilaItem(Labels.CI + " " + name);
+				double vci = Double.parseDouble((String) mHST.getValueAt(index, j+1));
 				double ci100K = 100000*vci/(vs+vi+vr);							//Cálculo
-				z.addNivel(labels.getWord(Labels.C100K), j, ci100K);									//Guardado del Nivel de contagio.
-				filaC100K[j+1] = "" + ci100K;
+				z.addNivel(Labels.C100K, j, ci100K);			//Guardado del Nivel de contagio.
+				filaC100K[j+1] = "" + ci100K;									
 				
+				//Establecer estos valores iniciales en los grupos de población (zonas)
 				if(j==0) {
-					if(traza) System.out.println(ns + " inicial " + name + " : " + pj);
-					if(traza) System.out.println("Casos Incidentes iniciales por cada 100 mil habitantes" + " : " + ci100K);
+					z.setNivel((int) ci100K);
+					z.setP(pj);
+					if(traza) {
+						System.out.println("P inicial " + name + " : " + pj);
+						System.out.println("C100K Incidentes: " + ci100K);
+					}
 				}
 			}
 			//Añadir las nuevas filas con los datos al módulo histórico.
@@ -416,23 +430,14 @@ public class ParserHistoricoVS {
 		String[] fila = new String[FT + 1];
 		fila[0] = et + " " + z.getName();
 		// OP + " " + NombreZ  == et
-		System.out.println(fila[0]);
-		//Se recorre para cada tipo de dato todos los registros.
+		// Se recorre para cada tipo de dato todos los registros.
 		while(correcto && (contador < FT)) {
 			String s = (String) dcvs.getValueAt(pos, contador +1);
 			String op = et.split(" ")[0];
 			
 			if(s != null && !s.equals("") && op != null) {
 				valor =  Double.parseDouble(s.replace(",", "."));
-				String etiqueta = labels.getWord(op);							//Obtener el valor de la etiqueta.	
-				//Caso especial para etiquetas con dos operandos.
-				if( op.equals("CAB") || op.equals("TCS")) {
-					etiqueta = etiqueta.replaceFirst("Z",getSecondID(et));
-				}
-				//Si etiqueta es nulo usar el pasado por parámetro.
-				if(etiqueta == null ) etiqueta = et;
-				//Guardar el valor en la gráfica de la zona.
-				z.addNivel(etiqueta, contador,valor);
+				z.addNivel(et, contador,valor);
 				fila[contador +1] = "" + valor;
 			}else { correcto = false; }											//Si un valor leído no es válido no continuar con la lectura.
 			//Siguiente línea.
@@ -440,7 +445,6 @@ public class ParserHistoricoVS {
 		}
 		
 		mHST.addFila(fila);
-
 	}
 	
 	
@@ -473,34 +477,49 @@ public class ParserHistoricoVS {
 	private void crearZonas() {
 		for(int i = 0; i<NG; i++) {
 			int superficie = 0;													//En este modelo VenSim no incluye superficie.	
-			int habitantes = getPeople(i);										//Obtener población inicial (si hay).
-			zonas.put(i+1,new Zona(i+1, IDs[i], habitantes, superficie,0,0,0,0,0, null));
-		}	
+			//Crear zonas con valores iniciales.
+			zonas.put(i+1,new Zona(i+1, IDs[i], 0, superficie,0,0,0,0,0, null));
+			//Obtener población inicial (si hay) PT0,R,S,I.
+			setPeople(i);
+		}
 	}
 	
 	/**
-	 * <p>Title: getPeople</p>  
-	 * <p>Description: Obtiene el número de habitantes para la zona indicada</p> 
-	 * @param ID Número identificador de la zona.
-	 * @return Número de habitantes de la zona. 0 en otro caso.
+	 * <p>Title: setPeople</p>  
+	 * <p>Description: Establece el número de habitantes para la zona indicada</p> 
+	 * Los habitantes que van a establecerse son los parámetros iniciales S,R,I,
+	 * PT0 así como el nivel inicial de contagio C100K, en caso de no haber tales
+	 *  etiquetas el valor inicial será el valor por defecto (0).
+	 * @param ID Número identificador de la zona tal y como consta en la fuente de origen.
+	 *  Se debe tener en cuenta que los indices de las zonas comienzan por 1, pero en los archivos
+	 *   de entrada como el de este parser, comienzan por 0.
 	 */
-	private int getPeople(int ID) {
+	private void setPeople(int ID) {
 		int habitantes = 0;
+		int s = 0;
+		int i = 0;
+		int r = 0;
 		String name = IDs[ID];
-		int row = dcvs.getFilaItem("PT0 " + name);
+		//Leer datos iniciales básicos. S,R e I.
+		int posS = dcvs.getFilaItem(Labels.S + " " + name);
+		if(posS > -1) s = Integer.parseInt((String) dcvs.getValueAt( posS,1));
+		int posR = dcvs.getFilaItem(Labels.R + " " + name);
+		if(posR > -1) r = Integer.parseInt((String) dcvs.getValueAt( posR,1));
+		int posI = dcvs.getFilaItem(Labels.I + " " + name);
+		if(posI > -1) i = Integer.parseInt((String) dcvs.getValueAt( posI,1));
+		//Leer dato de población total.
+		int row = dcvs.getFilaItem(Labels.PT0 + " " + name);
 		//Si existe la etiqueta concreta se toma su valor.
 		if(row>-1) habitantes = Integer.parseInt((String) dcvs.getValueAt(row, 0));
-		//En otro caso se realiza una suma de los valores de las etiquetas R,S,I.
-		else {
-			int posS = dcvs.getFilaItem("S " + name);
-			if(posS > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posS,1));
-			int posR = dcvs.getFilaItem("R " + name);
-			if(posR > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posR,1));
-			int posI = dcvs.getFilaItem("I " + name);
-			if(posI > -1) habitantes += Integer.parseInt((String) dcvs.getValueAt( posI,1));
-		}
-		if(traza) System.out.println("Población Inicial " + name + ": " + habitantes);
-		return habitantes;	
+		else habitantes = s + r + i;											//En otro caso realizar suma de S,R e I
+		Zona z = zonas.get(ID + 1);												//Las zonas tienen un incremento de 1 en los indices.
+		z.setR(r);
+		z.setI(i);
+		z.setS(s);
+		z.setPoblacion(habitantes);
+		
+		if(traza) System.out.println("Población Inicial " + name + ": " + habitantes + 
+				" Si: " + s + " Ii: " + i + " Ri: " + r);
 	}
 	
 	
@@ -509,8 +528,8 @@ public class ParserHistoricoVS {
 		int row0 = getPosOp("C");
 		//En caso de no contener dicha etiqueta buscará la básica S.
 		if(row0 < 0) {
-			op = "S";
-			row0 = getPosOp("S");
+			op = Labels.S;
+			row0 = getPosOp(Labels.S);
 		}
 		
 		
@@ -549,7 +568,7 @@ public class ParserHistoricoVS {
 	private int readNumberGroups() {
 		int contador = 0;
 		boolean fin = false;
-		String OP = "R";
+		String OP = Labels.R;
 		int nRows = dcvs.getRowCount();
 		//Primero encontramos la posición de la primera etiqueta C perteneciente a la matriz de contactos.
 		int row = getPosOp(OP);
@@ -677,4 +696,16 @@ public class ParserHistoricoVS {
 	 * @return Módulo histórico, con los datos leídos y los calculados a partir de estos.
 	 */
 	public DCVS getMHST() {return mHST;}
+	
+	/**
+	 * <p>Title: getPAL</p>  
+	 * <p>Description: Devuelve una paleta de colores (leyenda) por defecto.</p>
+	 * El módulo almacena la configuración por defecto del resto del proyecto del parser.
+	 * @return Módulo paleta de colores (leyenda).
+	 */
+	public DCVS getPAL() {
+		DCVS pal = DCVSFactory.newModule(TypesFiles.PAL);
+		setTypeAndName(pal,TypesFiles.PAL);
+		return pal;
+	}
 }

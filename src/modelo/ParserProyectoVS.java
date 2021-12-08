@@ -34,7 +34,6 @@ public class ParserProyectoVS {
 	private DCVS historico;														//Matriz de contactos (relaciones).
 	private DCVS proyecto;
 	private String[] IDs;														//Almacena los nombres de los grupos.
-	private Labels labels;
 	private HashMap<Integer,Zona> zonas;
 	private int NG;																//Número de grupos de población.
 	private int IT;																//Tiempo inicial de la simulación.
@@ -52,7 +51,6 @@ public class ParserProyectoVS {
 		this.definicionSIR = new DCVS();
 		this.historico = new DCVS();
 		this.proyecto = new DCVS();
-		this.labels = new Labels();
 		this.NG = 0;
 		IT = FT = 0;
 		
@@ -285,10 +283,10 @@ public class ParserProyectoVS {
 			Zona z = zonas.get(col);
 			//Se recorre para cada tipo de dato todos los registros.
 			while(correcto && (contador < FT)) {
-				double ci = z.getGrafica().getYValue(labels.getWord(Labels.CI), contador);
-				double s = z.getGrafica().getYValue(labels.getWord(Labels.S), contador);
-				double i = z.getGrafica().getYValue(labels.getWord(Labels.I), contador);
-				double r = z.getGrafica().getYValue(labels.getWord(Labels.R), contador);
+				double ci = z.getGrafica().getYValue(Labels.getWord(Labels.CI), contador);
+				double s = z.getGrafica().getYValue(Labels.getWord(Labels.S), contador);
+				double i = z.getGrafica().getYValue(Labels.getWord(Labels.I), contador);
+				double r = z.getGrafica().getYValue(Labels.getWord(Labels.R), contador);
 				if(ci > -1 && s > -1 && i > -1 && r > -1 ) {
 					double nivel = 100000*(ci/(s+i+r));
 					//z.addNivel("Nivel", contador,nivel);
@@ -377,7 +375,7 @@ public class ParserProyectoVS {
 			
 			if(s != null && !s.equals("") && op != null) {
 				valor =  Double.parseDouble(s);
-				String etiqueta = labels.getWord(op);							//Obtener el valor de la etiqueta.	
+				String etiqueta = Labels.getWord(op);							//Obtener el valor de la etiqueta.	
 				//Caso especial para etiquetas con dos operandos.
 				if( op.equals("CAB") || op.equals("TCS")) {
 //					if(traza) System.out.println("ParserProyecto > addSerieXs: " + et + " > col: " + col +	" fila: " + contador + " - " + etiqueta + ", Valor: " + valor);

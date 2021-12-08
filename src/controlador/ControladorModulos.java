@@ -17,6 +17,7 @@ import modelo.DCVS;
 import modelo.DCVSFactory;
 import modelo.IO;
 import modelo.Labels;
+import modelo.OperationsType;
 import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
 import modelo.ParserProyectoVS;
@@ -37,11 +38,13 @@ import vista.VistaSIR;
 /**
  * @author Silverio Manuel Rosales Santana
  * @date 13/07/2021
- * @version 2.4
+ * @version 6.2
  *
  */
 public class ControladorModulos {
 
+	@SuppressWarnings("unused")
+	private Labels labels;														//Necesario iniciarlo al menos una vez en el proyecto.
 	
 	private Paleta paleta;
 	private ControladorDatosIO cio;
@@ -87,6 +90,7 @@ public class ControladorModulos {
 	 * Constructor de la clase controladora.
 	 */
 	public ControladorModulos() {
+		labels = new Labels();
 		//Inicio del mapa de módulos.
 		modulos = new HashMap<String, DCVS>();
 		zonas = new HashMap<Integer,Zona>();
@@ -103,7 +107,7 @@ public class ControladorModulos {
 		paleta = new Paleta(this,100, 205);
 		mapa = new Mapa(w,h, this);
 		principal = new Principal(this);
-		player = new Player(this);
+		player = new Player(this,mapa);
 		vistaSIR = new VistaSIR(this);
 		pizarra = new Pizarra(this);
 		//Inicio de los parsers.
@@ -111,7 +115,7 @@ public class ControladorModulos {
 		parserPoly.setEscala(1);
 		agregarPaneles();
 		generarModulosBasicos();
-		refreshViews();
+		refresh();
 	}
 	
 	/**
@@ -199,10 +203,10 @@ public class ControladorModulos {
 	
 
 	/**
-	 * <p>Title: refreshViews</p>  
+	 * <p>Title: refresh</p>  
 	 * <p>Description: Llama a cada una de las vistas para que actualicen sus datos</p>
 	 */
-	private void refreshViews() {
+	private void refresh() {
 		archivos.refresh();
 		principal.refresh();
 		paleta.refresh();
@@ -296,15 +300,15 @@ public class ControladorModulos {
 	 * @param datos DCVS con los datos especificados de cada zona.
 	 */
 	private void setPoligonos(DCVS datos) {
+		if(!zonas.isEmpty()) {
+			mapa.reset();
+			pgrupos.reset();
+		}
+		
 		int filas = datos.getRowCount();										//Número de poligonos a procesar.
 		for(int i = 0; i<filas;i++) {
 			Zona z = parser(datos.getRow(i));									//Llamar función parser.
 			if(z != null) zonas.put(z.getID(), z);
-		}
-	
-		if(!zonas.isEmpty()) {
-			mapa.reset();
-			pgrupos.reset();
 		}
 	}
 	
@@ -412,13 +416,13 @@ public class ControladorModulos {
 	 */
 	private void play() {
 		if(isPlayable()) {
-			player.setPlay(mapa,getModule(TypesFiles.HST));
+			player.setPlay();
 			player.setVisible(true);
 		}
 	}
 
 	
-	/* Progreso de implementación control Principal */
+	/* Acciones Principal */
 	
 	/**
 	 * <p>Title: doAction</p>  
@@ -457,26 +461,36 @@ public class ControladorModulos {
 				break;
 			case "Abrir Proyecto":
 				DCVS prj = cio.abrirArchivo(null,TypesFiles.PRJ);
-				if(prj != null) {abrirProyecto(prj);}
+				if(prj != null) {
+					clearProject();
+					abrirProyecto(prj);
+				}
 				break;
 			case "Importar Modelo A":
 				DCVS pVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo.
-				if(pVS != null && pVS.getValueAt(0,0).equals("0")) importarProyectoVS(pVS);
+				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
+					clearProject();
+					importarProyectoVS(pVS);
+				}
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
 			case "Importar Modelo B":
+				
 				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
 				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
-				if(hVS != null && hVS.getColumnName(1).equals("0")) importarHistoricoVS(hVS);
+				if(hVS != null && hVS.getColumnName(1).equals("0")) {
+					clearProject();
+					importarHistoricoVS(hVS);
+				}
 				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;		
 			case "Nuevo Proyecto":
 				generarModulosBasicos();
 				break;
 			case "Salir":
-				if(showMessage("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
+				if(showMessage("Los cambios no guardados se perderán\n¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
 			case "Acerca de...":
 				about.toggleVisible();
@@ -539,7 +553,7 @@ public class ControladorModulos {
 		return opcion;
 	}
 	
-	/* En progreso de implementación control ARCHIVOS */
+	/* Control ARCHIVOS */
 	
 	/**
 	 * <p>Title: getModule</p>  
@@ -574,8 +588,10 @@ public class ControladorModulos {
 	 * Aquellos módulos creados pero sin nombre asignado obtendrán el nombre del
 	 *  proyecto con la extensión propia de cada módulo.
 	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ.
+	 * @return TRUE si la operación se ha realizado correctamente. False en otro caso.
 	 */
-	private void saveProjectAs(DCVS dcvsIn) {
+	private boolean saveProjectAs(DCVS dcvsIn) {
+		boolean done = true;
 		DCVS dcvs = dcvsIn;
 		//Guardado del fichero: En name se almacena el nombre elegido con su extensión.
 		String name = cio.guardarArchivo(dcvs);
@@ -587,12 +603,13 @@ public class ControladorModulos {
 			dcvs.setRuta(wd + System.getProperty("file.separator") + name);
 			dcvs.setName(name);
 			dcvs.setDirectorio(wd);
-			//Guardar todos los módulos en el mismo directorio de trabajo.
-//			saveModule(TypesFiles.PRJ,false);													//Guardar proyecto
+			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
 			saveAllTogether();													//Guardar resto	
 			//Mostrar rutas en Field.
 			archivos.refresh();
-		}
+		}else done = false;
+		
+		return done;
 	}
 	
 	/**
@@ -622,15 +639,17 @@ public class ControladorModulos {
 		//Borrado de las zonas cargadas.
 		zonas.clear();
 		//Limpieza de las etiquetas de las vistas de diferentes módulos.
+		tablaEditor.reset();
 		archivos.reset();
 		vistaSIR.reset();
 		pproyecto.reset();
-		tablaEditor.reset();
+		player.clear();
 		mapa.reset();
 		pgrupos.reset();
-		pizarra.reset();
 		principal.reset();
+		mostrarPanel(panelActivo);
 		paleta.reset();
+		pizarra.reset();
 	}
 	
 	/**
@@ -645,8 +664,6 @@ public class ControladorModulos {
 		String wd = IO.WorkingDirectory + System.getProperty("file.separator");
 		//Reiniciar todas las vistas y borrar datos anteriores.
 		clearProject();	
-		//Añadir ruta del proyecto a la etiqueta correspondiente.
-		archivos.setLabel(dcvs.getTipo(), dcvs.getNombre());
 
 		//Lectura de los módulos a cargar
 		for(int i= 0;  i < nm; i++) {
@@ -675,10 +692,8 @@ public class ControladorModulos {
 		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
 		//Sino coinciden el número de zonas, re-ajustar.
 		if(NG != getNumberZonas()) resizeZonas(NG);
-		//Forzar a todas las vistas a actualizar sus datos. La función setZonas se encarga.
-		setZonas(zonas);
 		//Refrescar vista de Proyecto
-		pproyecto.refresh();
+		refresh();
 	}
 	
 	/**
@@ -724,7 +739,11 @@ public class ControladorModulos {
 		case (TypesFiles.REL):		
 			break;
 		case (TypesFiles.MAP):	
-			if(isDone) setPoligonos(datos);
+			if(isDone) {
+				setPoligonos(datos);
+				//Forzar a todas las vistas a actualizar sus datos. La función setZonas se encarga.
+				setZonas(zonas);
+			}
 			break;
 		case (TypesFiles.HST):
 			break;
@@ -735,11 +754,11 @@ public class ControladorModulos {
 		default:
 		}
 		
-		refreshViews();
+		refresh();
 		return isDone;
 	}
 	
-	/* En progreso de implementación acciones Pizarra*/
+	/* Acciones Pizarra*/
 
 	/**
 	 * <p>Title: doActionPizarra</p>  
@@ -774,7 +793,7 @@ public class ControladorModulos {
 	
 	
 	
-	/* En progreso de implementación acciones Archivos */
+	/* Acciones Archivos */
 	
 	/**
 	 * <p>Title: openModule</p>  
@@ -799,8 +818,7 @@ public class ControladorModulos {
 				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
 			}	
 			establecerDatos(dcvs);	
-		}
-		else if(ok) {abrirProyecto(dcvs);}
+		}else if(ok) {abrirProyecto(dcvs);}
 		return ok;
 	}
 	
@@ -867,11 +885,13 @@ public class ControladorModulos {
 		//Optención del módulo correspondiente
 		DCVS dcvs = getModule(ext);
 		boolean done = dcvs != null;
-		if(done) {
+		if(done && !ext.equals(TypesFiles.PRJ)) {
 			//Ruta a null. En otro caso guardará con la ruta definida en dicho módulo.
 			if(as) dcvs.setRuta(null);
 			//
 			cio.guardarArchivo(dcvs);
+		}else {
+			done = saveProjectAs(dcvs);
 		}
 		return done;
 	}
@@ -934,12 +954,12 @@ public class ControladorModulos {
 		//indicar al módulo de archivos que modulo se ha modificado para activar 
 		//El botón de guardar correspondiente.
 		archivos.enableBotonesGuardado(modulo.getTipo(), true);
-		refreshViews();
+		refresh();
 		
 		return done;
 	}
 
-	/* En progreso de implementación VistasZonas y Grupos */
+	/* Acciones VistasZonas y Grupos */
 	
 	/**
 	 * <p>Title: resizeDCVS</p>  
@@ -1051,7 +1071,6 @@ public class ControladorModulos {
 		return done;
 	}
 	
-	
 	/* Acciones VistaSIR */
 	
 	/**
@@ -1068,8 +1087,7 @@ public class ControladorModulos {
 			done = modulos.get(ext).setDataToLabel(label, data);
 		}
 		return done;
-	}
-	
+	}	
 	
 	/**
 	 * <p>Title: getValueFromLabel</p>  
@@ -1109,35 +1127,54 @@ public class ControladorModulos {
 		return done;
 	}
 	
+	private boolean updateMSIR() {
+		boolean done = true;
+		//PTE
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.PTE ,vistaSIR.getLabel(Labels.PTE));
+		//DME
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.DME ,vistaSIR.getLabel(Labels.DME));
+		//IP
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.IP ,vistaSIR.getLabel(Labels.IP));
+		//DMIP
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.DMI ,vistaSIR.getLabel(Labels.DMI));
+		//IT
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.IT ,vistaSIR.getLabel(Labels.IT));
+		//FT
+		done = setValueAtLabel(TypesFiles.DEF ,Labels.FT ,vistaSIR.getLabel(Labels.FT));
+		return done;
+	}
 	
 	/**
 	 * <p>Title: doActionVistaSIR</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
 	 * de parámetros SIR</p>
-	 * La vista solo ejerce una opción, aplicar cambios de los campos.
+	 * La vista puede indicar dos acciones:
+	 * <l>1. aplicar cambios de los campos.</l>
+	 * <l>2. Iniciar el motor de cálculo del módelo.</l>
+	 * @param op Operación a realizar, UPDATE o EXECUTE
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
-	public boolean doActionVistaSIR() {
+	public boolean doActionVistaSIR(OperationsType op) {
 		//extraer datos de los fields y actualizar con los mismos el módulo.
-		boolean realizado = true;
-		//PTE
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.PTE ,vistaSIR.getLabel(Labels.PTE));
-		//DME
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.DME ,vistaSIR.getLabel(Labels.DME));
-		//IP
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.IP ,vistaSIR.getLabel(Labels.IP));
-		//DMIP
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.DMI ,vistaSIR.getLabel(Labels.DMI));
-		//IT
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.IT ,vistaSIR.getLabel(Labels.IT));
-		//FT
-		realizado = setValueAtLabel(TypesFiles.DEF ,Labels.FT ,vistaSIR.getLabel(Labels.FT));
+		boolean done = true;
 		
-		//Guardar el módulo en el disco.
-		saveModule(TypesFiles.DEF,false);
+		System.out.println(op);
+		
+		if(op == OperationsType.UPDATE) done = updateMSIR();
+		else {
+			done = updateMSIR();
+			//Checar si valores OK
+			// Si valores OK. Ejecutar motorSIR
+			// runSIR(double pte, double dme, boolean ip, double dmi) 
+			runSIR(Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.PTE)),
+					Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.DME)),
+					Boolean.parseBoolean( getValueFromLabel(TypesFiles.DEF ,Labels.IP)),
+					Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.DMI)));
+		}
+		
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
 		archivos.enableBotonesGuardado(TypesFiles.DEF, true);
-		return realizado;
+		return done;
 	}
 	
 	
@@ -1213,11 +1250,11 @@ public class ControladorModulos {
 			setValueAtLabel(TypesFiles.PRJ ,label ,data);
 		});
 		
-		//Guardar el módulo en el disco.
-		saveProjectAs(getModule(TypesFiles.PRJ));
-		
 		//En caso de no haber un módulo de grupos de población, generar y agregarlo.
-		if(!modulos.containsKey(TypesFiles.MAP)) generarModuloMAP();
+		if(!modulos.containsKey(TypesFiles.MAP)) {
+			generarModuloMAP();
+			generarModuloREL();
+		}
 		
 		//Ajustar el número de zonas o crearlas si es necesario.
 		if(getNumberZonas() != NG) { 
@@ -1231,7 +1268,7 @@ public class ControladorModulos {
 	}
 		
 	
-	/* En progreso de implamentación PARSERS archivos de pruebas*/
+	/* PARSERS archivos */
 	
 	/**
 	 * <p>Title: setZonas</p>  
@@ -1279,6 +1316,23 @@ public class ControladorModulos {
 	}
 	
 	/**
+	 * <p>Title: runSIR</p>  
+	 * <p>Description: Ejecuta el cálculo de demolo SIR</p>
+	 * La función no realiza comprobación de los valores iniciales. Dicha comprobación
+	 *  debe ser realizada previamente. 
+	 * @param pte Probabilidad de transmisión de la enfermedad (sin unidades).
+	 * @param dme Duración media de la enfermedad (en días).
+	 * @param ip Inmunidad Permanente.
+	 * @param dmi Duración media de la inmunidad permanente (en días).
+	 */
+	private void runSIR(double pte, double dme, boolean ip, double dmi) {	
+		MotorSIR motor = new MotorSIR(pte, dme, ip, dmi, zonas, modulos.get(TypesFiles.HST));
+		motor.start(0, 100);
+		//Establecer el historico de niveles.
+		establecerDatos(motor.getHST());
+	}
+	
+	/**
 	 * <p>Title: importarHistoricoVS</p>  
 	 * <p>Description: Importa los datos de un archivo de salida (histórico) generado con VenSim.</p>
 	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, R,S,I, tasas, etcetera,
@@ -1291,9 +1345,8 @@ public class ControladorModulos {
 		// impediría modularidad e independencia de módulos.
 		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
 		//Establecer los datos del proyecto primero (provoca clear). 
-		generarModuloMAP();
 		abrirProyecto(parser.getMPRJ());
-		//Establecer datos de los grupos (Mapa)
+		//Establecer datos de los grupos (Mapa).
 		establecerDatos(parser.getMAP());
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(zonas = parser.getZonas());
@@ -1303,6 +1356,10 @@ public class ControladorModulos {
 		establecerDatos(parser.getMContactos());
 		//Establecer el historico de niveles.
 		establecerDatos(parser.getMHST());
+		//Establecer paleta por defecto.
+		establecerDatos(parser.getPAL());
+		//Reiniciar vistas.
+		refresh();
 
 	}
 	

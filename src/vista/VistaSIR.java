@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -25,6 +26,7 @@ import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.IO;
 import modelo.Labels;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 
 import java.awt.event.MouseAdapter;
@@ -45,7 +47,7 @@ public class VistaSIR extends JPanel{
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -4611485519498921021L;
 	private HashMap<String,JTextField> mapaFields;
-	private JButton btnAplicar;
+	private JButton btnAplicar,btnExecute;
 	private JCheckBox chckbxIP;
 	//
 	private final int hi;														//Altura de los elementos (principalmente iconos).
@@ -177,15 +179,14 @@ public class VistaSIR extends JPanel{
 	 * particulares.
 	 */
 	private JLabel iniciarLabels(String label, String ruta) {
-		Labels labels = new Labels();
 		JLabel jl = new JLabel();
 		int posY = lineaBase + 30*contador;
 		int w = 360;
 		int posX = 150;
-		jl = new JLabel(labels.getWord(label));
+		jl = new JLabel(Labels.getWord(label));
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
-		if(label != null) jl.setToolTipText(labels.getWord(label));
+		if(label != null) jl.setToolTipText(Labels.getWord(label));
 		panelCentral.add(jl);
 		return jl;
 	}
@@ -201,14 +202,13 @@ public class VistaSIR extends JPanel{
 	 * @see #createFieldsInMap()
 	 */
 	private void generateControls(String ext, int posX){
-		Labels labels = new Labels();
 		int posY = lineaBase + 30*contador;
 		JTextField jtf = mapaFields.get(ext);
 		jtf.setEditable(true);
 		jtf.setEnabled(true);
 		jtf.setBounds(30,posY,100,hi);
 		jtf.setColumns(10);
-		jtf.setToolTipText(labels.getWord(ext));
+		jtf.setToolTipText(Labels.getWord(ext));
 		jtf.setHorizontalAlignment(SwingConstants.LEFT);
 		jtf.setBorder(new LineBorder(Color.BLACK, 1, true));
 		jtf.addFocusListener(new FocusJTextField(jtf));
@@ -299,6 +299,15 @@ public class VistaSIR extends JPanel{
 		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/motor_512px.png",70,75));
 		labelLogo.setBounds(12, 20, 70, 75);
 		panelCentral.add(labelLogo);
+		
+		btnExecute = new JButton("Ejecutar simulación");
+		btnExecute.setBounds(44, 302, 207, 37);
+		btnExecute.setVisible(false);
+		btnExecute.setEnabled(false);
+		btnExecute.setActionCommand("Ejecutar");
+		btnExecute.setToolTipText("Ejecuta el cálculo del modelo.");
+		btnExecute.addMouseListener(new BotonL());
+		panelCentral.add(btnExecute);
 		//Configuración del estado de los botones según contexto.
 		refreshControls();
 	}
@@ -310,7 +319,46 @@ public class VistaSIR extends JPanel{
 	private void refreshControls() {
 		mapaFields.get(Labels.DMI).setEnabled(!IP);
 		chckbxIP.setSelected(IP);
+		
+//		if( checkFields() && cm.hasZonas() && cm.hasModule(TypesFiles.REL)){
+//			btnExecute.setEnabled(true);
+//			btnExecute.setVisible(true);
+//			btnExecute.setBackground(Color.GREEN);
+//		}
 	}
+	
+	/**
+	 * <p>Title: checkValue</p>  
+	 * <p>Description: Comprueba si un valor es un dato númerico correcto. </p>
+	 * Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
+	 *  no númericos. Tampoco admite números negativos. 
+	 * @param label Etiqueta del campo a evaluar
+	 * @return TRUE si cumple las condiciones. FALSE en otro caso.
+	 */
+	private boolean checkValue(String label) {
+		boolean resultado = true;
+		String ve= getLabel(label);
+		
+		try {
+			double valor = Double.parseDouble(ve);
+			if(valor < 0) throw new ArithmeticException();
+		}catch(ArithmeticException ae) {
+			resultado = false;
+		}catch(Exception e) {
+			resultado = false;
+		}
+		return resultado;
+	}
+	
+	private boolean checkFields() {
+		boolean done = true;
+		for (String clave:mapaFields.keySet()) {
+		    if(!checkValue(clave)) done = false;
+		}
+		
+		return done;
+	}
+	
 	
 	/* Clases privadas */
 	
@@ -326,12 +374,26 @@ public class VistaSIR extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
+			OperationsType opt = OperationsType.UPDATE;
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
-			if(op.equals("IP")) {IP = chckbxIP.isSelected();}
+			
+			
 			//Avisa al controlador de cambios.
-			if(cm != null && op.equals("Aplicar") ) cm.doActionVistaSIR();
+			System.out.println("VistaSir > BotonL > OP: " + op);
+			if(op.equals("Aplicar")){
+				mapaFields.forEach((label,field) ->{
+					String valor = getLabel(label);
+					if(valor != null && !valor.equals("") && !checkValue(label)) {
+						setLabel(label,null);
+						cm.showMessage("El valor del campo " + Labels.getWord(label) + "  es incorrecto: " + valor, 0);
+					}				
+				});
+			}else if(op.equals(Labels.IP)) {IP = chckbxIP.isSelected();}
+			else if(((Component) evt.getSource()).isEnabled() ) opt = OperationsType.EXECUTE;
+			
+			cm.doActionVistaSIR(opt);
 			//Actualiza los controles.
-			refreshControls();
+			refresh();
 		}
 	}
 	

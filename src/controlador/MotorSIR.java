@@ -12,6 +12,7 @@ package controlador;
 import java.util.HashMap;
 
 import modelo.DCVS;
+import modelo.DCVSFactory;
 import modelo.Labels;
 import modelo.Zona;
 
@@ -30,11 +31,13 @@ public class MotorSIR {
 	private final double TR;													//Tasa de recuperación o curación.
 	private final double DME;													//Duración media de la enfermedad (en días).
 	private final boolean IP;													//Inmunidad Permanente.
-	private final double DMIP;													//Duración media de la inmunidad permanente.
+	private final double DMI;													//Duración media de la inmunidad permanente.
 	private final int NG;														//Número de grupos de población.
 	private DCVS matrizC;														//Matriz de contactos (relaciones).
 	private HashMap<Integer,Zona> zonas;										//Zonas o grupos de población.
-	private Labels labels;
+	private DCVS mHST;															//Módulo histórico a obtener.
+	private int FT;
+	private int IT;
 
 	/**
 	 * <p>Title: </p>  
@@ -44,23 +47,76 @@ public class MotorSIR {
 	 * @param pte Probabilidad de transmisión de la enfermedad (sin unidades).
 	 * @param dme Duración media de la enfermedad (en días).
 	 * @param ip Inmunidad Permanente.
-	 * @param dmip Duración media de la inmunidad permanente (en días).
+	 * @param dmi Duración media de la inmunidad permanente (en días).
 	 * @param zonas Conjunto de zonas representantes de los grupos de estudio.
 	 * @param matrizC Matriz de contactos de la simulación.
 	 */
-	public MotorSIR(Double pte, double dme, boolean ip, double dmip, HashMap <Integer,Zona> zonas, DCVS matrizC) {
+	public MotorSIR(Double pte, double dme, boolean ip, double dmi, HashMap <Integer,Zona> zonas, DCVS matrizC) {
+		new Labels();
 		this.PTE = pte;	
 		this.DME = dme;
 		this.TR = 1/dme;
 		this.IP = ip;
-		this.DMIP = dmip;
-		this.TVS = 1/dmip;
+		//En caso de haber Inmunidad permanente, se ignora el parámetro DMI.
+		if(IP) {this.DMI = 1;}
+		else this.DMI = dmi;
+		
+		this.TVS = 1/this.DMI;
 		this.zonas = zonas;
 		this.matrizC = matrizC;
 		this.NG = zonas.size();
-		this.labels = new Labels();
 	}
 	
+	
+	/**
+	 * <p>Title: readXs</p>  
+	 * <p>Description: Realiza lectura inicial de los valores SIR</p>
+	 * Almacena resultados en la tabla.
+	 * @param label Etiqueta S,R o I.
+	 */
+	private void readXs(String label) {
+		for(int i = 1; i<= zonas.size(); i++) {
+			Zona z = zonas.get(i);
+			String[] fila = {label + " " + z.getName(),null};
+			//Obtención de los datos SIR particulares para el instante de tiempo.
+			switch(label) {
+			case(Labels.S): fila[1] = "" + z.getS(); break;
+			case(Labels.I): fila[1] = "" + z.getI(); break;
+			case(Labels.R): fila[1] = "" + z.getR(); break;
+			}
+			mHST.addFila(fila);		
+		}
+	}
+	
+	/**
+	 * <p>Title: addLabels</p>  
+	 * <p>Description: Añade las etiquetas indicadas para cada grupo de población.</p> 
+	 * @param label Etiqueta
+	 * @see Labels 
+	 */
+	private void addLabels(String label) {
+		for(int i = 1; i<=NG; i++) {
+			mHST.addFila(new String[]{label + " " + zonas.get(i).getName(),null});
+		}
+	}
+
+	
+	private void setUpHST() {
+		this.mHST = DCVSFactory.newHST(FT +1);
+		//Leer datos iniciales.
+		readXs(Labels.S);
+		readXs(Labels.I);
+		readXs(Labels.R);
+		//
+		addLabels(Labels.P);
+		addLabels(Labels.TC);
+		addLabels(Labels.TCONTAGIO);
+		addLabels(Labels.CVS);
+		addLabels(Labels.CC);
+		addLabels(Labels.CI);
+		addLabels(Labels.C100K);
+	}
+
 	
 	/**
 	 * <p>Title: start</p>  
@@ -70,88 +126,132 @@ public class MotorSIR {
 	 * @param FT Tiempo final de la simulación.
 	 */
 	public void start(int IT, int FT) {
-		/* Los dos bucles anidados están en esta colocación en prevención de cálculos
-		 * relacionados entre diferentes zonas, puesto que una zona no debe calcular
-		 * toda la evolución sin tener en cuenta las demás de las que depende. */
-		for(int time = IT; time< FT; time++) {									//Bucle para todas las líneas de tiempo.
+		//Introducir datos de partida en la tabla.
+		this.IT = IT;
+		this.FT = FT;
+		setUpHST();
+		
+		for(int time = 1; time <= FT; time++) {									//Bucle para todas las líneas de tiempo.
 			//Cálculo de las prevalencias. Requiere cálculo antes que el resto.
+			//Cálculo P
 			calcP(time);
+			
 			for(int j = 1; j <= NG; j++) {										//Bucle para cada una de las zonas presentes.
 				Zona z = zonas.get(j);
+				String name = z.getName();	
+				
 				//Obtención de los datos SIR particulares para el instante de tiempo.
-				double s = z.getGrafica().getYValue(labels.getWord("S"), time);
-				double i = z.getGrafica().getYValue(labels.getWord("I"), time);
-				double r = z.getGrafica().getYValue(labels.getWord("R"), time);
+				//valor Sj.
+				int index = mHST.getFilaItem(Labels.S + " " + name);
+				double vs = Double.parseDouble((String) mHST.getValueAt(index, time));
+				//valor Ij.
+				index = mHST.getFilaItem(Labels.I + " " + name);
+				double vi = Double.parseDouble((String) mHST.getValueAt(index, time));
+				//valor Rj.
+				index = mHST.getFilaItem(Labels.R + " " + name);
+				double vr = Double.parseDouble((String) mHST.getValueAt(index, time));
+				//Prevalencias cargadas antes de entrar a este bucle.
+				
 				//Cálculo de TC particular.
-				double TC = addTCyP(z,time);
+				double TC = getTC(z,time);
+				int row = mHST.getFilaItem(Labels.TC + " " + name);
+				mHST.setValueAt("" + TC, row, time);
+				
 				//Cálculo TContagio
-				double TContagio = getTContagio(TC,PTE);
-				z.addNivel(labels.getWord("TCONTAGIO"), time, TContagio);
+				double TContagio = TC*PTE;
+				index = mHST.getFilaItem(Labels.TCONTAGIO + " " + name);
+				mHST.setValueAt("" + TContagio, index, time);
+				
 				//Cálculo CVS
-				double CVS = getCVS(TVS,r);
-				z.addNivel(labels.getWord("CVS"), time, CVS);
+				double CVS = TVS*vr;
+				index = mHST.getFilaItem(Labels.CVS + " " + name);
+				mHST.setValueAt("" + CVS, index, time);
+	
 				//Cálculo CC
-				double CC = getCVS(TR,i);
-				z.addNivel(labels.getWord("CC"), time, CC);
+				double CC = vi*TR;
+				index = mHST.getFilaItem(Labels.CC + " " + name);
+				mHST.setValueAt("" + CC, index, time);	
+				
 				//Cálculo CI
-				double CI = getCC(TContagio,s);
-				z.addNivel(labels.getWord("CI"), time, CI);
+				double CI = TContagio*vs;
+				index = mHST.getFilaItem(Labels.CI + " " + name);
+				mHST.setValueAt("" + CI, index, time);
+				
 				//Cálculo del nivel (casos por cada 100 mil habitantes)
-				double nivel = getCI100K(CI, s, i, r);
-				z.addNivel("Nivel", time, nivel);
+				double C100K = getCI100K(CI, vs, vi, vr);
+				index = mHST.getFilaItem(Labels.C100K + " " + name);
+				mHST.setValueAt("" + C100K, index, time);
 				
 				//Cálculo de los siguientes SIR (t+1).
-				z.addNivel(labels.getWord("S"), time+1 , CVS - CI );
-				z.addNivel(labels.getWord("I"), time+1 , CI - CC );
-				z.addNivel(labels.getWord("R"), time+1 , CC - CVS );	
+				//valor Sj.
+				if(time < FT) {
+					index = mHST.getFilaItem(Labels.S + " " + name);
+					vs = vs + CVS - CI;
+					mHST.setValueAt("" + vs, index, time + 1);
+					//valor Ij.
+					index = mHST.getFilaItem(Labels.I + " " + name);
+					vi = vi + CI - CC;
+					mHST.setValueAt("" + vi, index, time + 1);
+					//valor Rj.
+					index = mHST.getFilaItem(Labels.R + " " + name);
+					vr = vr +CC - CVS;
+					mHST.setValueAt("" + vr, index, time + 1);
+				}
 			}
 		}
+		
+		System.out.println("\nConfigurado para obtener Histórico de 10 posiciones\n=======================================\n");
+		System.out.println( mHST.toString() );
+		System.out.println( "\n===============================================\n");
 	}
 	
+	/**
+	 * <p>Title: calcP</p>  
+	 * <p>Description: Cálcula la prevalencia para un tiempo determinado.</p> 
+	 * @param time Slot de tiempo a usar para el cálculo.
+	 */
 	private void calcP(int time) {
-		for(int j = 1; j<= NG ;j++) {											//Indice de las columnas.
-			Zona z = zonas.get(j);
-			double s = z.getGrafica().getYValue(labels.getWord("S"), time);
-			double i = z.getGrafica().getYValue(labels.getWord("I"), time);
-			double r = z.getGrafica().getYValue(labels.getWord("R"), time);
-			double p = getPrevalencia(s,i,r);
-			//Almacenar la prevalencia particular calculada.
-			z.addNivel(labels.getWord("P"), time, p);
-			System.out.println("Prevalencia " + z.getName() + " : "+ p);
+		for(int j = 1; j<= NG; j++) {
+			String name = zonas.get(j).getName();
+			//valor Sj.
+			int index = mHST.getFilaItem(Labels.S + " " + name);
+			double vs = Double.parseDouble((String) mHST.getValueAt(index, time));
+			//valor Ij.
+			index = mHST.getFilaItem(Labels.I + " " + name);
+			double vi = Double.parseDouble((String) mHST.getValueAt(index, time));
+			//valor Rj.
+			index = mHST.getFilaItem(Labels.R + " " + name);
+			double vr = Double.parseDouble((String) mHST.getValueAt(index, time));
+			
+			//Guardar
+			index = mHST.getFilaItem(Labels.P + " " + name);
+			String valor = "" + getPrevalencia(vs,vi,vr);
+			mHST.setValueAt(valor, index, time);
 		}
 	}
 	
-	private double getCC(double tcontagio, double i) {return tcontagio*i;}
-	
-	private double getCVS(double tvs, double r) { return tvs*r;} 
-	
-	private double getTContagio(double tc, double pte) {return tc*pte;}
-	
 	/**
-	 * <p>Title: getTCyP</p>  
+	 * <p>Title: getTC</p>  
 	 * <p>Description: Cálcula la Tasa de Contactos de una zona y la almacena
 	 * en sus registros correspondientes.</p> 
 	 * @param z Zona o grupo de población de estudio.
-	 * @param ti Indice de tiempo del cálculo de donde extraer los datos para
+	 * @param time Indice de tiempo del cálculo de donde extraer los datos para
 	 * el cálculo presente.
 	 * @return El Tasa de contagios.
 	 */
-	private double addTCyP(Zona z, int ti) {
+	private double getTC(Zona z, int time) {
 		double sumTC = 0.0;
-		int id = z.getID(); 													//Coincide con el indice de la matrizC
-		for(int j = 0; j< NG ;j++) {											//Indice de las columnas.
-			Zona zAux = zonas.get(j+1);
-			/* Estos datos para la prevalencia ¿deben ser del tiempo en cálculo
-			 * o los datos anteriores (t-1)? */
-			double p = zAux.getGrafica().getYValue(labels.getWord("P"), ti);
-			//Almacenar la prevalencia particular calculada.
-			zAux.addNivel(labels.getWord("P"), ti, p);
-			//Ya cálculada se guarda 
-			sumTC += Double.parseDouble((String)matrizC.getValueAt(id-1, j)) * p;
+		int fila = z.getID() -1;												//Coincide con el indice de la matrizC
+		
+		for(int j = 1; j<= NG ;j++) {											//Indice de las columnas.																			
+			String name2 = zonas.get(j).getName();
+			//Obtener prevalencia actual de cada elemento..
+			int index = mHST.getFilaItem(Labels.P + " " + name2);
+			double p = Double.parseDouble((String) mHST.getValueAt(index, time));
+			//Ya cálculada añadir al sumatorio.
+			sumTC += Double.parseDouble((String)matrizC.getValueAt(fila, j)) * p;
 		}
-		//Guardar TC.
-		z.addNivel(labels.getWord("TC"), ti, sumTC);
-		System.out.println("TC " + z.getName() + " : " + sumTC);
+
 		return sumTC;
 	}
 	
@@ -179,32 +279,13 @@ public class MotorSIR {
 	private double getCI100K(double ci, double s, double i, double r) {return 100000*(ci/(s+i+r));}
 
 
-	
-	//Constantes.
-	
 	/**
-	 * @return Probabilidad de transmisión de la enfermedad.
+	 * <p>Title: getHST</p>  
+	 * <p>Description: Devuelve el histórico calculado con los parámetros de entrada</p> 
+	 * @return Módulo histórico en formato de tabla.
 	 */
-	public double getPTE() {return PTE;}
+	public DCVS getHST() {return mHST;}
 
-
-	/**
-	 * @return Duración media de la enfermedad (en días).
-	 */
-	public double getDME() {return DME;	}
-
-
-	/**
-	 * Devuelve la existencia o no de inmunidad permanente para la enfermedad estudiada.
-	 * @return TRUE si hay inmunidad permanente. False en otro caso.
-	 */
-	public boolean isIP() {	return IP;}
-
-
-	/**
-	 * @return Duración media de la inmunidad permanente en días.
-	 */
-	public double getDMIP() {return DMIP;}
 
 
 	/**
@@ -236,28 +317,16 @@ public class MotorSIR {
 		System.out.println("Matriz de contactos:\n" + matrizC.toString());
 		//ver grupos de población (zonas)
 		System.out.println("\nGrupos (" + NG + "):");
-		for(int i = 1; i<=NG; i++) {
-			System.out.println(zonas.get(i).toString());
-		}
+		for(int i = 1; i<=NG; i++) System.out.println(zonas.get(i).toString());
 		//Imprimir parámetros de la enfermedad:
 		System.out.println("\nParámetros de la enfermedad:");
 		System.out.println("PTE: " + PTE);
 		System.out.println("DME: " + DME);
 		System.out.println("IP: " + IP);
-		System.out.println("DMIP: " + DMIP);		
+		System.out.println("DMI: " + DMI);
 	}
 	
-	/**
-	 * <p>Title: abrirGraficas</p>  
-	 * <p>Description: Para pruebas, abre la/s gráfica de cada zona
-	 *  para comprobar valores.</p> 
-	 */
-	public void abrirGraficas() {
-		zonas.forEach((k,z) -> {
-			z.getGrafica().setVisible(true);
-		});
-	}
-	
+
 	/**
 	 * <p>Title: main</p>  
 	 * <p>Description: Función para las pruebas de implementación e integración. </p>
@@ -267,28 +336,23 @@ public class MotorSIR {
 	public static void main(String[] args) {
 		DCVS matrizC = new DCVS();
 		//Creación matriz de contactos.
-		matrizC.addCabecera(new String[] {"G1","G2","G3","G4"});				//Cabecera
-		matrizC.addFila(new String[] {"4","1","1","1"});
-		matrizC.addFila(new String[] {"0","4","2","2"});
-		matrizC.addFila(new String[] {"0","0","4","3"});
-		matrizC.addFila(new String[] {"0","0","0","4"});
+		matrizC.addCabecera(new String[] {"Grupos","G1","G2","G3","G4"});
+		matrizC.addFila(new String[] {"G1","4","1","1","1"});
+		matrizC.addFila(new String[] {"G2","1","4","2","2"});
+		matrizC.addFila(new String[] {"G3","1","2","4","3"});
+		matrizC.addFila(new String[] {"G4","1","2","3","4"});
 		
 		HashMap<Integer,Zona> zonas = new HashMap<Integer,Zona>();
 		//Creación de 4 zonas con las características de la prueba.
-		zonas.put(1,new Zona(1,"G1" , 1000,0 ,0,0,0,0,0, null));
-		zonas.put(2,new Zona(2,"G2" , 500,0 ,0,0,0,0,0, null));
-		zonas.put(3,new Zona(3,"G3" , 200,0 ,0,0,0,0,0, null));
-		zonas.put(4,new Zona(4,"G4" , 100,0 ,0,0,0,0,0, null));
-		//Configurar valores SIR iniciales.
-		zonas.get(1).setSIR(999,1,0);
-		zonas.get(2).setSIR(500,0,0);
-		zonas.get(3).setSIR(200,0,0);
-		zonas.get(4).setSIR(100,0,0);
-		//PTE,DME,IP,DMIP
+		zonas.put(1,new Zona(1,"G1" , 1000,0 ,999,1,0,0,0, null));
+		zonas.put(2,new Zona(2,"G2" , 500,0 ,500,0,0,0,0, null));
+		zonas.put(3,new Zona(3,"G3" , 200,0 ,200,0,0,0,0, null));
+		zonas.put(4,new Zona(4,"G4" , 100,0 ,100,0,0,0,0, null));
+		
+		//PTE,DME,IP,DMI
 		MotorSIR msir = new MotorSIR(0.05, 8, false, 50, zonas, matrizC);
-		msir.imprimirDatos();
-		msir.start(0, 2);
-//		msir.abrirGraficas();
+//		msir.imprimirDatos();
+		msir.start(0, 10);
 		System.exit(0);
 	}
 	

@@ -38,14 +38,9 @@ public class Zona {
 	private double P;
 	/** C100K Nivel de contagio de una poligono [0-9] */
 	private int C100K;
-	
-	
+		
 	// Lista de puntos que componen el poligono.
 	private ArrayList<Point> puntosPoligono;
-//	private final String SN = "Nivel";
-	/** Indica el valor del eje X para su representación de cada C100K en el eje Y. */
-	private int contadorN;
-	
 	private GraficasChart chart;
 	
 	/**
@@ -83,9 +78,6 @@ public class Zona {
 				"Nivel",
 				"Zona: " + name,
 				"Evolución pandemica." + " ID: " + ID);
-		this.contadorN = 0;														//Serie de niveles.
-		//Añadir los valores iniciales a la gráfica. Por tanto se añaden después de crearla.
-		setSIR(s,i,r);
 	}
 
 
@@ -115,39 +107,32 @@ public class Zona {
 		return txt;
 	}
 	
-	
-	/**
-	 * <p>Title: setSIR</p>  
-	 * <p>Description: Establece los valores iniciales Susceptibles, Recuperados
-	 * e Incidentes del grupo de población representado.</p> 
-	 * @param s Número de susceptibles.
-	 * @param i Número de incidentes o infectados.
-	 * @param r Número de recuperados o curados.
-	 */
-	public void setSIR(double s, double i, double r) {
-		Labels labels = new Labels();
-		addNivel(labels.getWord(Labels.S),0,s);
-		addNivel(labels.getWord(Labels.I),0,i);
-		addNivel(labels.getWord(Labels.R),0,r);
-		addNivel(labels.getWord(Labels.C100K),0,C100K);
-	}
-	
 	/**
 	 * <p>Title: addNivel</p>  
 	 * <p>Description: Añade un nuevo C100K a su hisstorico y establece el 
 	 * C100K añadido como C100K actual.</p>
 	 * @param name Nombre de la serie de datos al que añadir el nuevo C100K..
 	 * @param t Variable tiempo, indica el valor en el eje X de tiempo al que corresponderá el valor de la función.
-	 * @param valor Valor o C100K a añadir a dicha serie.
+	 * @param v Valor o C100K a añadir a dicha serie.
 	 */
-	public void addNivel(String name, int t, double valor) {
+	public void addNivel(String name, int t, double v) {
+		double valor = v;
+		//Obtener el nombre de la serie.
+		String serie = Labels.getWord(name);
+		//Si la etiqueta es de Nivel de contagio establecer valor en el atributo de la instancia.
 		if(name.equals(Labels.C100K)) {
-			chart.addPunto(name, contadorN, valor);
+			valor = valor/1000;
 			setNivel((int) valor);
-			contadorN++;			
-		}else chart.addPunto(name, t, valor);
+		}
+		else if(name.equals(Labels.CAB) || name.equals(Labels.TCS)) {
+			//Caso especial para etiquetas con dos operandos.
+			//Para una etiqueta adecuada hace falta indicar el grupo relacionado.
+			//Modificar el valor de la etiqueta.
+			serie = serie.replaceFirst("Z",name.split(" ")[2]);						
+		}
+		//Añadir el punto a la gráfica.
+		chart.addPunto(serie, t, valor);	
 	}
-	
 	
 	/* Funciones get y set de los atributos del grupo de población o zona. */ 
 	

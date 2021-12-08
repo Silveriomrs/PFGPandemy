@@ -100,9 +100,9 @@ public class Labels {
 	/** AREA Superficie de una zona.*/  
 	public final static String AREA = "AREA";
 	
-	private HashMap<String,String> dic;
+	private static HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;
-	private final String language = "Español";
+	private static final String language = "Español";
 	
 	/**
 	 * <p>Title: Labels</p>  
@@ -119,7 +119,7 @@ public class Labels {
 	 * <p>Description: Añade las etiquetas y sus correspondientes palabras en
 	 * el idioma destino. </p>
 	 */
-	private void addLabels(){
+	private static void addLabels(){
 		//Casos de.
 		dic.put(CC, "Casos de curación");
 		dic.put(CVS, "Casos de vuelta a la suceptibilidad");
@@ -174,13 +174,13 @@ public class Labels {
 	 * @param label Etiqueta a buscar dentro del diccionario.
 	 * @return TRUE si esta contenida (es válida). FALSE en otro caso.
 	 */
-	public boolean existLabel(String label) {return dic.containsKey(label);}
+	public static boolean existLabel(String label) {return dic.containsKey(label);}
 
 	/**
 	 * Devuelve el lenguaje del módulo.
 	 * @return El language de la aplicación
 	 */
-	public String getLanguage() {return language;}
+	public static String getLanguage() {return language;}
 	
 	/**
 	 * <p>Title: getWord</p>  
@@ -189,7 +189,7 @@ public class Labels {
 	 * @param label Etiqueta a buscar.
 	 * @return Cadena de texto con la frase en el idioma, null en otro caso.
 	 */
-	public String getWord(String label) {
+	public static String getWord(String label) {
 		String word = null;
 		if(dic.isEmpty()) addLabels();
 		if(existLabel(label)) word = dic.get(label);
@@ -198,11 +198,19 @@ public class Labels {
 	}
 
 	
+	/**
+	 * <p>Title: getKey</p>  
+	 * <p>Description: Devuelve la clave para un valor en el diccionario.</p>
+	 * Realiza una búsqueda comparando cada valor con la entrada proporcionada.
+	 *  Cuando encuentra la primera coincidencia, devuelve la clave asociada. 
+	 * @param word Texto a buscar.
+	 * @return La clave asociada a dicho texto. NULL en otro caso.
+	 */
 	public String getKey(String word) {
 		String label = null;
 		for (String clave:dic.keySet()) {
 			String valor = getWord(clave);
-			if(word.equals(word)) {return clave;}
+			if(valor.equals(word)) {return "" + clave;}
 		}
 		return label;
 	}
