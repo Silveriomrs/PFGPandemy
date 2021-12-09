@@ -183,10 +183,11 @@ public class VistaSIR extends JPanel{
 		int posY = lineaBase + 30*contador;
 		int w = 360;
 		int posX = 150;
-		jl = new JLabel(Labels.getWord(label));
+		String text = Labels.getWord(label);
+		jl = new JLabel(text);
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
-		if(label != null) jl.setToolTipText(Labels.getWord(label));
+		if(label != null) jl.setToolTipText(text);
 		panelCentral.add(jl);
 		return jl;
 	}
@@ -350,6 +351,13 @@ public class VistaSIR extends JPanel{
 		return resultado;
 	}
 	
+	/**
+	 * <p>Title: checkFields</p>  
+	 * <p>Description: Realiza un chequeo de todos los campos.</p>
+	 * En caso de que uno de los campos contenga un valor incorrecto retornará
+	 *  FALSE. 
+	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
+	 */
 	private boolean checkFields() {
 		boolean done = true;
 		for (String clave:mapaFields.keySet()) {

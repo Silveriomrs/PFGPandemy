@@ -211,6 +211,7 @@ public class ControladorModulos {
 		principal.refresh();
 		paleta.refresh();
 		vistaSIR.reset();
+		pproyecto.refresh();
 		pgrupos.refresh();
 	}
 	
@@ -489,6 +490,9 @@ public class ControladorModulos {
 			case "Nuevo Proyecto":
 				generarModulosBasicos();
 				break;
+			case "Guardar Proyecto":
+				saveProjectAs(modulos.get(TypesFiles.PRJ));
+				break;
 			case "Salir":
 				if(showMessage("Los cambios no guardados se perderán\n¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
@@ -496,7 +500,7 @@ public class ControladorModulos {
 				about.toggleVisible();
 				break;
 			default:
-				System.out.println("Controlador Modulos > doPrincipal: " + nombre + ", tipo no reconocido");
+				System.out.println("Controlador Modulos > doPrincipal: " + nombre + ", opción no reconocida");
 		}
 	}
 	

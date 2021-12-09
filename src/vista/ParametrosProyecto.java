@@ -193,7 +193,7 @@ public class ParametrosProyecto extends JPanel {
 			textArea.setText(cm.getValueFromLabel(tipo,Labels.DESCRIPTION));
 			fTFVersion.setText(cm.getValueFromLabel(tipo,Labels.VERSION));
 			dateChooser0.setDate(stringToDate(cm.getValueFromLabel(tipo,Labels.DATE0)));
-			dateChooser0.setDate(stringToDate(cm.getValueFromLabel(tipo,Labels.DATE0)));
+			dateChooser1.setDate(stringToDate(cm.getValueFromLabel(tipo,Labels.DATE1)));
 		}
 		fTFNGrupos.setText("" + cm.getNumberZonas());
 	}

@@ -193,7 +193,7 @@ public class Labels {
 		String word = null;
 		if(dic.isEmpty()) addLabels();
 		if(existLabel(label)) word = dic.get(label);
-		else System.out.println("No está agregada al diccionario: " + label);
+		else if(label != null) System.out.println("No está agregada al diccionario: " + label);
 		return word;
 	}
 

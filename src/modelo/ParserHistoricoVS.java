@@ -189,13 +189,12 @@ public class ParserHistoricoVS {
 		ArrayList<String> lista = new ArrayList<String>();
 		lista.add(Labels.PTE);
 		lista.add(Labels.DME);
-		
 		//Procesar la lista añadiendo dichos campos al módulo mDEF.
 		for(int i = 0; i<lista.size(); i++) {
 			String etiqueta = lista.get(i);
 			String value = "0";													//En caso de no estar, se configurará a 0.
 			int pos = dcvs.getFilaItem(etiqueta);		
-			if(pos > -1) {value = (String) dcvs.getValueAt(pos, 1);}
+			if(pos > -1) {value = ((String) dcvs.getValueAt(pos, 1)).replace(",", ".");}
 			mDEF.setDataToLabel(etiqueta, value);
 		}
 		
@@ -270,11 +269,11 @@ public class ParserHistoricoVS {
 		String value = "0";
 		//Realización al corte de la búsqueda, por eficiencia y por peso de etiqueta.
 		int pos = dcvs.getFilaItem(Labels.DMI);
-		if( pos > -1) {	value = (String) dcvs.getValueAt(pos,1);	}
+		if( pos > -1) {	value = ((String) dcvs.getValueAt(pos,1)).replace(",", ".");	}
 		else if(getPosOp(Labels.TVS) > 0) {
 			//En este caso hay que realizar la operación matemática inversa a su valor.
 			pos =  getPosOp(Labels.TVS);
-			value = (String) dcvs.getValueAt(pos,1);
+			value = ((String) dcvs.getValueAt(pos,1)).replace(",", ".");
 			double d = Double.parseDouble(value);
 			value = "" +  1/d;
 		}	

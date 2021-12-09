@@ -123,8 +123,7 @@ public class Zona {
 		if(name.equals(Labels.C100K)) {
 			valor = valor/1000;
 			setNivel((int) valor);
-		}
-		else if(name.equals(Labels.CAB) || name.equals(Labels.TCS)) {
+		}else if(name.equals(Labels.CAB) || name.equals(Labels.TCS)) {
 			//Caso especial para etiquetas con dos operandos.
 			//Para una etiqueta adecuada hace falta indicar el grupo relacionado.
 			//Modificar el valor de la etiqueta.
