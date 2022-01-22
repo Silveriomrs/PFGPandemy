@@ -377,13 +377,12 @@ public class ParserProyectoVS {
 				valor =  Double.parseDouble(s);
 				String etiqueta = Labels.getWord(op);							//Obtener el valor de la etiqueta.	
 				//Caso especial para etiquetas con dos operandos.
-				if( op.equals("CAB") || op.equals("TCS")) {
-//					if(traza) System.out.println("ParserProyecto > addSerieXs: " + et + " > col: " + col +	" fila: " + contador + " - " + etiqueta + ", Valor: " + valor);
+				if( op.equals(Labels.CAB) || op.equals(Labels.TCS)) {
 					etiqueta = etiqueta.replaceFirst("Z",getSecondID(et));
 				}
 				//Si etiqueta es nulo usar el pasado por parámetro.
 				if(etiqueta == null ) etiqueta = et;							
-				if(s != null && !s.equals("")) z.addNivel(etiqueta, contador,valor);
+				z.addNivel(etiqueta, contador,valor);
 			}else { correcto = false; }											//Si un valor leído no es válido no continuar con la lectura.
 			//Siguiente línea.
 			contador++;
@@ -617,8 +616,6 @@ public class ParserProyectoVS {
 	/**
 	 * @return El historico con la representación de nivel de contagio.
 	 */
-	public DCVS getHistorico() {
-//		System.out.println(historico.toString());
-		return historico;}
+	public DCVS getHistorico() {return historico;}
 	
 }

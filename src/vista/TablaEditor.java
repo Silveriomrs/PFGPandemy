@@ -56,7 +56,7 @@ public class TablaEditor extends JPanel{
 	//
 	private final String IVentana = "/vista/imagenes/Iconos/editorGrafico_128px.png";
 	//
-	private JButton btnAbrirArchivo,btnGuardarArchivo,btnGuardarCambios,btnBorrarTabla,btnImprimir;
+	private JButton btnGuardarArchivo,btnGuardarCambios,btnBorrarTabla;
 	private JButton btnAddRow,btnAddCol,btnNuevaTabla,btnBorrarFila,btnBorrarColumna;
 	private JScrollPane scrollPane;
 	private JTable tabla;
@@ -164,23 +164,22 @@ public class TablaEditor extends JPanel{
 		jtoolBar.setForeground(Color.BLACK);
 		jtoolBar.setName("Barra Herramientas");
 		jtoolBar.setOpaque(false);
-		jtoolBar.setOrientation(JToolBar.VERTICAL);
 
 		//Añadir los botones
-		btnNuevaTabla = addBotonToolBar(btnNuevaTabla, "Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaMouseListener(),Color.GREEN);
-		btnAddRow= addBotonToolBar(btnAddRow, "Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowMouseListener(),null);
-		btnAddCol = addBotonToolBar(btnAddCol, "Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColMouseListener(),null);
+		btnNuevaTabla = addBotonToolBar("Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaMouseListener(),Color.GREEN);
+		btnAddRow= addBotonToolBar("Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowMouseListener(),null);
+		btnAddCol = addBotonToolBar("Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColMouseListener(),null);
 		jtoolBar.addSeparator();
-		btnBorrarFila = addBotonToolBar(btnBorrarFila, "Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaMouseListener(),Color.ORANGE);
-		btnBorrarColumna = addBotonToolBar(btnBorrarColumna, "Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaMouseListener(),Color.ORANGE);
-		btnBorrarTabla = addBotonToolBar(btnBorrarTabla, "Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaMouseListener(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar("Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaMouseListener(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar("Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaMouseListener(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar("Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaMouseListener(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		btnGuardarCambios = addBotonToolBar(btnGuardarCambios, "Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosMouseListener(),null);
-		btnGuardarArchivo = addBotonToolBar(btnGuardarArchivo, "Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoMouseListener(),null);
-		btnAbrirArchivo = addBotonToolBar(btnAbrirArchivo, "Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoMouseListener(),null);
+		btnGuardarCambios = addBotonToolBar("Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosMouseListener(),null);
+		btnGuardarArchivo = addBotonToolBar("Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoMouseListener(),null);
+		addBotonToolBar("Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoMouseListener(),null);
 		jtoolBar.addSeparator();
-		btnImprimir = addBotonToolBar(btnImprimir, "Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirMouseListener(),null);
+		addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirMouseListener(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -193,7 +192,6 @@ public class TablaEditor extends JPanel{
 		btnAsignarTabla = new JButton("Aplicar tipo");
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAsignarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
-		//jtoolBar.add(btnAplicarTabla);
 		
 		lblAsignarTablaA = new JLabel("Asignar a modulo:");
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
@@ -261,18 +259,16 @@ public class TablaEditor extends JPanel{
 	 * <p>Description: Añade los controles la barra de herramietnas que los contendrá</p>
 	 * Los añade con el formato correcto y una separación costante, además,
 	 * permite que los botones puedan tener colores personalizados.
-	 * @param btn Botón a ser añadido.
 	 * @param tooltip Texto de ayuda al botón.
 	 * @param ruta Ruta completa hasta el archivo de imagen.
 	 * @param ml El observador o listener adjunto al botón.
 	 * @param c Color para el botón, null en otro caso.
 	 * @return JButton modificado con las propiedades requeridas.
 	 */
-	private JButton addBotonToolBar(JButton btn, String tooltip,String ruta, MouseAdapter ml, Color c) {
+	private JButton addBotonToolBar(String tooltip,String ruta, MouseAdapter ml, Color c) {
 		int hi,wi;
 		hi = wi =  25;
-		btn = new JButton();
-		//btn.setSize(new Dimension(102, 25));
+		JButton btn = new JButton();
 		btn.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btn.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		btn.setHorizontalAlignment(SwingConstants.LEFT);
@@ -366,7 +362,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				try {tabla.print();}
-				catch (PrinterException e1) {e1.printStackTrace();}
+				catch (PrinterException e1) {System.out.println("Error dealing with the printer.");}
 			}
 		}
 	}
@@ -425,8 +421,6 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
 				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-//				dcvs.setModelo(tabla.getModel());
-//				* Ver si se realizan los cambios en dvs sin necesidad de establecer sobre si mismo el modelo en dcvs
 				if(dcvs.getRowCount() >0) {
 					String rutaF = cio.guardarArchivo(dcvs);
 					if(rutaF != null) {

@@ -313,7 +313,8 @@ public class Player extends JPanel implements ActionListener{
 			while(!encontrado) {
 				String f = (String) historico.getValueAt(aux, 0);				//Obtención de la fecha almacenada en la posición 0 de la línea.
 				dAux = stringToDate(f);
-				int resultado = dAux.compareTo(d);
+				int resultado = 0;
+				if(dAux != null) resultado = dAux.compareTo(d);
 				if(resultado < 0) {												//Si Aux es anterior a la fecha búscada
 					inferior = linea = aux;										//Ajuste de margenes inferiores de la búsqueda.
 					aux += (superior -aux)/2;									//Nuevo punto de búsqueda.
@@ -340,11 +341,10 @@ public class Player extends JPanel implements ActionListener{
 	@SuppressWarnings("finally")
 	private Date stringToDate(String fecha){
 		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
-		 Date date = null;
+		 Date date = new Date();
 		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
 		 catch (ParseException ex) {
 			System.out.println("Player > stringToDate > Valor de fecha incorrecto: " + fecha );
-		 	date = new Date();
 		 }
 		 finally {return date;}
 	}
@@ -429,13 +429,10 @@ public class Player extends JPanel implements ActionListener{
 				
 				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
 				Date d = stringToDate(s);
-//				System.out.println("Player > Fecha búscada  : " + formato.format(f));		
-//				System.out.println("Player > Fecha propuesta: " + formato.format(d));
-//				System.out.println("Player > Línea calculada: " + linea);
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador
 				play(contador);
-				if(d.compareTo(f) < 0) {dateChooser.setDate(d);	}				//Caso tener la fecha, actualiza con la más cercana inferior..	
+				if(d != null && d.compareTo(f) < 0) {dateChooser.setDate(d);	}				//Caso tener la fecha, actualiza con la más cercana inferior..	
 			}
 		}
 	}

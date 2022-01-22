@@ -68,8 +68,8 @@ public class VistaZona extends JPanel {
 	private JTextField tf_P;
 	private JTextField tf_C100K;
 	//
-	private int posXL = 15;
-	private int gap = 20;
+	private static final int posXL = 15;
+	private static final int gap = 20;
 
 	/**
 	 * Creación del panel con la vista de una zona.
@@ -124,15 +124,15 @@ public class VistaZona extends JPanel {
 		int posY = 18;
 		int alto = 19;
 		int ancho = 150;
-		tf_ID = iniciarTextField(tf_ID, "ID",posX, posY, 114, alto);
-		tf_NAME = iniciarTextField(tf_NAME,"Nombre",posX, posY + gap*1, ancho, alto);
-		tf_PEOPLE = iniciarTextField(tf_PEOPLE,"Población",posX, posY + gap*2, ancho, alto);
-		tf_AREA = iniciarTextField(tf_AREA,"Superficie",posX, posY + gap*3, ancho, alto);
-		tf_S = iniciarTextField(tf_S,"Susceptibles",posX, posY + gap*4, ancho, alto);
-		tf_I = iniciarTextField(tf_I,"Infectados",posX, posY + gap*5, ancho, alto);
-		tf_R = iniciarTextField(tf_R,"Recuperados",posX, posY + gap*6, ancho, alto);
-		tf_P = iniciarTextField(tf_P,"Prevalencia",posX, posY + gap*7, ancho, alto);
-		tf_C100K = iniciarTextField(tf_C100K,"Nivel",152, posY + gap*8, 114, 19);	
+		tf_ID = iniciarTextField("ID",posX, posY, 114, alto);
+		tf_NAME = iniciarTextField("Nombre",posX, posY + gap*1, ancho, alto);
+		tf_PEOPLE = iniciarTextField("Población",posX, posY + gap*2, ancho, alto);
+		tf_AREA = iniciarTextField("Superficie",posX, posY + gap*3, ancho, alto);
+		tf_S = iniciarTextField("Susceptibles",posX, posY + gap*4, ancho, alto);
+		tf_I = iniciarTextField("Infectados",posX, posY + gap*5, ancho, alto);
+		tf_R = iniciarTextField("Recuperados",posX, posY + gap*6, ancho, alto);
+		tf_P = iniciarTextField("Prevalencia",posX, posY + gap*7, ancho, alto);
+		tf_C100K = iniciarTextField("Nivel",152, posY + gap*8, 114, 19);	
 		
 		JButton btnAplicar = new JButton("Aplicar Cambios");
 		btnAplicar.addMouseListener(new BotonL());
@@ -209,8 +209,8 @@ public class VistaZona extends JPanel {
 		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
 	
-	private JTextField iniciarTextField(JTextField jtf, String tt, int posX, int posY, int wi, int hi){
-		jtf = new JTextField();
+	private JTextField iniciarTextField(String tt, int posX, int posY, int wi, int hi){
+		JTextField jtf = new JTextField();
 		jtf.setEnabled(true);
 		jtf.setBounds(posX,posY,wi,hi);
 		jtf.setColumns(10);
@@ -271,13 +271,11 @@ public class VistaZona extends JPanel {
 		/** serialVersionUID*/  
 		private static final long serialVersionUID = 1575177244442912505L;
 		private JLabel lblSinPoligono;
-		private final int x = posXL;
-		private final int y = 12*gap;
 		private final int h = 250;
 		private final int w = 225;
 
 		public PanelPoligono() {
-			setBounds(x, y, w, h);
+			setBounds(posXL, 12*gap, w, h);
 			setLayout(null);	
 			//Etiqueta para mostrar en caso de falta de poligono.
 			lblSinPoligono = new JLabel();

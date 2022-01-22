@@ -52,16 +52,17 @@ public class IO{
 	 * @param ext extensión del archivo.
 	 * @return tabla de datos en formato ArrayList de ArrayList (ColumnasxFilas),
 	 *  null en otro caso.
+	 * @throws IOException  Ecepción en caso de que el fichero no sea legible desde el dispositivo.
 	 */
-	public DCVS abrirArchivo(String ruta, String ext) {
+	public DCVS abrirArchivo(String ruta, String ext) throws IOException {
 		DCVS dcvs = null;
 		String ruta2 = ruta;
+		CSVReader lectorCSV = null;
 		File f = getFile(1,ruta,ext);
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
-				CSVReader lectorCSV =  new CSVReader(new FileReader(f));		//Abrir el archivo.
+				lectorCSV =  new CSVReader(new FileReader(f));									//Abrir el archivo.
 				List<String[]> datos = lectorCSV.readAll();
-				lectorCSV.close();
 				if(ruta == null) ruta2 = f.getPath();
 				dcvs = new DCVS();
 				dcvs.crearModelo(datos);
@@ -72,8 +73,11 @@ public class IO{
 				dcvs.setDirectorio(WorkingDirectory);
 				dcvs.setDate("" + f.lastModified());
 			}
-			catch (IOException e) {e.printStackTrace();}
-			catch (CsvException e) {e.printStackTrace();}
+			catch (IOException e) {System.out.println("Error trying to open a file.");}
+			catch (CsvException e) {System.out.println("Error trying to open a CSV file.");}
+			finally {
+				if(lectorCSV != null) lectorCSV.close();
+			}
 		}
 		return dcvs;
 	}
@@ -113,9 +117,8 @@ public class IO{
 		    	ruta2 = f.getPath();
 		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
 		    	fw.write(bd);													//Escribimos el texto en el fichero.
-		    	fw.close();	 													//Cierre del escritor de fichero.
 		    	ruta2 = f.getName();											//Ahora devolvemos el nombre del fichero.
-		    } catch (IOException e1) {e1.printStackTrace();}
+		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
 		}
 		return ruta2;
 	}
@@ -124,7 +127,7 @@ public class IO{
 	private File getFile(int sel, String path,String ext) {
 		File f = null;
 		String ruta = path;
-		if(ruta == null || ruta == "") {ruta = selFile(sel,ext);}				// Obtención del archivo.	
+		if(ruta == null || ruta.equals("")) {ruta = selFile(sel,ext);}				// Obtención del archivo.	
 		if(ruta != null) f = new File(ruta);
 		return f;
 	}
@@ -183,10 +186,6 @@ public class IO{
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
 		if(ext.equals(TypesFiles.IMG) && !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
-			System.out.println("Tipo de imagen incorrecto: " + ext2);
-			ok = false;
-		}else if(!ext.equals(TypesFiles.IMG) && !ext.equals(ext2)) {												//Comprobación de elección de archivo correcta.
-			System.out.println("Tipo de fichero sin extensión conocida: " + ext2);
 			ok = false;
 		}
 		return ok;
@@ -202,14 +201,11 @@ public class IO{
 	 * @return imagen leído desde el dispostivo. Null en otro caso.
 	 */
 	public static Image getImagen(String ruta, boolean escalado, int w, int h) {
-		//System.out.println(ruta);
 		Image img = null;
 		try {
 			img = new ImageIcon(IO.class.getResource(ruta)).getImage();
 			if(escalado) img = img.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
 		}catch(Exception e) {
-			e.printStackTrace();
-			System.out.println("Imagen no cargada");
 			return img;
 		}
 		return img;

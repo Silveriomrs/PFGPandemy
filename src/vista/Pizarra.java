@@ -610,7 +610,7 @@ public class Pizarra extends JFrame {
 			IO io = new IO();													//Sin esta ininicialización previa, no es posible cargar una imagen de fondo.
     		String ruta = IO.selFile(1, TypesFiles.IMG);
     		// En caso de tener una ruta correcta se procede a la carga.
-    		if(ruta != null && ruta != "") {
+    		if(ruta != null && !ruta.equals("")) {
     			fondo = new ImageIcon(ruta).getImage();
 //    			fondo = IO.getImagen(ruta,false, 0, 0);
     			dibujarZonas();

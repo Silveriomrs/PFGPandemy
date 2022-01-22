@@ -44,7 +44,7 @@ public class Principal extends JFrame {
 	private JPanel panelCentral;
 	private ControladorModulos cm;
 	//
-	private JMenuBar menuBar;
+	private JMenuBar mBar;
 
 	/**
 	 * Crea el módulo principal de la aplicación.
@@ -54,7 +54,8 @@ public class Principal extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
 		int w = 1024;
 		int h = 768;
-		this.cm = cm;	
+		this.cm = cm;
+		//Configurar frame.
 		this.setTitle("Simulación de enfermedades transmisibles en varios grupos de población");
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
@@ -83,7 +84,7 @@ public class Principal extends JFrame {
 		panelCentral.setLayout(new BorderLayout(0, 0));
 
 		//Añadir elementos al JPanel principal.
-		fondo.add(menuBar, BorderLayout.NORTH);
+		fondo.add(mBar,BorderLayout.NORTH);
 		fondo.add(panelCentral, BorderLayout.CENTER);
 	}
 	
@@ -104,11 +105,8 @@ public class Principal extends JFrame {
 	 */
 	private void iniciarMenuBar() {
 		//Inicializar el HashMap
-		jmitems = new HashMap<String,JMenuItem>();
-		//Barra de menus.
-		menuBar = new JMenuBar();
-		getContentPane().add(menuBar, BorderLayout.NORTH);
-
+		this.jmitems = new HashMap<String,JMenuItem>();
+		this.mBar = new JMenuBar();
 		//Menu Archivo
 		JMenu mnArchivo = new JMenu("Archivo");
 		addJMenuItem(mnArchivo, "Nuevo Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
@@ -146,10 +144,10 @@ public class Principal extends JFrame {
 		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
 		
 		//Añadir sub-menus a la barra de menus.
-		menuBar.add(mnArchivo);
-		menuBar.add(mnVer);
-		menuBar.add(mnHerramientas);
-		menuBar.add(mnAyuda);
+		mBar.add(mnArchivo);
+		mBar.add(mnVer);
+		mBar.add(mnHerramientas);
+		mBar.add(mnAyuda);
 		
 		//Configurar estados de cada JMenuItem y/o sus menús según el contexto.
 		actualizarJMItems();

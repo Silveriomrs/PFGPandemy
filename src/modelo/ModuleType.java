@@ -35,7 +35,9 @@ public enum ModuleType {
 	/** Definición Relaciones entre zonas */
 	REL("Relaciones"),
 	/** Definición grupos (zonas) de estudio */
-	GRP("Grupos");
+	GRP("Grupos"),
+	/** Reproductor de histórico PLAYER*/  
+	PLAYER("Player");
 
     private final String display;
     private ModuleType(String s) { display = s; }

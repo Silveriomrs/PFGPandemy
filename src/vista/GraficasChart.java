@@ -246,7 +246,6 @@ public class GraficasChart{
 			try{y = tmp[1][x];}
 			catch(Exception e) {
 				System.out.println("GraciasChart > getYValue : Valores incorrectos: " + serie + " size: " + size + " X: "+ x);
-				e.printStackTrace();
 			}
 		}
 		return y;

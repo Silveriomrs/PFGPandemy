@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.HashMap;
-
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
@@ -17,6 +16,7 @@ import modelo.DCVS;
 import modelo.DCVSFactory;
 import modelo.IO;
 import modelo.Labels;
+import modelo.ModuleType;
 import modelo.OperationsType;
 import modelo.ParserHistoricoVS;
 import modelo.ParserPoly;
@@ -66,20 +66,14 @@ public class ControladorModulos {
 	//Obtener dimensiones de la pantalla para controlar donde aparecen los módulos.
 	Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
 
-	
-	/** LEYENDA referencia una paleta de colores o paleta*/  
-	public final static String LEYENDA = "paleta";
-	/** MAPA referencia a el módulo de mapa*/  
-	public final static String MAPA = "mapa";
-	/** REPRODUCTOR referencia al player o módulo del reproductor*/  
-	public final static String REPRODUCTOR = "player";
-	//"reproductor", "paleta", "mapa"
 	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/  
 	public final static Dimension FrameDim = new Dimension(1024, 768);
 	/** PanelCentralDim Dimensión del panel central para estandarizar el aspecto de los diferentes paneles de toda la aplicación */  
 	public final static Dimension PanelCentralDim = new Dimension(1024, 768);
 	/** MinDim damaño mínimo para todo marco o panel de la aplicación*/  
 	public final static Dimension MinDim = new Dimension(800, 600);
+
+	private final String separador = System.getProperty("file.separator");
 	
 	private int w = 1024;
 	private int h = 768;
@@ -141,8 +135,8 @@ public class ControladorModulos {
 	}
 	
 	private void generarModuloPAL() {
-		DCVS paleta = DCVSFactory.newModule(TypesFiles.PAL);
-		establecerDatos(paleta);
+		DCVS pal = DCVSFactory.newModule(TypesFiles.PAL);
+		establecerDatos(pal);
 	}
 	
 	/**
@@ -197,7 +191,7 @@ public class ControladorModulos {
 	
 			//Ruta absoluta.
 			module.setRuta(module.getDirectorio() +
-					System.getProperty("file.separator") + module.getNombre());
+					separador + module.getNombre());
 		}
 	}
 	
@@ -347,20 +341,26 @@ public class ControladorModulos {
 	 * decir, la posición 0 reservada al ID, la posición 1 reservada al nombre,
 	 * las siguientes posiciones representan cada uno de los puntos que conforman
 	 * el poligono.
-	 * @return Devuelve la zona creada para dicho poligono.
+	 * @return Devuelve la zona creada para dicho poligono. Null en otro caso.
 	 */
 	private Zona parser(String[] puntos) {
-		int id = Integer.parseInt(puntos[0]);
-		String nombre = puntos[1];
-		int habitantes =  Integer.parseInt(puntos[2]);
-		int superficie =  Integer.parseInt(puntos[3]);
-		double s0 =  Double.parseDouble(puntos[4]);
-		double i0 =  Double.parseDouble(puntos[5]);
-		double r0 =  Double.parseDouble(puntos[6]);
-		double p0 = Double.parseDouble(puntos[7]);
-		int c100k =  Integer.parseInt(puntos[8]);
+		Zona z = null;
+		try {
+			int id = Integer.parseInt(puntos[0]);
+			String nombre = puntos[1];
+			int habitantes =  Integer.parseInt(puntos[2]);
+			int superficie =  Integer.parseInt(puntos[3]);
+			double s0 =  Double.parseDouble(puntos[4]);
+			double i0 =  Double.parseDouble(puntos[5]);
+			double r0 =  Double.parseDouble(puntos[6]);
+			double p0 = Double.parseDouble(puntos[7]);
+			int c100k =  Integer.parseInt(puntos[8]);
+			z = new Zona(id,nombre,habitantes,superficie,s0,i0,r0,p0,c100k,parserPoly.parser(puntos,9));
+		}catch(Exception e) {
+			return null;
+		}
 		
-		return new Zona(id,nombre,habitantes,superficie,s0,i0,r0,p0,c100k,parserPoly.parser(puntos,9));
+		return z;
 	}
 
 	/*  Métodos relacionados con la reproducción  */
@@ -371,23 +371,23 @@ public class ControladorModulos {
 	 *  posición de la pantalla, este método no hace por si solo visible el marco. </p>
 	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA". Los cuales
 	 * son los nombres de los módulos externos a la aplicación.
-	 * @param nombre Nombre identificador del módulo a posicionar.
+	 * @param modulo identificador del módulo a posicionar. @see ModuleType
 	 * @param posX Posición X a establacer.
 	 * @param posY Posición Y a establecer.
 	 */
-	private void situarVentana(String nombre, int posX, int posY) {
-		switch(nombre) {
-		case REPRODUCTOR:
+	private void situarVentana(ModuleType modulo, int posX, int posY) {
+		switch(modulo) {
+		case PLAYER:
 			player.setPosicion(posX, posY);
 			break;
-		case LEYENDA:
+		case PAL:
 			paleta.setPosicion(posX, posY);
 			break;
-		case MAPA:
+		case MAP:
 			mapa.setPosicion(posX, posY);
 			break;
 		default:
-			System.out.println("Valor en el controlador de mapa no establecido: " + nombre);
+			System.out.println("Valor en el controlador de mapa no establecido: " + modulo);
 		}
 	}
 	
@@ -435,7 +435,7 @@ public class ControladorModulos {
 		//
 		switch(nombre){
 			case "Reproductor":
-				situarVentana(ControladorModulos.REPRODUCTOR, principal.getX() - 350, principal.getY() + h/3);
+				situarVentana(ModuleType.PLAYER, principal.getX() - 350, principal.getY() + h/3);
 				play();
 				mostrarPanel("Mapa");
 				break;
@@ -444,12 +444,12 @@ public class ControladorModulos {
 				this.pizarra.toogleVisible();
 				break;
 			case "Editor Paleta":
-				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
+				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(true);
 				paleta.setFrameVisible(true);
 				break;
 			case "Paleta":
-				situarVentana(LEYENDA, principal.getX() + w + 10, principal.getY());
+				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(false);
 				paleta.toggleFrameVisible();
 				break;
@@ -604,7 +604,7 @@ public class ControladorModulos {
 			//Obtener nuevo nombre y directorio de trabajo usado en este guardado.
 			String wd = IO.WorkingDirectory;
 			//Configuración de la ruta
-			dcvs.setRuta(wd + System.getProperty("file.separator") + name);
+			dcvs.setRuta(wd + separador + name);
 			dcvs.setName(name);
 			dcvs.setDirectorio(wd);
 			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
@@ -665,7 +665,7 @@ public class ControladorModulos {
 	public void abrirProyecto(DCVS dcvs) {
 		int NG = 0;																//Número de zonas que tiene definido el proyecto.
 		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
-		String wd = IO.WorkingDirectory + System.getProperty("file.separator");
+		String wd = IO.WorkingDirectory + separador;
 		//Reiniciar todas las vistas y borrar datos anteriores.
 		clearProject();	
 
@@ -837,7 +837,7 @@ public class ControladorModulos {
 	 */
 	private void regenerarModuloBasico(String type) {
 		switch(type) {
-		case(TypesFiles.MAP): generarModuloMAP();								//Generar un mapa => generar Relaciones también.
+		case(TypesFiles.MAP): generarModuloMAP(); generarModuloREL(); break;	//Generar un mapa => generar Relaciones también.
 		case(TypesFiles.REL): generarModuloREL(); break;
 		case(TypesFiles.DEF): generarModuloDEF(); break;
 		case(TypesFiles.PAL): generarModuloPAL(); break;						//Efecto de restablecer valores por defecto.
@@ -954,12 +954,14 @@ public class ControladorModulos {
 	 */
 	public boolean doActionTableEditor(DCVS modulo) {
 		boolean done = true;
-		if(modulo != null) {done = establecerDatos(modulo);}
-		//indicar al módulo de archivos que modulo se ha modificado para activar 
-		//El botón de guardar correspondiente.
-		archivos.enableBotonesGuardado(modulo.getTipo(), true);
-		refresh();
+		if(modulo != null) {
+			done = establecerDatos(modulo);
+			//indicar al módulo de archivos que modulo se ha modificado para activar 
+			//El botón de guardar correspondiente.
+			archivos.enableBotonesGuardado(modulo.getTipo(), true);
+		}
 		
+		refresh();	
 		return done;
 	}
 

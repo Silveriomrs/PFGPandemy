@@ -37,8 +37,8 @@ public class Paleta extends JPanel{
 	private HashMap<String,JButton> mapaBotones;
 	private ControladorModulos cm;
 	private static final long serialVersionUID = 3521309276542156368L;
-	private int width;
-	private int height;
+	private int w;
+	private int h;
 	private boolean editable;
 	
 	/**
@@ -52,8 +52,8 @@ public class Paleta extends JPanel{
 	public Paleta(ControladorModulos cm,int width, int height) {
 		super();
 		this.cm = cm;
-		this.width = width;
-		this.height = height;
+		this.w = width;
+		this.h = height;
 		this.editable = false;
 		this.mapaBotones = new HashMap<String, JButton>();
 		
@@ -74,7 +74,7 @@ public class Paleta extends JPanel{
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
 		frame.setTitle("Paleta");												//Establecimiento del título.
-		frame.setSize(width,height);											//Establecimiento de las dimensiones.
+		frame.setSize(w,h);											//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
 		frame.setAlwaysOnTop(false);

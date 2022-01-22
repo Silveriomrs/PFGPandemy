@@ -210,7 +210,7 @@ public class Labels {
 		String label = null;
 		for (String clave:dic.keySet()) {
 			String valor = getWord(clave);
-			if(valor.equals(word)) {return "" + clave;}
+			if(valor != null && valor.equals(word)) {return "" + clave;}
 		}
 		return label;
 	}

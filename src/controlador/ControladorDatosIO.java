@@ -5,6 +5,8 @@
  */
 package controlador;
 
+import java.io.IOException;
+
 import modelo.DCVS;
 import modelo.IO;
 
@@ -33,7 +35,9 @@ public class ControladorDatosIO {
 	 * @return DefaultTableModel modelo con los datos del archivo abierto.
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
-		DCVS dcvs =  io.abrirArchivo(ruta,ext);
+		DCVS dcvs = null;
+		try {dcvs = io.abrirArchivo(ruta,ext);}
+		catch (IOException e) {return null;}
 		return dcvs;
 	}
 	
