@@ -1,11 +1,20 @@
 /**  
 * <p>Title: TablaEditor.java</p>  
-* <p>Description: </p>    
+* <p>Description: Modulo independiente cuyo objetivo es el tratamiento de los datos
+*  en formato de tabla, permite importar datos en formato CVS así como exportarlo, 
+*   convertir a formatos adecuados a un tipo de módulo interno.</p>
+* Este módulo, puede ejecutarse tanto integrado en el resto de la aplicación, como de manera
+*  externa (con su ventana independiente).
+* <p>>El módulo permite también imprimir los resultados (si el sistema dispone de impresora,
+*  crear nuevas tablas, editar una tabla existente, añadir y eliminar filas o columnas, 
+*   borrar una tabla, guardar los cambios o la tabla nueva y aplicarla a otro módulo.</p>
+* Por último, este módulo disponen de una barra de herramientas flotante, configurable en caliente
+*  para facilitar el trabajo con dicha tabla.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
-* @date 30 sept. 2021  
-* @version 2.2  
-*/  
+* @date 30 sept. 2021
+* @version 2.2
+*/
 package vista;
 
 import java.awt.event.MouseAdapter;
@@ -166,20 +175,20 @@ public class TablaEditor extends JPanel{
 		jtoolBar.setOpaque(false);
 
 		//Añadir los botones
-		btnNuevaTabla = addBotonToolBar("Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaMouseListener(),Color.GREEN);
-		btnAddRow= addBotonToolBar("Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowMouseListener(),null);
-		btnAddCol = addBotonToolBar("Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColMouseListener(),null);
+		btnNuevaTabla = addBotonToolBar("Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaML(),Color.GREEN);
+		btnAddRow= addBotonToolBar("Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowML(),null);
+		btnAddCol = addBotonToolBar("Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColML(),null);
 		jtoolBar.addSeparator();
-		btnBorrarFila = addBotonToolBar("Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaMouseListener(),Color.ORANGE);
-		btnBorrarColumna = addBotonToolBar("Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaMouseListener(),Color.ORANGE);
-		btnBorrarTabla = addBotonToolBar("Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaMouseListener(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar("Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaML(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar("Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaML(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar("Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaML(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		btnGuardarCambios = addBotonToolBar("Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosMouseListener(),null);
-		btnGuardarArchivo = addBotonToolBar("Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoMouseListener(),null);
-		addBotonToolBar("Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoMouseListener(),null);
+		btnGuardarCambios = addBotonToolBar("Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosML(),null);
+		btnGuardarArchivo = addBotonToolBar("Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoML(),null);
+		addBotonToolBar("Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoML(),null);
 		jtoolBar.addSeparator();
-		addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirMouseListener(),null);
+		addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -191,7 +200,7 @@ public class TablaEditor extends JPanel{
 		
 		btnAsignarTabla = new JButton("Aplicar tipo");
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAsignarTabla.addMouseListener(new BtnAplicarTablaMouseListener());
+		btnAsignarTabla.addMouseListener(new BtnAplicarTablaML());
 		
 		lblAsignarTablaA = new JLabel("Asignar a modulo:");
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
@@ -357,135 +366,17 @@ public class TablaEditor extends JPanel{
 		estadoBotones();
 	}
 	
-	private class BtnImprimirMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				try {tabla.print();}
-				catch (PrinterException e1) {System.out.println("Error dealing with the printer.");}
-			}
-		}
-	}
-	
-	private class BtnAddColMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
-				//Si no se ha cancelado o no se ha introducido texto -> procede
-				if(txt != null && !txt.equals("")){									
-					dcvs.addColumna(txt);										//Añade la columna.
-					modificado = true;
-					estadoBotones();
-				}
-			}
-		}
-	}
-	
-	private class BtnAddRowMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				int ncols = dcvs.getColumnCount();							//Obtención del número de columnas.
-				if(ncols > 0) {													//Comprobación de que existe al menos una columna.
-					Object[] row = new Object[ncols];							//Generar una fila con tantos campos como columnas tiene la tabla.
-					dcvs.addFila(row);											//Se añade.
-					modificado = true;
-				}else {
-					cm.showMessage("Debe añadir alguna columna.", 0);
-				}
-				estadoBotones();
-			}
-		}
-	}
-	
-	private class BtnAbrirArchivoMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());			
-				if(dcvs2 != null) {
-					dcvs = dcvs2;
-					modificado = false;
-					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
-					cm.showMessage("Archivo Cargado", 1);
-					estadoBotones();
-				}
-			}
-		}
-	}
-	
-	private class BtnGuardarCambiosMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled() && modificado) {
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-				if(dcvs.getRowCount() >0) {
-					String rutaF = cio.guardarArchivo(dcvs);
-					if(rutaF != null) {
-						cm.showMessage("Archivo guardado", 1);
-						dcvs.setRuta(rutaF);
-						modificado = false;
-						estadoBotones();
-					}
-				} else cm.showMessage("No hay datos que guardar",0);
-			}
-		}
-	}
-	
-	private class BtnGuardarArchivoMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				String rutaF;
-				//Sino tiene de un tipo se le asigna el tipo general.
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
-				if(dcvs.getRowCount() >0) {
-					rutaF = cio.guardarArchivo(dcvs);
-					if(rutaF != null) {
-						cm.showMessage("Archivo guardado", 1);
-						dcvs.setRuta(rutaF);
-						modificado = false;
-						estadoBotones();
-					}					
-				} else cm.showMessage("No hay datos que guardar",0);
-
-			}
-		}
-	}
-	
-	private class BtnBorrarFilaMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				dcvs.delFilas(tabla.getSelectedRows());
-				modificado = true;
-				estadoBotones();
-			}
-		}
-	}
-	
-	private class BtnBorrarColumnaMouseListener extends MouseAdapter {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if(((JButton) e.getSource()).isEnabled()) {
-				tabla.setModel( dcvs.delColumnas(tabla.getSelectedColumns()));											//Establecemos el nuevo modelo en la tabla.
-				modificado = true;
-				estadoBotones();
-			}
-		}
-	}
-	
 	/**
 	 * <p>Title: BtnAplicarTablaMouseListener</p>  
-	 * <p>Description: Clase dedicada al establecimiento de los datos en los
-	 * apartados o módulos oportunos.</p>  
+	 * <p>Description: Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
+	 *  comunicación con el módulo controlador.</p> 
+	 * Esta clase además está implicada en el mantenimiento de la coherencia respecto al contexto de la aplicación
+	 *  de los diferentes controles implicados en esta vista.
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
-	 * @version versión
+	 * @version versión 1.2
 	 */
-	private class BtnAplicarTablaMouseListener extends MouseAdapter {
+	private class BtnAplicarTablaML extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -563,7 +454,192 @@ public class TablaEditor extends JPanel{
 		}
 	}
 	
-	private class BtnBorrarTablaMouseListener extends MouseAdapter {
+	
+	/**
+	 * <p>Title: BtnImprimirML</p>  
+	 * <p>Description: Gestiona la acción de imprimir la tabla actual al pulsar
+	 *  sobre el control que tenga asignado..</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnImprimirML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				try {tabla.print();}
+				catch (PrinterException e1) {System.out.println("Error dealing with the printer.");}
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnAddColML</p>  
+	 * <p>Description: Gestiona la acción de añadir una nueva columna a la tabla actual
+	 * 	al pulsar sobre el control asignado.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnAddColML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
+				//Si no se ha cancelado o no se ha introducido texto -> procede
+				if(txt != null && !txt.equals("")){									
+					dcvs.addColumna(txt);										//Añade la columna.
+					modificado = true;
+					estadoBotones();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnAddRowML</p>  
+	 * <p>Description: Gestiona la acción de añadir una fila a la tabla actual
+	 *  al pulsar sobre el control asignado.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnAddRowML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				int ncols = dcvs.getColumnCount();							//Obtención del número de columnas.
+				if(ncols > 0) {													//Comprobación de que existe al menos una columna.
+					Object[] row = new Object[ncols];							//Generar una fila con tantos campos como columnas tiene la tabla.
+					dcvs.addFila(row);											//Se añade.
+					modificado = true;
+				}else {
+					cm.showMessage("Debe añadir alguna columna.", 0);
+				}
+				estadoBotones();
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnAbrirArchivoML</p>  
+	 * <p>Description: Gestiona la carga de un fichero desde la unidad de almacenamiento
+	 *  al pulsar sobre el control asignado.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnAbrirArchivoML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
+				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());			
+				if(dcvs2 != null) {
+					dcvs = dcvs2;
+					modificado = false;
+					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
+					cm.showMessage("Archivo Cargado", 1);
+					estadoBotones();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnGuardarCambiosML</p>  
+	 * <p>Description: Gestiona el guardado de los cambios realizados en la tabla actual en el fichero asignado
+	 *  y en unidad de almacenamiento al activar el control.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnGuardarCambiosML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled() && modificado) {
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
+				if(dcvs.getRowCount() >0) {
+					String rutaF = cio.guardarArchivo(dcvs);
+					if(rutaF != null) {
+						cm.showMessage("Archivo guardado", 1);
+						dcvs.setRuta(rutaF);
+						modificado = false;
+						estadoBotones();
+					}
+				} else cm.showMessage("No hay datos que guardar",0);
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnGuardarArchivoML</p>  
+	 * <p>Description: Realiza el guardado de la tabla actual en el destino que se indique al pulsar sobre
+	 *  el control al que esté asignado.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnGuardarArchivoML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				String rutaF;
+				//Sino tiene de un tipo se le asigna el tipo general.
+				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
+				if(dcvs.getRowCount() >0) {
+					rutaF = cio.guardarArchivo(dcvs);
+					if(rutaF != null) {
+						cm.showMessage("Archivo guardado", 1);
+						dcvs.setRuta(rutaF);
+						modificado = false;
+						estadoBotones();
+					}					
+				} else cm.showMessage("No hay datos que guardar",0);
+
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnBorrarFilaML</p>  
+	 * <p>Description: Elimina la fila/s indicada/s al activar el control al que esté
+	 *  asignada.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnBorrarFilaML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				dcvs.delFilas(tabla.getSelectedRows());
+				modificado = true;
+				estadoBotones();
+			}
+		}
+	}
+	
+	/**
+	 * <p>Title: BtnBorrarColumnaML</p>  
+	 * <p>Description: Elimina la/s columna/s seleccionadas al activar el control 
+	 *  al que este asignada.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnBorrarColumnaML extends MouseAdapter {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(((JButton) e.getSource()).isEnabled()) {
+				tabla.setModel( dcvs.delColumnas(tabla.getSelectedColumns()));											//Establecemos el nuevo modelo en la tabla.
+				modificado = true;
+				estadoBotones();
+			}
+		}
+	}
+		
+	/**
+	 * <p>Title: BtnBorrarTablaML</p>  
+	 * <p>Description: Elimina la tabla actual con su contenido inclusive al activar el control
+	 *  al que se asigne.</p>
+	 * Previamente muestra un mensaje de aviso solicitando confirmación. 
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnBorrarTablaML extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -575,8 +651,14 @@ public class TablaEditor extends JPanel{
 		}
 	}
 
-
-	private class BtnNuevaTablaMouseListener extends MouseAdapter {
+	/**
+	 * <p>Title: BtnNuevaTablaML</p>  
+	 * <p>Description: Crea una nueva tabla eliminando la tabla anterior al activarse
+	 *  el control al que se asigne.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BtnNuevaTablaML extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -588,12 +670,20 @@ public class TablaEditor extends JPanel{
 		}
 	}
 	
+	/**
+	 * <p>Title: TableUpdateListener</p>  
+	 * <p>Description: Esta clase es una clase suscriptora apoyada en un patrón
+	 *  Observer. Su finalidad es detectar cambios en la tabla actual para notificar al resto
+	 *   de suscriptores, permitiendo tener actualizados el resto de controles.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
 	private class TableUpdateListener implements TableModelListener {
 		
         @Override
         public void tableChanged(TableModelEvent tme) {
-            if (tme.getType() == TableModelEvent.UPDATE) {
-                modificado = true;
+            if (tme.getType() == TableModelEvent.UPDATE) {						//Comprobación de que se ha actualizado un atributo de la tabla.
+                modificado = true;												//Activa la bandera de modificado.
             }
         }
     }

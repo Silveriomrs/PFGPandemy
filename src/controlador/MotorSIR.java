@@ -84,7 +84,7 @@ public class MotorSIR {
 			case(Labels.I): fila[1] = "" + z.getI(); break;
 			case(Labels.R): fila[1] = "" + z.getR(); break;
 			}
-			mHST.addFila(fila);		
+			mHST.addFila(fila);
 		}
 	}
 	

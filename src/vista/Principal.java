@@ -26,8 +26,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 /**
- * Clase de la vista principal donde se modelan las tablas
- * que sean necesarias.
+ * Clase de la vista principal donde se cargan los menús y los elementos que siver de
+ * soporte al resto de vistas de la aplicación.
  * @author Silverio Manuel Rosales Santana.
  * @date 2021/04/10
  * @version 2.9

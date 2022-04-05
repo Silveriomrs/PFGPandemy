@@ -1,7 +1,12 @@
 /**
 * <p>Title: Pizarra.java</p>
-* <p>Description: Módulo para el dibujado de los poligonos que represetan
+* <p>Description: Módulo para el dibujado de los polígonos que representan
 * las zonas dentro de un mapa de la simulación.</p>
+* <p>Esta clase encargada de servir editor gráfico de la aplicación, 
+*  permitiendo la creación, edición, eliminación  y asignación de polígonos a 
+*   los grupos de población.</p>
+* Permite la carga de una imagen de fondo para facilitar el dibujado de las figuras,
+* así mismo el guardado de los resultados en un fichero externo.
 * <p>Aplication: UNED</p>
 * @author Silverio Manuel Rosales Santana
 * @date 22 sept. 2021
@@ -30,7 +35,6 @@ import controlador.ControladorModulos;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -42,7 +46,11 @@ import modelo.Zona;
 
 /**
  * <p>Title: Pizarra</p>
- * <p>Description: </p>
+ * <p>Description: Clase encargada de servir editor gráfico de la aplicación, 
+ *  permitiendo la creación, edición, eliminación  y asignación de polígonos a 
+ *   los grupos de población.</p>
+ * Permite la carga de una imagen de fondo para facilitar el dibujado de las figuras,
+ * así mismo el guardado de los resultados en un fichero externo.
  * @author Silverio Manuel Rosales Santana
  * @date 23 sept. 2021
  * @version versión 3.6
@@ -145,7 +153,6 @@ public class Pizarra extends JFrame {
 	 */
 	public void toogleVisible() { this.setVisible(!isVisible());}
 
-
 	/**
 	 * <p>Title: configura</p>  
 	 * <p>Description: Configura los parámetros iniciales, datos y controles 
@@ -181,17 +188,17 @@ public class Pizarra extends JFrame {
 	    this.add(panelCentral);  
 	}
 
-    /**
-     * <p>Title: getPanel</p>
-     * <p>Description: Devuelve el JPanel que contiene los botones y la
-     * pizarra</p>
-     * @return El JPanel configurado.
-     */
-    public JPanel getPanel() {return panelCentral;}
 
     /* Métodos privados */
 
-    private Polygon generaPoligono() {
+	/**
+	 * <p>Title: generaPoligono</p>  
+	 * <p>Description: Genera un poligono desde una lista de puntos almacenados
+	 *  en un ArrayList.</p> 
+	 * @param listaPuntos ArrayList con la lista de puntos que compondrán el Poligono.
+	 * @return Poligono generado.
+	 */
+    private Polygon generaPoligono(ArrayList<Point> listaPuntos) {
     	int contador = listaPuntos.size();
     	Polygon pol = new Polygon();
 		//Volcado de coordenadas desde la lista de puntos.
@@ -202,6 +209,12 @@ public class Pizarra extends JFrame {
 		return pol;
     }
 
+    /**
+     * <p>Title: isPrimero</p>  
+     * <p>Description: Indica si el punto actual definido es el primer punto de la
+     *  lista que contiene el módulo.</p> 
+     * @return True si es el primer punto, False en otro caso.
+     */
     private boolean isPrimero() {return 0 == listaPuntos.size();}
 
     /**
@@ -209,12 +222,12 @@ public class Pizarra extends JFrame {
 	 * <p>Description: Dibuja un marco alrededor de la zona de pintado.</p>
 	 */
 	private void creaMarco() {
-		listaPuntos.add(new Point(5,5));
-		listaPuntos.add(new Point(c.getWidth() - 5,5));
-		listaPuntos.add(new Point(c.getWidth() - 5,c.getHeight() - 5));
-		listaPuntos.add(new Point(5,c.getHeight() - 5));	
-		this.marco = generaPoligono();
-		listaPuntos.clear();
+		ArrayList<Point> listaP = new ArrayList<Point>();
+		listaP.add(new Point(5,5));
+		listaP.add(new Point(c.getWidth() - 5,5));
+		listaP.add(new Point(c.getWidth() - 5,c.getHeight() - 5));
+		listaP.add(new Point(5,c.getHeight() - 5));	
+		this.marco = generaPoligono(listaP);
 	}
     
 	/**
@@ -474,7 +487,7 @@ public class Pizarra extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Creación del poligono.
-            poligono = generaPoligono();
+            poligono = generaPoligono(listaPuntos);
             //Primero dibujado de las figuras (por si se desactiva Canvas en reinicio botones).
             dibujarZonas();
             //Reconfiguramos los estados de los botones para el nuevo contexto.
@@ -634,41 +647,8 @@ public class Pizarra extends JFrame {
     			//Si se ha guardado, desactivar modificado => desactivar botón guardado.
     			modificado = !resultado;
         		updateControls();
-    		}
-    		
+    		}		
     	}
     }
-
-
-    /* Funciones para pruebas */
-
-	/**
-	 * <p>Title: testModulo</p>
-	 * <p>Description: Funcion cuyo proposito es realizar pruebas de funcionamiento
-	 * propio del módulo.</p>
-	 * zonas internas por esta propia función a efecto de pruebas.
-	 */
-	public void testModulo() {
-    	toogleVisible();
-    }
-
-	/**
-	 * <p>Title: main</p>
-	 * <p>Description: Metodo para pruebas</p>
-	 * @param args argumentos
-	 */
-	public static void main(String[] args) {
-		HashMap<Integer, Zona> zonas;
-		zonas = new HashMap<Integer, Zona>();
-    	Zona z1,z2,z3;
-    	z1 = new Zona(1, "Zona 1",0,0,0,0,0,0,0, null);
-    	z2 = new Zona(2, "Zona 2",0,0,0,0,0,0,0, null);
-    	z3 = new Zona(3, "Zona 3",0,0,0,0,0,0,0, null);
-    	zonas.put(z1.getID(), z1);
-    	zonas.put(z2.getID(), z2);
-    	zonas.put(z3.getID(), z3);
-		
-		Pizarra pizarra = new Pizarra(new ControladorModulos());
-		pizarra.testModulo();
-	}
+    
 }

@@ -279,7 +279,7 @@ public class Player extends JPanel implements ActionListener{
 //		System.out.println("Player > play > Pos: " + pos);
 		for(int row = 0; row < rows; row++) {
 			int id = getID("" + historico.getValueAt(row, 0));					//Obtener ID columna
-			double nivel = getValor("" + historico.getValueAt(row, pos + 1));		//Obtener valor
+			double nivel = getValor("" + historico.getValueAt(row, pos + 1));	//Obtener valor
 			String serie = ("" + historico.getValueAt(row, 0)).split(" ")[0];
 			mapa.addZonaNivel(id, serie,pos, nivel);							//Otorgar nivel al mapa/zona
 			this.updateUI();

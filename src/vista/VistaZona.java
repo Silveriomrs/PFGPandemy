@@ -2,7 +2,8 @@
 * <p>Title: VistaZona.java</p>  
 * <p>Description: Representa una vista con los datos organizados de forma legible.</p>
 * Su fuente de datos (modelo) es la clase Zona, que almacena los datos propios
-* de la zona o grupo de población que representa.    
+* de la zona o grupo de población que representa. Además de garantizar que cada campo recibe
+*  el tipo de datos correcto que le corresponda.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 2 nov. 2021  
@@ -242,15 +243,24 @@ public class VistaZona extends JPanel {
 	 * @param zona La zona a establecer
 	 */
 	public void setZona(Zona zona) {
+		this.zona = zona;
 		refresh();
 	}
 	
 	/* Clases privadas */
 	
+	/**
+	 * <p>Title: BotonL</p>  
+	 * <p>Description: Procesa el formulario asignando a cada uno de los atributos del grupo de población
+	 *  los datos introducidos en los campos del formulario.</p>
+	 *  Para garantizar la validez de dichos datos, se realiza una conversión de formato, en caso de existir
+	 *   un valor incorrecto, saltará una expceción que es capturada mostrando el mensaje de error correspondiente.  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
 	private class BotonL extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			
 			//
 			try{
 				zona.setName(tf_NAME.getText());
@@ -267,6 +277,18 @@ public class VistaZona extends JPanel {
 		}
 	}
 	
+	/**
+	 * <p>Title: PanelPoligono</p>  
+	 * <p>Description: Clase particular encargada de redimensionar un polígono representación
+	 *  de un grupo de población, de manera que quede escalado dentro del marco contenedor, respetando
+	 *   el factor de forma y demás atributos propios. No modifica el original.</p> 
+	 *   Por último desplaza dicho polígono de forma que que quede centrado en su marco contenedor.
+	 *    Esta clase esta vinculada al nivel de contagio del grupo de población con el fin de adquirir
+	 *     el color que le corresponda.
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 26 mar. 2022
+	 * @version versión 1.2
+	 */
 	private class PanelPoligono extends JPanel{
 		/** serialVersionUID*/  
 		private static final long serialVersionUID = 1575177244442912505L;
@@ -337,31 +359,31 @@ public class VistaZona extends JPanel {
 	
 	/* Funciones de pruebas */
 	
-	/**
-	 * <p>Title: generaTest</p>  
-	 * <p>Description: Genera unos datos básicos de prueba</p>
-	 * Función para comprobar el correcto funcionamiento. Genera unos datos de prueba
-	 * que será mostrados en la vista.
-	 */
-	public void generaTest() {
-		Polygon p = new Polygon();
-		p.addPoint( 65, 45 );
-		p.addPoint( 95, 150 );
-		p.addPoint( 170, 100 );
-		
-		this.zona = new Zona(0, "1_Test",2 , 3 ,4,5,6,7,8, p);
-		System.out.println( this.zona.toString() + "\nNivel: " + zona.getNivel());
-		refresh();
-	}
-	
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: Función a modo de prueba</p> 
-	 * @param args ninguno.
-	 */
-	public static void main(String[] args) {
-		VistaZona vz = new VistaZona(null,new ControladorModulos());
-		vz.generaTest();
-		vz.abrirFrame();
-	}
+//	/**
+//	 * <p>Title: generaTest</p>  
+//	 * <p>Description: Genera unos datos básicos de prueba</p>
+//	 * Función para comprobar el correcto funcionamiento. Genera unos datos de prueba
+//	 * que será mostrados en la vista.
+//	 */
+//	public void generaTest() {
+//		Polygon p = new Polygon();
+//		p.addPoint( 65, 45 );
+//		p.addPoint( 95, 150 );
+//		p.addPoint( 170, 100 );
+//		
+//		this.zona = new Zona(0, "1_Test",2 , 3 ,4,5,6,7,8, p);
+//		System.out.println( this.zona.toString() + "\nNivel: " + zona.getNivel());
+//		refresh();
+//	}
+//	
+//	/**
+//	 * <p>Title: main</p>  
+//	 * <p>Description: Función a modo de prueba</p> 
+//	 * @param args ninguno.
+//	 */
+//	public static void main(String[] args) {
+//		VistaZona vz = new VistaZona(null,new ControladorModulos());
+//		vz.generaTest();
+//		vz.abrirFrame();
+//	}
 }

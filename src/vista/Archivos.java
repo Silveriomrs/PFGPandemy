@@ -1,6 +1,9 @@
 /**  
 * <p>Title: Archivos.java</p>  
-* <p>Description: </p>    
+* <p>Description: Esta clase esta destinada a la carga de los diferentes
+*  módulos de la aplicación, mostrando en la vista aquellos módulos cargados
+*   además presentae una serie de controles comunes (guardar, guardar como, abrir)
+*    y unas opciones particulares (editar y borrar).</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 26 ago. 2021  
@@ -178,6 +181,12 @@ public class Archivos extends JPanel {
 	
 	/* Métodos privados */
 	
+	/**
+	 * <p>Title: configuracion</p>  
+	 * <p>Description: Configura los atributos generales de la vista, tales como
+	 *  dimensiones, comportamiento, tipo de borde, imagen de fondo, etc. </p>
+	 *  También llama a las funciones encargada de crear los controles y su configuración.
+	 */
 	private void configuracion() {
 		//Configuración del borde.
 		tb = BorderFactory.createTitledBorder("Ficheros");
@@ -433,6 +442,19 @@ public class Archivos extends JPanel {
 	
 	/* Clases privadas */
 	
+	/**
+	 * <p>Title: ArchivoML</p>  
+	 * <p>Description: Captura un evento de pulsación sobre un control (botón)
+	 *  y procesa la acción correspondiente mediante la llamada a la clase controladora</p>
+	 *  Para realizar dicha labor determina que botón ha sido pulsado mediante el análisis
+	 *  del tooltiptext asociado al control, extrayendo su extensión asociada y el tipo de control
+	 *   asociado al nombre, ext y op. Si el botón está habilitado procede con la operación. En otro 
+	 *    caso ingnora la acción.
+	 *  <p>Una vez realizada la acción procede a la actualización de los controles en función del
+	 *   nuevo estado de la aplicación.</p>
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 2.1
+	 */
 	private class ArchivoML extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -453,15 +475,15 @@ public class Archivos extends JPanel {
 		}
 	}
 	
-	
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: Función a efecto de pruebas</p> 
-	 * @param args Nada.
-	 */
-	public static void main(String[] args) {
-		Archivos archivos = new Archivos(new ControladorModulos());
-		archivos.abrirFrame();	
-	}
-	
+//	
+//	/**
+//	 * <p>Title: main</p>  
+//	 * <p>Description: Función a efecto de pruebas</p> 
+//	 * @param args Nada.
+//	 */
+//	public static void main(String[] args) {
+//		Archivos archivos = new Archivos(new ControladorModulos());
+//		archivos.abrirFrame();	
+//	}
+//	
 }

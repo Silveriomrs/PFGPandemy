@@ -1,6 +1,7 @@
 /**  
 * <p>Title: ParametrosProyecto.java</p>  
-* <p>Description: Clase dependiente de la clase ParametrosGrupos.</p>    
+* <p>Description: Clase dependiente de la clase ParametrosGrupos, además
+*  contiene la vista del módulo de Archivos.</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 19 oct. 2021  
@@ -369,34 +370,34 @@ public class ParametrosProyecto extends JPanel {
 		return jtf;
 	}
 	
-	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
-	 */
-	public void abrirFrame() {
-	    JFrame frame = new JFrame("Paneles de configuración");
-	    Dimension m = getPreferredSize();
-	    int x = (int)m.getWidth() +25;
-	    int y = (int)m.getHeight()+15;
-	    frame.setPreferredSize(new Dimension(x, y));
-	    frame.setSize(new Dimension(x, y));
-	    frame.setMaximumSize(new Dimension(2767, 2767));
-		frame.setMinimumSize(new Dimension(800, 600));
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    frame.setLocationRelativeTo(null);
-	    frame.getContentPane().add(this);
-		frame.pack();
-        frame.setVisible(true);
-	}
+//	/**
+//	 * <p>Title: abrirFrame</p>  
+//	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
+//	 */
+//	public void abrirFrame() {
+//	    JFrame frame = new JFrame("Paneles de configuración");
+//	    Dimension m = getPreferredSize();
+//	    int x = (int)m.getWidth() +25;
+//	    int y = (int)m.getHeight()+15;
+//	    frame.setPreferredSize(new Dimension(x, y));
+//	    frame.setSize(new Dimension(x, y));
+//	    frame.setMaximumSize(new Dimension(2767, 2767));
+//		frame.setMinimumSize(new Dimension(800, 600));
+//	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//	    frame.setLocationRelativeTo(null);
+//	    frame.getContentPane().add(this);
+//		frame.pack();
+//        frame.setVisible(true);
+//	}
 	
 
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: Método para pruebas.</p> 
-	 * @param args Nada
-	 */
-	public static void main(String[] args) {
-		ParametrosProyecto pp = new ParametrosProyecto(new ControladorModulos(),new Archivos(null));
-		pp.abrirFrame();
-	}
+//	/**
+//	 * <p>Title: main</p>  
+//	 * <p>Description: Método para pruebas.</p> 
+//	 * @param args Nada
+//	 */
+//	public static void main(String[] args) {
+//		ParametrosProyecto pp = new ParametrosProyecto(new ControladorModulos(),new Archivos(null));
+//		pp.abrirFrame();
+//	}
 }

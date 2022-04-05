@@ -1,6 +1,8 @@
 /**  
 * <p>Title: ParametrosGrupos.java</p>  
-* <p>Description: </p>    
+* <p>Description: Vista destinada a contener las vistas de los grupos de población
+* 	en formato de pestañas laterales. Además garantiza un ordenamiento correcto por
+*  número de índice.</p>
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 15 oct. 2021  
@@ -192,42 +194,42 @@ public class ParametrosGrupos extends JPanel {
 	
 	/* Funciones para realización de pruebas de funcionamiento */
 	
-	/**
-	 * @param zonas Conjunto de zonas cuyas vistas deben establecerse.
-	 */
-	public void setZonasTest(HashMap<Integer, Zona> zonas) {		
-		//Crear las pestañas de cada zona (grupo) con los datos correspondientes.
-		//Creación ordenada de un árbol con los elementos.
-		reset();
-		int nz = zonas.size();
-		TreeMap<Integer, Zona> t = new TreeMap<>();
-		t.putAll(zonas);
-		//Reccorrer los elementos y añadir sus vistas.
-		for(int i = 1; i <= nz; i++) {
-			Zona z = t.get(i);
-			if(z != null && !vistasZonas.containsKey(i)) {
-				iniciarTabZona(z,"/vista/imagenes/Iconos/sinImg_256px.png");
-			}else if(z != null){
-				vistasZonas.get(i).setZona(z);
-			}
-		}
-	}
-		
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: funciona para pruebas</p> 
-	 * @param args argumentos
-	 */
-	public static void main(String[] args) {
-		// Trabajo con un grupo inicial de 4.
-		ParametrosGrupos parametrosGrupos = new ParametrosGrupos(new ControladorModulos());
-		HashMap<Integer, Zona> zonas = new HashMap<Integer,Zona>();
-		for(int i=1; i<=4 ;i++) {
-			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),0,0,0,0,0,null));
-		}
-
-		parametrosGrupos.setZonasTest(zonas);
-		parametrosGrupos.toggleVisible();
-	}
+//	/**
+//	 * @param zonas Conjunto de zonas cuyas vistas deben establecerse.
+//	 */
+//	public void setZonasTest(HashMap<Integer, Zona> zonas) {		
+//		//Crear las pestañas de cada zona (grupo) con los datos correspondientes.
+//		//Creación ordenada de un árbol con los elementos.
+//		reset();
+//		int nz = zonas.size();
+//		TreeMap<Integer, Zona> t = new TreeMap<>();
+//		t.putAll(zonas);
+//		//Reccorrer los elementos y añadir sus vistas.
+//		for(int i = 1; i <= nz; i++) {
+//			Zona z = t.get(i);
+//			if(z != null && !vistasZonas.containsKey(i)) {
+//				iniciarTabZona(z,"/vista/imagenes/Iconos/sinImg_256px.png");
+//			}else if(z != null){
+//				vistasZonas.get(i).setZona(z);
+//			}
+//		}
+//	}
+//		
+//	/**
+//	 * <p>Title: main</p>  
+//	 * <p>Description: funciona para pruebas</p> 
+//	 * @param args argumentos
+//	 */
+//	public static void main(String[] args) {
+//		// Trabajo con un grupo inicial de 4.
+//		ParametrosGrupos parametrosGrupos = new ParametrosGrupos(new ControladorModulos());
+//		HashMap<Integer, Zona> zonas = new HashMap<Integer,Zona>();
+//		for(int i=1; i<=4 ;i++) {
+//			zonas.put(i, new Zona(i,"Grupo " + i,15+i*10,200*(i+7),0,0,0,0,0,null));
+//		}
+//
+//		parametrosGrupos.setZonasTest(zonas);
+//		parametrosGrupos.toggleVisible();
+//	}
 
 }

@@ -931,7 +931,7 @@ public class ControladorModulos {
 		return ok;
 	} 
 	
-	/* En progreso de implementación TableEditor */
+	/* Acciones TableEditor */
 	
 	/**
 	 * <p>Title: editModule</p>  

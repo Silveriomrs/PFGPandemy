@@ -1,5 +1,14 @@
 /**
- *
+ * 	Módulo independiente cuya función es la representación gráfica de los polígonos
+ *  que representan los grupos de población o zonas geográficas. 
+ *  <p>Este módulo permite además seleccionar una zona representada y mostrar información adicional
+ *   sobre la misma. Puede ser utilizado de forma integrada en la aplicación principal
+ *    o en una ventana independiente.</p>
+ *  El mapa es capaz de realizar representaciones dinámicas de las zonas, es decir,
+ *   debe permitir la modificación en tiempo de ejecución de los colores que
+ *    representan los niveles de contagio con respecto al tiempo.
+ *  @author Silverio Manuel Rosales Santana
+ *  @version 1.6
  */
 package vista;
 
@@ -24,11 +33,10 @@ import java.awt.ComponentOrientation;
 
 /**
  * Clase para la representación en modo de mapa de los datos de un núcleo
- * poblacional (provincia o comunidad autónoma).
+ * poblacional (provincia o comunidad autónoma), además permite su coloreado.
  * @author Silverio Manuel Rosales Santana
  * @date 10/07/2021
  * @version 1.6
- *
  */
 public class Mapa extends JPanel{
 
@@ -61,9 +69,7 @@ public class Mapa extends JPanel{
 	 * <p>Description: Reinicia la vista de este módulo.</p> 
 	 *  Elimina los datos almacenados en el mismo.
 	 */
-	public void reset() {
-		updateUI();
-	}
+	public void reset() {updateUI();}
 	
 	/**
 	 * <p>Title: verFrame</p>
@@ -104,6 +110,10 @@ public class Mapa extends JPanel{
 	 */
 	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
 
+	/**
+	 * Sobrescibe la función para lograr el dibujado de los poligonos en tiempo real.
+	 * Obtiene tanto el poligono como el color mediante solicitudes al controlador.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -120,13 +130,6 @@ public class Mapa extends JPanel{
 			}
 		});
 	}
-
-	/**
-	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
-	 * nombre, sobreescribirá la anterior.
-	 * @param z Zona que representa el poligono.
-	 */
-	public void addZona(Zona z) {if(z != null) cm.getZonas().put(z.getID(), z);}
 
 
 	/**
@@ -171,13 +174,4 @@ public class Mapa extends JPanel{
 	    }
 	}
 
-	/* Funciones para pruebas */
-
-
-	@SuppressWarnings("javadoc")
-	public static void main(String[] args) {
-		Mapa mapa = new Mapa(500, 500, new ControladorModulos());
-		mapa.iniciarFrame(520, 520);
-		mapa.verFrame(true);
-	}
 }
