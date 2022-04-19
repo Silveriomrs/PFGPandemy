@@ -100,7 +100,7 @@ public class GraficasChart{
 	 * apartados o módulos oportunos.</p>  
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
-	 * @version versión
+	 * @version versión 2.2
 	 */
 	private class VerMenuListener extends AbstractAction {
 		/** serialVersionUID*/  
@@ -312,39 +312,4 @@ public class GraficasChart{
 		this.chart.setBackgroundImage(img);										//Establecimiento del fondo.
 	}
 
-	
-	/* FUNCIONES SOLO PARA PRUEBAS */
-	
-	/**
-	 * <p>Title: addPuntos</p>  
-	 * <p>Description: A efectos de pruebas</p> 
-	 */
-	public void addPuntos() {
-	    // Introduccion de datos
-	    addPunto("serie1",1.0, 1.8);
-	    addPunto("serie1",2.3, 6.65);
-	    addPunto("serie1",3.1, 3);
-	    addPunto("serie1",3.2, 10);
-	    // Datos serie 2
-	    addPunto("serie2",1, 2);
-	    addPunto("serie2",2, 6);
-	    addPunto("serie2",3, 8);
-	    addPunto("serie2",4, 12);
-//	    dataset.addSeries(seriesMap.get("serie2"));
-	}
-	
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: </p> 
-	 * @param args Argumentos si fuera necesario.
-	 */
-	public static void main(String[] args) {
-		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Título","Ejemplo Grafica Lineal");
-//		chart.addSerie("serie1");
-//		chart.addSerie("serie2");
-		chart.addPuntos();
-		chart.setVisible(true);
-		//Pruebas
-		System.out.println(chart.getYValue("serie1", 0));		
-    }
 }

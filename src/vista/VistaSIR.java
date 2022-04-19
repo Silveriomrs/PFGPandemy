@@ -11,7 +11,6 @@ package vista;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
@@ -404,45 +403,5 @@ public class VistaSIR extends JPanel{
 			refresh();
 		}
 	}
-	
-	/* Funciones para pruebas */
-	
-	
-	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Permite visualizar el módulo en una ventana externa.</p> 
-	 * @param posX Posición horizontal de la pantalla donde colocar la ventana. (Pizeles).
-	 * @param posY Posición vertical en la pantalla donde colocar la ventana. (Pixeles).
-	 * @param w Ancho de la ventana.
-	 * @param h Alto de la ventana.
-	 */
-	public void abrirFrame(int posX, int posY, int w, int h) {
-		JFrame frame = new JFrame("Vista SIR");
-		frame.getContentPane().setLayout(null);
-		frame.setSize(w,h);
-		frame.setBounds(posX, posY, w, h);
-	    frame.setPreferredSize(new Dimension(w, h));
-	    frame.setLocationRelativeTo(null);
-	    frame.getContentPane().add(this);
-		frame.pack();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-	}
 
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: </p> 
-	 * @param args sin argumentos.
-	 */
-	public static void main(String[] args) {
-		VistaSIR vSIR = new VistaSIR(null);	
-		JFrame frame = new JFrame("Vista SIR");
-		frame.getContentPane().add(vSIR);	
-		frame.setBounds(280, 150, 600, 400);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(vSIR);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-//		vSIR.abrirFrame(280, 150, 600, 400);
-	}
 }

@@ -23,7 +23,12 @@ import javax.swing.JColorChooser;
 
 /**
  * <p>Title: Paleta</p>  
- * <p>Description: Clase para mostrar la leyenda de un mapa. </p>  
+ * <p>Description: Clase para mostrar la leyenda de un mapa.</p>
+ * Esta clase permite cambiar los valores de los colores de forma que se puede
+ * seleccionar nuevas paletas de colores y exportar.
+ * <p>Este módulo permite operar en dos modos, editable y no editable, con el primero
+ * se habilita la posibilidad de modificar la paleta, con el segundo solo se accede en 
+ *  modo lectura.</p>  
  * @author Silverio Manuel Rosales Santana
  * @date 29 jul. 2021
  * @version versión 1.2
@@ -64,7 +69,7 @@ public class Paleta extends JPanel{
 		this.setLayout(null);
 		
 		creaEtiquetas(50,20,50,20);												//Crea y dibuja las etiquetas.	
-		creaBotones(0,20,50,20);										//Crea y dibuja los botones.
+		creaBotones(0,20,50,20);												//Crea y dibuja los botones.
 		iniciarFrame();
 		refresh();
 	}
@@ -74,7 +79,7 @@ public class Paleta extends JPanel{
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
 		frame.setTitle("Paleta");												//Establecimiento del título.
-		frame.setSize(w,h);											//Establecimiento de las dimensiones.
+		frame.setSize(w,h);														//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
 		frame.setAlwaysOnTop(false);

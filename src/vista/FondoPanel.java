@@ -1,7 +1,7 @@
 /**
  * 
  */
-package modelo;
+package vista;
 
 import java.awt.Graphics;
 import java.awt.Image;

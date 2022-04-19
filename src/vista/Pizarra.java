@@ -134,7 +134,9 @@ public class Pizarra extends JFrame {
 	
 	/**
 	 * <p>Title: abrirFrame</p>
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p>
+	 * <p>Description: Configura las propiedades del marco contenedor, altura
+	 *  ancho, desactivación de redimensionabilidad y propiedad de ocultar en vez
+	 *   de cierre.</p>
 	 */
 	public void configuraFrame() {
 	    Dimension m = panelCentral.getPreferredSize();
@@ -274,6 +276,14 @@ public class Pizarra extends JFrame {
 	    bBoxAplicar.setToolTipText("Aplica las asignaciones seleccionadas.");
 	}
 
+	/**
+	 * <p>Title: getMaxItem</p>  
+	 * <p>Description: Realiza una comprobación para averiguar el nombre del item
+	 *  más largo del desplegable, ajustando hasta un límite el ancho mínimo del mismo.</p>
+	 *  Busca el compromiso entre el texto más largo y las dimensiones máximas de la ventana.
+	 *   como lóngitud mínima a comparar toma 8 carácteres.
+	 * @return La cadena de carácteres más larga que identifica uno de los items. Nombre de Zona.
+	 */
 	private String getMaxItem() {
 		int maxLargo = 0;
 		String item = "Zona: XX";												//Longitud mínima a comparar
@@ -369,6 +379,11 @@ public class Pizarra extends JFrame {
 		c.addMouseListener(new SelectPointListener());
 	}
 
+	/**
+	 * <p>Title: dibujaPoligono</p>  
+	 * <p>Description: Dibuja un polígono en la zona de la pizarra (canvas).</p> 
+	 * @param poligono Figura que debe ser dibujada.
+	 */
 	private void dibujaPoligono(Polygon poligono) {
 		if (poligono != null) {
 			Graphics g = c.getGraphics();
@@ -464,6 +479,16 @@ public class Pizarra extends JFrame {
 
 	/* Clases internas */
 	
+	/**
+	 * <p>Title: MiCanvas</p>  
+	 * <p>Description: Extiende la clase Canvas para permitir la sobrescritura
+	 *  de su método paint(), permitiendo hacer llamadas a la función dibujarZonas()
+	 *   de la clase Pizarra.</p>
+	 * Dicho definición es necesaria para garantizar el correcto dibujado de los elementos
+	 *  dentro del canvas cada vez que se añade cualquier nuevo elemento.  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
 	private class MiCanvas extends Canvas {
 		/** serialVersionUID */
 		private static final long serialVersionUID = 5398261596293519343L;
@@ -491,7 +516,7 @@ public class Pizarra extends JFrame {
             //Primero dibujado de las figuras (por si se desactiva Canvas en reinicio botones).
             dibujarZonas();
             //Reconfiguramos los estados de los botones para el nuevo contexto.
-            updateControls();     
+            updateControls();
         }
     }
 
@@ -530,6 +555,17 @@ public class Pizarra extends JFrame {
 			cm.doActionPizarra(op);
 		}
 
+		/**
+		 * <p>Title: cambiarBox</p>  
+		 * <p>Description: Realiza un cambio de item entre dos JComboBox.</p>
+		 * Además al cambiar de un grupo al otro, el poligono que tiene una zona asociado cambiará
+		 *  a un nuevo poligono o a un elemento nulo según corresponda.
+		 * @param item Nombre del item que cambia de JComboBox
+		 * @param index Posición del item.
+		 * @param combo1 JComboBox de origen.
+		 * @param combo2 JComboBox destino.
+		 * @param p Poligono que se asignara al item (Zona). Null para eliminar y un poligono en otro caso.
+		 */
 		private void cambiarBox(String item, int index, JComboBox<String> combo1, JComboBox<String> combo2, Polygon p) {
 			boolean encontrado = false;											//Bandera para salir del bucle al encontrar lo buscado.
 			combo1.setSelectedIndex(0);
@@ -557,7 +593,7 @@ public class Pizarra extends JFrame {
      *  los poligonos asignados permanecerán.  
      * @author Silverio Manuel Rosales Santana
      * @date 22 nov. 2021
-     * @version versión
+     * @version versión 1.2
      */
     private class LimpiarListener implements ActionListener{
 		@Override
@@ -578,7 +614,7 @@ public class Pizarra extends JFrame {
      * finalizar la operación.
      * @author Silverio Manuel Rosales Santana
      * @date 23 sept. 2021
-     * @version versión
+     * @version versión 1.3
      */
     private class SelectPointListener extends MouseAdapter{
     	private Point a;														// Punto inicial y final de una recta a dibujar.

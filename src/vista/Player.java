@@ -46,7 +46,6 @@ import com.toedter.calendar.JTextFieldDateEditor;
 
 import controlador.ControladorModulos;
 import modelo.DCVS;
-import modelo.FondoPanel;
 import modelo.Labels;
 import modelo.TypesFiles;
 
@@ -210,6 +209,11 @@ public class Player extends JPanel implements ActionListener{
 	 */
 	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
 	
+	/**
+	 * <p>Title: setIFT</p>  
+	 * <p>Description: Establece el tiempo inicial y el tiempo final absoluto del 
+	 *  histórico. Para ello realiza búsqueda de las etiquetas IT e FT del histórico.</p>
+	 */
 	private void setIFT() {
 		String sIT = (String) cm.getModule(TypesFiles.DEF).getDataFromRowLabel(Labels.IT);
 		String sFT = (String) cm.getModule(TypesFiles.DEF).getDataFromRowLabel(Labels.FT);
@@ -217,6 +221,12 @@ public class Player extends JPanel implements ActionListener{
 		ultima = Integer.parseInt(sFT);
 	}
 	
+	/**
+	 * <p>Title: setDates</p>  
+	 * <p>Description: Establece las fechas iniciales y final del histórico</p>
+	 * En caso de no estar incluídas en el histórico, establece la actual y final
+	 *  en relación a la fecha actual.
+	 */
 	private void setDates() {
 		//Establecer fechas iniciales y final.
 		//Obtener la fecha inicial de la etiqueta del histórico
@@ -297,7 +307,7 @@ public class Player extends JPanel implements ActionListener{
 	/**
 	 * <p>Title: getLineaDate</p>  
 	 * <p>Description: Realiza una búsqueda de una fecha concreta</p>
-	 * Realiza la búsqueda utilizando el algoritmo  
+	 * Realiza la búsqueda utilizando una búsqueda binaria. 
 	 * @param d Date contenedora de la fecha seleccionada.
 	 * @return número de línea del historico de fechas que contiene dicha fecha, 
 	 * la fecha inferior más cercana en otro caso.
@@ -418,6 +428,16 @@ public class Player extends JPanel implements ActionListener{
 		}
 	}
 	
+	/**
+	 * <p>Title: DateChooserListener</p>  
+	 * <p>Description: Clase que maneja el selector de fechas y se encarga de
+	 *  avanzar o retroceder en el histórico hasta la fecha que se pueda seleccionar
+	 *   mediante el DateChooser.</p>
+	 * Actual únicamente cuando está activo y realiza cambios tanto en el progressBar
+	 *  como en el contador.
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 2.0
+	 */
 	private class DateChooserListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {

@@ -129,7 +129,16 @@ class PolygonSelector extends MouseAdapter {
         		GraficasChart chart = new GraficasChart("Tiempo (días)","Nivel","Poligono: " + j,"Ejemplo Grafica Lineal");
         		chart.addSerie("serie1");
         		chart.addSerie("serie2");
-        		chart.addPuntos();
+        	    // Introduccion de datos
+        		chart.addPunto("serie1",1.0, 1.8);
+        		chart.addPunto("serie1",2.3, 6.65);
+        		chart.addPunto("serie1",3.1, 3);
+        		chart.addPunto("serie1",3.2, 10);
+        	    // Datos serie 2
+        		chart.addPunto("serie2",1, 2);
+        		chart.addPunto("serie2",2, 6);
+        		chart.addPunto("serie2",3, 8);
+        		chart.addPunto("serie2",4, 12);
 //        		chart.genera();
         		chart.setVisible(true);
                 break;

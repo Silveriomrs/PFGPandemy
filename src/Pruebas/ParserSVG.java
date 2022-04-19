@@ -2,7 +2,7 @@
  * ParserSVG para la conversión de datos gráficos, a fin de poder usar dichos
  * gráficos en la representación gráfica de los datos de la aplicación.
  */
-package modelo;
+package Pruebas;
 
 import java.awt.Polygon;
 

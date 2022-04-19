@@ -12,7 +12,6 @@ import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import controlador.ControladorModulos;
-import modelo.FondoPanel;
 import modelo.IO;
 import modelo.TypesFiles;
 
