@@ -63,7 +63,7 @@ public class TypesFiles {
     	tipos.put(PAL, "Paleta");
 		tipos.put(DEF, "Enfermedad");
 		tipos.put(CSV, "Archivo general");
-		tipos.put(HST, "Historico");
+		tipos.put(HST, "Histórico");
 		tipos.put(MAP, "Mapas");
 		tipos.put(GRP, "Grupos");
 		tipos.put(PRJ, "Proyecto");

@@ -17,7 +17,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 
-import modelo.IO;
+import controlador.IO;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

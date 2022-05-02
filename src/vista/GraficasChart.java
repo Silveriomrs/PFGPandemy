@@ -25,7 +25,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import modelo.IO;
+import controlador.IO;
 import modelo.Labels;
 import java.awt.BorderLayout;
 import javax.swing.JCheckBox;

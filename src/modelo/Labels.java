@@ -102,7 +102,7 @@ public class Labels {
 	
 	private static HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;
-	private static final String language = "Español";
+	private final static String language = "Español";
 	
 	/**
 	 * <p>Title: Labels</p>  
@@ -110,7 +110,6 @@ public class Labels {
 	 */
 	public Labels(){
 		dic = new HashMap<String,String>();
-//		nparametros = new HashMap<String,Integer>();
 		addLabels();
 	}
 	

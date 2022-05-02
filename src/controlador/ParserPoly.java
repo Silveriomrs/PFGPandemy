@@ -1,7 +1,7 @@
 /**
  * 
  */
-package modelo;
+package controlador;
 
 import java.awt.Polygon;
 

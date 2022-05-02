@@ -1,6 +1,8 @@
 /**  
 * <p>Title: ModuleType.java</p>  
-* <p>Description: </p>    
+* <p>Description: Contiene las etiquetas comunes a los diferentes tipos
+*  de ficheros que maneja la aplicación.</p>
+*  Cada etiqueta tiene asociado su significado completo.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 24 nov. 2021  

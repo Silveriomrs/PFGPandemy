@@ -6,10 +6,16 @@
 * @date 11 nov. 2021  
 * @version 1.0  
 */  
-package modelo;
+package controlador;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import modelo.DCVS;
+import modelo.DCVSFactory;
+import modelo.Labels;
+import modelo.TypesFiles;
+import modelo.Zona;
 
 /**
  * <p>Title: ParserProyectoVS</p>  

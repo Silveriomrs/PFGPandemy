@@ -12,10 +12,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /**
+ * Clase que soporta toda la parte del modelo de la aplicación. Contiene los datos
+ * en formato de tables y añade las funciones necesarias para facilitar su manipulación
+ * y lectura por los diferentes módulos que hacen uso de ella.
  * @author Silverio Manuel Rosales Santana
  * @date 2021.04.12
  * @version 2.8
- *
  */
 public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
@@ -163,23 +165,24 @@ public class DCVS implements TableModel{
 	 */
 	public DefaultTableModel delColumnas(int[] cols) {
 		int ncols = cols.length;												//Número de columnas a borrar.
-		int ncols2 = getColumnCount();									//Número de columnas en origen.
+		int ncols2 = getColumnCount();											//Número de columnas en origen.
 		int nfilas = getRowCount();
-		Object datos[][] = new Object[nfilas][ncols2 - ncols];
-		Object cabecera[] = new Object[ncols2 - ncols];
+		Object datos[][] = new Object[nfilas][ncols2 - ncols];					//Ajuste de las dimensiones de la nueva tabla.
+		Object cabecera[] = new Object[ncols2 - ncols];							//Ajuste de la nueva cabecera
 		int contCols = 0;
-		if (ncols > 0) {	
-			for(int j = 0; j<ncols2; j++) {
-				if(!isListed(cols,j)) {
-					//Copiar cabecera.
+		if (ncols > 0) {
+			for(int j = 0; j<ncols2; j++) {										//Bucle que debe copiar los datos que deben permanecer
+				if(!isListed(cols,j)) {											//Comprueba si la columna actual esta en la lista de columnas a eliminar.
+					//Copiar cabecera en caso de que esta columna no esté listada.
 					cabecera[contCols] = getColumnName(j);
-					//Copiar los datos.
+					//Copiar los datos de cada fila de dicha columnaen el mismo caso.
 					for(int i=0; i<nfilas;i++) {
 						datos[i][contCols] = getValueAt(i,j);	
 					}
 					contCols++;
 				}
 			}
+			//Compone la nueva tabla con la nueva cabecera y matriz.
 			this.cabecera = cabecera;
 			this.datos = datos;
 			modelo = new DefaultTableModel(datos,cabecera);
@@ -252,7 +255,7 @@ public class DCVS implements TableModel{
 	 * @return Modelo conformado.
 	 */
 	public DefaultTableModel crearModelo() {
-		this.modelo = new DefaultTableModel(datos,cabecera);				//Conformar modelo
+		this.modelo = new DefaultTableModel(datos,cabecera);					//Conformar modelo
 		return modelo;
 	}
 	
@@ -372,9 +375,11 @@ public class DCVS implements TableModel{
 		int col = -1;
 		int indexC = 0;
 		boolean encontrado = false;
+		//Bucle de búsqueda hasta encontrar la cadena o llegar al final de las columnas.
 		while(!encontrado && cols > indexC) {
-			String dato = getColumnName(indexC);
-			if(dato.equals(v)) {
+			String dato = getColumnName(indexC);								//Obtiene el valor de dicha columna.
+			if(dato.equals(v)) {												//Comprueba los valores búscado y contenido.
+				//En caso de encontrado, devuelve el número de columna y sale del bucle.
 				col = indexC;
 				encontrado = true;
 			}

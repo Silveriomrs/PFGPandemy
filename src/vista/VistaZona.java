@@ -20,7 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import modelo.IO;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,6 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import controlador.ControladorModulos;
+import controlador.IO;
 
 import javax.swing.JTextField;
 import java.awt.RenderingHints;
@@ -356,34 +356,5 @@ public class VistaZona extends JPanel {
             return tx.createTransformedShape(p2);
 		}
 	}
-	
-	/* Funciones de pruebas */
-	
-//	/**
-//	 * <p>Title: generaTest</p>  
-//	 * <p>Description: Genera unos datos básicos de prueba</p>
-//	 * Función para comprobar el correcto funcionamiento. Genera unos datos de prueba
-//	 * que será mostrados en la vista.
-//	 */
-//	public void generaTest() {
-//		Polygon p = new Polygon();
-//		p.addPoint( 65, 45 );
-//		p.addPoint( 95, 150 );
-//		p.addPoint( 170, 100 );
-//		
-//		this.zona = new Zona(0, "1_Test",2 , 3 ,4,5,6,7,8, p);
-//		System.out.println( this.zona.toString() + "\nNivel: " + zona.getNivel());
-//		refresh();
-//	}
-//	
-//	/**
-//	 * <p>Title: main</p>  
-//	 * <p>Description: Función a modo de prueba</p> 
-//	 * @param args ninguno.
-//	 */
-//	public static void main(String[] args) {
-//		VistaZona vz = new VistaZona(null,new ControladorModulos());
-//		vz.generaTest();
-//		vz.abrirFrame();
-//	}
+
 }

@@ -6,13 +6,19 @@
 * @date 11 nov. 2021  
 * @version 1.0  
 */  
-package modelo;
+package controlador;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+
+import modelo.DCVS;
+import modelo.DCVSFactory;
+import modelo.Labels;
+import modelo.TypesFiles;
+import modelo.Zona;
 
 /**
  * <p>Title: ParserProyectoVS</p>  
@@ -29,7 +35,7 @@ import java.util.HashMap;
 public class ParserProyectoVS {
 	
 	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
-	private DCVS mREL;												//Matriz de contactos (relaciones).
+	private DCVS mREL;															//Matriz de contactos (relaciones).
 	private DCVS definicionSIR;													//Módulo definición de la enfermedad (SIR)
 	private DCVS historico;														//Matriz de contactos (relaciones).
 	private DCVS proyecto;

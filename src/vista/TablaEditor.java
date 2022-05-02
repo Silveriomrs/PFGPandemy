@@ -43,8 +43,8 @@ import javax.swing.event.TableModelListener;
 
 import controlador.ControladorDatosIO;
 import controlador.ControladorModulos;
+import controlador.IO;
 import modelo.DCVS;
-import modelo.IO;
 import modelo.ModuleType;
 import modelo.TypesFiles;
 

@@ -28,14 +28,6 @@ import java.util.HashMap;
  * @version versión
  */
 public class DCVSFactory {
-
-	/**
-	 * <p>Title: </p>  
-	 * <p>Description: Constructor de la factoría de módulos. </p>  
-	 */
-	public DCVSFactory() {
-		// TODO Auto-generated constructor stub
-	}
 	
 		
 	/**

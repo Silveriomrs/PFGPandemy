@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import controlador.ControladorModulos;
+import controlador.IO;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -40,7 +41,6 @@ import java.util.Map.Entry;
 
 import java.awt.event.MouseAdapter;
 
-import modelo.IO;
 import modelo.TypesFiles;
 import modelo.Zona;
 

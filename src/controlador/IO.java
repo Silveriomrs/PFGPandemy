@@ -8,7 +8,7 @@
  * @author (Silverio Manuel Rosales Santana) 
  * @version (2017.10.15.0212)
  */
-package modelo;
+package controlador;
 
 
 import java.awt.Image;
@@ -23,6 +23,9 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+
+import modelo.DCVS;
+import modelo.TypesFiles;
 
 
 
@@ -107,7 +110,6 @@ public class IO{
 				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
 				ruta2 = ruta2 + ext;
 			}
-			System.out.println("Módulo IO - cambio de extensión: " + ruta + " -> " + ruta2);
 		}
 		
 		
@@ -123,7 +125,15 @@ public class IO{
 		return ruta2;
 	}
 	
-	
+	/**
+	 * <p>Title: getFile</p>  
+	 * <p>Description: Obtiene un enlace a un archivo en disco dentro de una instanccia
+	 *  File..</p> 
+	 * @param sel Tipo de dialogo a mostrar: 1 Abrir archivo, 2 Guardar archivo.
+	 * @param path ruta al fichero en disco. Null si se desea seleccionar un nuevo fichero.
+	 * @param ext Tipo de fichero a abrir.
+	 * @return Instancia File apuntando al fichero en disco. Null en otro caso.
+	 */
 	private File getFile(int sel, String path,String ext) {
 		File f = null;
 		String ruta = path;
@@ -181,7 +191,7 @@ public class IO{
 	 * @param ext Extensión con la que comparar.
 	 * @return True si las extensiones coinciden, False en otro caso.
 	 */
-	public static boolean checkExt(String ruta, String ext) {
+	private static boolean checkExt(String ruta, String ext) {
 		boolean ok = true;
 		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF

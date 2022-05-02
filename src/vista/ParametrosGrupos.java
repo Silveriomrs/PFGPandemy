@@ -23,7 +23,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 
 import controlador.ControladorModulos;
-import modelo.IO;
+import controlador.IO;
 import modelo.Zona;
 
 /**

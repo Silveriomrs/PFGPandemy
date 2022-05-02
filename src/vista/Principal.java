@@ -12,7 +12,7 @@ import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import controlador.ControladorModulos;
-import modelo.IO;
+import controlador.IO;
 import modelo.TypesFiles;
 
 import java.awt.BorderLayout;

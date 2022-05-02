@@ -16,7 +16,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
@@ -29,7 +28,7 @@ import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
 import controlador.ControladorModulos;
-import modelo.IO;
+import controlador.IO;
 import modelo.Labels;
 import modelo.TypesFiles;
 

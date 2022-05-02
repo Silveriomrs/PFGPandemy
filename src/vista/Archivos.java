@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorModulos;
-import modelo.IO;
+import controlador.IO;
 import modelo.TypesFiles;
 
 import java.awt.Color;
@@ -108,11 +108,11 @@ public class Archivos extends JPanel {
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
 		iniciarLabels(TypesFiles.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(TypesFiles.MAP,"Grupos","Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
-		iniciarLabels(TypesFiles.DEF,"Enfermedad","Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
-		iniciarLabels(TypesFiles.REL,"Relaciones","Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels(TypesFiles.PAL,"Paleta","Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels(TypesFiles.HST,"Histórico","Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),"Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
+		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),"Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
+		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),"Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),"Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
 		contador = 0;															// Reiniciar el contardor de líneas a 0.
 	}
 
@@ -475,15 +475,4 @@ public class Archivos extends JPanel {
 		}
 	}
 	
-//	
-//	/**
-//	 * <p>Title: main</p>  
-//	 * <p>Description: Función a efecto de pruebas</p> 
-//	 * @param args Nada.
-//	 */
-//	public static void main(String[] args) {
-//		Archivos archivos = new Archivos(new ControladorModulos());
-//		archivos.abrirFrame();	
-//	}
-//	
 }

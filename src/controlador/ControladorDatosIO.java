@@ -8,7 +8,6 @@ package controlador;
 import java.io.IOException;
 
 import modelo.DCVS;
-import modelo.IO;
 
 /**
  * @author Silverio Manuel Rosales Santana
