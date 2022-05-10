@@ -468,7 +468,7 @@ public class ControladorModulos {
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
 					clearProject();
-					importarProyectoVS(pVS);
+					importarModeloA(pVS);
 				}
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
@@ -479,7 +479,7 @@ public class ControladorModulos {
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) {
 					clearProject();
-					importarHistoricoVS(hVS);
+					importarModeloB(hVS);
 				}
 				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;		
@@ -1295,26 +1295,26 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: importarProyectoVS</p>  
+	 * <p>Title: importarModeloA</p>  
 	 * <p>Description: Importa los datos de un archivo de proyecto generado con VenSim.</p>
 	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, tales como la
 	 * matriz de contactos, R,S,I, tasas, etcetera.
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	private void importarProyectoVS(DCVS prjV) {
+	private void importarModeloA(DCVS prjV) {
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
 		// impediría modularidad e independencia de módulos.
-		ParserProyectoVS parser = new ParserProyectoVS(prjV);
+		ParserModeloA parser = new ParserModeloA(prjV);
 
 		//Establecer las zonas en las vistas correspondientes.
 		setZonas(parser.getZonas());
 		//Establecer el historico de niveles.
-		establecerDatos(parser.getHistorico());
+		establecerDatos(parser.getHST());
 		//Establecer datos propios de la enfermedad.
-		establecerDatos(parser.getmDefENF());
+		establecerDatos(parser.getDEF());
 		//Establecer matriz de relaciones.
-		establecerDatos(parser.getMContactos());
+		establecerDatos(parser.getREL());
 	}
 	
 	/**
@@ -1335,29 +1335,29 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: importarHistoricoVS</p>  
+	 * <p>Title: importarModeloB</p>  
 	 * <p>Description: Importa los datos de un archivo de salida (histórico) generado con VenSim.</p>
 	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, R,S,I, tasas, etcetera,
 	 * siempre que estén contenidos.
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	private void importarHistoricoVS(DCVS prjV) {
+	private void importarModeloB(DCVS prjV) {
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues 
 		// impediría modularidad e independencia de módulos.
-		ParserHistoricoVS parser = new ParserHistoricoVS(prjV);
+		ParserModeloB parser = new ParserModeloB(prjV);
 		//Establecer los datos del proyecto primero (provoca clear). 
-		abrirProyecto(parser.getMPRJ());
+		abrirProyecto(parser.getPRJ());
 		//Establecer datos de los grupos (Mapa).
 		establecerDatos(parser.getMAP());
 		//Establecer las zonas en las vistas correspondientes.
-		setZonas(zonas = parser.getZonas());
+		setZonas(parser.getZonas());
 		//Establecer datos propios de la enfermedad.
-		establecerDatos(parser.getmDefENF());
+		establecerDatos(parser.getDEF());
 		//Establecer matriz de relaciones.
-		establecerDatos(parser.getMContactos());
+		establecerDatos(parser.getREL());
 		//Establecer el historico de niveles.
-		establecerDatos(parser.getMHST());
+		establecerDatos(parser.getHST());
 		//Establecer paleta por defecto.
 		establecerDatos(parser.getPAL());
 		//Reiniciar vistas.

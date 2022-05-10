@@ -1,6 +1,6 @@
 /**  
-* <p>Title: ParserProyectoVS.java</p>  
-* <p>Description: Parser para importar datos de un proyecto VenSim</p>    
+* <p>Title: ParserModeloA.java</p>  
+* <p>Description: Parser para importar datos de un mPRJ VenSim</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 11 nov. 2021  
@@ -21,10 +21,10 @@ import modelo.TypesFiles;
 import modelo.Zona;
 
 /**
- * <p>Title: ParserProyectoVS</p>  
- * <p>Description: Parser para importar datos de un proyecto VenSim </p> 
+ * <p>Title: ParserModeloA</p>  
+ * <p>Description: Parser para importar datos de un mPRJ VenSim </p> 
  * La clase obtiene mediante un sistema de etiquetas todos los datos necesarios
- * de un proyecto VenSim y configura los módulos correspondientes con esos datos.
+ * de un mPRJ VenSim y configura los módulos correspondientes con esos datos.
  * Esta clase es usada para lectura de datos, no guarda datos.
  * <P>La fuente de datos tiene las etiquetas en la primera fila, es decir, 
  *  la información esta ordenada en columnas.</P>
@@ -32,13 +32,15 @@ import modelo.Zona;
  * @date 11 nov. 2021
  * @version versión 1.2
  */
-public class ParserProyectoVS {
+public class ParserModeloA {
 	
-	private DCVS dcvs;															//Conjunto de datos importados de VenSim.
+	private DCVS dcvs;															//Conjunto de datos importados desde VenSim.
 	private DCVS mREL;															//Matriz de contactos (relaciones).
-	private DCVS definicionSIR;													//Módulo definición de la enfermedad (SIR)
-	private DCVS historico;														//Matriz de contactos (relaciones).
-	private DCVS proyecto;
+	private DCVS mDEF;															//Módulo definición de la enfermedad (SIR)
+	private DCVS mPRJ;															//Módulo proyecto.
+	private DCVS mHST;															//Módulo histórico
+	private DCVS mMAP;
+	private DCVS mPAL;
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private HashMap<Integer,Zona> zonas;
 	private int NG;																//Número de grupos de población.
@@ -49,18 +51,18 @@ public class ParserProyectoVS {
 	/**
 	 * <p>Title: Constructor del parser</p>  
 	 * <p>Description: Inicializar el parser con los datos obtenidos por parámetro.</p>  
-	 * @param prjV Conjunto de datos del proyecto VenSim
+	 * @param prjV Conjunto de datos del mPRJ VenSim
 	 */
-	public ParserProyectoVS(DCVS prjV) {
+	public ParserModeloA(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
-		this.mREL = new DCVS();
-		this.definicionSIR = new DCVS();
-		this.historico = new DCVS();
-		this.proyecto = new DCVS();
+		this.mDEF = DCVSFactory.newModule(TypesFiles.DEF);
+		this.mPRJ = DCVSFactory.newModule(TypesFiles.PRJ);
+		this.mMAP = DCVSFactory.newModule(TypesFiles.MAP);
+		this.mPAL = DCVSFactory.newModule(TypesFiles.PAL);
+		setTypeAndName(this.mPAL,TypesFiles.PAL);
 		this.NG = 0;
 		IT = FT = 0;
-		
-		if(prjV != null) importarVensim(prjV);
+		if(prjV != null) importar(prjV);
 	}
 	
 
@@ -70,7 +72,7 @@ public class ParserProyectoVS {
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	public void importarVensim(DCVS prjV) {
+	private void importar(DCVS prjV) {
 		if (prjV != null) this.dcvs = prjV;
 		
 		//Obtención de los nombres de cada grupo.
@@ -78,7 +80,9 @@ public class ParserProyectoVS {
 		//Obtención del número de grupos.
 		this.NG = IDs.length;
 		if(traza) {
-			for(int i=0; i<NG;i++) System.out.println(IDs[i]);
+			String nombres = "Número de Grupos: " + NG + " >";
+			for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
+			System.out.println(nombres);
 		}
 		
 		//Obtención de los tiempos inicial y final.
@@ -86,7 +90,7 @@ public class ParserProyectoVS {
 		//Crear tantas Zonas como Grupos.
 		crearZonas();
 		
-		//Configuración del historico. Debe hacerse después de obtener Nombres e IDs
+		//Configuración del mHST. Debe hacerse después de obtener Nombres e IDs
 		//después de crear las zonas y antes del cálculo de los niveles de contagio.
 		setUpHistorico();
 
@@ -97,7 +101,7 @@ public class ParserProyectoVS {
 		//Depende de lectura previa de TIMES.
 		setUpDefEnf();
 		
-		//Por último la configuración del proyecto o modelo, pues para realizar
+		//Por último la configuración del mPRJ o modelo, pues para realizar
 		//Depende de que los otros módulos estén configurados.
 		setUpProyecto();
 		
@@ -138,39 +142,39 @@ public class ParserProyectoVS {
 	 *    tanto, se realiza una búsqueda encadenada de las tres etiquetas.</P>
 	 */
 	private void setUpDefEnf(){
-		setTypeAndName(definicionSIR,TypesFiles.DEF);
+		setTypeAndName(mDEF,TypesFiles.DEF);
 		//Crear cabecera		
 		String[] cabecera = {"tipo","dato"};
 		//Añadir cabecera.
-		definicionSIR.addCabecera(cabecera);
+		mDEF.addCabecera(cabecera);
 		
 		//Añadir etiquetas requeridas a la lista.
 		ArrayList<String> lista = new ArrayList<String>();
 		lista.add(Labels.PTE);
 		lista.add(Labels.DME);
 		
-		//Procesar la lista añadiendo dichos campos al módulo definicionSIR.
+		//Procesar la lista añadiendo dichos campos al módulo mDEF.
 		for(int i = 0; i<lista.size(); i++) {
 			String etiqueta = lista.get(i);
 			String value = "0";													//En caso de no estar, se configurará a 0.
 			int pos = dcvs.getColItem(etiqueta);		
 			if(pos > -1) {
 				value = (String) dcvs.getValueAt(0, pos);
-				definicionSIR.addFila(new String[]{etiqueta,value});
+				mDEF.addFila(new String[]{etiqueta,value});
 			}
-			else definicionSIR.addFila(new String[]{etiqueta,value});
+			else mDEF.addFila(new String[]{etiqueta,value});
 		}
 		
 		//IT Leído previamente
-		definicionSIR.addFila(new String[]{Labels.IT,"" + IT});
+		mDEF.addFila(new String[]{Labels.IT,"" + IT});
 		//FT Leído previamente
-		definicionSIR.addFila(new String[]{Labels.FT,"" + FT});
+		mDEF.addFila(new String[]{Labels.FT,"" + FT});
 		//Búsqueda de la IP específica.
-		definicionSIR.addFila(new String[]{Labels.IP,hasIP()});
+		mDEF.addFila(new String[]{Labels.IP,hasIP()});
 		//Búsqueda de DMIP o su inversa = 1/TVS
-		definicionSIR.addFila(new String[]{Labels.DMI,getDMIP()});
+		mDEF.addFila(new String[]{Labels.DMI,getDMIP()});
 		
-		if(traza) System.out.println( definicionSIR.toString() );		
+		if(traza) System.out.println( mDEF.toString() );		
 	}
 	
 	/**
@@ -219,23 +223,13 @@ public class ParserProyectoVS {
 	
 	private void setUpProyecto() {
 		//Añadir tipo y nombre
-		setTypeAndName(proyecto,TypesFiles.PRJ);
-		//Crear cabecera		
-		String[] cabecera = {"Tipo","Dato"};
-		//Añadir cabecera.
-		proyecto.addCabecera(cabecera);
-		//Añadir etiquetas generales.
-		proyecto.addFila(new String[]{Labels.NAME, dcvs.getNombre()});
-		proyecto.addFila(new String[]{Labels.NG,"" + getNG()});
-//		definicionSIR.addFila(new String[]{Labels.DATE,dcvs.getDate()});
-		proyecto.addFila(new String[]{Labels.DESCRIPTION,"Modelo obtenido de una fuente externa."});
-		
-		//Añadir ahora la ruta del resto de módulos.
-//		definicionSIR.addFila(new String[]{TypesFiles.HST,historico.getNombre()});
-//		definicionSIR.addFila(new String[]{TypesFiles.REL,mREL.getNombre()});
-//		definicionSIR.addFila(new String[]{TypesFiles.DEF,definicionSIR.getNombre()});
-		System.out.println("\nProyecto: \n" + proyecto.toString());
+		setTypeAndName(mPRJ,TypesFiles.PRJ);
 
+		//Añadir etiquetas generales.
+		mPRJ.addFila(new String[]{Labels.NAME, dcvs.getNombre()});
+		mPRJ.addFila(new String[]{Labels.NG,"" + getNG()});
+		mPRJ.addFila(new String[]{Labels.DESCRIPTION,"Modelo obtenido de una fuente externa."});	
+		System.out.println("\nProyecto: \n" + mPRJ.toString());
 	}
 		
 	/**
@@ -248,7 +242,7 @@ public class ParserProyectoVS {
 	 */
 	private void setUpHistorico() {
 		//Añadir tipo y nombre
-		setTypeAndName(historico,TypesFiles.HST);
+		setTypeAndName(mHST,TypesFiles.HST);
 		
 		String[] cabecera = new String[NG + 1];									//Una columna por cada zona y una columna para el tiempo.
 		//Generar cabecera.
@@ -258,12 +252,12 @@ public class ParserProyectoVS {
 			cabecera[i] = z.getID() + " " + z.getName();
 		}
 		//Añadir la cabecera.
-		historico.addCabecera(cabecera);
+		mHST.addCabecera(cabecera);
 		
 		//Añadir tantas filas como lecturas de tiempo hay.	
 		for(int i = IT; i<FT ;i++) {
 			String[] fila = new String[NG+1];									//Cada fila tiene NG+1 Slots (columnas).
-			historico.addFila(fila);
+			mHST.addFila(fila);
 		}
 	}
 	
@@ -299,10 +293,10 @@ public class ParserProyectoVS {
 					//Añadir fecha solo 1 vez, usar col = 1.
 					if(col == 1) {
 						//Añadimos valor al histórico.
-						historico.setValueAt("" + nivel, contador, col);
+						mHST.setValueAt("" + nivel, contador, col);
 						//Añadimos el tiempo.
 						String date =  new SimpleDateFormat("dd/MM/yyyy hh:mm").format(hoy);
-						historico.setValueAt(date, contador, 0);
+						mHST.setValueAt(date, contador, 0);
 						hoy = addDay(hoy);    									//Incrementar un día.
 					}				
 					contador++;													//Siguiente línea.
@@ -329,12 +323,7 @@ public class ParserProyectoVS {
 				int col = dcvs.getColItem(nameS);
 				if(col > -1) {addSerieXs(nameS,col,z);}							//Añadir la serie localizada a la zona indicada.
 			}
-			
-			if(traza) {
-//				z.getGrafica().setVisible(true);
-			}
 		}
-		
 	}
 		
 	@SuppressWarnings("unused")
@@ -596,32 +585,43 @@ public class ParserProyectoVS {
 	public int getNG() {return NG;}
 	
 	/**
-	 * @return Matriz de contactos.
-	 */
-	public DCVS getMContactos() {return this.mREL;}
-	
-	/**
-	 * @return Definición de la enfermedad, sus parámetros.
-	 */
-	public DCVS getmDefENF() {return definicionSIR;}	
-	
-	/**
-	 * @return Descripción del modelo (proyecto), sus parámetros.
-	 */
-	public DCVS getmProyecto() {return proyecto;}	
-
-	
-	/**
 	 * <p>Title: getZonas</p>  
 	 * <p>Description: </p> 
 	 * @return Los grupos de población o zonas obtenidas.
 	 */
-	public HashMap<Integer, Zona> getZonas() {return zonas;	}
-
+	public HashMap<Integer, Zona> getZonas() {return zonas;}	
 
 	/**
-	 * @return El historico con la representación de nivel de contagio.
+	 * @return Obtiene el módulo de grupos de población.
 	 */
-	public DCVS getHistorico() {return historico;}
+	public DCVS getMAP() {return mMAP;}
+	
+	/**
+	 * @return Matriz de contactos.
+	 */
+	public DCVS getREL() {return this.mREL;}
+	
+	/**
+	 * @return Definición de la enfermedad, sus parámetros.
+	 */
+	public DCVS getDEF() {return mDEF;}	
+	
+	/**
+	 * @return Descripción del modelo (mPRJ), sus parámetros.
+	 */
+	public DCVS getPRJ() {return mPRJ;}	
+
+	/**
+	 * @return El módulo HST con la representación de nivel de contagio.
+	 */
+	public DCVS getHST() {return mHST;}
+	
+	/**
+	 * <p>Title: getPAL</p>  
+	 * <p>Description: Devuelve una paleta de colores (leyenda) por defecto.</p>
+	 * El módulo almacena la configuración por defecto del resto del proyecto del parser.
+	 * @return Módulo paleta de colores (leyenda).
+	 */
+	public DCVS getPAL() {return this.mPAL;}
 	
 }

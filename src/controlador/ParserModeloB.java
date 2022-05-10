@@ -1,5 +1,5 @@
 /**  
-* <p>Title: ParserProyectoVS.java</p>  
+* <p>Title: ParserModeloA.java</p>  
 * <p>Description: Parser para importar datos de un proyecto VenSim</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
@@ -18,16 +18,16 @@ import modelo.TypesFiles;
 import modelo.Zona;
 
 /**
- * <p>Title: ParserProyectoVS</p>  
- * <p>Description: Parser para importar datos de un proyecto VenSim </p> 
+ * <p>Title: ParserModeloA</p>  
+ * <p>Description: Parser para importar datos de un proyecto VenSim cuyo etiquetado sea horizontal</p> 
  * La clase obtiene mediante un sistema de etiquetas todos los datos necesarios
  * de un proyecto VenSim y configura los módulos correspondientes con esos datos.
  * Esta clase es usada para lectura de datos, no guarda datos.
  * @author Silverio Manuel Rosales Santana
  * @date 11 nov. 2021
- * @version versión 1.0
+ * @version versión 1.2
  */
-public class ParserHistoricoVS {
+public class ParserModeloB {
 	
 	private DCVS dcvs;															//Conjunto de datos importados desde VenSim.
 	private DCVS mREL;															//Matriz de contactos (relaciones).
@@ -35,6 +35,7 @@ public class ParserHistoricoVS {
 	private DCVS mPRJ;															//Módulo proyecto.
 	private DCVS mHST;															//Módulo histórico
 	private DCVS mMAP;
+	private DCVS mPAL;
 	private String[] IDs;														//Almacena los nombres de los grupos.
 	private HashMap<Integer,Zona> zonas;
 	private int NG;																//Número de grupos de población.
@@ -47,16 +48,17 @@ public class ParserHistoricoVS {
 	 * <p>Description: Inicializar el parser con los datos obtenidos por parámetro.</p>  
 	 * @param prjV Conjunto de datos del proyecto VenSim
 	 */
-	public ParserHistoricoVS(DCVS prjV) {
+	public ParserModeloB(DCVS prjV) {
 		this.zonas = new HashMap<Integer,Zona>();
 		this.mREL = new DCVS();
 		this.mDEF = DCVSFactory.newModule(TypesFiles.DEF);
 		this.mPRJ = DCVSFactory.newModule(TypesFiles.PRJ);
 		this.mMAP = DCVSFactory.newModule(TypesFiles.MAP);
-			
+		this.mPAL = DCVSFactory.newModule(TypesFiles.PAL);
+		setTypeAndName(this.mPAL,TypesFiles.PAL);
 		this.NG = 0;
 		IT = FT = 0;
-		if(prjV != null) importarVensim(prjV);
+		if(prjV != null) importar(prjV);
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class ParserHistoricoVS {
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de salida Vensim.
 	 */
-	public void importarVensim(DCVS prjV) {
+	private void importar(DCVS prjV) {
 		if (prjV != null) this.dcvs = prjV;
 		System.out.println();
 		
@@ -74,9 +76,11 @@ public class ParserHistoricoVS {
 		
 		//Obtención del número de grupos.
 		this.NG = IDs.length;
-		String nombres = "Número de Grupos: " + NG + " >";
-		for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
-		if(traza) System.out.println(nombres);
+		if(traza) {
+			String nombres = "Número de Grupos: " + NG + " >";
+			for(int i=0; i<NG;i++) nombres +=  " " + IDs[i];
+			System.out.println(nombres);
+		}
 		
 		//Establecer módulo proyecto.
 		setUpProyecto();
@@ -102,29 +106,27 @@ public class ParserHistoricoVS {
 		crearMDEF();
 		
 		//Leer R,S,I
-		readXs("R");
-		readXs("S");
-		readXs("I");
+		readXs(Labels.R);
+		readXs(Labels.S);
+		readXs(Labels.I);
 		
 		//Leer casos de CC,CVS,CI
-		readXs("CC");
-		readXs("CVS");
-		readXs("CI");
+		readXs(Labels.CC);
+		readXs(Labels.CVS);
+		readXs(Labels.CI);
 		
 		//Leer o calcular Prevalencia.
 		//Debe realizarse después de haber obtenido R,S,I e CI.
-		if(getPosOp("P") > -1) {readXs("P");}									//Añadir la serie localizada a la zona indicada	
+		if(getPosOp(Labels.P) > -1) {readXs(Labels.P);}									//Añadir la serie localizada a la zona indicada	
 		else {getPs();}															//En otro caso calcular las prevalencias.
 		
 		//Leer tasas TC, TCONTAGIO
-		readXs("TC");
-		readXs("TCONTAGIO");
+		readXs(Labels.TC);
+		readXs(Labels.TCONTAGIO);
 		
 		//Leer casos de contactos de A con B y tasas de A con B
-		readXenZ("TCS");
-		readXenZ("CAB");
-		
-		
+		readXenZ(Labels.TCS);
+		readXenZ(Labels.CAB);		
 	}
 	
 	/**
@@ -160,7 +162,7 @@ public class ParserHistoricoVS {
 		mPRJ.setDataToLabel(Labels.NAME, dcvs.getNombre());
 		mPRJ.setDataToLabel(Labels.NG,"" + getNG());
 		mPRJ.setDataToLabel(Labels.DESCRIPTION,"Modelo obtenido de una fuente externa.");		
-		System.out.println("\nProyecto: \n" + mPRJ.toString());
+		if(traza) System.out.println("\nProyecto: \n" + mPRJ.toString());
 	}
 
 	/**
@@ -238,19 +240,24 @@ public class ParserHistoricoVS {
 	 * conjunto de datos.</p>
 	 */
 	private void crearMREL() {
-		mREL = DCVSFactory.newREL(zonas);
-		setTypeAndName(mREL,TypesFiles.REL);
+		mREL = DCVSFactory.newREL(zonas);										//Obtiene la tabla configurada.
+		setTypeAndName(mREL,TypesFiles.REL);									//Establece los atributos del nombre y tipo de módulo.
+		//Búsqueda de la primera coincidencia con el operador "C".
 		int index = getPosOp("C");
 		boolean hasMC = index > -1;
-		
+		//En caso de existir procesa.
 		if(hasMC) {
+			//Blucle para cada uno de los grupos de población
 			for(int i = 0; i<NG;i++) {
-				String label = "C " + IDs[i] + " ";
+				//Componer la etiqueta a buscar.
+				String label = "C " + IDs[i] + " ";								
 				for(int j = 0; j<NG;j++) {
+					//Búsqueda de la etiqueta para el grupo de población en curso.
 					index = dcvs.getFilaItem(label + IDs[j]);
 					hasMC = index > -1;
+					//En caso de estar contenida procede a la lectura de su valor asociado.
 					if(hasMC) {
-						//Leer valor.
+						//Leer valor asociado.
 						String valor = (String) dcvs.getValueAt(index, 1);
 						//escribir valor en tabla
 						mREL.setValueAt(valor,i,j+1);
@@ -347,7 +354,7 @@ public class ParserHistoricoVS {
 				index = mHST.getFilaItem(Labels.CI + " " + name);
 				double vci = Double.parseDouble((String) mHST.getValueAt(index, j+1));
 				double ci100K = 100000*vci/(vs+vi+vr);							//Cálculo
-				z.addNivel(Labels.C100K, j, ci100K);			//Guardado del Nivel de contagio.
+				z.addNivel(Labels.C100K, j, ci100K);							//Guardado del Nivel de contagio.
 				filaC100K[j+1] = "" + ci100K;									
 				
 				//Establecer estos valores iniciales en los grupos de población (zonas)
@@ -362,8 +369,7 @@ public class ParserHistoricoVS {
 			}
 			//Añadir las nuevas filas con los datos al módulo histórico.
 			mHST.addFila(filaC100K);
-			mHST.addFila(filaP);
-			
+			mHST.addFila(filaP);	
 		}
 	}
 	
@@ -379,26 +385,36 @@ public class ParserHistoricoVS {
 		//Primera ronda para el primer parámetro.
 		for(int i = 1; i<=NG; i++) {
 			Zona z = zonas.get(i);
+//			String[] fila = new String[FT + 1];
+//			fila[0] = et + " " + z.getName();
 			//Segunda ronda para el segundo parámetro.
 			for(int j=0; j<NG; j++) {
 				//Crear nombre columna.
 				String nameS = et + " " + z.getName() + " " + IDs[j];
 				int row = dcvs.getFilaItem(nameS);
-				if(row > -1) {addSerieXs(nameS,row,z);}							//Añadir la serie localizada a la zona indicada.
+				//Añadir la serie si ha sido localizada a la zona indicada.
+				if(row > -1) {
+					addSerieXs(nameS,row,z);
+					
+				}							
 			}	
 		}
 	}
 	
-	
+	/**
+	 * <p>Title: changeXY</p>  
+	 * <p>Description: Función auxiliar que permite cambiar las etiquetas particulares X y Z de 
+	 *   de una etiqueta con dos IDs, por sus correspondientes identificadores de grupos de población</p> 
+	 * @param et Etiqueta completa con sus sub-etiquetas X y Z.
+	 * @return Nueva etiqueta recompuesta con los identificadores personalizados.
+	 */
 	@SuppressWarnings("unused")
-	private String changeXY(String et, int id1, int id2) {
+	private String changeXY(String et) {
 		String label = et;
-		label = label.replaceFirst("X", IDs[1]);
-		label = label.replaceFirst("Z", IDs[2]);
+		label = label.replaceFirst("X", IDs[1]);								//Sustituir primera etiqueta.
+		label = label.replaceFirst("Z", IDs[2]);								//Sustituir segunda etiqueta.
 		return label;
-	}
-	
-	
+	}	
 	
 	/**
 	 * <p>Title: readXs</p>  
@@ -412,13 +428,11 @@ public class ParserHistoricoVS {
 		//Primero añadir las series básicas R,S e I a cada zona.
 		for(int i = 1; i<=NG; i++) {
 			Zona z = zonas.get(i);
-			String sID = et + " " + z.getName();
-			int row = dcvs.getFilaItem(sID);
+			String sID = et + " " + z.getName();								//Compone la etiqueta particular a la zona.
+			int row = dcvs.getFilaItem(sID);									//Obtiene la posición de dicha etiqueta.
 			if(row > -1) addSerieXs(et,row,z);									//Añadir la serie localizada a la zona indicada	
 		}
-	}
-	
-	
+	}	
 	
 	/**
 	 * <p>Title: addXs</p>  
@@ -434,7 +448,6 @@ public class ParserHistoricoVS {
 		int contador = IT;
 		String[] fila = new String[FT + 1];
 		fila[0] = et + " " + z.getName();
-		// OP + " " + NombreZ  == et
 		// Se recorre para cada tipo de dato todos los registros.
 		while(correcto && (contador < FT)) {
 			String s = (String) dcvs.getValueAt(pos, contador +1);
@@ -448,11 +461,9 @@ public class ParserHistoricoVS {
 			//Siguiente línea.
 			contador++;
 		}
-		
+		//Añadir el array de valores leídos al módulo.
 		mHST.addFila(fila);
 	}
-	
-	
 	
 	/**
 	 * <p>Title: readTimes</p>  
@@ -527,7 +538,14 @@ public class ParserHistoricoVS {
 				" Si: " + s + " Ii: " + i + " Ri: " + r);
 	}
 	
-	
+	/**
+	 * <p>Title: getNombresGrupos</p>  
+	 * <p>Description: Obtener todos los IDs contenidos en el módulo</p>
+	 * Esta función realiza una búsqueda de todas las etiquetas que contienen el denominador
+	 *  inicial "C" común a todos los grupos de población en su definición de la matriz de contactos.
+	 *   Son procesadas todas las coincidencias separando los identificadores de dichos grupos de población.
+	 * @return Arreglo de cadenas de texto con los IDs de los grupos de población.
+	 */
 	private String[] getNombresGrupos() {
 		String op = "C";		
 		int row0 = getPosOp("C");
@@ -595,21 +613,21 @@ public class ParserHistoricoVS {
 		return contador;														//Devolver número de coincidencias == número de grupos.
 	}
 	
-	
-	/**
-	 * @return El INITIAL TIME o tiempo de inicio de la simulación.
-	 */
-	public int getIT() {return IT;}	
 
 	/**
-	 * @return El FINAL TIME o tiempo final de la simulación.
+	 * <p>Title: getFirstID</p>  
+	 * <p>Description: Obtener el primer ID de una cadena de texto. </p> 
+	 * @param parte Una cadena de texto parcial de la que extraer el primer ID.
+	 * @return Primer ID encontrado.
 	 */
-	public int getFT() {return FT;}
-
-
 	private String getFirstID(String parte) {return parte.split(" ")[1];}
 	
-	
+	/**
+	 * <p>Title: getSecondID</p>  
+	 * <p>Description: Obtener el segundo ID de una cadena de texto. </p> 
+	 * @param parte Una cadena de texto parcial de la que extraer el segundo ID.
+	 * @return Segundo ID encontrado.
+	 */
 	private String getSecondID(String parte) {return parte.split(" ")[2];}
 	
 	/**
@@ -638,7 +656,8 @@ public class ParserHistoricoVS {
 	/**
 	 * <p>Title: hasOperator</p>  
 	 * <p>Description: Indica si la sintaxis de una cadena de comando y operadores
-	 * contiene un operador o comando determiando.</p> 
+	 * contiene un operador o comando determiando.</p>
+	 * Los comandos y operadores deben estar separados por espacios.
 	 * @param op Operador buscado.
 	 * @param txt Cadena de texto donde buscar el comando u operador.
 	 * @return TRUE si la cadena contiene dicho operador, FALSE en otro caso.
@@ -656,25 +675,17 @@ public class ParserHistoricoVS {
 	
 		return encontrado;
 	}
-
+	
 	
 	/**
-	 * @return Matriz de contactos.
+	 * @return El INITIAL TIME o tiempo de inicio de la simulación.
 	 */
-	public DCVS getMContactos() {return mREL;}
-
+	public int getIT() {return IT;}
 
 	/**
-	 * @return El/la zonas
+	 * @return El FINAL TIME o tiempo final de la simulación.
 	 */
-	public HashMap<Integer, Zona> getZonas() {return zonas;	}
-
-
-	/**
-	 * @return Obtiene el módulo de grupos de población.
-	 */
-	public DCVS getMAP() {return mMAP;}
-	
+	public int getFT() {return FT;}
 
 	/**
 	 * <p>Title: getNG</p>  
@@ -684,23 +695,38 @@ public class ParserHistoricoVS {
 	public int getNG() {return this.NG;}
 
 	/**
+	 * @return El/la zonas
+	 */
+	public HashMap<Integer, Zona> getZonas() {return zonas;}
+	
+	/**
+	 * @return Matriz de contactos.
+	 */
+	public DCVS getREL() {return mREL;}
+
+	/**
+	 * @return Obtiene el módulo de grupos de población.
+	 */
+	public DCVS getMAP() {return mMAP;}
+
+	/**
 	 * @return Definición de la enfermedad, sus parámetros.
 	 */
-	public DCVS getmDefENF() {return mDEF;}	
+	public DCVS getDEF() {return this.mDEF;}
 	
 	/**
 	 * <p>Title: getMPRJ</p>  
 	 * <p>Description: Devuelve el módulo del proyecto configurado.</p> 
 	 * @return Módulo Proyecto.
 	 */
-	public DCVS getMPRJ() {return mPRJ;}
+	public DCVS getPRJ() {return this.mPRJ;}
 	
 	/**
 	 * <p>Title: getMHST</p>  
 	 * <p>Description: Devuelve el módulo histórico con los valores obtenidos</p> 
 	 * @return Módulo histórico, con los datos leídos y los calculados a partir de estos.
 	 */
-	public DCVS getMHST() {return mHST;}
+	public DCVS getHST() {return this.mHST;}
 	
 	/**
 	 * <p>Title: getPAL</p>  
@@ -708,9 +734,5 @@ public class ParserHistoricoVS {
 	 * El módulo almacena la configuración por defecto del resto del proyecto del parser.
 	 * @return Módulo paleta de colores (leyenda).
 	 */
-	public DCVS getPAL() {
-		DCVS pal = DCVSFactory.newModule(TypesFiles.PAL);
-		setTypeAndName(pal,TypesFiles.PAL);
-		return pal;
-	}
+	public DCVS getPAL() {return this.mPAL;}
 }

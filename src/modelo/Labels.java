@@ -160,11 +160,7 @@ public class Labels {
 		//Etiquetas particulares de las zonas.
 		dic.put(ID, "Indentificador");
 		dic.put(PEOPLE, "Número de habitantes");
-		dic.put(AREA, "Superficie de la zona");
-		
-		///
-
-		
+		dic.put(AREA, "Superficie de la zona");		
 	}
 	
 	/**
@@ -195,7 +191,6 @@ public class Labels {
 		else if(label != null) System.out.println("No está agregada al diccionario: " + label);
 		return word;
 	}
-
 	
 	/**
 	 * <p>Title: getKey</p>  
