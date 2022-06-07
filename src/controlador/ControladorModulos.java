@@ -109,7 +109,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: generarModulosBasicos</p>  
 	 * <p>Description: Genera los módulos básicos para operar con el sistema</p>
 	 * Estos son los del proyecto y los parámetros de la enfermedad.
 	 */
@@ -124,19 +123,29 @@ public class ControladorModulos {
 		
 	}
 	
+	/**
+	 * <p>Description: Genera la tabla del módulo correspondiente a la definición de
+	 *  propiedades intrínsicas de la enfermedad.</p>
+	 * Esta función además integra dicha tabla en el resto de la aplicación.
+	 */
 	private void generarModuloDEF() {
 		DCVS pSIR = DCVSFactory.newModule(TypesFiles.DEF);
 		//Procesarlo.
 		establecerDatos(pSIR);
 	}
 	
+	/**
+	 * <p>Description: Genera una tabla (módulo) de la representación en grados de color
+	 *  de los niveles de contagio on las etiquetas propias.</p>
+	 * <p>Además de establecerle los atributos propios que pudieran estar definidos en el proyecto y
+	 *  procesará el establecimiento del módulo generado dentro de la aplicación.
+	 */
 	private void generarModuloPAL() {
 		DCVS pal = DCVSFactory.newModule(TypesFiles.PAL);
 		establecerDatos(pal);
 	}
 	
 	/**
-	 * <p>Title: generarModuloMAP</p>  
 	 * <p>Description: Genera el módulo de grupos de población o zonas.</p>
 	 * El módulo es añadido al conjunto de módulos sin datos de los propios
 	 *  grupos de población añadidos.
@@ -151,6 +160,13 @@ public class ControladorModulos {
 		establecerDatos(moduloZonas);
 	}
 	
+	/**
+	 * <p>Description: Genera una tabla (módulo) de relaciones o matriz de contactos
+	 *  con las etiquetas propias, además de establecerle los atributos propios que
+	 *   pudieran estar definidos en el proyecto.</p>
+	 * Esta función también procesará el establecimiento del módulo generado dentro
+	 *  de la aplicación.
+	 */
 	private void generarModuloREL(){
 		//Añadimos nueva matriz de contactos.
 		DCVS relaciones = DCVSFactory.newREL(zonas);
@@ -159,7 +175,6 @@ public class ControladorModulos {
 	}
 			
 	/**
-	 * <p>Title: setProjectParameters</p>  
 	 * <p>Description: Añade los tres parámetros básicos del proyecto al módulo</p>
 	 * Estos son: Nombre unificado, directorio de trabajo y ruta absoluta.
 	 *  Debe existir previamente un módulo de proyecto creado y con dichos parámetros.
@@ -191,22 +206,39 @@ public class ControladorModulos {
 		}
 	}
 	
-
 	/**
-	 * <p>Title: refresh</p>  
 	 * <p>Description: Llama a cada una de las vistas para que actualicen sus datos</p>
 	 */
 	private void refresh() {
 		archivos.refresh();
 		principal.refresh();
 		paleta.refresh();
-		vistaSIR.reset();
-		pproyecto.refresh();
+		vistaSIR.refresh();
 		pgrupos.refresh();
 	}
 	
 	/**
-	 * <p>Title: agregarPaneles</p>  
+	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
+	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
+	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
+	 */
+	private void setZonas(HashMap<Integer,Zona> zonas) {
+		this.zonas = zonas;
+		//Actualiza el mapa.
+		mapa.reset();
+		//Actualizar Grupos.
+		pgrupos.reset();
+		//Actualizar en vista del proyecto en valor de NG.
+		pproyecto.refresh();
+		//Actualización de la vista principal.
+		principal.reset();
+		//Actualización de la pizarra.
+		pizarra.reset();
+		//Actualización de la vista archivos.
+		archivos.refresh();
+	}
+	
+	/**
 	 * <p>Description: Aquí se situan todos los paneles (módulos) que se quieren
 	 * añadir al a vista principal en su panel central.</p>
 	 */
@@ -221,7 +253,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: addDefaultBorder</p>  
 	 * <p>Description: Añade un JPanel (módulo) a la vista central del módulo principal 
 	 * dotándole además de un border personalizado para la aplicación a todos los paneles.</p>
 	 * Como añadido coloca un título a dicho panel, permitiendo identificarlo con 
@@ -244,7 +275,6 @@ public class ControladorModulos {
 	}
 		
 	/**
-	 * <p>Title: hasZonas</p>  
 	 * <p>Description: Indica si hay zonas cargadas.</p> 
 	 * @return TRUE si el sistema tiene zonas definidas, FALSE en otro caso.
 	 */
@@ -262,7 +292,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: getLevelColor</p>  
 	 * <p>Description: Devuelve el color correspondiente a un nivel de contagio.</p> 
 	 * @param n Nivel de contagio del 0 al 9. Siendo el 0 el más bajo y el 9 el más alto.
 	 * @return Color representante de dicho nivel.
@@ -285,7 +314,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: setPoligonos</p>  
 	 * <p>Description: Establece la representación gráfica de cada zona. Una fila
 	 * por zona.</p> 
 	 * @param datos DCVS con los datos especificados de cada zona.
@@ -304,7 +332,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: getZonas</p>  
 	 * <p>Description: Función para facilitar el acceso al conjuto de 
 	 * zonas desde otros módulos.</p> 
 	 * @return Conjunto de zonas actualmente almacenados.
@@ -312,7 +339,6 @@ public class ControladorModulos {
 	public HashMap<Integer,Zona> getZonas() { return this.zonas;}
 			
 	/**
-	 * <p>Title: isNumeric</p>  
 	 * <p>Description: Determina si un dato es convertible a un número tipo Integer</p> 
 	 * @param cadena Cadena de texto a evaluar.
 	 * @return TRUE si es convertible a Integer, FALSE en otro caso.
@@ -359,10 +385,7 @@ public class ControladorModulos {
 		return z;
 	}
 
-	/*  Métodos relacionados con la reproducción  */
-	
 	/**
-	 * <p>Title: situarVentana</p>  
 	 * <p>Description: Posiciona el marco (frame) del módulo incado en la nueva
 	 *  posición de la pantalla, este método no hace por si solo visible el marco. </p>
 	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA". Los cuales
@@ -387,8 +410,9 @@ public class ControladorModulos {
 		}
 	}
 	
+	/*  Métodos relacionados con la reproducción  */
+	
 	/**
-	 * <p>Title: isPlayable</p>  
 	 * <p>Description: Evalua si el reproductor puede ser ejecutado en función
 	 *  de disponer de un historico condatos y un conjunto de zonas representables</p>
 	 *  Para facilitar su seguimiento, en caso de no cumplirse la idoniedad, mostrará
@@ -402,14 +426,12 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: play</p>  
 	 * <p>Description: Ejecuta la reproducción de un historico mostrando gráficamente
 	 * la evolución grabada. </p>
 	 * La representación gráfica corresponde a las zonas creadas. Para poder
 	 * usarse esta función deben haber sido almacezandos previamente los datos
-	 * de las zonas y el historico a reproducir.
-	 * @also setPoligonos.
-	 * @also setPaleta.
+	 * de las zonas y el historico a reproducir. Para más detalles consultar:
+	 * - \ref setPoligonos()
 	 */
 	private void play() {
 		if(isPlayable()) {
@@ -419,10 +441,202 @@ public class ControladorModulos {
 	}
 
 	
+	/* Control ARCHIVOS */
+	
+	/**
+	 * <p>Description: Devuelve el módulo con la información que contenga. </p>
+	 * El tipo de módulo es acorde a las extensiones aceptadas.
+	 * @param tipo Tipo de módulo a devolver. Ej. MAP, HST, etc.
+	 * @return El módulo solicitado.
+	 */
+	public DCVS getModule(String tipo) {
+		DCVS dcvs = null;
+		if(modulos.containsKey(tipo)) dcvs = modulos.get(tipo);
+		return dcvs;
+	}
+	
+	/**
+	 * <p>Description: Indica si existe un módulo cargado en el sistema.</p> 
+	 * @param tipo Tipo de módulo
+	 * @return TRUE si el sistema contiene dicho módulo, FALSE en otro caso.
+	 * \see TypesFiles
+	 */
+	public boolean hasModule(String tipo) {	return modulos.containsKey(tipo);}
+	
+	/**
+	 * <p>Description: Guarda la configuración del proyecto.</p> En caso de que
+	 * el módulo recibido sea null, no realizará operación alguna. Cuando dicho
+	 *  módulo no tiene establecido un directorio de trabajo, lo obtendrá del 
+	 *   resultado de la operación.
+	 * <P>Cuando se guarda los módulos existentes serán guardados en el mismo
+	 * mismo directorio de trabajo, además de variar sus propiedades internas para
+	 *  conservar dichos cambios.</P>
+	 * Aquellos módulos creados pero sin nombre asignado obtendrán el nombre del
+	 *  proyecto con la extensión propia de cada módulo.
+	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ.
+	 * @return TRUE si la operación se ha realizado correctamente. False en otro caso.
+	 */
+	private boolean saveProjectAs(DCVS dcvsIn) {
+		boolean done = true;
+		DCVS dcvs = dcvsIn;
+		//Guardado del fichero: En name se almacena el nombre elegido con su extensión.
+		String name = cio.guardarArchivo(dcvs);
+		//Si no es nulo el módulo y no se ha cancelado el guardado -> procede.
+		if(dcvs != null && name != null) {
+			//Obtener nuevo nombre y directorio de trabajo usado en este guardado.
+			String wd = IO.WorkingDirectory;
+			//Configuración de la ruta
+			dcvs.setRuta(wd + separador + name);
+			dcvs.setName(name);
+			dcvs.setDirectorio(wd);
+			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
+			saveAllTogether();													//Guardar resto	
+			//Mostrar rutas en Field.
+			archivos.refresh();
+		}else done = false;
+		
+		return done;
+	}
+	
+	/**
+	 * <p>Description: Almacena los módulos actuales del sistema en el mismo
+	 *  directorio de trabajo que el módulo principal (proyecto).</p>
+	 */
+	private void saveAllTogether() {
+		modulos.forEach((type,module)->{
+			if(!type.equals(TypesFiles.PRJ)) {
+				setProjectParameters(module);;
+				//Re-integrar el módulo en el entorno.
+				establecerDatos(module);
+				//Guardar en el directorio de trabajo.
+				saveModule(type,false);
+			}
+		});
+	}
+	
+	/**
+	 * <p>Description: Elimina los datos del proyecto y reinicia las vistas. </p>
+	 */
+	private void clearProject() {
+		//Borrado de todos los módulos.
+		modulos.clear();
+		//Borrado de las zonas cargadas.
+		zonas.clear();
+		//Limpieza de las etiquetas de las vistas de diferentes módulos.
+		tablaEditor.reset();
+		archivos.reset();
+		vistaSIR.reset();
+		pproyecto.reset();
+		player.clear();
+		mapa.reset();
+		pgrupos.reset();
+		principal.reset();
+		mostrarPanel(panelActivo);
+		paleta.reset();
+		pizarra.reset();
+	}
+	
+	/**
+	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
+	 * correspondientes.</p>
+	 * @param dcvs Archivo de proyecto con los datos del resto de módulos.
+	 */
+	public void abrirProyecto(DCVS dcvs) {
+		int NG = 0;																//Número de zonas que tiene definido el proyecto.
+		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
+		String wd = IO.WorkingDirectory + separador;
+		//Reiniciar todas las vistas y borrar datos anteriores.
+		clearProject();	
+
+		//Lectura de los módulos a cargar
+		for(int i= 0;  i < nm; i++) {
+			String[] m = dcvs.getRow(i);
+			String dato = m[1];
+			String etiq = m[0];
+			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
+			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
+				//Como es un módulo, que esta dentro del proyecto, al nombre del archivo
+				//Le añadimos al directorio de trabajo. Esa será la ruta donde debe
+				//Estar el otro archivo.
+				String ruta = wd + dato;
+				DCVS mAux = cio.abrirArchivo(ruta,etiq);						//Carga el módulo desde el sistema de archivos.
+				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
+				else showMessage("Archivo de proyecto incorrecto. \nReferencia un módulo que no está contenido en la misma carpeta:\n " + dato + "." + etiq,0);
+			}else if(etiq.equals(Labels.NG)){									
+				//Guardar el número de zonas que debe contener el proyecto.
+				NG = Integer.parseInt(dato);
+			}
+		}
+		
+		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
+		archivos.disableAllSavers();
+		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
+		modulos.put(dcvs.getTipo(), dcvs);
+		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
+		//Sino coinciden el número de zonas, re-ajustar.
+		if(NG != getNumberZonas()) resizeZonas(NG);
+		//Refrescar vista de Proyecto
+		refresh();
+	}
+	
+	/**
+	 * <p>Description: Introduce los datos (tipo y nombre del archivo del módulo)
+	 *  en el módulo del proyecto. Su finalidad es la carga de este módulo al abrir
+	 *   el proyecto.</p>
+	 * No realiza acción alguna sino hay un módulo de proyecto previamente en el sistema.
+	 * @param datos Módulo a referenciar dentro del módulo del proyecto.
+	 */
+	private void insertInProjectModule(DCVS datos) {
+		String tipo = datos.getTipo();
+		if(modulos.containsKey(TypesFiles.PRJ)) {
+			String[] nuevaEntrada = {tipo,datos.getNombre()};
+			int linea = modulos.get(TypesFiles.PRJ).getFilaItem(tipo);
+			boolean lineaDuplicada = linea > -1;
+			//Si hay un módulo ya cargado, hay que sustituirlo.
+			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	//Eliminar entrada duplicada.
+			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					//Añadir nueva entrada.
+		}
+	}
+		
+	/**
+	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
+	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
+	 * @param datos Conjunto de datos y cabecera encapsulados.
+	 */
+	private void establecerDatos(DCVS datos) {
+		String tipo = datos.getTipo();
+		
+		//Añadir la ruta del módulo al módulo del proyecto.
+		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
+		insertInProjectModule(datos);
+		
+		//Guardar los datos del módulo en su conjunto.
+		modulos.put(tipo, datos);
+		
+		//Operaciones extras según tipo de módulo.
+		switch(tipo) {
+		case (TypesFiles.REL):		
+			break;
+		case (TypesFiles.MAP):	
+			setPoligonos(datos);
+			//Forzar a todas las vistas a actualizar sus datos. La función setZonas se encarga.
+			setZonas(zonas);
+			break;
+		case (TypesFiles.HST):
+			break;
+		case (TypesFiles.DEF):
+			break;
+		case (TypesFiles.PAL):
+			break;
+		default:
+		}
+		
+		refresh();
+	}
+	
 	/* Acciones Principal */
 	
 	/**
-	 * <p>Title: doAction</p>  
 	 * <p>Description: Realiza la acción concreta indicada desde la vista
 	 * que ha realizado la llamada.</p> 
 	 * @param nombre Nombre de la acción.
@@ -468,7 +682,7 @@ public class ControladorModulos {
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
 					clearProject();
-					importarModeloA(pVS);
+					importarModelo(pVS,"A");
 				}
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
@@ -479,7 +693,7 @@ public class ControladorModulos {
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) {
 					clearProject();
-					importarModeloB(hVS);
+					importarModelo(hVS,"B");
 				}
 				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;		
@@ -500,9 +714,7 @@ public class ControladorModulos {
 		}
 	}
 	
-	
 	/**
-	 * <p>Title: mostrarPanel</p>  
 	 * <p>Description: Establece la vista que debe ser visible.</p> 
 	 * @param nombre Nombre de la vista a hacer visible.
 	 */
@@ -552,216 +764,11 @@ public class ControladorModulos {
 		
 		return opcion;
 	}
-	
-	/* Control ARCHIVOS */
-	
-	/**
-	 * <p>Title: getModule</p>  
-	 * <p>Description: Devuelve el módulo con la información que contenga. </p>
-	 * El tipo de módulo es acorde a las extensiones aceptadas.
-	 * @param tipo Tipo de módulo a devolver. Ej. MAP, HST, etc.
-	 * @return El módulo solicitado.
-	 */
-	public DCVS getModule(String tipo) {
-		DCVS dcvs = null;
-		if(modulos.containsKey(tipo)) dcvs = modulos.get(tipo);
-		return dcvs;
-	}
-	
-	/**
-	 * <p>Title: hasModule</p>  
-	 * <p>Description: Indica si existe un módulo cargado en el sistema.</p> 
-	 * @param tipo Tipo de módulo {@link TypesFiles Tipo de archivos y módulos}.
-	 * @return TRUE si el sistema contiene dicho módulo, FALSE en otro caso.
-	 */
-	public boolean hasModule(String tipo) {	return modulos.containsKey(tipo);}
-	
-	/**
-	 * <p>Title: saveProjectAs</p>  
-	 * <p>Description: Guarda la configuración del proyecto.</p> En caso de que
-	 * el módulo recibido sea null, no realizará operación alguna. Cuando dicho
-	 *  módulo no tiene establecido un directorio de trabajo, lo obtendrá del 
-	 *   resultado de la operación.
-	 * <P>Cuando se guarda los módulos existentes serán guardados en el mismo
-	 * mismo directorio de trabajo, además de variar sus propiedades internas para
-	 *  conservar dichos cambios.</P>
-	 * Aquellos módulos creados pero sin nombre asignado obtendrán el nombre del
-	 *  proyecto con la extensión propia de cada módulo.
-	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ.
-	 * @return TRUE si la operación se ha realizado correctamente. False en otro caso.
-	 */
-	private boolean saveProjectAs(DCVS dcvsIn) {
-		boolean done = true;
-		DCVS dcvs = dcvsIn;
-		//Guardado del fichero: En name se almacena el nombre elegido con su extensión.
-		String name = cio.guardarArchivo(dcvs);
-		//Si no es nulo el módulo y no se ha cancelado el guardado -> procede.
-		if(dcvs != null && name != null) {
-			//Obtener nuevo nombre y directorio de trabajo usado en este guardado.
-			String wd = IO.WorkingDirectory;
-			//Configuración de la ruta
-			dcvs.setRuta(wd + separador + name);
-			dcvs.setName(name);
-			dcvs.setDirectorio(wd);
-			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
-			saveAllTogether();													//Guardar resto	
-			//Mostrar rutas en Field.
-			archivos.refresh();
-		}else done = false;
 		
-		return done;
-	}
-	
-	/**
-	 * <p>Title: saveAllTogether</p>  
-	 * <p>Description: Almacena los módulos actuales del sistema en el mismo
-	 *  directorio de trabajo que el módulo principal (proyecto).</p>
-	 */
-	private void saveAllTogether() {
-		modulos.forEach((type,module)->{
-			if(!type.equals(TypesFiles.PRJ)) {
-				setProjectParameters(module);;
-				//Re-integrar el módulo en el entorno.
-				establecerDatos(module);
-				//Guardar en el directorio de trabajo.
-				saveModule(type,false);
-			}
-		});
-	}
-	
-	/**
-	 * <p>Title: clearProject</p>  
-	 * <p>Description: Elimina los datos del proyecto y reinicia las vistas. </p>
-	 */
-	private void clearProject() {
-		//Borrado de todos los módulos.
-		modulos.clear();
-		//Borrado de las zonas cargadas.
-		zonas.clear();
-		//Limpieza de las etiquetas de las vistas de diferentes módulos.
-		tablaEditor.reset();
-		archivos.reset();
-		vistaSIR.reset();
-		pproyecto.reset();
-		player.clear();
-		mapa.reset();
-		pgrupos.reset();
-		principal.reset();
-		mostrarPanel(panelActivo);
-		paleta.reset();
-		pizarra.reset();
-	}
-	
-	/**
-	 * <p>Title: abrirProyecto</p>  
-	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
-	 * correspondientes.</p>
-	 * @param dcvs Archivo de proyecto con los datos del resto de módulos.
-	 */
-	public void abrirProyecto(DCVS dcvs) {
-		int NG = 0;																//Número de zonas que tiene definido el proyecto.
-		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
-		String wd = IO.WorkingDirectory + separador;
-		//Reiniciar todas las vistas y borrar datos anteriores.
-		clearProject();	
-
-		//Lectura de los módulos a cargar
-		for(int i= 0;  i < nm; i++) {
-			String[] m = dcvs.getRow(i);
-			String dato = m[1];
-			String etiq = m[0];
-			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
-			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
-				//Como es un módulo, que esta dentro del proyecto, al nombre del archivo
-				//Le añadimos al directorio de trabajo. Esa será la ruta donde debe
-				//Estar el otro archivo.
-				String ruta = wd + dato;
-				DCVS mAux = cio.abrirArchivo(ruta,etiq);						//Carga el módulo desde el sistema de archivos.
-				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
-				else showMessage("Archivo de proyecto incorrecto. \nReferencia un módulo que no está contenido en la misma carpeta:\n " + dato + "." + etiq,0);
-			}else if(etiq.equals(Labels.NG)){									
-				//Guardar el número de zonas que debe contener el proyecto.
-				NG = Integer.parseInt(dato);
-			}
-		}
-		
-		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
-		archivos.disableAllSavers();
-		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
-		modulos.put(dcvs.getTipo(), dcvs);
-		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
-		//Sino coinciden el número de zonas, re-ajustar.
-		if(NG != getNumberZonas()) resizeZonas(NG);
-		//Refrescar vista de Proyecto
-		refresh();
-	}
-	
-	/**
-	 * <p>Title: insertInProjectModule</p>  
-	 * <p>Description: Introduce los datos (tipo y nombre del archivo del módulo)
-	 *  en el módulo del proyecto. Su finalidad es la carga de este módulo al abrir
-	 *   el proyecto.</p>
-	 * No realiza acción alguna sino hay un módulo de proyecto previamente en el sistema.
-	 * @param datos Módulo a referenciar dentro del módulo del proyecto.
-	 */
-	private void insertInProjectModule(DCVS datos) {
-		String tipo = datos.getTipo();
-		if(modulos.containsKey(TypesFiles.PRJ)) {
-			String[] nuevaEntrada = {tipo,datos.getNombre()};
-			int linea = modulos.get(TypesFiles.PRJ).getFilaItem(tipo);
-			boolean lineaDuplicada = linea > -1;
-			//Si hay un módulo ya cargado, hay que sustituirlo.
-			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	//Eliminar entrada duplicada.
-			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					//Añadir nueva entrada.
-		}
-	}
-		
-	/**
-	 * <p>Title: establecerDatos</p>  
-	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
-	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
-	 * @param datos Conjunto de datos y cabecera encapsulados.
-	 * @return TRUE si la operación se ha realizado. FALSE en otro caso.
-	 */
-	private boolean establecerDatos(DCVS datos) {
-		boolean isDone = true;
-		String tipo = datos.getTipo();
-		
-		//Añadir la ruta del módulo al módulo del proyecto.
-		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
-		insertInProjectModule(datos);
-		
-		//Guardar los datos del módulo en su conjunto.
-		if(isDone) modulos.put(tipo, datos);
-		
-		//Operaciones extras según tipo de módulo.
-		switch(tipo) {
-		case (TypesFiles.REL):		
-			break;
-		case (TypesFiles.MAP):	
-			if(isDone) {
-				setPoligonos(datos);
-				//Forzar a todas las vistas a actualizar sus datos. La función setZonas se encarga.
-				setZonas(zonas);
-			}
-			break;
-		case (TypesFiles.HST):
-			break;
-		case (TypesFiles.DEF):
-			break;
-		case (TypesFiles.PAL):
-			break;
-		default:
-		}
-		
-		refresh();
-		return isDone;
-	}
 	
 	/* Acciones Pizarra*/
 
 	/**
-	 * <p>Title: doActionPizarra</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a esta vista</p>
 	 * La vista de pizarra puede comunicar dos operaciones: 1. aplicar cambios 
 	 *  de las representaciones gráficas de los grupos de población o zonas.
@@ -790,13 +797,11 @@ public class ControladorModulos {
 		}
 		return done;
 	}
-	
-	
+		
 	
 	/* Acciones Archivos */
 	
 	/**
-	 * <p>Title: openModule</p>  
 	 * <p>Description: Abre un fichero (módulo) desde disco.</p> 
 	 * @param ext Tipo de fichero/módulo a abrir.
 	 * @return TRUE si la operación se ha realizado correctamente. FALSE en otro caso.
@@ -823,7 +828,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: regenerarModuloBasico</p>  
 	 * <p>Description: Recrea el módulo especificado con los parámetros básicos</p>
 	 * Método diseñado para restablecer valroes por defecto cuando se elimina un 
 	 *  módulo considerado básico.
@@ -833,7 +837,7 @@ public class ControladorModulos {
 	 */
 	private void regenerarModuloBasico(String type) {
 		switch(type) {
-		case(TypesFiles.MAP): generarModuloMAP(); generarModuloREL(); break;	//Generar un mapa => generar Relaciones también.
+		case(TypesFiles.MAP): generarModuloMAP();								//Generar un mapa => generar Relaciones también.
 		case(TypesFiles.REL): generarModuloREL(); break;
 		case(TypesFiles.DEF): generarModuloDEF(); break;
 		case(TypesFiles.PAL): generarModuloPAL(); break;						//Efecto de restablecer valores por defecto.
@@ -841,7 +845,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: removeModule</p>  
 	 * <p>Description: Elimina un módulo del proyecto.</p>
 	 * Elimina tanto la referencia dentro del módulo del proyecto como del conjunto
 	 *  de módulos cargados. No elimina el fichero del disco. 
@@ -870,7 +873,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: saveModule</p>  
 	 * <p>Description: Guarda los datos del módulo indicado en el disco.</p>
 	 * El método puede guardar en la ruta indicada dentro del propio módulo o
 	 *  realizar una consulta del lugar donde guardarlo. Este comportamiento es
@@ -894,11 +896,9 @@ public class ControladorModulos {
 			done = saveProjectAs(dcvs);
 		}
 		return done;
-	}
-	
+	}	
 	
 	/**
-	 * <p>Title: doActionArchivos</p>  
 	 * <p>Description: Función dedicada a la realización de las funciones de la
 	 * la vista correspondiente.</p>
 	 * Recibiendo dos operadores por parámetros realiza las diferentes actividades
@@ -930,7 +930,6 @@ public class ControladorModulos {
 	/* Acciones TableEditor */
 	
 	/**
-	 * <p>Title: editModule</p>  
 	 * <p>Description: Abre el editor general de módulos con el módulo en cuestión.</p>
 	 * @see modelo.ModuleType
 	 * @param ext Tipo de módulo a editar.
@@ -942,7 +941,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: doActionTable</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes al módulo
 	 *  editor de tablas.</p>
 	 * @param modulo Módulo con los datos que esperan ser guardados tras modificación.
@@ -951,12 +949,11 @@ public class ControladorModulos {
 	public boolean doActionTableEditor(DCVS modulo) {
 		boolean done = true;
 		if(modulo != null) {
-			done = establecerDatos(modulo);
+			establecerDatos(modulo);
 			//indicar al módulo de archivos que modulo se ha modificado para activar 
 			//El botón de guardar correspondiente.
 			archivos.enableBotonesGuardado(modulo.getTipo(), true);
 		}
-		
 		refresh();	
 		return done;
 	}
@@ -964,7 +961,6 @@ public class ControladorModulos {
 	/* Acciones VistasZonas y Grupos */
 	
 	/**
-	 * <p>Title: resizeDCVS</p>  
 	 * <p>Description: Ajusta el número de columnas del módulo.</p>
 	 * El método comprueba si el número de columnas existentes es menor que el 
 	 *  nuevo número de columnas indicado, en tal caso genera nuevas columnas y 
@@ -988,7 +984,19 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: doActionVistaZona</p>  
+	 * <p>Description: Incluye el nombre de un grupo de población en la matriz de
+	 *  relaciones.</p> 
+	 * @param ID Identificador del grupo de población.
+	 */
+	private void setNameMAPinREL(int ID) {
+		String name = zonas.get(ID).getName();
+		//Cambiar el nombre de la fila (su etiqueta)
+		getModule(TypesFiles.REL).setValueAt(name, ID-1, 0);					//IDs empiezan por 1, las filas por 0.
+		//Cambiar el nombre de la columnna.
+		getModule(TypesFiles.REL).setColumnName(ID, name);
+	}
+	
+	/**
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
 	 * de Zonas</p>
 	 * La vista de zonas solo ejerce una opción, aplicar cambios de los campos.
@@ -1034,18 +1042,9 @@ public class ControladorModulos {
 	}
 	
 	
-	private void setNameMAPinREL(int ID) {
-		String name = zonas.get(ID).getName();
-		//Cambiar el nombre de la fila (su etiqueta)
-		getModule(TypesFiles.REL).setValueAt(name, ID-1, 0);					//IDs empiezan por 1, las filas por 0.
-		//Cambiar el nombre de la columnna.
-		getModule(TypesFiles.REL).setColumnName(ID, name);
-	}
-	
 	/* Acciones VistaPaleta */
 	
 	/**
-	 * <p>Title: doActionPAL</p>  
 	 * <p>Description: Realiza las acciones de actualización de datos de la vista
 	 *  correspondiente a la paleta de colores o representación gráfica por colores 
 	 *   de los niveles de contagio.</p>
@@ -1076,7 +1075,6 @@ public class ControladorModulos {
 	/* Acciones VistaSIR */
 	
 	/**
-	 * <p>Title: setDataToLabel</p>  
 	 * <p>Description: Asigna un valor a una etiqueta en el módulo específicado.</p>
 	 * @param ext Extensión (etiqueta identificadora) del módulo objetivo.
 	 * @param label Etiqueta a la que modificar su valor asignado.
@@ -1092,7 +1090,6 @@ public class ControladorModulos {
 	}	
 	
 	/**
-	 * <p>Title: getValueFromLabel</p>  
 	 * <p>Description: Recupera un valor de una etiqueta. Si la etiqueta no existe, devuelve null.</p>
 	 * @param ext Tipo de módulo (extensión) donde realizar la búsqueda.
 	 * @param label Etiqueta a buscar dentro de dicho módulo.
@@ -1108,10 +1105,8 @@ public class ControladorModulos {
 		}
 		return resultado;
 	}
-	
-	
+		
 	/**
-	 * <p>Title: setValueAtLabel</p>  
 	 * <p>Description: Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea.</p>
 	 * 
 	 * @param ext Extensión (etiqueta identificadora) del módulo a editar.
@@ -1129,6 +1124,11 @@ public class ControladorModulos {
 		return done;
 	}
 	
+	/**
+	 * <p>Description: Actualiza los datos de la tabla SIR con los datos que
+	 *  esten establecidos en las etiquetas correspondientes de la Vista.</p> 
+	 * @return TRUE si se han añadido los datos, FALSE en otro caso.
+	 */
 	private boolean updateMSIR() {
 		boolean done = true;
 		//PTE
@@ -1147,12 +1147,11 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: doActionVistaSIR</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
 	 * de parámetros SIR</p>
 	 * La vista puede indicar dos acciones:
-	 * <l>1. aplicar cambios de los campos.</l>
-	 * <l>2. Iniciar el motor de cálculo del módelo.</l>
+	 * - 1. aplicar cambios de los campos.
+	 * - 2. Iniciar el motor de cálculo del módelo.
 	 * @param op Operación a realizar, UPDATE o EXECUTE
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
@@ -1168,10 +1167,7 @@ public class ControladorModulos {
 			//Checar si valores OK
 			// Si valores OK. Ejecutar motorSIR
 			// runSIR(double pte, double dme, boolean ip, double dmi) 
-			runSIR(Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.PTE)),
-					Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.DME)),
-					Boolean.parseBoolean( getValueFromLabel(TypesFiles.DEF ,Labels.IP)),
-					Double.parseDouble( getValueFromLabel(TypesFiles.DEF ,Labels.DMI)));
+			runSIR();
 		}
 		
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
@@ -1183,7 +1179,6 @@ public class ControladorModulos {
 	/* Acciones ParametrosProyecto */
 	
 	/**
-	 * <p>Title: addNewZones</p>  
 	 * <p>Description: Añade nuevas zonas hasta cubrir el total indicado.</p> 
 	 * @param index Indice de la última zona actual.
 	 * @param nNew Número total de zonas que deben haber en el sistema.
@@ -1201,7 +1196,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: removeExtraZones</p>  
 	 * <p>Description: Elimina las zonas extras. </p> 
 	 * @param index Último número de zona del sistema
 	 * @param nNew Nuevo número de zonas a establecer.
@@ -1215,7 +1209,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: resizeZonas</p>  
 	 * <p>Description: Crea o elimina zonas del grupo de Zonas según sea necesario.</p>
 	 * La modificación se realiza sobre el HashMap, no sobre el módulo (lo cual lo realizan
 	 *  las otras funciones de apoyo a este método).
@@ -1236,7 +1229,6 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Title: doPProyecto</p>  
 	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
 	 * de parámetros del modelo</p>
 	 * La vista solo ejerce una opción, aplicar cambios de los campos.
@@ -1270,82 +1262,28 @@ public class ControladorModulos {
 	}
 		
 	
-	/* PARSERS archivos */
+	/* PARSERS y generación Históricos */
+	
 	
 	/**
-	 * <p>Title: setZonas</p>  
-	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
-	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
-	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
-	 */
-	private void setZonas(HashMap<Integer,Zona> zonas) {
-		this.zonas = zonas;
-		//Actualiza el mapa.
-		mapa.reset();
-		//Actualizar Grupos.
-		pgrupos.reset();
-		//Actualizar en vista del proyecto en valor de NG.
-		pproyecto.refresh();
-		//Actualización de la vista principal.
-		principal.reset();
-		//Actualización de la pizarra.
-		pizarra.reset();
-		//Actualización de la vista archivos.
-		archivos.refresh();
-	}
-	
-	/**
-	 * <p>Title: importarModeloA</p>  
-	 * <p>Description: Importa los datos de un archivo de proyecto generado con VenSim.</p>
+	 * <p>Description: Importa los datos de un archivo de proyecto generado con alguna herramienta externa.</p>
 	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, tales como la
 	 * matriz de contactos, R,S,I, tasas, etcetera.
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
-	 * @param prjV Conjunto de datos del archivo de salida Vensim.
+	 * @param prjV Conjunto de datos del archivo de entrada.
+	 * @param tipoModelo Cadena de texto con el tipo de modelo a cargar, siendo:
+	 *  <p>"A" tipo de modelo A (Etiquetado por columnas).</p>
+	 * 	<p>"B" tipo de modelo B (Etiquetado por filas).</p>
 	 */
-	private void importarModeloA(DCVS prjV) {
+	private void importarModelo(DCVS prjV, String tipoModelo) {
+		ParserModelo parser = null;
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
 		// impediría modularidad e independencia de módulos.
-		ParserModeloA parser = new ParserModeloA(prjV);
-
-		//Establecer las zonas en las vistas correspondientes.
-		setZonas(parser.getZonas());
-		//Establecer el historico de niveles.
-		establecerDatos(parser.getHST());
-		//Establecer datos propios de la enfermedad.
-		establecerDatos(parser.getDEF());
-		//Establecer matriz de relaciones.
-		establecerDatos(parser.getREL());
-	}
-	
-	/**
-	 * <p>Title: runSIR</p>  
-	 * <p>Description: Ejecuta el cálculo de demolo SIR</p>
-	 * La función no realiza comprobación de los valores iniciales. Dicha comprobación
-	 *  debe ser realizada previamente. 
-	 * @param pte Probabilidad de transmisión de la enfermedad (sin unidades).
-	 * @param dme Duración media de la enfermedad (en días).
-	 * @param ip Inmunidad Permanente.
-	 * @param dmi Duración media de la inmunidad permanente (en días).
-	 */
-	private void runSIR(double pte, double dme, boolean ip, double dmi) {	
-		MotorSIR motor = new MotorSIR(pte, dme, ip, dmi, zonas, modulos.get(TypesFiles.HST));
-		motor.start(0, 100);
-		//Establecer el historico de niveles.
-		establecerDatos(motor.getHST());
-	}
-	
-	/**
-	 * <p>Title: importarModeloB</p>  
-	 * <p>Description: Importa los datos de un archivo de salida (histórico) generado con VenSim.</p>
-	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, R,S,I, tasas, etcetera,
-	 * siempre que estén contenidos.
-	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
-	 * @param prjV Conjunto de datos del archivo de salida Vensim.
-	 */
-	private void importarModeloB(DCVS prjV) {
-		//Limpiar todos los datos previos. No debe hacerse en otra parte pues 
-		// impediría modularidad e independencia de módulos.
-		ParserModeloB parser = new ParserModeloB(prjV);
+		switch(tipoModelo) {
+		case("A"): parser = new ParserModeloA(prjV); break;
+		case("B"): parser = new ParserModeloB(prjV); break;
+		}
+		
 		//Establecer los datos del proyecto primero (provoca clear). 
 		abrirProyecto(parser.getPRJ());
 		//Establecer datos de los grupos (Mapa).
@@ -1362,12 +1300,22 @@ public class ControladorModulos {
 		establecerDatos(parser.getPAL());
 		//Reiniciar vistas.
 		refresh();
-
 	}
 	
-	/* Funciones para pruebas */
 	/**
-	 * Método main de la clase.
+	 * <p>Description: Ejecuta el cálculo de demolo SIR</p>
+	 * La función no realiza comprobación de los valores iniciales. Dicha comprobación
+	 *  debe ser realizada previamente. 
+	 */
+	private void runSIR() {	
+		MotorSIR motor = new MotorSIR(modulos.get(TypesFiles.DEF), zonas, modulos.get(TypesFiles.HST));
+		motor.start();
+		//Establecer el historico de niveles.
+		establecerDatos(motor.getHST());
+	}
+	
+	/**
+	 * Método main de la clase responsable del inicio de la aplicación.
 	 * @param args no usado.
 	 */
 	public static void main(String[] args) {

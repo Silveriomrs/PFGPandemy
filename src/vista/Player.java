@@ -228,23 +228,17 @@ public class Player extends JPanel implements ActionListener{
 	 *  en relación a la fecha actual.
 	 */
 	private void setDates() {
-		//Establecer fechas iniciales y final.
 		//Obtener la fecha inicial de la etiqueta del histórico
-		
+		d1 = stringToDate(historico.getColumnName(1));							//Obtener primera fecha.
 		//Sino existe obtener la de creación del proyecto.
 		
 		//Obtener la fecha final búscando la etiqueta en el histórico.
-		
+		d2 = stringToDate(historico.getColumnName(ultima));						//Obtener segunda fecha.
 		//Sino está buscar la última fecha de columna
 		
-		//Sino es válida, sumar a la fecha inicial los slots de tiempo.
-		d1 = stringToDate(historico.getColumnName(1));							//Obtener primera fecha.
-        d2 = new Date();
 		Calendar c = Calendar.getInstance();
         c.setTime(d2);
         c.add(Calendar.DATE, ultima);
-        d2 = c.getTime();
-//		Date d2 = stringToDate(historico.getColumnName(ultima));				//Obtener segunda fecha.
 	}
 	
 	/**
@@ -279,20 +273,23 @@ public class Player extends JPanel implements ActionListener{
 	 * @param pos Número de columna a leer de la entrada de datos.
 	 */
 	private void play(int pos) {
-//		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
+		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
 		//Actualizar fecha
-//		String f = (String) historico.getValueAt(pos, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
-//		Date d = stringToDate(f);	
-//		frmtdtxtfldHoraMinuto.setText(formato.format(d));
-//		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
+		String f = historico.getColumnName(pos);								//Obtención de la fecha almacenada en la posición 0 de la línea.
+		Date d = stringToDate(f);	
+		frmtdtxtfldHoraMinuto.setText(formato.format(d));
+		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
 		int rows = cm.getModule(TypesFiles.HST).getRowCount();
-//		System.out.println("Player > play > Pos: " + pos);
 		for(int row = 0; row < rows; row++) {
-			int id = getID("" + historico.getValueAt(row, 0));					//Obtener ID columna
-			double nivel = getValor("" + historico.getValueAt(row, pos + 1));	//Obtener valor
-			String serie = ("" + historico.getValueAt(row, 0)).split(" ")[0];
-			mapa.addZonaNivel(id, serie,pos, nivel);							//Otorgar nivel al mapa/zona
-			this.updateUI();
+			double nivel;
+			String serie = (String) historico.getValueAt(row, 0);
+			int id = getID(serie);												//Obtener ID columna.
+			String v = (String) historico.getValueAt(row, pos + 1);				//Obtener valor.
+			if(v != null) {
+				nivel = getValor(v);											//Realizar conversión.
+				mapa.addZonaNivel(id, serie,pos, nivel);						//Otorgar nivel al mapa/zona
+				this.updateUI();
+			}	
 		}
 	
 		progressBar.setValue(pos);												//Actualización del la barra de progreso.
@@ -321,7 +318,7 @@ public class Player extends JPanel implements ActionListener{
 		boolean encontrado = false;
 		if(d != null) {
 			while(!encontrado) {
-				String f = (String) historico.getValueAt(aux, 0);				//Obtención de la fecha almacenada en la posición 0 de la línea.
+				String f = historico.getColumnName(aux);						//Obtención de la fecha almacenada en la posición 0 de la línea.
 				dAux = stringToDate(f);
 				int resultado = 0;
 				if(dAux != null) resultado = dAux.compareTo(d);
@@ -361,9 +358,11 @@ public class Player extends JPanel implements ActionListener{
 
 	/**
 	 * <p>Title: getID</p>  
-	 * <p>Description: Devuelve el valor entero almacenado como texto.</p> 
+	 * <p>Description: Devuelve el valor entero correspondiente como identificador.</p>
+	 * El identificador de un grupo de población es númerico, al contrario que el nombre, 
+	 *  el cual puede ser texto.
 	 * @param s Cadena de texto que representa al número entero.
-	 * @return valor del número entero. -1 en otro caso.
+	 * @return Identificador (número entero) del nombre que se le ha pasado. -1 en otro caso.
 	 */
 	private int getID(String s) {
 		int id = -1;
@@ -383,7 +382,12 @@ public class Player extends JPanel implements ActionListener{
 	private double getValor(String v) {
 		double vd = 0.0;
 		//Cambio de símbolo decimal y conversion a Double.
-		vd = Double.parseDouble(v.replace(",", "."));
+		try{
+			vd = Double.parseDouble(v.replace(",", "."));
+		}catch (Exception e) {
+			System.out.println("Error, Player > getValor: " + v);
+			e.printStackTrace();
+		}
 		return vd;
 	}
 	
@@ -447,7 +451,7 @@ public class Player extends JPanel implements ActionListener{
 				Date f = dateChooser.getDate();									//Obtención del valor establecido.				
 				linea = getLineaDate(f);
 				
-				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
+				String s = historico.getColumnName(linea);						//Obtención de la fecha almacenadala línea obtenida.
 				Date d = stringToDate(s);
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador

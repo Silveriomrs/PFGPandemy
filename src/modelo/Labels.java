@@ -72,10 +72,10 @@ public class Labels {
 	public final static String PTE ="PTE";
 	/** DME Duración media de la enfermedad*/  
 	public final static String DME ="DME";
-	/** IP Inmunidad permanente*/  
-	public final static String IP ="IP";
 	/** DMIP Duración de la inmunidad*/  
 	public final static String DMI ="DMI";
+	/** IP Inmunidad permanente*/  
+	public final static String IP ="IP";
 	/* Etiquetas propiedades proyecto */
 	/** NAME Nombre del proyecto*/
 	public final static String NAME = "NAME";
@@ -121,7 +121,7 @@ public class Labels {
 	private static void addLabels(){
 		//Casos de.
 		dic.put(CC, "Casos de curación");
-		dic.put(CVS, "Casos de vuelta a la suceptibilidad");
+		dic.put(CVS,"Casos de vuelta a la suceptibilidad");
 		dic.put(CI, "Casos incidentes");
 		dic.put(C100K, "Nivel de contagio");
 		//Básicas
@@ -141,13 +141,13 @@ public class Labels {
 		dic.put(S0, "Susceptibles iniciales");
 		dic.put(I0, "Incidentes iniciales");
 		dic.put(R0, "Recuperados iniciales");
-		dic.put(PT0, "Población inicial");
+		dic.put(PT0,"Población inicial");
 		dic.put(FT, "Tiempo final");
 		dic.put(IT, "Tiempo inicial");
 		//Parámetros de la enfermedad
 		dic.put(PTE,"Probabilidad de transmisión de la enfermedad");
 		dic.put(DME,"Duración media de la enfermedad");
-		dic.put(IP,"Inmunidad permanente");
+		dic.put(IP, "Inmunidad permanente");
 		dic.put(DMI,"Duración media de la inmunidad");
 		//Etiquetas de propiedades del proyecto.
 		dic.put(NAME,"Nombre del proyecto" );

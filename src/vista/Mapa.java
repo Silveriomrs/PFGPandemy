@@ -131,7 +131,6 @@ public class Mapa extends JPanel{
 		});
 	}
 
-
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
@@ -146,7 +145,18 @@ public class Mapa extends JPanel{
 		}
 	}
 
-
+	/**
+	 * <p>Title: SelectorPoligono</p>  
+	 * <p>Description: Clase usada para la detección de la selección de un grupo de
+	 *  población.</p>
+	 *  Basa su funcionamiento en las coordenadas de la pulsación en pantalla, recorriendo
+	 *   cada uno de los polígonos de las diferentes zonas y comprobando cual contiene dicho
+	 *    punto dentro de sus límintes.
+	 * <p>Una vez encontrada muestra la información deseada, en este caso el gráfico de línea
+	 *  asociado a dicha zona.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.2
+	 */
 	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
 		public void mousePressed(MouseEvent e)  {
@@ -156,6 +166,13 @@ public class Mapa extends JPanel{
 	        if(z != null) z.getGrafica().setVisible(true);
 	    }
 
+	    /**
+	     * <p>Title: getZona</p>  
+	     * <p>Description: Devuelve la zona cuyo polígono de representación gráfica
+	     *  contenga el punto pásado por parámetro.</p> 
+	     * @param p Punto de coordenadas.
+	     * @return Zona que contiene dicho punto de coordenadas dentro de su representación.
+	     */
 	    private Zona getZona(Point p) {
 	    	boolean encontrado = false;
 	    	Zona zona = null;

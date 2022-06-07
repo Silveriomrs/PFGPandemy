@@ -26,50 +26,49 @@ import modelo.Zona;
  */
 public class MotorSIR {
 	
-	private final double PTE;													//Probabilidad de transmisión de la enfermedad (sin unidades).
-	private final double TVS;													//Tasa vuelta a la susceptibilidad.
-	private final double TR;													//Tasa de recuperación o curación.
-	private final double DME;													//Duración media de la enfermedad (en días).
-	private final boolean IP;													//Inmunidad Permanente.
-	private final double DMI;													//Duración media de la inmunidad permanente.
-	private final int NG;														//Número de grupos de población.
-	private DCVS matrizC;														//Matriz de contactos (relaciones).
-	private HashMap<Integer,Zona> zonas;										//Zonas o grupos de población.
-	private DCVS mHST;															//Módulo histórico a obtener.
+	private double PTE;													//Probabilidad de transmisión de la enfermedad (sin unidades).
+	private double TVS;													//Tasa vuelta a la susceptibilidad.
+	private double TR;													//Tasa de recuperación o curación.
+	private Double DME;													//Duración media de la enfermedad (en días).
+	private boolean IP;													//Inmunidad Permanente.
+	private double DMI;													//Duración media de la inmunidad permanente.
+	private int NG;														//Número de grupos de población.
+	private DCVS matrizC;												//Matriz de contactos (relaciones).
+	private HashMap<Integer,Zona> zonas;								//Zonas o grupos de población.
+	private DCVS mHST;													//Módulo histórico a obtener.
 	private int FT;
+	@SuppressWarnings("unused")
 	private int IT;
 
 	/**
-	 * <p>Title: </p>  
 	 * <p>Description: Constructor que requiere los parámetros obligados
 	 * para la realización de los diferentes cálculos de propagación de la enfermedad
 	 * bajo este modelo. </p>  
-	 * @param pte Probabilidad de transmisión de la enfermedad (sin unidades).
-	 * @param dme Duración media de la enfermedad (en días).
-	 * @param ip Inmunidad Permanente.
-	 * @param dmi Duración media de la inmunidad permanente (en días).
+	 * @param mDEF Módulo con la definición de las propiedades de la enfermedad.
 	 * @param zonas Conjunto de zonas representantes de los grupos de estudio.
 	 * @param matrizC Matriz de contactos de la simulación.
 	 */
-	public MotorSIR(Double pte, double dme, boolean ip, double dmi, HashMap <Integer,Zona> zonas, DCVS matrizC) {
+	public MotorSIR(DCVS mDEF, HashMap <Integer,Zona> zonas, DCVS matrizC) {
 		new Labels();
-		this.PTE = pte;	
-		this.DME = dme;
-		this.TR = 1/dme;
-		this.IP = ip;
-		//En caso de haber Inmunidad permanente, se ignora el parámetro DMI.
-		if(IP) {this.DMI = 1;}
-		else this.DMI = dmi;
-		
-		this.TVS = 1/this.DMI;
+		if(mDEF != null) {
+			this.PTE = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.PTE));	
+			this.DME = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.DME));
+			this.TR = 1/DME;
+			this.IP = Boolean.parseBoolean( (String) mDEF.getDataFromRowLabel(Labels.IP));
+			//En caso de haber Inmunidad permanente, se ignora el parámetro DMI.
+			if(IP) {DMI = 1;}
+			else this.DMI = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.PTE));
+			this.IT = Integer.parseInt( (String) mDEF.getDataFromRowLabel(Labels.IT));
+		    this.FT = Integer.parseInt( (String) mDEF.getDataFromRowLabel(Labels.IT));
+			this.TVS = 1/DMI;
+		}
 		this.zonas = zonas;
 		this.matrizC = matrizC;
 		this.NG = zonas.size();
 	}
 	
-	
+
 	/**
-	 * <p>Title: readXs</p>  
 	 * <p>Description: Realiza lectura inicial de los valores SIR</p>
 	 * Almacena resultados en la tabla.
 	 * @param label Etiqueta S,R o I.
@@ -89,7 +88,6 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Title: addLabels</p>  
 	 * <p>Description: Añade las etiquetas indicadas para cada grupo de población.</p> 
 	 * @param label Etiqueta
 	 * @see Labels 
@@ -100,7 +98,10 @@ public class MotorSIR {
 		}
 	}
 
-	
+	/**
+	 * <p>Description: Configura las etiquetas iniciales de la tabla histórico y
+	 *  realiza una lectura inicial de los valores SIR.</p>
+	 */
 	private void setUpHST() {
 		this.mHST = DCVSFactory.newHST(FT +1);
 		//Leer datos iniciales.
@@ -119,16 +120,11 @@ public class MotorSIR {
 
 	
 	/**
-	 * <p>Title: start</p>  
 	 * <p>Description: Inicia la realización de los cálculos para cada uno de los
 	 * parámetros del modelo.</p> 
-	 * @param IT Tiempo inicial de la simulación.
-	 * @param FT Tiempo final de la simulación.
 	 */
-	public void start(int IT, int FT) {
+	public void start() {
 		//Introducir datos de partida en la tabla.
-		this.IT = IT;
-		this.FT = FT;
 		setUpHST();
 		
 		for(int time = 1; time <= FT; time++) {									//Bucle para todas las líneas de tiempo.
@@ -206,7 +202,6 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Title: calcP</p>  
 	 * <p>Description: Cálcula la prevalencia para un tiempo determinado.</p> 
 	 * @param time Slot de tiempo a usar para el cálculo.
 	 */
@@ -231,7 +226,6 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Title: getTC</p>  
 	 * <p>Description: Cálcula la Tasa de Contactos de una zona y la almacena
 	 * en sus registros correspondientes.</p> 
 	 * @param z Zona o grupo de población de estudio.
@@ -245,11 +239,11 @@ public class MotorSIR {
 		
 		for(int j = 1; j<= NG ;j++) {											//Indice de las columnas.																			
 			String name2 = zonas.get(j).getName();
-			//Obtener prevalencia actual de cada elemento..
+			//Obtener prevalencia actual de cada elemento.
 			int index = mHST.getFilaItem(Labels.P + " " + name2);
 			double p = Double.parseDouble((String) mHST.getValueAt(index, time));
 			//Ya cálculada añadir al sumatorio.
-			sumTC += Double.parseDouble((String)matrizC.getValueAt(fila, j)) * p;
+			sumTC += (Double.parseDouble( (String) matrizC.getValueAt(fila, j))) * p;
 		}
 
 		return sumTC;
@@ -257,7 +251,6 @@ public class MotorSIR {
 	
 	
 	/**
-	 * <p>Title: getPrevalencia</p>  
 	 * <p>Description: Calcula la prevalencia instantánea </p> 
 	 * @param s Número de susceptibles.
 	 * @param i Número de infectados o incidentes.
@@ -268,7 +261,6 @@ public class MotorSIR {
 	
 	
 	/**
-	 * <p>Title: getCI100K</p>  
 	 * <p>Description: Calcula los casos incidentes por 100 mil habitantes en el grupo</p> 
 	 * @param ci Casos incidentes en el grupo.
 	 * @param s Número de susceptibles.
@@ -280,12 +272,10 @@ public class MotorSIR {
 
 
 	/**
-	 * <p>Title: getHST</p>  
 	 * <p>Description: Devuelve el histórico calculado con los parámetros de entrada</p> 
 	 * @return Módulo histórico en formato de tabla.
 	 */
 	public DCVS getHST() {return mHST;}
-
 
 
 	/**
@@ -294,7 +284,6 @@ public class MotorSIR {
 	public HashMap<Integer,Zona> getZonas() {return zonas;}
 	
 	/**
-	 * <p>Title: getZona</p>  
 	 * <p>Description: Devuelve una zona indicada por su identificador.</p> 
 	 * @param ID Identificador de la zona o grupo de población.
 	 * @return Zona o grupo de población. Null en otro caso.
@@ -309,7 +298,6 @@ public class MotorSIR {
 	
 	
 	/**
-	 * <p>Title: imprimirDatos</p>  
 	 * <p>Description: Imprimir los datos iniciales de las pruebas</p> 
 	 */
 	public void imprimirDatos() {
@@ -318,6 +306,16 @@ public class MotorSIR {
 		//ver grupos de población (zonas)
 		System.out.println("\nGrupos (" + NG + "):");
 		for(int i = 1; i<=NG; i++) System.out.println(zonas.get(i).toString());
+		//Datos de pruebas:
+		//Hay que dar valores a las propiedades de la enfermedad:
+		PTE = 0.05;
+		DME = 8.0;
+		DMI = 50;
+		IP = false;
+		TR = 1/DME;
+		TVS = 1/DMI;
+		IT = 0;
+	    FT = 10;
 		//Imprimir parámetros de la enfermedad:
 		System.out.println("\nParámetros de la enfermedad:");
 		System.out.println("PTE: " + PTE);
@@ -328,7 +326,6 @@ public class MotorSIR {
 	
 
 	/**
-	 * <p>Title: main</p>  
 	 * <p>Description: Función para las pruebas de implementación e integración. </p>
 	 * Inicialmente las pruebas estarán acotadas a 4 grupos de población.
 	 * @param args ninguno.
@@ -350,9 +347,10 @@ public class MotorSIR {
 		zonas.put(4,new Zona(4,"G4" , 100,0 ,100,0,0,0,0, null));
 		
 		//PTE,DME,IP,DMI
-		MotorSIR msir = new MotorSIR(0.05, 8, false, 50, zonas, matrizC);
-//		msir.imprimirDatos();
-		msir.start(0, 10);
+		MotorSIR msir = new MotorSIR(null, zonas, matrizC);
+
+		msir.imprimirDatos();
+		msir.start();
 		System.exit(0);
 	}
 	

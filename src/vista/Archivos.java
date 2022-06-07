@@ -108,7 +108,7 @@ public class Archivos extends JPanel {
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
 		iniciarLabels(TypesFiles.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.MAP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
 		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),"Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
 		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),"Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
 		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),"Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
@@ -142,19 +142,6 @@ public class Archivos extends JPanel {
 	    frame.getContentPane().add(this);
 		frame.pack();
         frame.setVisible(true);
-	}
-	
-	
-	/**
-	 * <p>Title: setLabel</p>  
-	 * <p>Description: Establece el texto al campo que se le indique.</p> 
-	 * @param label Etiqueta o campo a escribir.
-	 * @param text Texto a escribir en el campo.
-	 */
-	public void setLabel(String label, String text) {
-		if(mapaFields.containsKey(label)) {
-			mapaFields.get(label).setText(text);
-		}
 	}
 	
 	/**
@@ -249,7 +236,7 @@ public class Archivos extends JPanel {
 	/**
 	 * <p>Title: iniciarLabels</p>  
 	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
-	 * @param ext Tipo de archivos que controla. Ver {@link TypesFiles Tipos de archivo}.
+	 * @param ext Tipo de archivos que controla. Ver \ref modelo#TypesFiles .
 	 * @param nombre Nombre en la etiqueta.
 	 * @param tt Tooltip mensaje emergente.
 	 * @param ruta Ruta al icono de la etiqueta.
@@ -266,7 +253,6 @@ public class Archivos extends JPanel {
 		jl.setBounds(posX, posY, w, hi);
 		panelCentral.add(jl);
 	}
-		
 
 	/**
 	 * <p>Title: iniciarBoton</p>  
@@ -329,7 +315,6 @@ public class Archivos extends JPanel {
 		if(!ext.equals(TypesFiles.PRJ) && !ext.equals(TypesFiles.DEF) && !ext.equals(TypesFiles.MAP)) {
 			iniciarBoton("Borrar",ext,iconBorrar,xpos + 4*gap,posY,false);
 		}
-		
 	}
 		
 	/**
@@ -424,7 +409,6 @@ public class Archivos extends JPanel {
 			else elemento.setBackground(elemento.getCaretColor());
 			//Asigna el nombre al campo correspondiente.
 			elemento.setText(nombre);
-			
 		});
 	}
 	

@@ -80,7 +80,6 @@ public class Zona {
 				"Evolución pandemica." + " ID: " + ID);
 	}
 
-
 	/**
 	 * @return La listas de puntos que componen el poligono que representa la zona.
 	 */
@@ -109,28 +108,33 @@ public class Zona {
 	
 	/**
 	 * <p>Title: addNivel</p>  
-	 * <p>Description: Añade un nuevo C100K a su hisstorico y establece el 
-	 * C100K añadido como C100K actual.</p>
-	 * @param name Nombre de la serie de datos al que añadir el nuevo C100K..
+	 * <p>Description: Añade un nuevo valor a una serie de su historico, en caso
+	 *  de que no exissta dicha serie se creará de forma automática por la clase
+	 *   recipiente.</p>
+	 * Hace un tratamiento especial para las etiquetas {C100K,CAB,TCS} acorde a sus
+	 *  particularidades.
+	 * @param et Nombre de la serie de datos al que añadir el nuevo dato, o nueva serie a crear.
 	 * @param t Variable tiempo, indica el valor en el eje X de tiempo al que corresponderá el valor de la función.
-	 * @param v Valor o C100K a añadir a dicha serie.
+	 * @param v Valor a añadir a la serie.
 	 */
-	public void addNivel(String name, int t, double v) {
+	public void addNivel(String et, int t, double v) {
 		double valor = v;
-		//Obtener el nombre de la serie.
-		String serie = Labels.getWord(name);
+		//Optener el tipo de serie.
+		String op = et.split(" ")[0];
+		//Obtener el nombre de la serie. Será la opción por defecto excepto
+		// para los dos casos indicados a continuación.
+		String serie = Labels.getWord(op);
 		//Si la etiqueta es de Nivel de contagio establecer valor en el atributo de la instancia.
-		if(name.equals(Labels.C100K)) {
+		if(op.equals(Labels.C100K)) {
 			valor = valor/1000;
 			setNivel((int) valor);
-		}else if(name.equals(Labels.CAB) || name.equals(Labels.TCS)) {
+		}else if(op.equals(Labels.CAB) || op.equals(Labels.TCS)) {
 			//Caso especial para etiquetas con dos operandos.
 			//Para una etiqueta adecuada hace falta indicar el grupo relacionado.
-			//Modificar el valor de la etiqueta.
-			serie = serie.replaceFirst("Z",name.split(" ")[2]);						
+			serie = serie.replaceFirst("Z",et.split(" ")[2]);					//Al aplicar el separador se obtienen 3 sub-partes.
 		}
 		//Añadir el punto a la gráfica.
-		chart.addPunto(serie, t, valor);	
+		chart.addPunto(serie, t, valor);
 	}
 	
 	/* Funciones get y set de los atributos del grupo de población o zona. */ 
@@ -205,7 +209,7 @@ public class Zona {
 	public void setName(String name) {this.name = name;}
 	
 	/**
-	 * @return devuelve ID de la poligono
+	 * @return devuelve ID del grupo de población.
 	 */
 	public int getID() {return ID;}
 

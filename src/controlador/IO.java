@@ -126,7 +126,6 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Title: getFile</p>  
 	 * <p>Description: Obtiene un enlace a un archivo en disco dentro de una instanccia
 	 *  File..</p> 
 	 * @param sel Tipo de dialogo a mostrar: 1 Abrir archivo, 2 Guardar archivo.
@@ -183,7 +182,6 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Title: checkExt</p>  
 	 * <p>Descripción: Comprobación de la extensión sea de los tipos aceptados
 	 * y además para los tipos de archivos imagen, comprobar los tres formatos
 	 * admitidos.</p> 
@@ -222,7 +220,6 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Title: getIcon</p>  
 	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
 	 * por parámetros, de la imagen fuente..</p> 
 	 * @param ruta Ruta del archivo de imagen.

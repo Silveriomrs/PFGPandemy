@@ -16,8 +16,14 @@ package modelo;
  * @version versión 1.0
  */
 public enum OperationsType {
-	/** Archivos generales formato CSV*/ 
+	/** Operación de actualizar datos o vista.*/ 
 	UPDATE("Actualizar"),
+	/** Operación de abrir un componente o un fichero*/
+	OPEN("Abrir"),
+	/** Operación de eliminar un dato o fichero*/
+	DELETE("Borrar"),
+	/** Operación de editar un dato o fichero*/
+	EDIT("Editar"),
 	/** Archivo de proyecto que contiene el módelo PRJ*/  
 	EXECUTE("Ejecutar");
 

@@ -365,8 +365,9 @@ public class DCVS implements TableModel{
 
 	/**
 	 * <p>Title: getColItem</p>  
-	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
-	 * de cada columna en la tabla. Es decir sus nombres.</p> 
+	 * <p>Description: Busca un elemento/valor en la cabecera de las columnas
+	 *  de la tabla (etiquetas) y devuelve el indice de la columna que coincide
+	 *   con la etiqueta buscada.</p> 
 	 * @param v Valor a encontrar.
 	 * @return Número de la columna que contiene dicho valor (nombre). -1 En otro caso.
 	 */

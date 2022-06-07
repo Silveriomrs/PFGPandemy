@@ -35,7 +35,6 @@ import javax.swing.JCheckBox;
 
 
 /**
- * <p>Title: VistaSIR</p>  
  * <p>Description: Vista dedicada a mostrar los parámetros del modelo de 
  * predicción/cálculo SIR</p>  
  * @author Silverio Manuel Rosales Santana
@@ -58,7 +57,6 @@ public class VistaSIR extends JPanel{
 	private boolean IP;
 
 	/**
-	 * <p>Title: VistaSIR</p>  
 	 * <p>Description: Constructor de la vista del módulo SIR</p>  
 	 * @param cm Controlador de módulos, necesario para permitir el flujo de datos
 	 * entre las vistas, el módelo y el controlador.
@@ -76,7 +74,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: reset</p>  
 	 * <p>Description: Limpia los textos mostrados en cada etiqueta, sustituyéndolos
 	 * por cadenas vacias y activa el valor de Inmunidad Permanente.</p>
 	 */
@@ -90,7 +87,6 @@ public class VistaSIR extends JPanel{
 	
 	
 	/**
-	 * <p>Title: refresh</p>  
 	 * <p>Description: Actualiza los campos de la vista. No realiza borrado previo.</p>
 	 * Una vez actualizados, actualiza los controles y refresca el dibujado. En caso
 	 *  de no disponer del módulo correspondiente en el sistema, no realiza acción alguna.
@@ -104,7 +100,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: updateFields</p>  
 	 * <p>Description: Actualiza los campos de la vista.</p>
 	 * Solicita al controlador los datos necesarios para actualizar la vista,
 	 *  en caso de estar disponibles, procede a la acción. No actualiza aquellas
@@ -128,7 +123,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: setLabel</p>  
 	 * <p>Description: Establece el texto al campo que se le indique.</p>
 	 * @param label Etiqueta o campo a escribir.
 	 * @param text Texto a escribir en el campo.
@@ -140,7 +134,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: getLabel</p>  
 	 * <p>Description: Devuelve el texto al campo que se le indique.</p>
 	 * @param label Etiqueta o campo a leer.
 	 * @return El dato almacenado en tal campo.
@@ -155,7 +148,6 @@ public class VistaSIR extends JPanel{
 	
 	
 	/**
-	 * <p>Title: addIconL</p>  
 	 * <p>Description: Añade un icono a una etiqueta</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
@@ -170,7 +162,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: iniciarLabels</p>  
 	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
 	 * @param label Nombre en la etiqueta.
 	 * @param ruta Ruta al icono de la etiqueta.
@@ -192,7 +183,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: generateControls</p>  
 	 * <p>Description: Genera todos los JTextFields necesarios para cubrir
 	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
 	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
@@ -216,7 +206,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: createFieldsInMap</p>  
 	 * <p>Description: Añade todas las funcionalidades y controles necesarias.</p>
 	 * Dede esta función se añaden cada una de las líneas de control necesarias.
 	 * <p>Para mas información sobre crear los controles
@@ -248,7 +237,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: addNewControlLine</p>  
 	 * <p>Description: Agrega los elementos JTextField al grupo mapaFields</p>
 	 * Todo elemento que se desea agregar se añade aquí se configuran automáticamente
 	 * y se añaden a las diferentes partes de la vista.
@@ -265,7 +253,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: configurar</p>  
 	 * <p>Description: Función general para crear la vista y sus controles.</p>
 	 */
 	private void configurar() {
@@ -328,7 +315,6 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: checkValue</p>  
 	 * <p>Description: Comprueba si un valor es un dato númerico correcto. </p>
 	 * Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
 	 *  no númericos. Tampoco admite números negativos. 
@@ -351,12 +337,12 @@ public class VistaSIR extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: checkFields</p>  
 	 * <p>Description: Realiza un chequeo de todos los campos.</p>
 	 * En caso de que uno de los campos contenga un valor incorrecto retornará
 	 *  FALSE. 
 	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
 	 */
+	@SuppressWarnings("unused")
 	private boolean checkFields() {
 		boolean done = true;
 		for (String clave:mapaFields.keySet()) {
@@ -370,7 +356,6 @@ public class VistaSIR extends JPanel{
 	/* Clases privadas */
 	
 	/**
-	 * <p>Title: BotonL</p>  
 	 * <p>Description: Clase encargada de detectar la pulsación del botón aplicar</p>
 	 * Cuando es pulsado, intercambia la información necesaria con el controlador.  
 	 * @author Silverio Manuel Rosales Santana

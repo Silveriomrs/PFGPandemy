@@ -222,7 +222,7 @@ public class GraficasChart{
 	 */
 	public void addPunto(String serie, double x, double y) {
 		//Comprobación previa si existe dicha serie, en caso contrario la crea.
-		if(!seriesMap.containsKey(serie)) {	addSerie(serie);}
+		if(serie != null && !seriesMap.containsKey(serie)) {addSerie(serie);}
 		//Añade el valor a la serie o actualiza el valor si no existe.
 		seriesMap.get(serie).addOrUpdate(x, y);
 	}

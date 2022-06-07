@@ -321,7 +321,7 @@ public class TablaEditor extends JPanel{
 	/**
 	 * <p>Title: setModelo</p>  
 	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
-	 * El tipo de módulo debe estar definido en: {@link ModuleType Tipos de módulos}.
+	 * El tipo de módulo debe estar definido en: \ref modelo#ModuleType
 	 * @param dcvsIn JTableModel o modelo que se quiere establecer.
 	 * @param editable TRUE si se quiere permitir la edición del número de columnas y filas.
 	 *  FALSE en otro caso.
@@ -413,9 +413,9 @@ public class TablaEditor extends JPanel{
 		/**
 		 * <p>Title: setTipo</p>  
 		 * <p>Description: Realiza una conversión de tipos de archivos definidos
-		 *  en la clase {@link TypesFiles} a tipos enumerados de {@link ModuleType}.</p> 
-		 * @param seleccion Tipo enumerado de la clase {@link ModuleType}
-		 * @return Valor correspondiente a los tipos de la clase {@link TypesFiles}.
+		 *  en la clase \ref modelo#TypesFiles a tipos enumerados de \ref modelo#ModuleType .</p> 
+		 * @param seleccion Tipo enumerado de la clase \ref modelo#ModuleType .
+		 * @return Valor correspondiente a los tipos de la clase \ref modelo#TypesFiles .
 		 * @see ModuleType
 		 */
 		private String setTipo(ModuleType seleccion) {
