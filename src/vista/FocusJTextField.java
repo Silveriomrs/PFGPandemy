@@ -1,8 +1,7 @@
 /**  
-* <p>Title: FocusJTextField.java</p>  
-* <p>Description: Clase particular que simplifica el proceso de dotar a los 
+* Clase particular que simplifica el proceso de dotar a los 
 * formularios de la característica visual de remarcar un campo de texto que 
-* obtiene el foco (está seleccionado, de cuando no lo está.</p>    
+* obtiene el foco (está seleccionado, de cuando no lo está.  
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 19 nov. 2021  
@@ -19,8 +18,7 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 /**
- * <p>Title: FocusJTextField</p>  
- * <p>Description: Clase que hereda de la clase FocusAdapter</p> 
+ * <p>Clase que hereda de la clase FocusAdapter</p> 
  * Su función es remarcar aquellos JTextFields de forma diferenciada cuando
  * tienen el foco a cuando no lo tienen.
  * @author Silverio Manuel Rosales Santana

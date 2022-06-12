@@ -22,8 +22,7 @@ import javax.swing.JColorChooser;
 
 
 /**
- * <p>Title: Paleta</p>  
- * <p>Description: Clase para mostrar la leyenda de un mapa.</p>
+ * <p>Clase para mostrar la leyenda de un mapa.</p>
  * Esta clase permite cambiar los valores de los colores de forma que se puede
  * seleccionar nuevas paletas de colores y exportar.
  * <p>Este módulo permite operar en dos modos, editable y no editable, con el primero
@@ -74,6 +73,11 @@ public class Paleta extends JPanel{
 		refresh();
 	}
 	
+	/**
+	 * Inicia los parámetros de la ventana que contendrá la vista de la paleta,
+	 *  ajustándolo a los atributos deseados en la aplicación, entre ellos, la posición
+	 *   y las dimensiones.
+	 */
 	private void iniciarFrame(){
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
@@ -86,8 +90,7 @@ public class Paleta extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 * <p>Reinicia la vista de este módulo.</p> 
 	 *  Elimina los datos previamente almacenados en el mismo.
 	 */
 	public void reset() {
@@ -95,23 +98,20 @@ public class Paleta extends JPanel{
 	}
 
 	/**
-	 * <p>Title: setFrameVisible</p>  
-	 * <p>Description: Establece el frame como visible o no.</p> 
+	 *  Establece el frame como visible o no.
 	 * @param ver TRUE para hacerlo visible, FALSE en otro caso.
 	 */
 	public void setFrameVisible(boolean ver) {frame.setVisible(ver);}
 	
 	/**
-	 * <p>Title: toggleVisible</p>  
-	 * <p>Description: Cambia la propiedad de visibilidad del estado anterior</p>
+	 * <p>Cambia la propiedad de visibilidad del estado anterior</p>
 	 * Si el estado actual es Visible pasa a estar oculto, de la misma manera
 	 * cuando el estado actual es oculto pasa a estar visible.  
 	 */
 	public void toggleFrameVisible() {setFrameVisible(!frame.isVisible());}
 	
 	/**
-	 * <p>Title: setPosicion</p>  
-	 * <p>Description: Establece la posición para el frame</p> 
+	 * Establece la posición para el frame.
 	 * @param xPos Posición X relativa a la pantalla.
 	 * @param yPos Posición Y relativa a la pantalla.
 	 */
@@ -119,8 +119,7 @@ public class Paleta extends JPanel{
 		
 	
 	/**
-	 * <p>Title: setEditable</p>  
-	 * <p>Description: Establece como editable o no la paleta de colores.</p> 
+	 * <p>Establece como editable o no la paleta de colores.</p> 
 	 * Cuando cambia a editable permite que se pueda modificar la paleta de colores.
 	 * @param edit TRUE para permitir edición. FALSE en caso contrario.
 	 */
@@ -186,9 +185,8 @@ public class Paleta extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Actualiza los colores de los botones con los valores
-	 *  que consten en el controlador de módulos.</p> 
+	 * Actualiza los colores de los botones con los valores
+	 *  que consten en el controlador de módulos.
 	 */
 	public void refresh() {
 		if(cm.hasModule(TypesFiles.PAL)) {
@@ -210,6 +208,13 @@ public class Paleta extends JPanel{
 		repaint();
 	}
 	
+	/**
+	 * Genera el observador que actuará en función del estado de cada botón que 
+	 *  representa a cada uno de los colores de la paleta. Actúa cuando el atributo
+	 *   "editable" de la paleta está activo.
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
 	private class BotonL implements ActionListener{
 		JButton boton;
 		

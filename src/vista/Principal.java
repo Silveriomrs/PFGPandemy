@@ -88,8 +88,7 @@ public class Principal extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: addPanelToView</p>  
-	 * <p>Description: Agrega un panel a la vista central.</p> 
+	 * Agrega un panel a la vista central. 
 	 * @param panel JPanel o vista para agregar.
 	 */
 	public void addPanelToView(JPanel panel) {
@@ -98,9 +97,7 @@ public class Principal extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: iniciarMenuBar</p>  
-	 * <p>Description: Genera una barra de herramientas y la añade
-	 * al JPanel principal, localización Norte.</p> 
+	 * Genera una barra de herramientas y la añade al JPanel principal, localización Norte. 
 	 */
 	private void iniciarMenuBar() {
 		//Inicializar el HashMap
@@ -153,8 +150,7 @@ public class Principal extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinia la vista</p>
+	 * <p>Reinia la vista.</p>
 	 * Provoca una lectura de los datos requeridos para que la cosistencia de
 	 *  la vista sea adecuada. 
 	 */
@@ -163,16 +159,14 @@ public class Principal extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Refresca la vista con los datos del módulo.  </p> 
+	 * Refresca la vista con los datos del módulo. 
 	 */
 	public void refresh() {
 		actualizarJMItems();
 	}
 	
 	/**
-	 * <p>Title: actualizarJMItems</p>  
-	 * <p>Description: Actualiza los JMenuItems en función del contexto de la aplicación</p>
+	 * <p>Actualiza los JMenuItems en función del contexto de la aplicación.</p>
 	 * Actua leyendo el estado de la aplicación y activando o desactivado las funciones
 	 * de los menús en base a los datos cargados y el estado previo de los diferentes módulos.
 	 */
@@ -194,6 +188,12 @@ public class Principal extends JFrame {
 		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);
 	}
 
+	/**
+	 * Añade un elemento a la barra de menú.
+	 * @param padre Elemento padre del que colgará la opción de menú.
+	 * @param nombre Nombre con el que aparecerá en el menú.
+	 * @param rutaIcon Ruta a un icono que será añadido a la opción.
+	 */
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
 		JMenuItem item = new JMenuItem(new VerMenuListener(nombre));
 		if(rutaIcon != null)  item.setIcon(IO.getIcon(rutaIcon,20,20));
@@ -202,9 +202,7 @@ public class Principal extends JFrame {
 	}
 	
 	 /**
-	 * <p>Title: VerMenuListener</p>  
-	 * <p>Description: Clase dedicada al establecimiento de los datos en los
-	 * apartados o módulos oportunos.</p>  
+	 * Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos.  
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
 	 * @version versión 1.1
@@ -214,11 +212,22 @@ public class Principal extends JFrame {
 		private static final long serialVersionUID = -5103462996882781094L;
 		private String name;
 		
+		/**
+		 * Esstablece como propiedad el nombre de la clase con el que se
+		 *  identificará ante el controlador de módulos y así identificar la acción
+		 *   requerida.  
+		 * @param name Nombre del control al que se asocia.
+		 */
 		public VerMenuListener(String name) {
 			super(name);
 			this.name = name;
 		}
 		
+		/**
+		 * Sobrescritura del método heredado, le pasa el nombre del control asociado
+		 *  al controlador de módulos y actualiza los menús de la barra en función
+		 *   del contexto actual.
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
@@ -228,8 +237,7 @@ public class Principal extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: WindowListener</p>  
-	 * <p>Description: Clase privada para controlar el cierre de la aplicación.</p>
+	 * <p>Clase privada para controlar el cierre de la aplicación.</p>
 	 * El objetivo principal es permitir a la clase controladora interrogar sobre
 	 * la operación, así como realizar el guardado de los datos antes de salir
 	 * de manera abrupta o incontrolada.  
@@ -239,22 +247,15 @@ public class Principal extends JFrame {
 	 */
 	private class WindowListener extends WindowAdapter {
 		
+			/**
+			 * Al sobrescribir este método se fuerza que la aplicación fuerce al
+			 *  usuario a confirmar la acción, de esta manera se da seguridad extra
+			 *   al eviar la perdida accidental de datos.
+			 */
 			@Override
 			public void windowClosing(WindowEvent e) {
 				cm.doActionPrincipal("Salir");
 		    }
-	}
-
-	
-	/* Funciones para pruebas */
-	
-	/**
-	 * Método main de la clase.
-	 * @param args no usado.
-	 */
-	public static void main(String[] args) {
-		new ControladorModulos();
-		
 	}
 }
 

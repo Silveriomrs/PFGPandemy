@@ -1,7 +1,6 @@
 /**  
-* <p>Title: MotorSIR.java</p>  
-* <p>Description: Motor para el cálculo de los diferentes valores evolutivos de
-* una enfermedad. Dichos cálculos están basados en el Módelo SIR. </p>    
+* Motor para el cálculo de los diferentes valores evolutivos de
+* una enfermedad. Dichos cálculos están basados en el Módelo SIR.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 13 nov. 2021  
@@ -17,9 +16,8 @@ import modelo.Labels;
 import modelo.Zona;
 
 /**
- * <p>Title: MotorSIR</p>  
- * <p>Description: Motor para el cálculo de los diferentes valores evolutivos de
- * una enfermedad. Dichos cálculos están basados en el Módelo SIR.</p>  
+ * Motor para el cálculo de los diferentes valores evolutivos de una enfermedad.
+ * Dichos cálculos están basados en el Módelo SIR. 
  * @author Silverio Manuel Rosales Santana
  * @date 13 nov. 2021
  * @version versión 1.0
@@ -29,7 +27,7 @@ public class MotorSIR {
 	private double PTE;													//Probabilidad de transmisión de la enfermedad (sin unidades).
 	private double TVS;													//Tasa vuelta a la susceptibilidad.
 	private double TR;													//Tasa de recuperación o curación.
-	private Double DME;													//Duración media de la enfermedad (en días).
+	private double DME;													//Duración media de la enfermedad (en días).
 	private boolean IP;													//Inmunidad Permanente.
 	private double DMI;													//Duración media de la inmunidad permanente.
 	private int NG;														//Número de grupos de población.
@@ -41,9 +39,8 @@ public class MotorSIR {
 	private int IT;
 
 	/**
-	 * <p>Description: Constructor que requiere los parámetros obligados
-	 * para la realización de los diferentes cálculos de propagación de la enfermedad
-	 * bajo este modelo. </p>  
+	 * Constructor que requiere los parámetros obligados para la realización de los 
+	 *  diferentes cálculos de propagación de la enfermedad bajo este modelo.  
 	 * @param mDEF Módulo con la definición de las propiedades de la enfermedad.
 	 * @param zonas Conjunto de zonas representantes de los grupos de estudio.
 	 * @param matrizC Matriz de contactos de la simulación.
@@ -65,12 +62,10 @@ public class MotorSIR {
 		this.zonas = zonas;
 		this.matrizC = matrizC;
 		this.NG = zonas.size();
-	}
-	
+	}	
 
 	/**
-	 * <p>Description: Realiza lectura inicial de los valores SIR</p>
-	 * Almacena resultados en la tabla.
+	 * Realiza lectura inicial de los valores SIR y almacena los resultados en la tabla.
 	 * @param label Etiqueta S,R o I.
 	 */
 	private void readXs(String label) {
@@ -88,7 +83,7 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Description: Añade las etiquetas indicadas para cada grupo de población.</p> 
+	 * Añade las etiquetas indicadas para cada grupo de población.
 	 * @param label Etiqueta
 	 * @see Labels 
 	 */
@@ -99,8 +94,8 @@ public class MotorSIR {
 	}
 
 	/**
-	 * <p>Description: Configura las etiquetas iniciales de la tabla histórico y
-	 *  realiza una lectura inicial de los valores SIR.</p>
+	 * Configura las etiquetas iniciales de la tabla histórico y
+	 *  realiza una lectura inicial de los valores SIR.
 	 */
 	private void setUpHST() {
 		this.mHST = DCVSFactory.newHST(FT +1);
@@ -117,11 +112,9 @@ public class MotorSIR {
 		addLabels(Labels.CI);
 		addLabels(Labels.C100K);
 	}
-
 	
 	/**
-	 * <p>Description: Inicia la realización de los cálculos para cada uno de los
-	 * parámetros del modelo.</p> 
+	 * Inicia la realización de los cálculos para cada uno de los parámetros del modelo.
 	 */
 	public void start() {
 		//Introducir datos de partida en la tabla.
@@ -202,7 +195,7 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Description: Cálcula la prevalencia para un tiempo determinado.</p> 
+	 * Cálcula la prevalencia para un tiempo determinado. 
 	 * @param time Slot de tiempo a usar para el cálculo.
 	 */
 	private void calcP(int time) {
@@ -226,8 +219,7 @@ public class MotorSIR {
 	}
 	
 	/**
-	 * <p>Description: Cálcula la Tasa de Contactos de una zona y la almacena
-	 * en sus registros correspondientes.</p> 
+	 * Cálcula la Tasa de Contactos de una zona y la almacena en sus registros correspondientes. 
 	 * @param z Zona o grupo de población de estudio.
 	 * @param time Indice de tiempo del cálculo de donde extraer los datos para
 	 * el cálculo presente.
@@ -248,20 +240,18 @@ public class MotorSIR {
 
 		return sumTC;
 	}
-	
-	
+		
 	/**
-	 * <p>Description: Calcula la prevalencia instantánea </p> 
+	 * Calcula la prevalencia instantánea. 
 	 * @param s Número de susceptibles.
 	 * @param i Número de infectados o incidentes.
 	 * @param r Número de recuperados.
 	 * @return La prevalencia instantanea de la enfermedad.
 	 */
 	private double getPrevalencia( double s, double i, double r) { return i/(s+i+r);}
-	
-	
+		
 	/**
-	 * <p>Description: Calcula los casos incidentes por 100 mil habitantes en el grupo</p> 
+	 * Calcula los casos incidentes por 100 mil habitantes en el grupo. 
 	 * @param ci Casos incidentes en el grupo.
 	 * @param s Número de susceptibles.
 	 * @param i Número de infectados o incidentes.
@@ -270,13 +260,11 @@ public class MotorSIR {
 	 */
 	private double getCI100K(double ci, double s, double i, double r) {return 100000*(ci/(s+i+r));}
 
-
 	/**
-	 * <p>Description: Devuelve el histórico calculado con los parámetros de entrada</p> 
+	 * Devuelve el histórico calculado con los parámetros de entrada. 
 	 * @return Módulo histórico en formato de tabla.
 	 */
 	public DCVS getHST() {return mHST;}
-
 
 	/**
 	 * @return El conjunto de grupos de población.
@@ -284,7 +272,7 @@ public class MotorSIR {
 	public HashMap<Integer,Zona> getZonas() {return zonas;}
 	
 	/**
-	 * <p>Description: Devuelve una zona indicada por su identificador.</p> 
+	 * Devuelve una zona indicada por su identificador.
 	 * @param ID Identificador de la zona o grupo de población.
 	 * @return Zona o grupo de población. Null en otro caso.
 	 */
@@ -298,7 +286,7 @@ public class MotorSIR {
 	
 	
 	/**
-	 * <p>Description: Imprimir los datos iniciales de las pruebas</p> 
+	 * Imprimir los datos iniciales de las pruebas. 
 	 */
 	public void imprimirDatos() {
 		//Ver Matriz de contactos.
@@ -322,11 +310,10 @@ public class MotorSIR {
 		System.out.println("DME: " + DME);
 		System.out.println("IP: " + IP);
 		System.out.println("DMI: " + DMI);
-	}
-	
+	}	
 
 	/**
-	 * <p>Description: Función para las pruebas de implementación e integración. </p>
+	 * Función para las pruebas de implementación e integración.
 	 * Inicialmente las pruebas estarán acotadas a 4 grupos de población.
 	 * @param args ninguno.
 	 */

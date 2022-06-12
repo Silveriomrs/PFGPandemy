@@ -1,7 +1,6 @@
 /**  
-* <p>Title: Labels.java</p>  
-* <p>Description: Diccionario de conversión del texto de las etiquetas de la
-* aplicación al idioma español (España)</p>    
+* Diccionario de conversión del texto de las etiquetas de la
+* aplicación al idioma español (España)    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 9 nov. 2021  
@@ -13,9 +12,8 @@ import java.util.HashMap;
 
 
 /**
- * <p>Title: Labels</p>  
  * Diccionario de conversión del texto de las etiquetas de la
- * aplicación al idioma español (España)</p> 
+ * aplicación al idioma español (España) 
  * @author Silverio Manuel Rosales Santana
  * @date 9 nov. 2021
  * @version versión
@@ -105,8 +103,7 @@ public class Labels {
 	private final static String language = "Español";
 	
 	/**
-	 * <p>Title: Labels</p>  
-	 * <p>Description: constructor</p> 
+	 * Constructor, necesita ser invocado al menos una vez. 
 	 */
 	public Labels(){
 		dic = new HashMap<String,String>();
@@ -114,9 +111,8 @@ public class Labels {
 	}
 	
 	/**
-	 * <p>Title: addLabels</p>  
-	 * <p>Description: Añade las etiquetas y sus correspondientes palabras en
-	 * el idioma destino. </p>
+	 * Description: Añade las etiquetas y sus correspondientes palabras en
+	 * el idioma destino.
 	 */
 	private static void addLabels(){
 		//Casos de.
@@ -163,9 +159,7 @@ public class Labels {
 		dic.put(AREA, "Superficie de la zona");		
 	}
 	
-	/**
-	 * <p>Title: existLabel</p>  
-	 * <p>Description: </p> 
+	/** 
 	 * @param label Etiqueta a buscar dentro del diccionario.
 	 * @return TRUE si esta contenida (es válida). FALSE en otro caso.
 	 */
@@ -178,9 +172,8 @@ public class Labels {
 	public static String getLanguage() {return language;}
 	
 	/**
-	 * <p>Title: getWord</p>  
-	 * <p>Description: Comprueba si existe una etiqueta dentro del diccionario
-	 * en caso de que exista devuelve el texto en el idioma del diccionario</p> 
+	 * Comprueba si existe una etiqueta dentro del diccionario
+	 * en caso de que exista devuelve el texto en el idioma del diccionario.
 	 * @param label Etiqueta a buscar.
 	 * @return Cadena de texto con la frase en el idioma, null en otro caso.
 	 */
@@ -193,8 +186,7 @@ public class Labels {
 	}
 	
 	/**
-	 * <p>Title: getKey</p>  
-	 * <p>Description: Devuelve la clave para un valor en el diccionario.</p>
+	 * Devuelve la clave para un valor en el diccionario.
 	 * Realiza una búsqueda comparando cada valor con la entrada proporcionada.
 	 *  Cuando encuentra la primera coincidencia, devuelve la clave asociada. 
 	 * @param word Texto a buscar.

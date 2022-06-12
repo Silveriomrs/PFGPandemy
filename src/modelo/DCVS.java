@@ -31,7 +31,6 @@ public class DCVS implements TableModel{
 	private Object datos[][];
 	
 	/**
-	 * <p>Title: Constructor básico</p>  
 	 * <p>Description: crea un nuevo modelo sin filas ni columnas</p>
 	 * Su ruta es null y su tipo de datos vacio.  
 	 */
@@ -101,8 +100,7 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * <p>Title: setColumnName</p>  
-	 * <p>Description: Establece un nuevo nombre a una posición de la cebcera</p>
+	 * Establece un nuevo nombre a una posición de la cebcera
 	 * La función en si misma realiza una copia de la antigua cabecera y sustituye
 	 *  el valor de la posición indicada por el nuevo valor.
 	 * @param index Posición de la columna cuyo nombre se quiere cambiar.
@@ -250,8 +248,7 @@ public class DCVS implements TableModel{
 	
 	
 	/**
-	 * <p>Title: crearModelo</p>  
-	 * <p>Description: Crea un modelo con los datos almacenados en la instancia</p> 
+	 * Crea un modelo con los datos almacenados en la instancia 
 	 * @return Modelo conformado.
 	 */
 	public DefaultTableModel crearModelo() {
@@ -260,8 +257,7 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * <p>Title: nuevoModelo</p>  
-	 * <p>Description: Crea una nueva tabla/modelo vacia.</p> 
+	 * Crea una nueva tabla/modelo vacia.
 	 */
 	public void nuevoModelo() {
 		//Cuerpo de datos
@@ -304,8 +300,7 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * <p>Title: setDataToLabel</p>  
-	 * <p>Description: Asigna un valor a una etiqueta.</p>
+	 * Asigna un valor a una etiqueta.
 	 * Realiza una búsqueda por las filas buscando una etiqueta (que están situadas
 	 *  en la primera fila (indice 0) hasta encontrarla, el valor de dicha etiqueta
 	 *   esta almacenado en el segundo campo, y este dato será sobre escrito por
@@ -323,8 +318,7 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * <p>Title: getDataFromRowLabel</p>  
-	 * <p>Description: Devuelve el valor asignado a una etiqueta horizontal.</p>
+	 * Devuelve el valor asignado a una etiqueta horizontal.
 	 * Las estiquetas en los módulos pueden estar orientadas de forma vertical
 	 *  (una columna) u horizontal (en filas). Este método realiza el indexado
 	 *   en modo horizontal, cuando encuentra dicha etiqueta devuelve el valor
@@ -341,9 +335,8 @@ public class DCVS implements TableModel{
 	
 	
 	/**
-	 * <p>Title: getFilaItem</p>  
-	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
-	 * de la tabla.</p> 
+	 * Busca un elemento/valor en todas las primeras celdas
+	 * de la tabla.
 	 * @param v Valor a encontrar.
 	 * @return Número de la fila que contiene dicho valor. -1 En otro caso.
 	 */
@@ -364,10 +357,9 @@ public class DCVS implements TableModel{
 	}
 
 	/**
-	 * <p>Title: getColItem</p>  
-	 * <p>Description: Busca un elemento/valor en la cabecera de las columnas
+	 * Busca un elemento/valor en la cabecera de las columnas
 	 *  de la tabla (etiquetas) y devuelve el indice de la columna que coincide
-	 *   con la etiqueta buscada.</p> 
+	 *   con la etiqueta buscada. 
 	 * @param v Valor a encontrar.
 	 * @return Número de la columna que contiene dicho valor (nombre). -1 En otro caso.
 	 */
@@ -472,32 +464,27 @@ public class DCVS implements TableModel{
 	public void setTipo(String tipo) {	this.tipo = tipo;}
 	
 	/**
-	 * <p>Title: getNombre</p>  
-	 * <p>Description: Devuelve el nombre del archivo, con extensión inclusive</p> 
+	 * Devuelve el nombre del archivo, con extensión inclusive 
 	 * @return Nombre del archivo.
 	 */
 	public String getNombre() {return this.nombre;}
 
 
 	/**
-	 * <p>Title: setName</p>  
-	 * <p>Description: </p> 
 	 * @param name Nombre del archivo.
 	 */
 	public void setName(String name) {this.nombre = name;}
 	
 	
 	/**
-	 * <p>Title: getDirectorio</p>  
-	 * <p>Description: Devuelve el directorio del que ha sido cargado este módulo</p>
+	 * Devuelve el directorio del que ha sido cargado este módulo
 	 * No incluye nombre del fichero.
 	 * @return Directorio del módulo.
 	 */
 	public String getDirectorio() { return this.directorio;}
 	
 	/**
-	 * <p>Title: setDirectorio</p>  
-	 * <p>Description: Establece su directorio de trabajo </p> 
+	 * Establece su directorio de trabajo 
 	 * @param ruta Ruta desde el raíz hasta el directorio padre.
 	 */
 	public void setDirectorio(String ruta) {this.directorio = ruta;}

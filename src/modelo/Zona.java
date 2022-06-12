@@ -107,10 +107,9 @@ public class Zona {
 	}
 	
 	/**
-	 * <p>Title: addNivel</p>  
-	 * <p>Description: Añade un nuevo valor a una serie de su historico, en caso
+	 * Añade un nuevo valor a una serie de su historico, en caso
 	 *  de que no exissta dicha serie se creará de forma automática por la clase
-	 *   recipiente.</p>
+	 *   recipiente.
 	 * Hace un tratamiento especial para las etiquetas {C100K,CAB,TCS} acorde a sus
 	 *  particularidades.
 	 * @param et Nombre de la serie de datos al que añadir el nuevo dato, o nueva serie a crear.
@@ -240,8 +239,7 @@ public class Zona {
 	public Polygon getPoligono() {return poligono;}
 
 	/**
-	 * <p>Title: setPoligono</p>  
-	 * <p>Description: Establece un Poligono como poligono representativa gráfica</p> 
+	 * Establece un Poligono como poligono representativa gráfica 
 	 * @param poligono Figura geometrica.
 	 */
 	public void setPoligono(Polygon poligono) {this.poligono = poligono;}

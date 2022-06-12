@@ -1,8 +1,7 @@
 /**  
-* <p>Title: ParametrosGrupos.java</p>  
-* <p>Description: Vista destinada a contener las vistas de los grupos de población
+* Vista destinada a contener las vistas de los grupos de población
 * 	en formato de pestañas laterales. Además garantiza un ordenamiento correcto por
-*  número de índice.</p>
+*  número de índice.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 15 oct. 2021  
@@ -27,8 +26,7 @@ import controlador.IO;
 import modelo.Zona;
 
 /**
- * <p>Title: ParametrosGrupos</p>  
- * <p>Description: </p>  
+ * Constructor de la clase que extiende de JPanel sus propiedades.
  * @author Silverio Manuel Rosales Santana
  * @date 15 oct. 2021
  * @version versión 1.1
@@ -43,10 +41,9 @@ public class ParametrosGrupos extends JPanel {
 	private HashMap<Integer, VistaZona> vistasZonas;
 	
 	/**
-	 * <p>Title: ParametrosGrupos del proyecto</p>  
-	 * <p>Description: Constructor de la clase que recibe los valores esenciales
+	 * Constructor de la clase que recibe los valores esenciales
 	 * del proyecto, como por ejemplo número inicial de grupos, nombre del proyecto,
-	 * etcétera. </p>  
+	 * etcétera.
 	 * @param cm Controlador de los módulos. Necesario para el correcto funcionamiento
 	 * de la aplicación permitiendo la comunicación y el flujo de datos bidireccional.
 	 */
@@ -68,8 +65,7 @@ public class ParametrosGrupos extends JPanel {
 	}
 
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 * <p>Reinicia la vista de este módulo.</p> 
 	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
 	 * por cadenas vacias y reinicia el resto de valores.
 	 */
@@ -88,8 +84,7 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Refresca los datos de las vistas.</p> 
+	 * Refresca los datos de las vistas.
 	 */
 	public void refresh() {
 		vistasZonas.forEach((k,vista)->{
@@ -98,8 +93,7 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
+	 * Visualiza los datos del módulo dentro de su propio marco.
 	 */
 	public void configurarFrame() {
 	    frame = new JFrame("Parámetros de los Grupos");
@@ -117,26 +111,22 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: toggleVisible</p>  
-	 * <p>Description: Cambia la visibilidad del frame que contiene la vista</p>
+	 * <p>Cambia la visibilidad del frame que contiene la vista</p>
 	 * Pasa del estado anterior al opuesto. Si previamente estaba oculto pasa a 
 	 * estar visible, de igual forma si estaba visible pasa a estar oculto. 
 	 */
 	public void toggleVisible() { frame.setVisible( !frame.isVisible()); }
 	
 	/**
-	 * <p>Title: configura</p>  
-	 * <p>Description: Comprueba mediante el módulo controlador si existen zonas definidas,
-	 *  en caso de exisitr fuerza la actualización de los paneles.</p>
+	 * Comprueba mediante el módulo controlador si existen zonas definidas,
+	 *  en caso de exisitr fuerza la actualización de los paneles.
 	 */
 	private void configura() {
 		if(cm.getNumberZonas() > 0) updatePaneles();
 	}
 	
 	/**
-	 * <p>Title: updatePaneles</p>  
-	 * <p>Description: Genera los paneles que representan cada una de las zonas
-	 * que componen el proyecto </p>
+	 * <p>Genera los paneles que representan cada una de las zonas que componen el proyecto </p>
 	 * En caso de no haberse cargado unas zonas con datos, se generan tantas pestañas
 	 * (vistas de zonas) como grupos/zonas compongan el proyecto.
 	 */
@@ -157,8 +147,7 @@ public class ParametrosGrupos extends JPanel {
 	}
 
 	/**
-	 * <p>Title: iniciarTabZona</p>  
-	 * <p>Description: Genera la vista para cada zona implicada.</p>
+	 * Genera la vista para cada zona implicada.
 	 * @param zona Zona con los datos correspondientes.
 	 * @param icono Imagen a mostrar como icono de la pestaña.
 	 */
@@ -180,8 +169,7 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: setBorder</p>  
-	 * <p>Description: Añade un título y un borde a un panel.</p>
+	 * <p>Añade un título y un borde a un panel.</p>
 	 * Dicho borde rodea la vista de la zoa. 
 	 * @param titulo Título que contendrá el borde.
 	 * @param panel JPanel al que añadir el borde y su título.

@@ -1,6 +1,6 @@
 /**  
-* <p>Title: TypesFiles.java</p>  
-* <p>Description: </p>    
+* Contiene las etiquetas referentes a los diferentes tipos de ficheros 
+*  que puede manejar la aplicación.  
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 17 nov. 2021  
@@ -11,9 +11,8 @@ package modelo;
 import java.util.HashMap;
 
 /**
- * <p>Title: TypesFiles</p>  
- * <p>Description: Clase coordinadora de los tipos de archivos, módulos, 
- * extensiones y cualquie otra vicisitud que sea requerida por el sistema.</p>
+ * Clase coordinadora de los tipos de archivos, módulos, 
+ * extensiones y cualquie otra vicisitud que sea requerida por el sistema.
  * Usa etiquetas para la relación con extensiones y archivos.
  * @author Silverio Manuel Rosales Santana
  * @date 17 nov. 2021
@@ -52,9 +51,7 @@ public class TypesFiles {
 	
 
 	/**
-	 * <p>Title: </p>  
-	 * <p>Description: Inicializa los valores aceptables para los tipos de
-	 * archivos soportados por el sistema.</p>  
+	 * Inicializa los valores aceptables para los tipos de archivos soportados por el sistema. 
 	 */
 	public TypesFiles() {configurar();}
 	
@@ -75,9 +72,8 @@ public class TypesFiles {
 		tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
     }
    
-	   /**
-	 * <p>Title: get</p>  
-	 * <p>Description: Devuelve el texto asociado a una extensión.</p> 
+   /**
+	 * Devuelve el texto asociado a una extensión. 
 	 * @param t Tipo de datos o etiqueta.
 	 * @return Texto asociado a dicha etiqueta. Null en otro caso.
 	 */
@@ -91,8 +87,7 @@ public class TypesFiles {
 	}
    
 	/**
-	 * <p>Title: hasType</p>  
-	 * <p>Description: Indica si existe dicha extensión o etiqueta.</p> 
+	 * Indica si existe dicha extensión o etiqueta. 
 	 * @param t Tipo de extensión o etiqueta.
 	 * @return TRUE si esta contenida, FALSE en otro caso.
 	 */

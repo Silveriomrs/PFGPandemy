@@ -1,22 +1,23 @@
-/**  
-* <p>Title: VistaSIR.java</p>  
-* <p>Description: Vista dedicada a mostrar los parámetros del modelo de 
-* predicción/cálculo SIR</p>    
-* <p>Aplication: UNED</p>  
+/**
+* Vista dedicada a mostrar los parámetros del modelo de predicción/cálculo SIR.
+* <p>Aplication: UNED</p>
 * @author Silverio Manuel Rosales Santana
-* @date 17 nov. 2021  
-* @version 1.0  
-*/  
+* @date 17 nov. 2021
+* @version 1.0
+*/
 package vista;
 
 import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -32,17 +33,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import javax.swing.JCheckBox;
+import java.awt.Point;
 
 
 /**
- * <p>Description: Vista dedicada a mostrar los parámetros del modelo de 
- * predicción/cálculo SIR</p>  
+ * Vista dedicada a mostrar los parámetros del modelo de predicción/cálculo SIR.
+ * Esta clase hereda de JPanel.
  * @author Silverio Manuel Rosales Santana
  * @date 17 nov. 2021
  * @version versión 1.2
  */
 public class VistaSIR extends JPanel{
-	/** serialVersionUID*/  
+	/** serialVersionUID*/
 	private static final long serialVersionUID = -4611485519498921021L;
 	private HashMap<String,JTextField> mapaFields;
 	private JButton btnAplicar,btnExecute;
@@ -55,27 +57,95 @@ public class VistaSIR extends JPanel{
 	private JPanel panelCentral;
 	private ControladorModulos cm;												//Controlador de módulos.
 	private boolean IP;
+	private String ruta = "/vista/imagenes/blueWind.png";
+
 
 	/**
-	 * <p>Description: Constructor de la vista del módulo SIR</p>  
+	 * Constructor de la vista del módulo SIR.
 	 * @param cm Controlador de módulos, necesario para permitir el flujo de datos
 	 * entre las vistas, el módelo y el controlador.
 	 */
 	public VistaSIR(ControladorModulos cm) {
 		super();
 		this.cm = cm;
-		this.mapaFields = new HashMap<String,JTextField>();
+		this.mapaFields = new HashMap<String,JTextField>();						//Guardar los JTextFields con su etiqueta como ID
 		this.IP = true;
+		//Configuración panel superior.
+		setLocation(new Point(10, 10));
+		setLayout(new BorderLayout(0, 0));
+		setBorder(null);
+		setOpaque(false);
 		setLayout(null);
+		
 		panelCentral = new JPanel();
-		panelCentral.setBackground(Color.LIGHT_GRAY);
-		hi = wi =  20;
+		hi = wi =  20;															//Establecer dimensiones de los iconos.
 		configurar();
 	}
-	
+
 	/**
-	 * <p>Description: Limpia los textos mostrados en cada etiqueta, sustituyéndolos
-	 * por cadenas vacias y activa el valor de Inmunidad Permanente.</p>
+	 * Función general para crear la vista y sus controles.
+	 */
+	private void configurar() {
+		//Botón aplicar.
+		btnAplicar = new JButton("Aplicar");
+		btnAplicar.addMouseListener(new BotonL());
+		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
+		btnAplicar.setToolTipText("Aplica los cambios efectuados.");
+		btnAplicar.setBounds(334, 252, 150, 87);
+		btnAplicar.setActionCommand("Aplicar");
+		panelCentral.add(btnAplicar);
+		//Botón ejecutar simulación
+		btnExecute = new JButton("Ejecutar simulación");
+		btnExecute.setBounds(44, 302, 207, 37);
+		btnExecute.setVisible(true);
+		btnExecute.setEnabled(false);
+		btnExecute.setActionCommand("Ejecutar");
+		btnExecute.setToolTipText("Ejecuta el cálculo del modelo.");
+		btnExecute.addMouseListener(new BotonL());
+		panelCentral.add(btnExecute);
+
+		//Configuración básica del panelCentral superior
+		setToolTipText("Visulación de los parámetros particulares de la enfermedad.");
+		panelCentral.setBounds(225, 200, 550, 400);								//Indicar donde colocar el panel central respecto al panel del que cuelga.
+		this.setBounds(220, 195, 560, 410);
+		setName("Vista parámetros SIR");
+		setAutoscrolls(true);
+
+		panelCentral.setToolTipText("Parámetros SIR");
+		panelCentral.setLayout(null);
+		add(panelCentral, BorderLayout.CENTER);
+
+		//Muy importante iniciar este método antes de proseguir.
+		createFieldsInMap();
+
+		//Establecer el icono representación del módulo Archivos.
+		JLabel labelLogo = new JLabel("");
+		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/motor_512px.png",70,75));
+		labelLogo.setBounds(12, 20, 70, 75);
+		panelCentral.add(labelLogo);
+
+		//Configuración del estado de los botones según contexto.
+		refreshControls();
+	}
+
+	/**
+	 * Sobrescritura del método heredado de dibujado con el objetivo de permitir
+	 *  colocar una imagen de fondo centrada y con efecto transparente.
+	 */
+	@Override
+	public void paint(Graphics g) {
+		if(ruta != null) {
+			Image imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+			g.drawImage(imagen,panelCentral.getX(),panelCentral.getY(),panelCentral.getWidth(),panelCentral.getHeight(),panelCentral);
+			panelCentral.setOpaque(false);
+			super.paint(g);
+		}
+	}
+
+
+	/**
+	 * Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * por cadenas vacias y activa el valor de Inmunidad Permanente.
 	 */
 	public void reset() {
 		IP = true;
@@ -84,10 +154,9 @@ public class VistaSIR extends JPanel{
 		//Realizar lectura de los datos en el propio módulo (si hay).
 		refresh();
 	}
-	
-	
+
 	/**
-	 * <p>Description: Actualiza los campos de la vista. No realiza borrado previo.</p>
+	 * <p>Actualiza los campos de la vista. No realiza borrado previo.</p>
 	 * Una vez actualizados, actualiza los controles y refresca el dibujado. En caso
 	 *  de no disponer del módulo correspondiente en el sistema, no realiza acción alguna.
 	 */
@@ -98,12 +167,12 @@ public class VistaSIR extends JPanel{
 			updateUI();
 		}
 	}
-	
+
 	/**
-	 * <p>Description: Actualiza los campos de la vista.</p>
+	 * <p>Actualiza los campos de la vista.</p>
 	 * Solicita al controlador los datos necesarios para actualizar la vista,
 	 *  en caso de estar disponibles, procede a la acción. No actualiza aquellas
-	 *   partes que no estén definidas. Es decir, no elimina datos previos, los 
+	 *   partes que no estén definidas. Es decir, no elimina datos previos, los
 	 *    sobreescribe si hay un nuevo dato disponible.
 	 */
 	private void updateFields() {
@@ -116,14 +185,14 @@ public class VistaSIR extends JPanel{
 			else {
 				//Cuando la etiqueta es IP, recibe el tratamiento específico.
 				//Convertirlo a int sino es null, en otro caso dar valor 1 (activo).
-				int a = (data == null || data.equals(""))? 1 : Integer.parseInt(data);				
+				int a = (data == null || data.equals(""))? 1 : Integer.parseInt(data);
 				IP = a == 1;													//Obtener el resultado si es activo o no.
 			}
 		}
 	}
-	
+
 	/**
-	 * <p>Description: Establece el texto al campo que se le indique.</p>
+	 * Establece el texto al campo que se le indique.
 	 * @param label Etiqueta o campo a escribir.
 	 * @param text Texto a escribir en el campo.
 	 */
@@ -132,9 +201,9 @@ public class VistaSIR extends JPanel{
 			mapaFields.get(label).setText(text);
 		}
 	}
-	
+
 	/**
-	 * <p>Description: Devuelve el texto al campo que se le indique.</p>
+	 * Devuelve el texto al campo que se le indique.
 	 * @param label Etiqueta o campo a leer.
 	 * @return El dato almacenado en tal campo.
 	 */
@@ -145,12 +214,11 @@ public class VistaSIR extends JPanel{
 		}else if(label.equals(Labels.IP)) data = "" + ((IP == true)? 1:0);
 		return data;
 	}
-	
-	
+
 	/**
-	 * <p>Description: Añade un icono a una etiqueta</p>
-	 * Los valores de dimensión de ancho y largo se establecen en función de los 
-	 * datos pasados por parámetro. 
+	 * <p>Añade un icono a una etiqueta.
+	 * Los valores de dimensión de ancho y largo se establecen en función de los
+	 * datos pasados por parámetro.
 	 * @param componente Etiqueta a la que adjuntar el icono
 	 * @param ruta Nombre del archivo y su ruta.
 	 * @param w Ancho a escalar de la imagen original.
@@ -158,11 +226,11 @@ public class VistaSIR extends JPanel{
 	 */
 	private void addIconL(JLabel componente, String ruta, int w, int h) {
 		componente.setIconTextGap(5);
-		componente.setIcon(IO.getIcon(ruta,w,h));	
+		componente.setIcon(IO.getIcon(ruta,w,h));
 	}
-	
+
 	/**
-	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
+	 * Establece las facetas de las etiquetas descripticas.
 	 * @param label Nombre en la etiqueta.
 	 * @param ruta Ruta al icono de la etiqueta.
 	 * @return La propia etiqueta configurada a efectos de permitir modificaciones
@@ -181,9 +249,9 @@ public class VistaSIR extends JPanel{
 		panelCentral.add(jl);
 		return jl;
 	}
-	
+
 	/**
-	 * <p>Description: Genera todos los JTextFields necesarios para cubrir
+	 * <p>Genera todos los JTextFields necesarios para cubrir
 	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
 	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
 	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
@@ -204,9 +272,9 @@ public class VistaSIR extends JPanel{
 		jtf.addFocusListener(new FocusJTextField(jtf));
 		panelCentral.add(jtf);
 	}
-	
+
 	/**
-	 * <p>Description: Añade todas las funcionalidades y controles necesarias.</p>
+	 * <p>Añade todas las funcionalidades y controles necesarias.</p>
 	 * Dede esta función se añaden cada una de las líneas de control necesarias.
 	 * <p>Para mas información sobre crear los controles
 	 *  ver {@link #generateControls(String ext, int posX)} .</p>
@@ -229,15 +297,15 @@ public class VistaSIR extends JPanel{
 		chckbxIP.setBorder(null);
 		chckbxIP.setOpaque(false);
 		chckbxIP.setHorizontalAlignment(SwingConstants.LEFT);
-		chckbxIP.setBounds(55, posY, 196, 23);	
+		chckbxIP.setBounds(55, posY, 196, 23);
 		chckbxIP.setHorizontalTextPosition(SwingConstants.LEFT);
 		chckbxIP.addMouseListener(new BotonL());
 		chckbxIP.setActionCommand("IP");
 		panelCentral.add(chckbxIP);
 	}
-	
+
 	/**
-	 * <p>Description: Agrega los elementos JTextField al grupo mapaFields</p>
+	 * <p>Agrega los elementos JTextField al grupo mapaFields</p>
 	 * Todo elemento que se desea agregar se añade aquí se configuran automáticamente
 	 * y se añaden a las diferentes partes de la vista.
 	 * <p>Para crear los controles ver {@link #generateControls(String ext, int posX)} .</p>
@@ -251,80 +319,31 @@ public class VistaSIR extends JPanel{
 		generateControls(et,0);
 		contador++;
 	}
-	
-	/**
-	 * <p>Description: Función general para crear la vista y sus controles.</p>
-	 */
-	private void configurar() {
-		//Botón aplicar.
-		btnAplicar = new JButton("Aplicar");
-		btnAplicar.addMouseListener(new BotonL());
-		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
-		btnAplicar.setToolTipText("Aplica los cambios efectuados.");
-		btnAplicar.setBounds(334, 252, 150, 87);
-		btnAplicar.setActionCommand("Aplicar");
-		panelCentral.add(btnAplicar);
-			
-		//Configuración básica del panelCentral superior
-		setToolTipText("Visulación de los parámetros particulares de la enfermedad.");
-		setSize(new Dimension(650, 400));
-		setName("Vista parámetros SIR");
-		setMinimumSize(new Dimension(650, 400));
-		setMaximumSize(new Dimension(1024, 768));
-		setAutoscrolls(true);
-		setLayout(new BorderLayout(0, 0));	
-		
-		panelCentral.setToolTipText("Parámetros SIR");
-		panelCentral.setLayout(null);
-		add(panelCentral, BorderLayout.CENTER);	
 
-		//Muy importante iniciar este método antes de proseguir.
-		createFieldsInMap();
-
-		//Establecer el icono representación del módulo Archivos.
-		JLabel labelLogo = new JLabel("");
-		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/motor_512px.png",70,75));
-		labelLogo.setBounds(12, 20, 70, 75);
-		panelCentral.add(labelLogo);
-		
-		btnExecute = new JButton("Ejecutar simulación");
-		btnExecute.setBounds(44, 302, 207, 37);
-		btnExecute.setVisible(false);
-		btnExecute.setEnabled(false);
-		btnExecute.setActionCommand("Ejecutar");
-		btnExecute.setToolTipText("Ejecuta el cálculo del modelo.");
-		btnExecute.addMouseListener(new BotonL());
-		panelCentral.add(btnExecute);
-		//Configuración del estado de los botones según contexto.
-		refreshControls();
-	}
-	
 	/**
-	 * <p>Title: refreshControls</p>  
-	 * <p>Description: Actualiza los controles de la vista.</p>
+	 * Actualiza los controles de la vista.
 	 */
 	private void refreshControls() {
 		mapaFields.get(Labels.DMI).setEnabled(!IP);
 		chckbxIP.setSelected(IP);
-		
-//		if( checkFields() && cm.hasZonas() && cm.hasModule(TypesFiles.REL)){
-//			btnExecute.setEnabled(true);
-//			btnExecute.setVisible(true);
-//			btnExecute.setBackground(Color.GREEN);
-//		}
+
+		if( checkFields() && cm.hasZonas() && cm.hasModule(TypesFiles.REL)){
+			btnExecute.setEnabled(true);
+			btnExecute.setBackground(Color.GREEN);
+		}
 	}
-	
+
 	/**
-	 * <p>Description: Comprueba si un valor es un dato númerico correcto. </p>
+	 * <p>Comprueba si un valor es un dato númerico correcto. </p>
 	 * Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
-	 *  no númericos. Tampoco admite números negativos. 
+	 *  no númericos. Tampoco admite números negativos.
 	 * @param label Etiqueta del campo a evaluar
 	 * @return TRUE si cumple las condiciones. FALSE en otro caso.
 	 */
 	private boolean checkValue(String label) {
 		boolean resultado = true;
 		String ve= getLabel(label);
-		
+
 		try {
 			double valor = Double.parseDouble(ve);
 			if(valor < 0) throw new ArithmeticException();
@@ -335,41 +354,48 @@ public class VistaSIR extends JPanel{
 		}
 		return resultado;
 	}
-	
+
 	/**
-	 * <p>Description: Realiza un chequeo de todos los campos.</p>
+	 * <p>Realiza un chequeo de todos los campos.</p>
 	 * En caso de que uno de los campos contenga un valor incorrecto retornará
-	 *  FALSE. 
+	 *  FALSE.
 	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
 	 */
-	@SuppressWarnings("unused")
 	private boolean checkFields() {
 		boolean done = true;
 		for (String clave:mapaFields.keySet()) {
 		    if(!checkValue(clave)) done = false;
 		}
-		
+
 		return done;
 	}
-	
-	
+
+
 	/* Clases privadas */
-	
+
 	/**
-	 * <p>Description: Clase encargada de detectar la pulsación del botón aplicar</p>
-	 * Cuando es pulsado, intercambia la información necesaria con el controlador.  
+	 * <p>Clase encargada de detectar la pulsación del botón aplicar</p>
+	 * Cuando es pulsado, intercambia la información necesaria con el controlador.
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 19 nov. 2021
 	 * @version versión 1.0
 	 */
 	private class BotonL extends MouseAdapter {
+
+		/**
+		 * Sobrescribe la función heredada. Comprueba el operador asociado al
+		 *  botón al que ha sido agregado el observador y en función del control
+		 *   activado realiza las opciones correspondientes, previa comprobación de
+		 *    los valores correctos.
+		 * <p>Comunica al controlador la opción ejecutada a través de su doAction</p>
+		 */
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
 			OperationsType opt = OperationsType.UPDATE;
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
-			
-			
+
+
 			//Avisa al controlador de cambios.
 			System.out.println("VistaSir > BotonL > OP: " + op);
 			if(op.equals("Aplicar")){
@@ -378,11 +404,11 @@ public class VistaSIR extends JPanel{
 					if(valor != null && !valor.equals("") && !checkValue(label)) {
 						setLabel(label,null);
 						cm.showMessage("El valor del campo " + Labels.getWord(label) + "  es incorrecto: " + valor, 0);
-					}				
+					}
 				});
 			}else if(op.equals(Labels.IP)) {IP = chckbxIP.isSelected();}
 			else if(((Component) evt.getSource()).isEnabled() ) opt = OperationsType.EXECUTE;
-			
+			//Llamada al controlador para ejectuar la acción de la opción elegida.
 			cm.doActionVistaSIR(opt);
 			//Actualiza los controles.
 			refresh();

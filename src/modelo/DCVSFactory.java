@@ -1,6 +1,5 @@
 /**  
-* <p>Title: DCVSFactory.java</p>  
-* <p>Description: Clase generadora de módulos configurados.</p>
+* Clase generadora de módulos configurados.
 * Usando los conceptos de los patrones Factory Method y Builder, esta clase
 *  tiene el objetivo de facilitar la obtención de una instancia de los módulos 
 *   DCVS configurados con las etiquetas propias de cada módulo. Facilitando su
@@ -15,25 +14,23 @@ package modelo;
 import java.util.HashMap;
 
 /**
- * <p>Title: DCVSFactory</p>  
-* <p>Description: Clase generadora de módulos configurados.</p>
+* Clase generadora de módulos configurados.
 * Usando los conceptos de los patrones Factory Method y Builder, esta clase
 *  tiene el objetivo de facilitar la obtención de una instancia de los módulos 
 *   DCVS configurados con las etiquetas propias de cada módulo. Facilitando su
 *    reutilización y mejorando la legibilidad del código general.
-* <p>Para ver los tipos soportados ver {@link ModuleType}</p>
+* <p>Para ver los tipos soportados ver \ref modelo#ModuleType </p>
 *  @see ModuleType   
  * @author Silverio Manuel Rosales Santana
  * @date 2 dic. 2021
- * @version versión
+ * @version versión 1.1
  */
 public class DCVSFactory {
 	
 		
 	/**
-	 * <p>Title: newModule</p>  
-	 * <p>Description: Devuelve una nueva instancia con los atributos del tipo
-	 *  de módulo específicado.</p>
+	 * Devuelve una nueva instancia con los atributos del tipo
+	 *  de módulo específicado.
 	 *  Crea las etiquetas correspondientes a dicho módulo y los atributos característicos.
 	 * @param type Tipo de módulo a generar.
 	 * @return Una instancia nueva del módulo específicado.
@@ -48,8 +45,6 @@ public class DCVSFactory {
 	}
 	
 	/**
-	 * <p>Title: setType</p>  
-	 * <p>Description: </p> 
 	 * @param module Realiza la configuración general de atributos particularizando
 	 *  a para el módulo que se especifique.
 	 */
@@ -65,9 +60,8 @@ public class DCVSFactory {
 	}
 	
 	/**
-	 * <p>Title: setPRJ</p>  
-	 * <p>Description: Configura el módulo con las etiquetas y valores como módulo
-	 *  de proyecto.</p> 
+	 * Configura el módulo con las etiquetas y valores como módulo
+	 *  de proyecto. 
 	 * @param module Modulo a configurar como módulo de proyecto.
 	 */
 	private static void setPRJ(DCVS module) {
@@ -87,8 +81,8 @@ public class DCVSFactory {
 	}
 	
 	/**
-	 * <p>Description: Configura el módulo con las etiquetas y valores como módulo
-	 *  de de mapa.</p> 
+	 * Configura el módulo con las etiquetas y valores como módulo
+	 *  de de mapa. 
 	 * @param module Modulo a configurar como módulo de mapas.
 	 */
 	private static void setMAP(DCVS module) {
@@ -100,9 +94,8 @@ public class DCVSFactory {
 	}
 	
 	/**
-	 * <p>Title: setDEF</p>  
-	 * <p>Description: Establece las propiedades para configurar el módulo como un
-	 *  módulo de Definición de enfermedad transmisible.</p> 
+	 * Establece las propiedades para configurar el módulo como un
+	 *  módulo de Definición de enfermedad transmisible. 
 	 * @param module Módulo al que establecer los atributos.
 	 */
 	private static void setDEF(DCVS module) {
@@ -121,10 +114,9 @@ public class DCVSFactory {
 	
 	
 	/**
-	 * <p>Title: newHST</p>  
-	 * <p>Description: Genera una tabla de Histórico con la cabecera adecuada
+	 * Genera una tabla de Histórico con la cabecera adecuada
 	 *  y ajustada al time slot definido por el parámetro FT (final time o tiempo
-	 *   final).</p> 
+	 *   final). 
 	 * @param FT Tiempo final del histórico. Número de slots (en días) que contendrá
 	 *  el histórico.
 	 * @return Módulo histórico configurado con las estiquetas (sin datos).
@@ -145,9 +137,8 @@ public class DCVSFactory {
 	
 	
 	/**
-	 * <p>Title: newREL</p>  
-	 * <p>Description: Establece las propiedades para configurar el módulo como un
-	 *  módulo de definición de relaciones, es decir, matriz de contactos. </p> 
+	 * Establece las propiedades para configurar el módulo como un
+	 *  módulo de definición de relaciones, es decir, matriz de contactos. 
 	 * @param grupos Grupos de población dentro de un HashMap.
 	 * @return Modulo preconfigurado con los nombres de los grupos de población.
 	 */
@@ -183,9 +174,8 @@ public class DCVSFactory {
 	}
 	
 	/**
-	 * <p>Title: setPAL</p>  
-	 * <p>Description: Establece las propiedades para configurar el módulo como un
-	 *  módulo de leyenda o paleta de colores.</p> 
+	 * Establece las propiedades para configurar el módulo como un
+	 *  módulo de leyenda o paleta de colores. 
 	 * @param module Módulo al que establecer los atributos propios de la paleta de colores.
 	 *  Además al ser la paleta por defecto, cargará los valores iniciales.
 	 */

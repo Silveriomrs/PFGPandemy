@@ -65,8 +65,7 @@ public class Mapa extends JPanel{
 	}
 
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 * <p>Reinicia la vista de este módulo.</p> 
 	 *  Elimina los datos almacenados en el mismo.
 	 */
 	public void reset() {updateUI();}
@@ -89,22 +88,20 @@ public class Mapa extends JPanel{
 	}
 
 	/**
-	 * <p>Title: verFrame</p>
-	 * <p>Description: Activa o desactiva la visibilidad del frame.</p>
+	 * Activa o desactiva la visibilidad del frame.
 	 * @param activado True para hacerlo visible, False en otro caso.
 	 */
 	public void verFrame(boolean activado) {frame.setVisible(activado);}
 
 	/**
-	 * <p>Title: toogleVisible</p>
-	 * <p>Description: Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
+	 * <p>Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
 	 * Para tal efecto consulta el estado previo y configura el estado actual en
 	 * función del anterior.
 	 */
 	public void toogleVisible() {this.setVisible(!this.isVisible());}
 
-	 /** <p>Title: setPosicion</p>
-	 * <p>Description: Establece la posición para el frame</p>
+	 /**
+	 * Establece la posición para el frame.
 	 * @param xPos Posición X relativa a la pantalla.
 	 * @param yPos Posición Y relativa a la pantalla.
 	 */
@@ -146,8 +143,7 @@ public class Mapa extends JPanel{
 	}
 
 	/**
-	 * <p>Title: SelectorPoligono</p>  
-	 * <p>Description: Clase usada para la detección de la selección de un grupo de
+	 * <p>Clase usada para la detección de la selección de un grupo de
 	 *  población.</p>
 	 *  Basa su funcionamiento en las coordenadas de la pulsación en pantalla, recorriendo
 	 *   cada uno de los polígonos de las diferentes zonas y comprobando cual contiene dicho
@@ -167,9 +163,8 @@ public class Mapa extends JPanel{
 	    }
 
 	    /**
-	     * <p>Title: getZona</p>  
-	     * <p>Description: Devuelve la zona cuyo polígono de representación gráfica
-	     *  contenga el punto pásado por parámetro.</p> 
+	     * Devuelve la zona cuyo polígono de representación gráfica
+	     *  contenga el punto pásado por parámetro.
 	     * @param p Punto de coordenadas.
 	     * @return Zona que contiene dicho punto de coordenadas dentro de su representación.
 	     */

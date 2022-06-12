@@ -1,6 +1,5 @@
 /**  
-* <p>Title: CellRenderTableEditor.java</p>  
-* <p>Description: Colorea las celdas según el tipo de datos editado en la tabla</p>    
+* <p>Colorea las celdas según el tipo de datos editado en la tabla</p>    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 3 dic. 2021  
@@ -17,8 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
- * <p>Title: CellRenderTableEditor</p>  
- * <p>Description: Render especial para el Editor de tablas. </p>  
+ * Render especial para el Editor de tablas.
  * @author Silverio Manuel Rosales Santana
  * @date 3 dic. 2021
  * @version versión 1.1

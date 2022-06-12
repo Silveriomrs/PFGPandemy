@@ -1,7 +1,6 @@
 /**  
-* <p>Title: ModuleType.java</p>  
-* <p>Description: Contiene las etiquetas comunes a los diferentes tipos
-*  de ficheros que maneja la aplicación.</p>
+* Contiene las etiquetas comunes a los diferentes tipos
+*  de ficheros que maneja la aplicación.
 *  Cada etiqueta tiene asociado su significado completo.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
@@ -11,8 +10,7 @@
 package modelo;
 
 /**
- * <p>Title: ModuleType</p>  
- * <p>Description: Definición de los tipos de módulos que maneja la aplicación </p> 
+ * Definición de los tipos de módulos que maneja la aplicación. 
  * Su objetivo principal es brindar de una base que permita usar enumerados de manera
  *  que sea en todo momento una referencia para coordinar los valores. Además, sus valores
  *  permiten usar su nombre completo como opciones o parte de los mensajes y no únicamente

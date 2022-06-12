@@ -1,7 +1,5 @@
 /**  
-* <p>Title: ParametrosProyecto.java</p>  
-* <p>Description: Clase dependiente de la clase ParametrosGrupos, además
-*  contiene la vista del módulo de Archivos.</p>    
+* Clase dependiente de la clase ParametrosGrupos, además contiene la vista del módulo de Archivos. 
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 19 oct. 2021  
@@ -44,8 +42,7 @@ import javax.swing.JButton;
 import java.util.Locale;
 
 /**
- * <p>Title: ParametrosProyecto</p>  
- * <p>Description: Panel de las propiedades del proyecto </p>  
+ * Panel de las propiedades del proyecto.
  * @author Silverio Manuel Rosales Santana
  * @date 19 oct. 2021
  * @version versión 2.3
@@ -68,9 +65,7 @@ public class ParametrosProyecto extends JPanel {
 	
 		
 	/**
-	 * <p>Title: Constructor de la clase</p>  
-	 * <p>Description: Inicialización de las propiedades y datos principales
-	 * del proyecto.</p>
+	 * Inicialización de las propiedades y datos principales del proyecto.
 	 * @param cm Controlador de los módulos.
 	 * @param archivos Módulo encargado de la gestión de los archivos del proyecto.
 	 */
@@ -85,7 +80,11 @@ public class ParametrosProyecto extends JPanel {
 		configurar();
 	}
 	
-	
+	/**
+	 * Sobrescritura del método que permite un redibujado de los elementos gráficos
+	 *  acordes a la necesidades de esta clase. En este caso, una imagen de fondo, iconos,
+	 *   y otros atributos particulares de esta vista.
+	 */
 	@Override
 	public void paint(Graphics g) {
 		if(ruta != null) {
@@ -99,7 +98,13 @@ public class ParametrosProyecto extends JPanel {
 
 	/* Clases privadas */
 	
-	
+	/**
+	 * Clase privada que hereda de la clase MouseADapter para lograr aplicar un
+	 * patrón observer con el objetivo de poder manejar los eventos que el usuario realiza
+	 *  con el ratón sobre los controles de la vista.
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
 	private class BotonL extends MouseAdapter {
 		private HashMap<String,String> datos;
 		private int NG;
@@ -109,6 +114,12 @@ public class ParametrosProyecto extends JPanel {
 			datos = new HashMap<String,String>();
 		}
 		
+		/**
+		 * Método sobrescrito de captura de la pulsación del ratón sobre el control.
+		 *  Antes de proceder con la acción muestra un aviso de las consecuencias de dicha acción.
+		 *   Si es aprovada dicha acción, comprueba la corrección de los datos almacenados en los campos de la vista,
+		 *    finalmente, procede con la ejecución de las acciones pertinentes.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			boolean continuar = true;
@@ -141,8 +152,7 @@ public class ParametrosProyecto extends JPanel {
 		}
 		
 		/**
-		 * <p>Title: proceed</p>  
-		 * <p>Description: Recolecta los datos de los campos dentro del HashMap</p>
+		 * Recolecta los datos de los campos y los introduce en el HashMap.
 		 */
 		private void proceed() {
 			//Si se ha pulsado el botón de aplicar... recolectar datos.
@@ -166,8 +176,7 @@ public class ParametrosProyecto extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 * <p>Reinicia la vista de este módulo.</p> 
 	 *  Limpia los textos mostrados en cada etiqueta, sustituyéndolos
 	 * por cadenas vacias y reinicia el resto de valores.
 	 */
@@ -182,8 +191,7 @@ public class ParametrosProyecto extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Actualiza los controles pertinentes de la vista.</p> 
+	 * Actualiza los controles pertinentes de la vista.
 	 */
 	public void refresh() {
 		String tipo = TypesFiles.PRJ;
@@ -198,7 +206,10 @@ public class ParametrosProyecto extends JPanel {
 		fTFNGrupos.setText("" + cm.getNumberZonas());
 	}
 
-
+	/**
+	 * Configura todas las propiedades de la vista y los controles adjuntos, tal como
+	 *  posiciones, dimensiones, iconos, textos emergentes, etc.
+	 */
 	private void configurar() {
 		fTFNombre = setUpTextField(null,"Nombre del modelo, se usará para dar nombre a los archivos que lo componen.", SwingConstants.LEFT);
 		fTFAutor = setUpTextField(null,"Autor del modelo.",SwingConstants.LEFT);
@@ -321,9 +332,7 @@ public class ParametrosProyecto extends JPanel {
 	
 	
 	/**
-	 * <p>Title: stringToDate</p>  
-	 * <p>Description: Convierte una cadena de texto que contiene una fecha
-	 * en un objeto Date</p> 
+	 * Convierte una cadena de texto que contiene una fecha en un objeto Date.
 	 * @param fecha Grupo fecha/hora en formato: "dd/MM/yyyy hh:mm"
 	 * @return Date con los valores leidos almacenados.
 	 */
@@ -340,6 +349,11 @@ public class ParametrosProyecto extends JPanel {
 		 return date;
 	}
 	
+	/**
+	 * Convierte una fecha en cadena de texto con un formato "dd/MM/yyyy".
+	 * @param date Fecha a convertir a texto.
+	 * @return La cadena de texto resultante de la conversión.
+	 */
 	private String dateToString(Date date) {
 		String fecha = null;
 		SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
@@ -349,8 +363,7 @@ public class ParametrosProyecto extends JPanel {
 	
 	
 	/**
-	 * <p>Title: setUpTextField</p>  
-	 * <p>Description: Establece una configuración general para los campos de texto</p> 
+	 * <p>Establece una configuración general para los campos de texto</p> 
 	 * Dicha configuración consta de tooltip, un borde personalizado, el ancho, alineación,
 	 *  y el texto inicial. Además de un Listener para el resalte de los campos.
 	 * @param texto Texto inicial a mostrar en el campo. Acepta null como parámetro.

@@ -1,8 +1,5 @@
 /**  
-* <p>Title: About.java</p>  
-* <p>Description: Clase diseñada para mostrar información acerca de esta
-* aplicación.</p>    
-* <p>Aplication: UNED</p>  
+* Clase diseñada para mostrar información acerca de esta aplicación.
 * @author Silverio Manuel Rosales Santana
 * @date 6 ago. 2021  
 * @version 1.0  
@@ -23,8 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * <p>Title: About</p>  
- * <p>Description: Muestra la información acerca del proyeccto</p>  
+ * Muestra la información acerca del proyeccto.
  * @author Silverio Manuel Rosales Santana
  * @date 6 ago. 2021
  * @version versión 1.2
@@ -78,9 +74,7 @@ public class About extends JPanel {
 	
 	
 	/**
-	 * <p>Title: BotonListener</p>  
-	 * <p>Description: Observador de acción de pulsar con el ratón sobre el
-	 * boton para cerrar la ventana (JFrame)</p>  
+	 * Observador de acción de pulsar con el ratón sobre el boton para cerrar la ventana (JFrame).
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 7 ago. 2021
 	 * @version versión
@@ -91,8 +85,7 @@ public class About extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: toggleVisible</p>  
-	 * <p>Description: Cambia la propiedad de visibilidad del frame</p>
+	 * Cambia la propiedad de visibilidad del frame.
 	 * Esta función actua como un interruptor de visibilidad, cambiando de visible
 	 * a oculto cada vez que se le llama. 
 	 */
@@ -101,8 +94,7 @@ public class About extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: Para realización de pruebas </p> 
+	 * Para realización de pruebas.
 	 * @param args argumentos.
 	 */
 	public static void main(String[] args) {

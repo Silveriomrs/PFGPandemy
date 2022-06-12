@@ -1,6 +1,7 @@
 /**  
-* <p>Title: OperationsType.java</p>  
-* <p>Description: </p>    
+* Concentra las etiquetas relacionadas con operaciones. Su objetivo es homogenizar
+*  las llamadas a dichas operaciones desde diferentes partes de la aplicación, así
+*   como permitir desacoplar las accionos del idioma.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 7 dic. 2021  
@@ -8,9 +9,7 @@
 */  
 package modelo;
 
-/**
- * <p>Title: OperationsType</p>  
- * <p>Description: </p>  
+/**  
  * @author Silverio Manuel Rosales Santana
  * @date 7 dic. 2021
  * @version versión 1.0

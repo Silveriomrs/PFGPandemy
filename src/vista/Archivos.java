@@ -1,9 +1,8 @@
 /**  
-* <p>Title: Archivos.java</p>  
-* <p>Description: Esta clase esta destinada a la carga de los diferentes
+* Esta clase esta destinada a la carga de los diferentes
 *  módulos de la aplicación, mostrando en la vista aquellos módulos cargados
 *   además presentae una serie de controles comunes (guardar, guardar como, abrir)
-*    y unas opciones particulares (editar y borrar).</p>    
+*    y unas opciones particulares (editar y borrar).
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 26 ago. 2021  
@@ -36,8 +35,7 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
 /**
- * <p>Title: Archivos</p>  
- * <p>Description: Vista de los archivos asociados a cada módulo del proyecto</p>  
+ * Vista de los archivos asociados a cada módulo del proyecto. 
  * @author Silverio Manuel Rosales Santana
  * @date 26 ago. 2021
  * @version 2.5
@@ -97,12 +95,10 @@ public class Archivos extends JPanel {
 	/* Métodos principales para añadir nuevos elementos y sus controles */
 	
 	/**
-	 * <p>Title: createFieldsInMap</p>  
-	 * <p>Description: Agrega los elementos JTextField al grupo mapaFields</p>
+	 * Agrega los elementos JTextField al grupo mapaFields.
 	 * Todo elemento que se desea agregar se añade aquí, basado en los elementos
 	 * añadidos en este punto se generarán tantos los botones como los controles
 	 * que sean necerios para el funcionamiento de este módulo.
-	 * <p>Para crear los controles ver {@link #generateControls(String ext, int posX)} .</p>
 	 * @see #generateControls(String ext, int posX)
 	 */
 	private void createFieldsInMap() {
@@ -126,8 +122,7 @@ public class Archivos extends JPanel {
 	public HashMap<String, JTextField> getMapaFields() {return mapaFields;}
 	
 	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
+	 * Visualiza los datos del módulo dentro de su propio marco.
 	 */
 	public void abrirFrame() {
 	    JFrame frame = new JFrame("Módulo de Archivos");
@@ -145,8 +140,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: disableAllSavers</p>  
-	 * <p>Description: Desactiva todos los botones de guardado</p> 
+	 * Desactiva todos los botones de guardado.
 	 */
 	public void disableAllSavers() {
 		//Desactivar todos los botones de guardado.
@@ -155,10 +149,9 @@ public class Archivos extends JPanel {
 	}	
 	
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * Limpia los textos mostrados en cada etiqueta, sustituyéndolos
 	 * por cadenas vacias y posteriormente realiza una lectura de los módulos
-	 *  cargados en el sistema actualizando los campos correspondientes.</p> 
+	 *  cargados en el sistema actualizando los campos correspondientes.
 	 */
 	public void reset() {
 		//En esta vista, no se almacenan datos => actualización de componentes.
@@ -169,9 +162,8 @@ public class Archivos extends JPanel {
 	/* Métodos privados */
 	
 	/**
-	 * <p>Title: configuracion</p>  
-	 * <p>Description: Configura los atributos generales de la vista, tales como
-	 *  dimensiones, comportamiento, tipo de borde, imagen de fondo, etc. </p>
+	 * Configura los atributos generales de la vista, tales como
+	 *  dimensiones, comportamiento, tipo de borde, imagen de fondo, etc.
 	 *  También llama a las funciones encargada de crear los controles y su configuración.
 	 */
 	private void configuracion() {
@@ -204,10 +196,10 @@ public class Archivos extends JPanel {
 	}
 			
 	/**
-	 * <p>Title: addIconL</p>  
-	 * <p>Description: Añade un icono a una etiqueta</p>
+	 * Añade un icono a una etiqueta
+	 * <p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
-	 * datos pasados por parámetro. 
+	 * datos pasados por parámetro.</p>
 	 * @param componente Etiqueta a la que adjuntar el icono
 	 * @param ruta Nombre del archivo y su ruta.
 	 * @param w Ancho a escalar de la imagen original.
@@ -219,8 +211,7 @@ public class Archivos extends JPanel {
 	}	
 	
 	/**
-	 * <p>Title: addIconB</p>  
-	 * <p>Description: Añade un icono a una botón</p>
+	 * <p>Añade un icono a una botón</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
 	 * @param componente Etiqueta a la que adjuntar el icono
@@ -234,8 +225,7 @@ public class Archivos extends JPanel {
 	}
 		
 	/**
-	 * <p>Title: iniciarLabels</p>  
-	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
+	 * <p>Establece las facetas de las etiquetas descripticas</p> 
 	 * @param ext Tipo de archivos que controla. Ver \ref modelo#TypesFiles .
 	 * @param nombre Nombre en la etiqueta.
 	 * @param tt Tooltip mensaje emergente.
@@ -255,8 +245,7 @@ public class Archivos extends JPanel {
 	}
 
 	/**
-	 * <p>Title: iniciarBoton</p>  
-	 * <p>Description: Inicia un botón con los parámetros generales que se requiere
+	 * <p>Inicia un botón con los parámetros generales que se requiere
 	 * para múltiples instancias que deben tener facetas comunes.</p> 
 	 * La función devuelve la propia instancia del botón con el fin de facilitar
 	 * el evitar perdidas de referencias.
@@ -284,8 +273,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: generateControls</p>  
-	 * <p>Description: Genera todos los JTextFields necesarios para cubrir
+	 * <p>Genera todos los JTextFields necesarios para cubrir
 	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
 	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
 	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
@@ -318,8 +306,7 @@ public class Archivos extends JPanel {
 	}
 		
 	/**
-	 * <p>Title: inicializarMapas</p>  
-	 * <p>Description: Inicializa los mapas de los elementos característicos</p>
+	 * <p>Inicializa los mapas de los elementos característicos</p>
 	 * @param btn JButton a introducir en el grupo correspondiente.
 	 * @param ext Tipo de archivos a los que hace referencia dicho boton.
 	 */
@@ -342,8 +329,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: isFieldEmpty</p>  
-	 * <p>Description: Particularación de la función isEmpty de los componentes</p>
+	 * <p>Particularación de la función isEmpty de los componentes</p>
 	 * La particularización estriba en que previamente comprueba que existe dicho
 	 * campo mendiante la etiqueta (extensión) y obtiene el componente en caso 
 	 *  de exitir de su campo.
@@ -359,8 +345,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: enableBotonesGuardado</p>  
-	 * <p>Description: Configura los botones de guardado correspondientes
+	 * <p>Configura los botones de guardado correspondientes
 	 * a la etiqueta indicada.</p>
 	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
 	 *  activados mientras no haya definida una ruta previamente en el correspondiente
@@ -374,8 +359,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refreshEditarBorrar</p>  
-	 * <p>Description: Actualiza el estado de los botones Editar y Borrar de cada
+	 * <p>Actualiza el estado de los botones Editar y Borrar de cada
 	 *  tipo de fichero.</p> 
 	 */
 	private void refreshEditarBorrar() {
@@ -387,8 +371,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refreshFields</p>  
-	 * <p>Description: Actualiza el estado de los campos de cada
+	 * <p>Actualiza el estado de los campos de cada
 	 *  tipo de fichero.</p> 
 	 */
 	private void refreshFields() {
@@ -413,8 +396,7 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Actualiza el estado de todos los componentes de la vista </p>
+	 * <p>Actualiza el estado de todos los componentes de la vista </p>
 	 * La actualización de los componentes se basa en los datos relacionados con
 	 *  el controlador. No elimina datos. 
 	 */
@@ -427,8 +409,7 @@ public class Archivos extends JPanel {
 	/* Clases privadas */
 	
 	/**
-	 * <p>Title: ArchivoML</p>  
-	 * <p>Description: Captura un evento de pulsación sobre un control (botón)
+	 * <p>Captura un evento de pulsación sobre un control (botón)
 	 *  y procesa la acción correspondiente mediante la llamada a la clase controladora</p>
 	 *  Para realizar dicha labor determina que botón ha sido pulsado mediante el análisis
 	 *  del tooltiptext asociado al control, extrayendo su extensión asociada y el tipo de control

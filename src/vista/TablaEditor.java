@@ -45,6 +45,7 @@ import controlador.ControladorDatosIO;
 import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.DCVS;
+import modelo.DCVSFactory;
 import modelo.ModuleType;
 import modelo.TypesFiles;
 
@@ -88,8 +89,8 @@ public class TablaEditor extends JPanel{
 
 	
 	/**
-	 * <p>Title: TablaEditor</p>  
-	 * <p>Description: Constructor principal</p> 
+	 * Constructor principal, establece los atributos iniciales de la vista, como si 
+	 *  es editable, el editor de celdas, y establece que no ha sido modificado.
 	 * @param cm Controlador de mapa.
 	 */
 	public TablaEditor(ControladorModulos cm) {
@@ -106,6 +107,9 @@ public class TablaEditor extends JPanel{
 		initialize();
 	}
 	
+	/**
+	 * Sobrescritura del método para colocar una imagen de fondo con transparencias.
+	 */
 	@Override
 	public void paint(Graphics g) {
 		if(ruta != null) {
@@ -117,8 +121,7 @@ public class TablaEditor extends JPanel{
 	}
 
 	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Abre el módulo en un frame particular</p> 
+	 * Abre el módulo en un frame particular. 
 	 * @param nombre Nombre a mostrar en el marco. El nombre del módulo.
 	 */
 	public void abrirFrame(String nombre) {
@@ -135,14 +138,12 @@ public class TablaEditor extends JPanel{
 	}
 
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia todos los datos del módulo.</p> 
+	 * Reinicia todos los datos del módulo.
 	 */
 	public void reset() {nuevaTabla();}
 
 	/**
-	 * <p>Title: setUpComboBox</p>  
-	 * <p>Description: Configuración del JComboBox con las opciones posibles</p>
+	 * Configuración del JComboBox con las opciones posibles.
 	 */
 	private void setUpComboBox() {
 		comboBox = new JComboBox<ModuleType>();
@@ -158,7 +159,8 @@ public class TablaEditor extends JPanel{
 	 * Inicialización de los contenidos del frame.
 	 */
 	private void initialize() {
-		setBounds(0, 0, 914, 610);	
+		setBounds(40, 30, 934, 680);											//Dimensiones y posicióno del panel que contiene la tabla.	
+		//Configuración del panel con Scroll de la tabla.
 		scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
 		scrollPane.setBackground(Color.GRAY);
@@ -237,6 +239,12 @@ public class TablaEditor extends JPanel{
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Configura el estado de los botones en función del contexto.
+	 * Tiene en cuenta el número de columnas y filas de la tabla en curso,
+	 *  si ha sido realizado algún cambio y la opción establecida en el control del
+	 *   selector.
+	 */
 	private void estadoBotones() {
 		boolean tieneColumna = dcvs.getColumnCount() > 0;
 		boolean tieneFila = dcvs.getRowCount() > 0;
@@ -250,7 +258,7 @@ public class TablaEditor extends JPanel{
 		if(editable) {
 			//Botones nueva tabla, fila, borrarTabla	
 			btnBorrarTabla.setEnabled(tieneColumna);							//Botón borrar columna => debe tener alguna columna.
-			btnNuevaTabla.setEnabled(tieneColumna);
+			btnNuevaTabla.setEnabled(true);
 			btnAddRow.setEnabled(tieneColumna);
 			btnBorrarColumna.setEnabled(tieneColumna);
 			//Botón borrar fila => debe tener alguna fila.		
@@ -264,8 +272,7 @@ public class TablaEditor extends JPanel{
 	}
 
 	/**
-	 * <p>Title: addBotonToolBar</p>  
-	 * <p>Description: Añade los controles la barra de herramietnas que los contendrá</p>
+	 * <p>Añade los controles la barra de herramietnas que los contendrá</p>
 	 * Los añade con el formato correcto y una separación costante, además,
 	 * permite que los botones puedan tener colores personalizados.
 	 * @param tooltip Texto de ayuda al botón.
@@ -290,8 +297,7 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: addIconB</p>  
-	 * <p>Description: Añade un icono a una botón</p>
+	 * <p>Añade un icono a una botón</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
 	 * @param componente Etiqueta a la que adjuntar el icono
@@ -305,9 +311,7 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: getIcon</p>  
-	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
-	 * por parámetros, de la imagen fuente..</p> 
+	 * <p>Devuelve un icono escalado a las medidas obtenidas por parámetros, de la imagen fuente.</p> 
 	 * @param ruta Ruta del archivo de imagen.
 	 * @param w Ancho del escalado de la imagen.
 	 * @param h Alto del escalado de la imagen.
@@ -319,8 +323,7 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: setModelo</p>  
-	 * <p>Description: Establece un modelo concreto en la tabla.</p> 
+	 * <p>Establece un modelo concreto en la tabla.</p> 
 	 * El tipo de módulo debe estar definido en: \ref modelo#ModuleType
 	 * @param dcvsIn JTableModel o modelo que se quiere establecer.
 	 * @param editable TRUE si se quiere permitir la edición del número de columnas y filas.
@@ -344,8 +347,7 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: nuevaTabla</p>  
-	 * <p>Description: Crea una nueva tabla sin columnas ni filas..</p>
+	 * Crea una nueva tabla sin columnas ni filas.
 	 */
 	private void nuevaTabla() {
 		//Cuerpo de datos
@@ -367,8 +369,49 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: BtnAplicarTablaMouseListener</p>  
-	 * <p>Description: Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
+	 * Realiza una conversión de tipos de archivos definidos
+	 *  en la clase \ref modelo#TypesFiles a tipos enumerados de \ref modelo#ModuleType . 
+	 * @param seleccion Tipo enumerado de la clase \ref modelo#ModuleType .
+	 * @return Valor correspondiente a los tipos de la clase \ref modelo#TypesFiles .
+	 * @see ModuleType
+	 */
+	private String setTipo(ModuleType seleccion) {
+		String tipo;
+		switch(seleccion){
+		case MAP:
+			tipo = TypesFiles.MAP;
+			break;
+		case HST: 
+			tipo = TypesFiles.HST;
+			break;
+		case PAL:
+			tipo = TypesFiles.PAL;
+			break;
+		case REL:
+			tipo = TypesFiles.REL;
+			break;
+		case DEF:
+			tipo = TypesFiles.DEF;
+			break;
+		case PRJ:
+			tipo = TypesFiles.PRJ;
+			break;
+		case CSV:
+			tipo = TypesFiles.CSV;
+			break;
+		case GRP:
+			tipo = TypesFiles.GRP;
+			break;
+		default:
+			tipo = TypesFiles.CSV;
+			break;
+		}
+		
+		return tipo;
+	}
+	
+	/**
+	 * <p>Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
 	 *  comunicación con el módulo controlador.</p> 
 	 * Esta clase además está implicada en el mantenimiento de la coherencia respecto al contexto de la aplicación
 	 *  de los diferentes controles implicados en esta vista.
@@ -378,6 +421,15 @@ public class TablaEditor extends JPanel{
 	 */
 	private class BtnAplicarTablaML extends MouseAdapter {
 
+		/**
+		 * Sobrescritura del método que detecta la pulsación del ratón sobre el elemento asociado.
+		 * Esta función tiene asignada la asignación de la tabla al módulo que esté seleccionado en el
+		 *  combobox.
+		 *  <p>Antes de aplicar la selección avisa de la sobrescritura de los dantos anteriores y en caso
+		 *   de aceptar, ejecuta la acción mediante el paso de la tabla al controlador a través de su
+		 *    doAction.</p>
+		 *  Esta función fuerza la revisión del estado de los botones con el nuevo contexto de la aplicación.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			boolean activo = ((JButton) e.getSource()).isEnabled();
@@ -405,64 +457,24 @@ public class TablaEditor extends JPanel{
 					cm.showMessage("Datos aplicados al módulo: " + seleccion, 1);
 					estadoBotones();
 				}	
-			} else {
-				cm.doActionTableEditor(null);
-			}
-		}
-		
-		/**
-		 * <p>Title: setTipo</p>  
-		 * <p>Description: Realiza una conversión de tipos de archivos definidos
-		 *  en la clase \ref modelo#TypesFiles a tipos enumerados de \ref modelo#ModuleType .</p> 
-		 * @param seleccion Tipo enumerado de la clase \ref modelo#ModuleType .
-		 * @return Valor correspondiente a los tipos de la clase \ref modelo#TypesFiles .
-		 * @see ModuleType
-		 */
-		private String setTipo(ModuleType seleccion) {
-			String tipo;
-			switch(seleccion){
-			case MAP:
-				tipo = TypesFiles.MAP;
-				break;
-			case HST: 
-				tipo = TypesFiles.HST;
-				break;
-			case PAL:
-				tipo = TypesFiles.PAL;
-				break;
-			case REL:
-				tipo = TypesFiles.REL;
-				break;
-			case DEF:
-				tipo = TypesFiles.DEF;
-				break;
-			case PRJ:
-				tipo = TypesFiles.PRJ;
-				break;
-			case CSV:
-				tipo = TypesFiles.CSV;
-				break;
-			case GRP:
-				tipo = TypesFiles.GRP;
-				break;
-			default:
-				tipo = TypesFiles.CSV;
-				break;
-			}
-			
-			return tipo;
+			} else {cm.doActionTableEditor(null);}
 		}
 	}
 	
-	
 	/**
-	 * <p>Title: BtnImprimirML</p>  
-	 * <p>Description: Gestiona la acción de imprimir la tabla actual al pulsar
-	 *  sobre el control que tenga asignado..</p>  
+	 * Gestiona la acción de imprimir la tabla actual al pulsar
+	 *  sobre el control que tenga asignado.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnImprimirML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 * <p>Imprime la tabla actual en el dispositivo de impresión que tenga establecido
+		 *  el sistema operativo.</p>
+		 * Como precondición requiere tener una impresora instalada y configurada en el sistema operativo.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -473,13 +485,19 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: BtnAddColML</p>  
-	 * <p>Description: Gestiona la acción de añadir una nueva columna a la tabla actual
-	 * 	al pulsar sobre el control asignado.</p>  
+	 * Gestiona la acción de añadir una nueva columna a la tabla actual
+	 * 	al pulsar sobre el control asignado.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnAddColML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 * <p>Añade una nueva columna a la tabla actual.</p>
+		 *  Como precondición, antes de añadir la columna solicita el nombre de la columna, el que será
+		 *   añadido a la tabla. No debe ser nulo o cadena vacía.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -495,114 +513,145 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: BtnAddRowML</p>  
-	 * <p>Description: Gestiona la acción de añadir una fila a la tabla actual
-	 *  al pulsar sobre el control asignado.</p>  
+	 * Gestiona la acción de añadir una fila a la tabla actual
+	 *  al pulsar sobre el control asignado. 
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnAddRowML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 * <p>Añade una nueva fila a la tabla actual.</p>
+		 * Como precondición requiere que exista al menos una columna en la tabla.
+		 *  En caso de cumplir la precondición, añade una nueva fila con tantas celdas
+		 *   como columnas contiene la tabla.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				int ncols = dcvs.getColumnCount();							//Obtención del número de columnas.
+				int ncols = dcvs.getColumnCount();								//Obtención del número de columnas.
 				if(ncols > 0) {													//Comprobación de que existe al menos una columna.
 					Object[] row = new Object[ncols];							//Generar una fila con tantos campos como columnas tiene la tabla.
 					dcvs.addFila(row);											//Se añade.
-					modificado = true;
+					modificado = true;											//Activa la bandera de modificación.
 				}else {
 					cm.showMessage("Debe añadir alguna columna.", 0);
 				}
-				estadoBotones();
+				estadoBotones();												//Actualización de los estados de los botones.
 			}
 		}
 	}
 	
 	/**
-	 * <p>Title: BtnAbrirArchivoML</p>  
-	 * <p>Description: Gestiona la carga de un fichero desde la unidad de almacenamiento
-	 *  al pulsar sobre el control asignado.</p>  
+	 *  Gestiona la carga de un fichero desde la unidad de almacenamiento
+	 *  al pulsar sobre el control asignado.  
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnAbrirArchivoML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 * <p>Abre una tabla desde la unidad de almacenamiento. En caso de una tabla
+		 *  no válida no realiza acción.</p>
+		 * Una vez cargado, actualiza la ruta en el propio módulo, emite avisos al usuario,
+		 *  desactiva bandera de modificación y actualiza el estado de los botones.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());			
+				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());				//Abre la nueva tabla en una variable temporal.
+				//En caso de ser una tabla no nula...
 				if(dcvs2 != null) {
-					dcvs = dcvs2;
-					modificado = false;
+					dcvs = dcvs2;												//Establecer la nueva tabla como tabla activa.
+					modificado = false;											//Desactivar el registro de modificado.
 					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
 					cm.showMessage("Archivo Cargado", 1);
-					estadoBotones();
+					estadoBotones();											//Actualiza el estado de los botones.
 				}
 			}
 		}
 	}
 	
 	/**
-	 * <p>Title: BtnGuardarCambiosML</p>  
-	 * <p>Description: Gestiona el guardado de los cambios realizados en la tabla actual en el fichero asignado
-	 *  y en unidad de almacenamiento al activar el control.</p>  
+	 * Gestiona el guardado de los cambios realizados en la tabla actual en el fichero asignado
+	 *  y en unidad de almacenamiento al activar el control.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnGuardarCambiosML extends MouseAdapter {
+		
+		/**
+		 *  Sobrescritura de pulsación de botón del ratón sobre el control.
+		 *  <p>Utiliza la ruta de archivo almacenada en el propio módulo para guardar
+		 *   los datos de la tabla actual. Cuando no tiene un tipo establecido,
+		 *    el tipo por defecto es CVS.</p>
+		 *  Como precondición requiere que al menos exista una fila en la tabla,
+		 *   además de que haya sido guardado previamente, es decir, tenga una ruta
+		 *    prestablecida previamente.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
 				if(dcvs.getRowCount() >0) {
-					String rutaF = cio.guardarArchivo(dcvs);
-					if(rutaF != null) {
-						cm.showMessage("Archivo guardado", 1);
-						dcvs.setRuta(rutaF);
-						modificado = false;
-						estadoBotones();
-					}
+					// Sistema que era identico al de la clase BtnGuardarArchivoML.
+					cio.guardarArchivo(dcvs);
+					cm.showMessage("Archivo guardado", 1);
+					modificado = false;
+					estadoBotones();
 				} else cm.showMessage("No hay datos que guardar",0);
 			}
 		}
 	}
 	
 	/**
-	 * <p>Title: BtnGuardarArchivoML</p>  
-	 * <p>Description: Realiza el guardado de la tabla actual en el destino que se indique al pulsar sobre
-	 *  el control al que esté asignado.</p>  
+	 * Realiza el guardado de la tabla actual en el destino que se indique al pulsar sobre
+	 *  el control al que esté asignado. 
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnGuardarArchivoML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 * <p>Guarda la tabla actual en la unidad de almacenamiento si el número de filas
+		 *  es superior a 0.</p>
+		 * Una vez guardado, actualiza la ruta en el propio módulo, emite avisos al usuario,
+		 *  activa bandera de modificación y actualiza el estado de los botones.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				String rutaF;
 				//Sino tiene de un tipo se le asigna el tipo general.
 				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
-				if(dcvs.getRowCount() >0) {
-					rutaF = cio.guardarArchivo(dcvs);
+				if(dcvs.getRowCount() >0) {										//Comprobación de número de filas mínimo.
+					String rutaF = cio.guardarArchivo(dcvs);							//Obtención de la ruta de guardado.
+					//En caso de guardado correcto, proceder...
 					if(rutaF != null) {
 						cm.showMessage("Archivo guardado", 1);
-						dcvs.setRuta(rutaF);
-						modificado = false;
-						estadoBotones();
+						dcvs.setRuta(rutaF);									//Establecimiento de la nueva ruta al módulo.
+						modificado = false;										//Activación flag modificado.
+						estadoBotones();										//Actualización del estado de los botones.
 					}					
 				} else cm.showMessage("No hay datos que guardar",0);
-
 			}
 		}
 	}
 	
 	/**
-	 * <p>Title: BtnBorrarFilaML</p>  
-	 * <p>Description: Elimina la fila/s indicada/s al activar el control al que esté
-	 *  asignada.</p>  
+	 * Elimina la fila/s indicada/s al activar el control al que esté asignada. 
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnBorrarFilaML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control con el objetivo
+		 *  de eliminar las filas seleccionadas de la tabla, modifica la bandera de mofidicado
+		 *   y actualiza el estado de los botones.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -614,17 +663,22 @@ public class TablaEditor extends JPanel{
 	}
 	
 	/**
-	 * <p>Title: BtnBorrarColumnaML</p>  
-	 * <p>Description: Elimina la/s columna/s seleccionadas al activar el control 
-	 *  al que este asignada.</p>  
+	 * Elimina la/s columna/s seleccionadas al activar el control 
+	 *  al que este asignada.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnBorrarColumnaML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura de pulsación de botón del ratón sobre el control.
+		 *  Procede a la eliminación de las columnas seleccionadas, activa la
+		 *   bandera de modificación y actualiza el estado de los botones.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				tabla.setModel( dcvs.delColumnas(tabla.getSelectedColumns()));											//Establecemos el nuevo modelo en la tabla.
+				tabla.setModel( dcvs.delColumnas(tabla.getSelectedColumns()));	//Establecemos el nuevo modelo en la tabla.
 				modificado = true;
 				estadoBotones();
 			}
@@ -632,14 +686,19 @@ public class TablaEditor extends JPanel{
 	}
 		
 	/**
-	 * <p>Title: BtnBorrarTablaML</p>  
-	 * <p>Description: Elimina la tabla actual con su contenido inclusive al activar el control
+	 * <p>Elimina la tabla actual con su contenido inclusive al activar el control
 	 *  al que se asigne.</p>
 	 * Previamente muestra un mensaje de aviso solicitando confirmación. 
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnBorrarTablaML extends MouseAdapter {
+		
+		/**
+		 * Sobrescrita la función de detección de pulsación de la tecla del ratón.
+		 * <p>Emite mensaje previo con solicitud de confirmación de acción, 
+		 *  aceptada la acción elimina la tabla actual y genera una nueva vacía.</p>
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
@@ -652,34 +711,58 @@ public class TablaEditor extends JPanel{
 	}
 
 	/**
-	 * <p>Title: BtnNuevaTablaML</p>  
-	 * <p>Description: Crea una nueva tabla eliminando la tabla anterior al activarse
-	 *  el control al que se asigne.</p>  
+	 * Crea una nueva tabla eliminando la tabla anterior al activarse
+	 *  el control al que se asigne.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class BtnNuevaTablaML extends MouseAdapter {
+		
+		/**
+		 * Sobrescritura del método heredado de la pulsación de un botón del ratón,
+		 *  Ofrece una lista de opciones entre las que elegir el tipo de plantilla a cargar.
+		 * <p>emite un mensaje de confirmación antes de proceder a la eliminación de la tabla
+		 *   existente y el mensaje de selección de la nueva tabla a crear.</p>
+		 * En caso de cierre de alguno de los mensajes emitidos, no se realiza modificación.
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
 				int opt = cm.showMessage("Eliminará la tabla actual con sus datos ¿Desea continuar?", 3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
-				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+				if(opt == JOptionPane.YES_OPTION) {
+					ModuleType[] options = new ModuleType[] {ModuleType.CSV,ModuleType.PRJ,ModuleType.DEF,ModuleType.PAL,ModuleType.MAP};
+					ModuleType opt2 = (ModuleType) JOptionPane.showInputDialog(getParent(),
+							"Escoja una plantilla",								//Mensaje de solicitud
+							"Selección de plantilla",							//Mensaje de ventana
+							JOptionPane.QUESTION_MESSAGE,						//Tipo de mensaje (pregunta selección)
+							null,												//Icono personalizado
+							options,											//Array de opciones.
+							options[0]);										//Opción por defecto, la primera.
+					if(opt2 == ModuleType.CSV) nuevaTabla();					//Caso rápido de tabla general.
+					else if(opt2 != null) {										//Para otros casos correctos procesar.
+						dcvs = DCVSFactory.newModule(setTipo(opt2));			//Obtención de la tabla y asignación.
+						tabla.setModel(dcvs);									//Establecimiento en el módelo actual.
+					}
+				}
 			}
 		}
 	}
 	
 	/**
-	 * <p>Title: TableUpdateListener</p>  
-	 * <p>Description: Esta clase es una clase suscriptora apoyada en un patrón
+	 * Esta clase es una clase suscriptora apoyada en un patrón
 	 *  Observer. Su finalidad es detectar cambios en la tabla actual para notificar al resto
-	 *   de suscriptores, permitiendo tener actualizados el resto de controles.</p>  
+	 *   de suscriptores, permitiendo tener actualizados el resto de controles.
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
 	private class TableUpdateListener implements TableModelListener {
 		
+		/**
+		 * Sobrescritura del método permitiendo adaptarlo para poder activar el 
+		 *  registro de cambio en las propiedades o elementos de la tabla.
+		 */
         @Override
         public void tableChanged(TableModelEvent tme) {
             if (tme.getType() == TableModelEvent.UPDATE) {						//Comprobación de que se ha actualizado un atributo de la tabla.
@@ -687,12 +770,5 @@ public class TablaEditor extends JPanel{
             }
         }
     }
-	
-	
-	@SuppressWarnings("javadoc")
-	public static void main(String[] args) {
-		TablaEditor te = new TablaEditor(new ControladorModulos());
-		te.abrirFrame("Testing");
-	}
 
 }

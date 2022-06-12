@@ -1,7 +1,6 @@
 /**
-* <p>Title: Pizarra.java</p>
-* <p>Description: Módulo para el dibujado de los polígonos que representan
-* las zonas dentro de un mapa de la simulación.</p>
+* Módulo para el dibujado de los polígonos que representan
+* las zonas dentro de un mapa de la simulación.
 * <p>Esta clase encargada de servir editor gráfico de la aplicación, 
 *  permitiendo la creación, edición, eliminación  y asignación de polígonos a 
 *   los grupos de población.</p>
@@ -45,8 +44,7 @@ import modelo.TypesFiles;
 import modelo.Zona;
 
 /**
- * <p>Title: Pizarra</p>
- * <p>Description: Clase encargada de servir editor gráfico de la aplicación, 
+ * <p>Clase encargada de servir editor gráfico de la aplicación, 
  *  permitiendo la creación, edición, eliminación  y asignación de polígonos a 
  *   los grupos de población.</p>
  * Permite la carga de una imagen de fondo para facilitar el dibujado de las figuras,
@@ -80,8 +78,7 @@ public class Pizarra extends JFrame {
 	private java.awt.Image fondo;
 
 	/**
-	 * <p>Title: Pizarra de dibujo</p>
-	 * <p>Description: Pizarra donde poder crear los poligonos que representarán
+	 * <p>Pizarra donde poder crear los poligonos que representarán
 	 * a cada zona</p>
 	 * En caso de obtener un valor núlo o cuyo número de zonas no sea mayor a
 	 * cero, no se iniciará el módulo.
@@ -105,8 +102,7 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: reset</p>  
-	 * <p>Description: Reinicia la vista de este módulo.</p> 
+	 * <p>Reinicia la vista de este módulo.</p> 
 	 *  Elimina los datos almacenados en el mismo y restaura el valor por defecto
 	 *   de los controles.
 	 */
@@ -133,10 +129,9 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: abrirFrame</p>
-	 * <p>Description: Configura las propiedades del marco contenedor, altura
+	 * Configura las propiedades del marco contenedor, altura
 	 *  ancho, desactivación de redimensionabilidad y propiedad de ocultar en vez
-	 *   de cierre.</p>
+	 *   de cierre.
 	 */
 	public void configuraFrame() {
 	    Dimension m = panelCentral.getPreferredSize();
@@ -149,16 +144,14 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: toogleVisible</p>  
-	 * <p>Description: Cambia de un estado de visibilidad a uno de oculto y
-	 * viceversa.</p> 
+	 * Description: Cambia de un estado de visibilidad a uno de oculto y
+	 * viceversa.
 	 */
 	public void toogleVisible() { this.setVisible(!isVisible());}
 
 	/**
-	 * <p>Title: configura</p>  
-	 * <p>Description: Configura los parámetros iniciales, datos y controles 
-	 * 	generales de este módulo</p>
+	 * Configura los parámetros iniciales, datos y controles 
+	 * 	generales de este módulo.
 	 */
 	private void configura() {
 		//Inicialización de los componentes en estricto orden de dependencia.
@@ -194,9 +187,8 @@ public class Pizarra extends JFrame {
     /* Métodos privados */
 
 	/**
-	 * <p>Title: generaPoligono</p>  
-	 * <p>Description: Genera un poligono desde una lista de puntos almacenados
-	 *  en un ArrayList.</p> 
+	 * Description: Genera un poligono desde una lista de puntos almacenados
+	 *  en un ArrayList. 
 	 * @param listaPuntos ArrayList con la lista de puntos que compondrán el Poligono.
 	 * @return Poligono generado.
 	 */
@@ -212,16 +204,14 @@ public class Pizarra extends JFrame {
     }
 
     /**
-     * <p>Title: isPrimero</p>  
-     * <p>Description: Indica si el punto actual definido es el primer punto de la
-     *  lista que contiene el módulo.</p> 
+     * Description: Indica si el punto actual definido es el primer punto de la
+     *  lista que contiene el módulo. 
      * @return True si es el primer punto, False en otro caso.
      */
     private boolean isPrimero() {return 0 == listaPuntos.size();}
 
     /**
-	 * <p>Title: creaMarco</p>  
-	 * <p>Description: Dibuja un marco alrededor de la zona de pintado.</p>
+	 * Dibuja un marco alrededor de la zona de pintado.
 	 */
 	private void creaMarco() {
 		ArrayList<Point> listaP = new ArrayList<Point>();
@@ -233,9 +223,8 @@ public class Pizarra extends JFrame {
 	}
     
 	/**
-	 * <p>Title: iniciarToolBar</p>  
-	 * <p>Description: Crea la barra de herramientas y añade los todos los 
-	 *  controles (una vez creados e inciados) a la misma.</p>
+	 * Crea la barra de herramientas y añade los todos los 
+	 *  controles (una vez creados e inciados) a la misma.
 	 */
 	private void iniciarToolBar() {
 	    toolBar = new JToolBar();
@@ -250,8 +239,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: crearBotones</p>  
-	 * <p>Description: Crear los elementos (botones) de la barra de herramientas.</p>
+	 * <p>Crear los elementos (botones) de la barra de herramientas.</p>
 	 * Crea los controles (botones) a mostrar en la barra de herramientas, además
 	 *  les asigna su icono.
 	 */
@@ -277,8 +265,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: getMaxItem</p>  
-	 * <p>Description: Realiza una comprobación para averiguar el nombre del item
+	 * <p>Realiza una comprobación para averiguar el nombre del item
 	 *  más largo del desplegable, ajustando hasta un límite el ancho mínimo del mismo.</p>
 	 *  Busca el compromiso entre el texto más largo y las dimensiones máximas de la ventana.
 	 *   como lóngitud mínima a comparar toma 8 carácteres.
@@ -299,8 +286,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: zonasToCombo</p>  
-	 * <p>Description: Establece los elementos a colocar en cada ComboBox.</p>
+	 * <p>Establece los elementos a colocar en cada ComboBox.</p>
 	 * Recorre todos los grupos de población (zonas) y situa los nombres de cada
 	 *  grupo en un combobox u otro, en función de si ya disponen de un poligono
 	 *   como representación gráfica.
@@ -315,8 +301,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: crearCombos</p>  
-	 * <p>Description: Crea los controles de los ComboBox</p>
+	 * <p>Crea los controles de los ComboBox</p>
 	 * Esta función no añade items a los ComboBox, para tal próposito ver
 	 *  el método {@link #zonasToCombo() zonasToCombo}.
 	 */
@@ -341,8 +326,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: updateControls</p>  
-	 * <p>Description: Actualiza los controles propios del módulo</p>
+	 * <p>Actualiza los controles propios del módulo</p>
 	 * Detecta el estado en que se encuentra la aplicación y configura la activación
 	 *  o desactivación de los controles en función de dicho estado inicial.
 	 */
@@ -369,8 +353,7 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: iniciarCanvas</p>  
-	 * <p>Description: Inicializa el Canvas o zona de dibujo.</p>
+	 * Inicializa el Canvas o zona de dibujo.
 	 */
 	private void iniciarCanvas() {
 		c.setBounds(0, 0, dimX, dimY -25);
@@ -380,8 +363,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: dibujaPoligono</p>  
-	 * <p>Description: Dibuja un polígono en la zona de la pizarra (canvas).</p> 
+	 * Dibuja un polígono en la zona de la pizarra (canvas). 
 	 * @param poligono Figura que debe ser dibujada.
 	 */
 	private void dibujaPoligono(Polygon poligono) {
@@ -400,8 +382,7 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
-	 * <p>Title: dibujaLinea</p>
-	 * <p>Description: Dibuja una línea entre dos puntos.</p>
+	 * <p>Dibuja una línea entre dos puntos.</p>
 	 * Considerar el origen de coordenadas (0.0) está en la
 	 * esquina superior izquierda del objeto sobre el que se dibuja.
 	 * @param pa Punto inicial de la recta a dibujar.
@@ -418,8 +399,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: marcaPunto</p>
-	 * <p>Description: Dibuja una marca de cruz en las coordenadas indicadas</p>
+	 * <p>Dibuja una marca de cruz en las coordenadas indicadas</p>
 	 * Considerar el origen de coordenadas (0.0) está en la
 	 * esquina superior izquierda del objeto sobre el que se dibuja.
 	 * @param p Punto sobre el que dibujar la cruz.
@@ -434,8 +414,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: dibujarZonas</p>  
-	 * <p>Description: Realiza una lectura de las figuras gráficas y las dibuja</p>
+	 * <p>Realiza una lectura de las figuras gráficas y las dibuja</p>
 	 * Dibuja los poligonos almacenados, las líneas y puntos actuales inclusive, 
 	 *  así como el marco.
 	 *  <p>En caso de haber una imagen de fondo cargada, también la redibuja.</p>
@@ -480,8 +459,7 @@ public class Pizarra extends JFrame {
 	/* Clases internas */
 	
 	/**
-	 * <p>Title: MiCanvas</p>  
-	 * <p>Description: Extiende la clase Canvas para permitir la sobrescritura
+	 * <p>Extiende la clase Canvas para permitir la sobrescritura
 	 *  de su método paint(), permitiendo hacer llamadas a la función dibujarZonas()
 	 *   de la clase Pizarra.</p>
 	 * Dicho definición es necesaria para garantizar el correcto dibujado de los elementos
@@ -500,8 +478,7 @@ public class Pizarra extends JFrame {
 	}
 
 	/**
-	 * <p>Title: ComponerListener</p>  
-	 * <p>Description: Clase específica para el botón componer</p>
+	 * <p>Clase específica para el botón componer</p>
 	 * Esta clase compone un poligono con los datos actuales, lo dibuja y actualiza 
 	 *  los controles.  
 	 * @author Silverio Manuel Rosales Santana
@@ -521,8 +498,7 @@ public class Pizarra extends JFrame {
     }
 
     /**
-     * <p>Title: AsignarBoxListener</p>  
-     * <p>Description: Efectua los cambios de cada combo box cuando es activado
+     * <p>Efectua los cambios de cada combo box cuando es activado
      *  el control correspondiente.</p>
      *  Implica que eliminará o añadirá los poligonos a los grupos de población
      *   o zonas correspondientes, activa el botón de guardado y actualiza el
@@ -556,8 +532,7 @@ public class Pizarra extends JFrame {
 		}
 
 		/**
-		 * <p>Title: cambiarBox</p>  
-		 * <p>Description: Realiza un cambio de item entre dos JComboBox.</p>
+		 * <p>Realiza un cambio de item entre dos JComboBox.</p>
 		 * Además al cambiar de un grupo al otro, el poligono que tiene una zona asociado cambiará
 		 *  a un nuevo poligono o a un elemento nulo según corresponda.
 		 * @param item Nombre del item que cambia de JComboBox
@@ -587,8 +562,7 @@ public class Pizarra extends JFrame {
     }
 
     /**
-     * <p>Title: LimpiarListener</p>  
-     * <p>Description: Limpia la pizarra.</p>
+     * <p>Limpia la pizarra.</p>
      * Los datos de poligonos o líneas pendientes serán borrados. Los datos de
      *  los poligonos asignados permanecerán.  
      * @author Silverio Manuel Rosales Santana
@@ -606,8 +580,7 @@ public class Pizarra extends JFrame {
     }
 
     /**
-     * <p>Title: SelectPointListener</p>
-     * <p>Description: Realiza un seguimiento de los puntos que son seleccionados para
+     * <p>Realiza un seguimiento de los puntos que son seleccionados para
      * conformar el Poligono posteriormente</p>
      * Cada punto seleccionado se marca con una cruz y un punto en su centro, a
      * medida que se van añadiendo más puntos se van creando más líneas hasta
@@ -644,14 +617,20 @@ public class Pizarra extends JFrame {
     }
 
     /**
-     * <p>Title: AbrirListener</p>  
-     * <p>Description: Realiza la acción de cargar una imagen de fondo que sirva
-     *  como guía para el dibujado de los poligonos.</p>  
+     * <p>Realiza la acción de cargar una imagen de fondo que sirva
+     *  como guía para el dibujado de los poligonos.</p> 
      * @author Silverio Manuel Rosales Santana
      * @date 22 nov. 2021
      * @version versión 1.2
      */
     private class AbrirListener extends MouseAdapter {
+    	
+    	/**
+    	 * La sobrescritura de este método permite controlar las acciones para
+    	 *  abrir un fichero al activar el control mediante la pulsación con el ratón.
+    	 * <p>Para alcanzar su objetivo hace uso de las funciones de la clase IO.</p>
+    	 * @see controlador#IO 
+    	 */
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Selección de imagen de fondo.
@@ -668,13 +647,19 @@ public class Pizarra extends JFrame {
     }
     
     /**
-     * <p>Title: GuardarListener</p>  
-     * <p>Description: Realiza la acción de guardado de las figuras modificadas.</p>  
+     * Realiza la acción de guardado de las figuras modificadas.  
      * @author Silverio Manuel Rosales Santana
      * @date 22 nov. 2021
      * @version versión 1.2
      */
     private class GuardarListener extends MouseAdapter {
+    	
+    	/**
+    	 * Sobrescribe el método para lograr la activación del guardado cuando
+    	 *  se pulsa sobre el control correspondiente.
+    	 * <p>Esta función hace uso de la llamada al método doAction de la clase
+    	 *  controladora correspondiente.</p>
+    	 */
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Llamada al controlador para efectuar la acción pertinente.
