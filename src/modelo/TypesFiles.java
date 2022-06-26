@@ -48,7 +48,8 @@ public class TypesFiles {
     public final static String GIF= "gif";
     /** Archivo de Imagenes PNG, JPG p GIF */
     public final static String IMG = "imagen";
-	
+    /** Archivo de lectura PDF*/
+	public final static String PDF = "pdf";
 
 	/**
 	 * Inicializa los valores aceptables para los tipos de archivos soportados por el sistema. 
@@ -62,7 +63,7 @@ public class TypesFiles {
 		tipos.put(CSV, "Archivo general");
 		tipos.put(HST, "Histórico");
 		tipos.put(MAP, "Mapas");
-		tipos.put(GRP, "Grupos");
+		tipos.put(GRP, "Poblaciones");
 		tipos.put(PRJ, "Proyecto");
 		tipos.put(REL, "Relaciones");
 		tipos.put(PNG, "Archivos de imagen PNG");
@@ -70,6 +71,7 @@ public class TypesFiles {
 		tipos.put(JPEG,"Archivos de imagen JPEG");
 		tipos.put(GIF, "Archivos de imagen GIF");
 		tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
+		tipos.put(PDF, "Archivo de manual PDF");
     }
    
    /**

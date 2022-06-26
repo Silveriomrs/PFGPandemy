@@ -67,8 +67,8 @@ public class Paleta extends JPanel{
 		this.setBorder(tb);
 		this.setLayout(null);
 		
-		creaEtiquetas(50,20,50,20);												//Crea y dibuja las etiquetas.	
-		creaBotones(0,20,50,20);												//Crea y dibuja los botones.
+		creaEtiquetas(65,20,100,20);												//Crea y dibuja las etiquetas.	
+		creaBotones(10,20,50,20);												//Crea y dibuja los botones.
 		iniciarFrame();
 		refresh();
 	}
@@ -135,20 +135,24 @@ public class Paleta extends JPanel{
 	 * parámetros.
 	 * @param x Coordenada x de la posición de alineación horizontal de los botones.
 	 * @param y0 Coordenada y de la posición inicial del primer botón.
-	 * @param h Altura de los botones.
-	 * @param w Anchura de los botones
+	 * @param w Altura de los botones.
+	 * @param h Anchura de los botones.
 	 */
-	private void creaEtiquetas(int x, int y0, int h, int w) {
+	private void creaEtiquetas(int x, int y0, int w, int h) {
 		int separacion = 15;
 		int escala = 100;
-		String s = "<";
 		int y = y0;
 		for(int i=0; i<10; i++) {
-			JLabel nivel = new JLabel(s + escala);
-			nivel.setBounds(x, y, h, w);
+			JLabel nivel = null;
+			if(i == 0) nivel = new JLabel("< " + escala);
+			else if(i == 9) nivel = new JLabel(">= " + escala);
+			else {
+				nivel = new JLabel(">= " + escala + " < " + (escala + 100));
+				escala += 100;
+			}
+			nivel.setBounds(x, y, w, h);
 			add(nivel);
 			y += separacion;
-			escala += 100;
 		}
 	}
 	

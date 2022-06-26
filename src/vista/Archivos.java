@@ -104,7 +104,7 @@ public class Archivos extends JPanel {
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
 		iniciarLabels(TypesFiles.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.MAP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
 		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),"Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
 		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),"Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
 		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),"Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
@@ -168,7 +168,7 @@ public class Archivos extends JPanel {
 	 */
 	private void configuracion() {
 		//Configuración del borde.
-		tb = BorderFactory.createTitledBorder("Ficheros");
+		tb = BorderFactory.createTitledBorder("Modulos");
 		tb.setTitleColor(Color.BLUE);
 		panelCentral.setBorder(tb);
 		//Configuración básica del panelCentral superior
@@ -236,7 +236,7 @@ public class Archivos extends JPanel {
 		int posY = lineaBase + 30*contador;
 		generateControls(ext,0);
 		contador++;
-		int w = 110;
+		int w = 120;
 		int posX = 12;
 		jl.setToolTipText(tt);
 		addIconL(jl,ruta,wi,hi);
@@ -286,7 +286,7 @@ public class Archivos extends JPanel {
 		int posY = lineaBase + 30*contador;
 		jtf.setEditable(false);
 		jtf.setEnabled(true);
-		jtf.setBounds(140,posY,300,hi);
+		jtf.setBounds(150,posY,300,hi);
 		jtf.setColumns(10);
 		jtf.setToolTipText("Archivo seleccionado");
 		jtf.setHorizontalAlignment(SwingConstants.LEFT);
@@ -350,7 +350,7 @@ public class Archivos extends JPanel {
 	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
 	 *  activados mientras no haya definida una ruta previamente en el correspondiente
 	 *  campo.
-	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos 
+	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos.
 	 * o módulo al que hace referencia.
 	 * @param activar TRUE si se desea habilitar, FALSE en otro caso.
 	 */

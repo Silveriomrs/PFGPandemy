@@ -5,7 +5,7 @@
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 15 oct. 2021  
-* @version 1.0  
+* @version 1.0
 */  
 package vista;
 
@@ -74,9 +74,9 @@ public class ParametrosGrupos extends JPanel {
 		if(paneles.getTabCount() > 0) {
 			paneles.removeAll();
 			contadorPaneles = 0;
-		}		
+		}
 		
-		vistasZonas.clear();															//Para correcto funcionamiento este valor inciial no puede ser 0.
+		vistasZonas.clear();													//Para correcto funcionamiento este valor incial no puede ser 0.
 		
 		this.setEnabled(cm.hasZonas());
 		updatePaneles();
@@ -84,9 +84,22 @@ public class ParametrosGrupos extends JPanel {
 	}
 	
 	/**
+	 * Cambia el nombre de una pestaña del índice indicado por uno nuevo.
+	 * @param ID ID del grupo de población que coincide con la posición del índice.
+	 * @param newName Nuevo nombre para la pestaña.
+	 */
+	public void changeTabName(int ID, String newName) {
+		int index = ID -1;														//El índice coincide con el ID menos una posición
+		paneles.setTitleAt(index,newName);										//Cambia el nombre de la pestaña de dicho indice.
+		//Ahora actualizar el nombre en la gráfica líneal.
+		vistasZonas.get(ID).refresh();	
+	}
+	
+	/**
 	 * Refresca los datos de las vistas.
 	 */
 	public void refresh() {
+		//Actualizar las vistas de las zonas
 		vistasZonas.forEach((k,vista)->{
 			vista.refresh();
 		});

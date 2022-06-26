@@ -75,6 +75,15 @@ public class GraficasChart{
 	}
 	
 	/**
+	 * Renombra el título de la gráfica de línea.
+	 * @param newTitle Nuevo título para la gráfica.
+	 */
+	public void changeTitle(String newTitle) {
+		this.titulo = newTitle;
+		chart.setTitle(this.titulo);
+	}
+	
+	/**
 	 * Inicia los parámetros internos del menú adjunto a la gráfica.
 	 */
 	private void iniciarMenu() {	
@@ -103,8 +112,7 @@ public class GraficasChart{
 	}
 	
 	 /**
-	 * Clase dedicada al establecimiento de los datos en los
-	 * apartados o módulos oportunos.
+	 * Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos.
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
 	 * @version versión 2.2
@@ -227,8 +235,7 @@ public class GraficasChart{
 		//Añade el valor a la serie o actualiza el valor si no existe.
 		seriesMap.get(serie).addOrUpdate(x, y);
 	}
-	
-	
+		
 	/**
 	 * <p>Devuelve el valor del eje Y en la posición indicada por
 	 * parámetro.</p>
@@ -250,7 +257,6 @@ public class GraficasChart{
 		}
 		return y;
 	}
-	
 	
 	/**
 	 * <p>Devuelve los valores almanceados de una serie dentro de un Array de Strings.</p> 

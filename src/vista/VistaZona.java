@@ -88,12 +88,15 @@ public class VistaZona extends JPanel {
 		configurar();
 	}
 	
+	/**
+	 * Configura los controles, etiquetas y campos de la vista.
+	 * Además también configura los atributos propios de la vista.
+	 */
 	private void configurar() {
 		setLayout(new BorderLayout(0, 0));	
 	
 		add(panelCentral);
-		panelCentral.setLayout(null);
-		
+		panelCentral.setLayout(null);	
 		
 		addLabel("ID:", null, posXL,gap,19,15);
 		addLabel("Nombre:",null,posXL,2*gap,172,15);
@@ -104,7 +107,7 @@ public class VistaZona extends JPanel {
 		addLabel("Incidentes:",null,posXL,6*gap,100,15);
 		addLabel("Recuperados:",null,posXL,7*gap,100,15);
 		addLabel("Prevalencia:",null,posXL,8*gap,100,15);
-		addLabel("Nivel de contagio:",null,posXL,9*gap,175,15);
+		addLabel("Nivel de incidencia:",null,posXL,9*gap,175,15);
 		
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(0, 0, 139));
@@ -133,7 +136,8 @@ public class VistaZona extends JPanel {
 		tf_I = iniciarTextField("Infectados",posX, posY + gap*5, ancho, alto);
 		tf_R = iniciarTextField("Recuperados",posX, posY + gap*6, ancho, alto);
 		tf_P = iniciarTextField("Prevalencia",posX, posY + gap*7, ancho, alto);
-		tf_C100K = iniciarTextField("Nivel",152, posY + gap*8, 114, 19);	
+		tf_C100K = iniciarTextField("Nivel",152, posY + gap*8, 114, 19);
+		tf_C100K.setEditable(false);
 		
 		JButton btnAplicar = new JButton("Aplicar Cambios");
 		btnAplicar.addMouseListener(new BotonL());
@@ -151,8 +155,7 @@ public class VistaZona extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: refresh</p>  
-	 * <p>Description: Recarga los campos de los TextFields con los datos del modelo</p>
+	 * <p>Recarga los campos de los TextFields con los datos del modelo</p>
 	 * Realiza una nueva lectura de cada campo del modelo (zona) e introduciendo
 	 *  sus valores en los correspondientes JTextFields. 
 	 */
@@ -173,12 +176,12 @@ public class VistaZona extends JPanel {
 			tf_P.setText("" + zona.getP());		
 			tf_C100K.setText("" + zona.getNivel());								//Nivel inicial de contagio.
 		}
-	}
-	
+	}	
 	
 	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
+	 * <p>Visualiza los datos del módulo dentro de su propio marco.</p>
+	 * La ventaja de esta función es que abre la vista en modo de ficha flotante,
+	 * mejorando mucho la personalización de la aplicación.
 	 */
 	public void abrirFrame() {
 	    JFrame frame = new JFrame("Módulo de Archivos");
@@ -196,8 +199,7 @@ public class VistaZona extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: addIconL</p>  
-	 * <p>Description: Añade un icono a una etiqueta</p>
+	 * <p>Añade un icono a una etiqueta</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
 	 * @param componente Etiqueta a la que adjuntar el icono
@@ -210,20 +212,29 @@ public class VistaZona extends JPanel {
 		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
 	
+	/**
+	 * Inicializa un campo de texto con los atributos necesarios para su correcta
+	 *  visualización y funcionamiento.
+	 * @param tt Texto emergente a establecer.
+	 * @param posX Posición en el eje horizontal donde colocar la etiqueta.
+	 * @param posY Posición en el eje vertical donde colocar la etiqueta.
+	 * @param wi Ancho de la etiqueta.
+	 * @param hi Alto de la etiqueta,
+	 * @return Devuelve el campo de texto configurado con los atributos comunes.
+	 */
 	private JTextField iniciarTextField(String tt, int posX, int posY, int wi, int hi){
 		JTextField jtf = new JTextField();
-		jtf.setEnabled(true);
-		jtf.setBounds(posX,posY,wi,hi);
-		jtf.setColumns(10);
-		if(tt != null) jtf.setToolTipText(tt);
-		jtf.setHorizontalAlignment(SwingConstants.LEFT);
-		panelCentral.add(jtf);
+		jtf.setEnabled(true);													//Inicialmente el campo está habilitado.
+		jtf.setBounds(posX,posY,wi,hi);											//Establecer posición.
+		jtf.setColumns(10);														//Número de columnas.
+		if(tt != null) jtf.setToolTipText(tt);									//Establecer mensaje emergente.
+		jtf.setHorizontalAlignment(SwingConstants.LEFT);						//Alineación a la izquierda.
+		panelCentral.add(jtf);													//Añadir al panel central
 		return jtf;
 	}
 	
 	/**
-	 * <p>Title: iniciarLabel</p>  
-	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
+	 * Establece las facetas de las etiquetas descripticas
 	 * @param nombre Nombre en la etiqueta.
 	 * @param ruta Ruta al icono de la etiqueta. Null en otro caso.
 	 * @param posX Posición donde colocarlo en el eje X.
@@ -238,7 +249,6 @@ public class VistaZona extends JPanel {
 		panelCentral.add(jl);
 	}
 
-
 	/**
 	 * @param zona La zona a establecer
 	 */
@@ -250,8 +260,7 @@ public class VistaZona extends JPanel {
 	/* Clases privadas */
 	
 	/**
-	 * <p>Title: BotonL</p>  
-	 * <p>Description: Procesa el formulario asignando a cada uno de los atributos del grupo de población
+	 * <p>Procesa el formulario asignando a cada uno de los atributos del grupo de población
 	 *  los datos introducidos en los campos del formulario.</p>
 	 *  Para garantizar la validez de dichos datos, se realiza una conversión de formato, en caso de existir
 	 *   un valor incorrecto, saltará una expceción que es capturada mostrando el mensaje de error correspondiente.  
@@ -263,12 +272,16 @@ public class VistaZona extends JPanel {
 		public void mouseClicked(MouseEvent evt) {
 			//
 			try{
+				Double s,i,r;
 				zona.setName(tf_NAME.getText());
 				zona.setPoblacion(Integer.parseInt(tf_PEOPLE.getText()));
 				zona.setSuperficie(Integer.parseInt(tf_AREA.getText()));
-				zona.setS(Double.parseDouble(tf_S.getText()));
-				zona.setI(Double.parseDouble(tf_I.getText()));
-				zona.setR(Double.parseDouble(tf_R.getText()));
+				s = Double.parseDouble(tf_S.getText());
+				i = Double.parseDouble(tf_I.getText());
+				r = Double.parseDouble(tf_R.getText());
+				zona.setS(s);
+				zona.setI(i);
+				zona.setR(r);
 				zona.setP(Double.parseDouble(tf_P.getText()));
 				zona.setNivel(Integer.parseInt(tf_C100K.getText()));
 				
@@ -278,8 +291,7 @@ public class VistaZona extends JPanel {
 	}
 	
 	/**
-	 * <p>Title: PanelPoligono</p>  
-	 * <p>Description: Clase particular encargada de redimensionar un polígono representación
+	 * <p>Clase particular encargada de redimensionar un polígono representación
 	 *  de un grupo de población, de manera que quede escalado dentro del marco contenedor, respetando
 	 *   el factor de forma y demás atributos propios. No modifica el original.</p> 
 	 *   Por último desplaza dicho polígono de forma que que quede centrado en su marco contenedor.

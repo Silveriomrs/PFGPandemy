@@ -133,14 +133,13 @@ public class IO{
 	 * @param ext Tipo de fichero a abrir.
 	 * @return Instancia File apuntando al fichero en disco. Null en otro caso.
 	 */
-	private File getFile(int sel, String path,String ext) {
+	public static File getFile(int sel, String path,String ext) {
 		File f = null;
 		String ruta = path;
 		if(ruta == null || ruta.equals("")) {ruta = selFile(sel,ext);}				// Obtención del archivo.	
 		if(ruta != null) f = new File(ruta);
 		return f;
 	}
-	
 	
 	/**
 	 * Selecciona un archivo del disco, o establece su nombre. Puede recibir un

@@ -5,9 +5,11 @@
  */
 package controlador;
 
+import java.awt.Desktop;
 import java.io.IOException;
 
 import modelo.DCVS;
+import modelo.TypesFiles;
 
 /**
  * @author Silverio Manuel Rosales Santana
@@ -61,6 +63,27 @@ public class ControladorDatosIO {
 	public String selFile(int sel, String ext) {
 		return IO.selFile(sel, ext);
 	}
-
+	
+	/**
+	 * Abre un fichero PDF del sistema.
+	 * Función realizada para la parte de ayuda de la barra de menús, abrir manuales.
+	 * @param man Tipo de manual para abrir.
+	 */
+	public void openPDF(String man) {
+		//Composición de la ruta al manual.
+		String pathPDF = "src/modelo/Manuales/";
+		pathPDF += man + "." + TypesFiles.PDF;
+		//Apertura del PDF desde la propia aplicación del sistema.
+		try {
+			String r = IO.getFile(1, pathPDF, TypesFiles.PDF).getAbsolutePath();
+			String r2 = IO.getFile(1, pathPDF, TypesFiles.PDF).getPath();
+			/* El File se encuentra, pero la aplicación del OS no puede abrirlo dentro del JAR */
+			System.out.println("r = " + r + "\nr2 = " + r2);
+			pathPDF = r2;
+			Desktop.getDesktop().open(IO.getFile(1, pathPDF, TypesFiles.PDF));
+		}catch (Exception ex) {
+			System.out.println("ControladorDatosIO > openPDF > Error, No encontrado fichero: " + pathPDF);
+		}
+	}
 
 }

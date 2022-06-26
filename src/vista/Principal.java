@@ -118,25 +118,28 @@ public class Principal extends JFrame {
 		addJMenuItem(mnArchivo, "Salir","/vista/imagenes/Iconos/salir_64px.png" );
 		
 		//Menu Ver
-		JMenu mnVer = new JMenu("Ver");
+		JMenu mnVer = new JMenu("Parámetros modelo");
 		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );	
-		addJMenuItem(mnVer, "Parámetros SIR","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnVer, "Grupos","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer, "Parámetros Enfermedad","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer, "Grupos de Población","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer, "Matriz de Contactos","/vista/imagenes/Iconos/nodos_64px.png" );
 		mnVer.addSeparator();
 		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
+		addJMenuItem(mnVer, "Leyenda","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 		addJMenuItem(mnVer, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
-		addJMenuItem(mnVer, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 			
 		
 		//Menu Herramientas
 		JMenu mnHerramientas = new JMenu("Herramientas");
-		addJMenuItem(mnHerramientas, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		addJMenuItem(mnHerramientas, "Editor de Tablas","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
 		mnHerramientas.addSeparator();
 		addJMenuItem(mnHerramientas, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
 		addJMenuItem(mnHerramientas, "Editor Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 		
 		//Menu Ayuda
 		JMenu mnAyuda = new JMenu("Ayuda");
+		addJMenuItem(mnAyuda, "Formato Tablas","/vista/imagenes/LogoUNED.jpg" );
+		addJMenuItem(mnAyuda, "Manual de Usuario","/vista/imagenes/LogoUNED.jpg" );
 		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
 		
 		//Añadir sub-menus a la barra de menus.
@@ -154,16 +157,12 @@ public class Principal extends JFrame {
 	 * Provoca una lectura de los datos requeridos para que la cosistencia de
 	 *  la vista sea adecuada. 
 	 */
-	public void reset() {
-		actualizarJMItems();
-	}
+	public void reset() {	actualizarJMItems();}
 	
 	/**
 	 * Refresca la vista con los datos del módulo. 
 	 */
-	public void refresh() {
-		actualizarJMItems();
-	}
+	public void refresh() {	actualizarJMItems();}
 	
 	/**
 	 * <p>Actualiza los JMenuItems en función del contexto de la aplicación.</p>
@@ -178,9 +177,11 @@ public class Principal extends JFrame {
 		//Desactivar editor de zonas gráfico.
 		jmitems.get("Editor Gráfico").setEnabled(hasZonas);
 		//Desactivar vistas de grupos.
-		jmitems.get("Grupos").setEnabled(hasZonas);
+		jmitems.get("Grupos de Población").setEnabled(hasZonas);
+		//Desactivar matriz de contactos.
+		jmitems.get("Matriz de Contactos").setEnabled(hasZonas);
 		//Desactivar vista de Parámetros de la enfermedad.
-		jmitems.get("Parámetros SIR").setEnabled(cm.hasModule(TypesFiles.DEF));
+		jmitems.get("Parámetros Enfermedad").setEnabled(cm.hasModule(TypesFiles.DEF));
 //		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
 		jmitems.get("Reproductor").setEnabled(hasZonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)

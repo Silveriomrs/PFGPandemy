@@ -245,8 +245,7 @@ public class DCVS implements TableModel{
 		}
 		return modelo;
 	}
-	
-	
+		
 	/**
 	 * Crea un modelo con los datos almacenados en la instancia 
 	 * @return Modelo conformado.
@@ -332,8 +331,7 @@ public class DCVS implements TableModel{
 		if(index > -1) data = getValueAt(index,1);
 		return data;
 	}
-	
-	
+		
 	/**
 	 * Busca un elemento/valor en todas las primeras celdas
 	 * de la tabla.
@@ -381,18 +379,37 @@ public class DCVS implements TableModel{
 		return col;
 	}
 	
+	/**
+	 * Añade un suscriptor a la tabla.
+	 * @param arg0 El suscriptor a añadir a la lista de observadores.
+	 */
 	@Override
 	public void addTableModelListener(TableModelListener arg0) {modelo.addTableModelListener(arg0);}
 
+	/**
+	 * Devuelve la clase general correspondiente una columna.
+	 * @param arg0 Índice de la columna de la que se desea obtener su definición de clase.
+	 * @return Tipo de clase al que corresponde la columna indicada.
+	 */
 	@Override
 	public Class<?> getColumnClass(int arg0) {return modelo.getColumnClass(arg0);}
 
+	/**
+	 * @return Número de columnas que contiene la tabla.
+	 */
 	@Override
 	public int getColumnCount() {return modelo.getColumnCount();}
 
+	/**
+	 * @param arg0 Número de la columna cuyo nombre se desea obtener.
+	 * @return Cadena de texto con el nombre de la columna.
+	 */
 	@Override
 	public String getColumnName(int arg0) {return modelo.getColumnName(arg0);}
 
+	/**
+	 * @return devuelve el número de filas contenido en la tabla.
+	 */
 	@Override
 	public int getRowCount() {return modelo.getRowCount();}
 
@@ -418,6 +435,10 @@ public class DCVS implements TableModel{
 		return is;		
 	}
 
+	/**
+	 * Elimina un suscriptor de la lista de observadores de la tabla.
+	 * @param arg0 Suscriptor a eliminar de la lista.
+	 */
 	@Override
 	public void removeTableModelListener(TableModelListener arg0) { modelo.removeTableModelListener(arg0);}
 

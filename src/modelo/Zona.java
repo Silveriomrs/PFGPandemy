@@ -203,9 +203,14 @@ public class Zona {
 	public String getName() {return name;}
 
 	/**
+	 * Cambia el nombre del grupo de población y establece el nuevo título para
+	 *  su gráfica de línea.
 	 * @param name Nuevo nombre para el grupo de población.
 	 */
-	public void setName(String name) {this.name = name;}
+	public void setName(String name) {
+		this.name = name;
+		chart.changeTitle(this.name);												//Actualizar el nombre del chart.
+	}
 	
 	/**
 	 * @return devuelve ID del grupo de población.

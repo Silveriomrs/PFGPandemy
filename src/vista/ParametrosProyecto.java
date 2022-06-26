@@ -301,7 +301,7 @@ public class ParametrosProyecto extends JPanel {
 		JLabel lblNmeroDeGrupos = new JLabel("Número de Grupos de estudio:");
 		lblNmeroDeGrupos.setBounds(53, 279, 217, 15);
 		add(lblNmeroDeGrupos);
-		JLabel lblArchivosDelProyecto = new JLabel("Archivos del Proyecto:");
+		JLabel lblArchivosDelProyecto = new JLabel("Archivos del modelo:");
 		lblArchivosDelProyecto.setBounds(53, 336, 157, 15);
 		add(lblArchivosDelProyecto);
 		JLabel txtVersion = new JLabel();

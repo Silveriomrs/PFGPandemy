@@ -119,7 +119,7 @@ public class Labels {
 		dic.put(CC, "Casos de curación");
 		dic.put(CVS,"Casos de vuelta a la suceptibilidad");
 		dic.put(CI, "Casos incidentes");
-		dic.put(C100K, "Nivel de contagio");
+		dic.put(C100K, "Nivel de incidencia");
 		//Básicas
 		dic.put(S, "Susceptibles");
 		dic.put(I, "Incidencias");

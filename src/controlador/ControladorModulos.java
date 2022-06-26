@@ -32,10 +32,11 @@ import vista.TablaEditor;
 import vista.VistaSIR;
 
 /**
+ * Clase principal del módulo controlador, coordina todas las acciones entre
+ *  las vistas, el módelo y la gestión del flujo de datos.
  * @author Silverio Manuel Rosales Santana
  * @date 13/07/2021
  * @version 6.2
- *
  */
 public class ControladorModulos {
 
@@ -94,7 +95,7 @@ public class ControladorModulos {
 		pgrupos = new ParametrosGrupos(this);
 		pproyecto = new ParametrosProyecto(this,archivos);
 		about = new About();
-		paleta = new Paleta(this,100, 205);
+		paleta = new Paleta(this,170, 215);
 		mapa = new Mapa(w,h, this);
 		principal = new Principal(this);
 		player = new Player(this,mapa);
@@ -109,7 +110,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Genera los módulos básicos para operar con el sistema</p>
+	 * <p>Genera los módulos básicos para operar con el sistema</p>
 	 * Estos son los del proyecto y los parámetros de la enfermedad.
 	 */
 	private void generarModulosBasicos() {
@@ -124,7 +125,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Genera la tabla del módulo correspondiente a la definición de
+	 * <p>Genera la tabla del módulo correspondiente a la definición de
 	 *  propiedades intrínsicas de la enfermedad.</p>
 	 * Esta función además integra dicha tabla en el resto de la aplicación.
 	 */
@@ -135,7 +136,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Genera una tabla (módulo) de la representación en grados de color
+	 * <p>Genera una tabla (módulo) de la representación en grados de color
 	 *  de los niveles de contagio on las etiquetas propias.</p>
 	 * <p>Además de establecerle los atributos propios que pudieran estar definidos en el proyecto y
 	 *  procesará el establecimiento del módulo generado dentro de la aplicación.
@@ -146,7 +147,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Genera el módulo de grupos de población o zonas.</p>
+	 * <p>Genera el módulo de grupos de población o zonas.</p>
 	 * El módulo es añadido al conjunto de módulos sin datos de los propios
 	 *  grupos de población añadidos.
 	 */
@@ -161,7 +162,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Genera una tabla (módulo) de relaciones o matriz de contactos
+	 * <p>Genera una tabla (módulo) de relaciones o matriz de contactos
 	 *  con las etiquetas propias, además de establecerle los atributos propios que
 	 *   pudieran estar definidos en el proyecto.</p>
 	 * Esta función también procesará el establecimiento del módulo generado dentro
@@ -175,7 +176,7 @@ public class ControladorModulos {
 	}
 			
 	/**
-	 * <p>Description: Añade los tres parámetros básicos del proyecto al módulo</p>
+	 * <p>Añade los tres parámetros básicos del proyecto al módulo</p>
 	 * Estos son: Nombre unificado, directorio de trabajo y ruta absoluta.
 	 *  Debe existir previamente un módulo de proyecto creado y con dichos parámetros.
 	 *  <P>En caso de que el módulo posea nombre este se respetará. Los demás serán
@@ -207,9 +208,10 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Llama a cada una de las vistas para que actualicen sus datos</p>
+	 * Llama a cada una de las vistas para que actualicen sus datos.
 	 */
 	private void refresh() {
+		pproyecto.refresh();
 		archivos.refresh();
 		principal.refresh();
 		paleta.refresh();
@@ -218,7 +220,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Establece el conjunto de zonas o grupos de población.</p>
+	 * <p>Establece el conjunto de zonas o grupos de población.</p>
 	 * Actualiza las diferentes vistas vinculadas con los grupos de población obtenidos. 
 	 * @param zonas Mapa cuya clave es la ID de cada zona y valor la zona.
 	 */
@@ -239,8 +241,8 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Aquí se situan todos los paneles (módulos) que se quieren
-	 * añadir al a vista principal en su panel central.</p>
+	 * Aquí se situan todos los paneles (módulos) que se quieren
+	 * añadir al a vista principal en su panel central.
 	 */
  	private void agregarPaneles() {
 		//Añadir paneles de los módulos.
@@ -253,7 +255,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Añade un JPanel (módulo) a la vista central del módulo principal 
+	 * <p>Añade un JPanel (módulo) a la vista central del módulo principal 
 	 * dotándole además de un border personalizado para la aplicación a todos los paneles.</p>
 	 * Como añadido coloca un título a dicho panel, permitiendo identificarlo con 
 	 * un nombre personalizado. 
@@ -275,14 +277,13 @@ public class ControladorModulos {
 	}
 		
 	/**
-	 * <p>Description: Indica si hay zonas cargadas.</p> 
+	 * Indica si hay zonas cargadas.
 	 * @return TRUE si el sistema tiene zonas definidas, FALSE en otro caso.
 	 */
 	public boolean hasZonas() {return !zonas.isEmpty();}
 	
 	/**
-	 * <p>Title: getNumberZonas</p>  
-	 * <p>Description: Devuelve el número de zonas actuales.</p> 
+	 * Devuelve el número de zonas actuales.
 	 * @return Número de grupos de población o zonas actuales en el sistema.
 	 */
 	public int getNumberZonas() {
@@ -292,7 +293,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Devuelve el color correspondiente a un nivel de contagio.</p> 
+	 * Devuelve el color correspondiente a un nivel de contagio. 
 	 * @param n Nivel de contagio del 0 al 9. Siendo el 0 el más bajo y el 9 el más alto.
 	 * @return Color representante de dicho nivel.
 	 */
@@ -314,8 +315,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Establece la representación gráfica de cada zona. Una fila
-	 * por zona.</p> 
+	 * Establece la representación gráfica de cada zona. Una fila por zona.
 	 * @param datos DCVS con los datos especificados de cada zona.
 	 */
 	private void setPoligonos(DCVS datos) {
@@ -332,14 +332,13 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Función para facilitar el acceso al conjuto de 
-	 * zonas desde otros módulos.</p> 
+	 * Función para facilitar el acceso al conjuto de zonas desde otros módulos. 
 	 * @return Conjunto de zonas actualmente almacenados.
 	 */
 	public HashMap<Integer,Zona> getZonas() { return this.zonas;}
 			
 	/**
-	 * <p>Description: Determina si un dato es convertible a un número tipo Integer</p> 
+	 * Determina si un dato es convertible a un número tipo Integer. 
 	 * @param cadena Cadena de texto a evaluar.
 	 * @return TRUE si es convertible a Integer, FALSE en otro caso.
 	 */
@@ -386,8 +385,8 @@ public class ControladorModulos {
 	}
 
 	/**
-	 * <p>Description: Posiciona el marco (frame) del módulo incado en la nueva
-	 *  posición de la pantalla, este método no hace por si solo visible el marco. </p>
+	 * <p>Posiciona el marco (frame) del módulo incado en la nueva
+	 *  posición de la pantalla, este método no hace por si solo visible el marco.</p>
 	 * Los valores que puede tomar son: "REPRODUCTOR", "LEYENDA", "MAPA". Los cuales
 	 * son los nombres de los módulos externos a la aplicación.
 	 * @param modulo identificador del módulo a posicionar. @see ModuleType
@@ -413,7 +412,7 @@ public class ControladorModulos {
 	/*  Métodos relacionados con la reproducción  */
 	
 	/**
-	 * <p>Description: Evalua si el reproductor puede ser ejecutado en función
+	 * <p>Evalua si el reproductor puede ser ejecutado en función
 	 *  de disponer de un historico condatos y un conjunto de zonas representables</p>
 	 *  Para facilitar su seguimiento, en caso de no cumplirse la idoniedad, mostrará
 	 *  el mensaje adecuado de información por consola.
@@ -426,7 +425,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Ejecuta la reproducción de un historico mostrando gráficamente
+	 * <p>Ejecuta la reproducción de un historico mostrando gráficamente
 	 * la evolución grabada. </p>
 	 * La representación gráfica corresponde a las zonas creadas. Para poder
 	 * usarse esta función deben haber sido almacezandos previamente los datos
@@ -444,7 +443,7 @@ public class ControladorModulos {
 	/* Control ARCHIVOS */
 	
 	/**
-	 * <p>Description: Devuelve el módulo con la información que contenga. </p>
+	 * <p>Devuelve el módulo con la información que contenga.</p>
 	 * El tipo de módulo es acorde a las extensiones aceptadas.
 	 * @param tipo Tipo de módulo a devolver. Ej. MAP, HST, etc.
 	 * @return El módulo solicitado.
@@ -456,7 +455,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Indica si existe un módulo cargado en el sistema.</p> 
+	 * Indica si existe un módulo cargado en el sistema.
 	 * @param tipo Tipo de módulo
 	 * @return TRUE si el sistema contiene dicho módulo, FALSE en otro caso.
 	 * \see TypesFiles
@@ -464,7 +463,7 @@ public class ControladorModulos {
 	public boolean hasModule(String tipo) {	return modulos.containsKey(tipo);}
 	
 	/**
-	 * <p>Description: Guarda la configuración del proyecto.</p> En caso de que
+	 * <p>Guarda la configuración del proyecto.</p> En caso de que
 	 * el módulo recibido sea null, no realizará operación alguna. Cuando dicho
 	 *  módulo no tiene establecido un directorio de trabajo, lo obtendrá del 
 	 *   resultado de la operación.
@@ -499,8 +498,8 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Almacena los módulos actuales del sistema en el mismo
-	 *  directorio de trabajo que el módulo principal (proyecto).</p>
+	 * Almacena los módulos actuales del sistema en el mismo
+	 *  directorio de trabajo que el módulo principal (proyecto).
 	 */
 	private void saveAllTogether() {
 		modulos.forEach((type,module)->{
@@ -515,7 +514,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Elimina los datos del proyecto y reinicia las vistas. </p>
+	 * Elimina los datos del proyecto y reinicia las vistas.
 	 */
 	private void clearProject() {
 		//Borrado de todos los módulos.
@@ -537,8 +536,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
-	 * correspondientes.</p>
+	 * Carga un proyecto con sus ficheros en los módulos correspondientes.
 	 * @param dcvs Archivo de proyecto con los datos del resto de módulos.
 	 */
 	public void abrirProyecto(DCVS dcvs) {
@@ -580,7 +578,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Introduce los datos (tipo y nombre del archivo del módulo)
+	 * <p>Introduce los datos (tipo y nombre del archivo del módulo)
 	 *  en el módulo del proyecto. Su finalidad es la carga de este módulo al abrir
 	 *   el proyecto.</p>
 	 * No realiza acción alguna sino hay un módulo de proyecto previamente en el sistema.
@@ -599,8 +597,8 @@ public class ControladorModulos {
 	}
 		
 	/**
-	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
-	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
+	 * Establece el contenido del módulo cargado de acuerdo
+	 * con su tipo, actualiza los elementos del JPanel correspondientes.
 	 * @param datos Conjunto de datos y cabecera encapsulados.
 	 */
 	private void establecerDatos(DCVS datos) {
@@ -637,8 +635,7 @@ public class ControladorModulos {
 	/* Acciones Principal */
 	
 	/**
-	 * <p>Description: Realiza la acción concreta indicada desde la vista
-	 * que ha realizado la llamada.</p> 
+	 *  Realiza la acción concreta indicada desde la vista que ha realizado la llamada.
 	 * @param nombre Nombre de la acción.
 	 */
 	public void doActionPrincipal(String nombre) {
@@ -658,18 +655,19 @@ public class ControladorModulos {
 				paleta.setEditable(true);
 				paleta.setFrameVisible(true);
 				break;
-			case "Paleta":
+			case "Leyenda":
 				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(false);
 				paleta.toggleFrameVisible();
 				break;
 			case "Mapa":
-			case "Grupos":
-			case "Tabla":
-			case "Parámetros SIR":
+			case "Grupos de Población":
+			case "Editor de Tablas":
+			case "Parámetros Enfermedad":
 			case "Proyecto":
 				mostrarPanel(nombre);
 				break;
+			case "Matriz de Contactos": editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
 			case "Abrir Proyecto":
 				DCVS prj = cio.abrirArchivo(null,TypesFiles.PRJ);
 				if(prj != null) {
@@ -686,9 +684,8 @@ public class ControladorModulos {
 				}
 				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
 				break;
-			case "Importar Modelo B":
-				
-				//Hay que conocer la extensión que usa VenSim en sus proyectos. Temporalmente usar CSV
+			case "Importar Modelo B":	
+				//Formato de importación CSV
 				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) {
@@ -706,6 +703,9 @@ public class ControladorModulos {
 			case "Salir":
 				if(showMessage("Los cambios no guardados se perderán\n¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
+			case "Formato Tablas":
+				cio.openPDF("mTablas");
+				break;
 			case "Acerca de...":
 				about.toggleVisible();
 				break;
@@ -715,16 +715,16 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Establece la vista que debe ser visible.</p> 
+	 * Establece la vista que debe ser visible.
 	 * @param nombre Nombre de la vista a hacer visible.
 	 */
 	private void mostrarPanel(String nombre) {		
 		//Mostrar panel correspondiente y ocultación del resto.
 		mapa.setVisible(nombre.equals("Mapa"));					
-		tablaEditor.setVisible(nombre.equals("Tabla"));
-		pgrupos.setVisible(nombre.equals("Grupos"));
+		tablaEditor.setVisible(nombre.equals("Editor de Tablas"));
+		pgrupos.setVisible(nombre.equals("Grupos de Población"));
 		pproyecto.setVisible(nombre.equals("Proyecto"));
-		vistaSIR.setVisible(nombre.equals("Parámetros SIR"));
+		vistaSIR.setVisible(nombre.equals("Parámetros Enfermedad"));
 	}
 	
 	/**
@@ -769,7 +769,7 @@ public class ControladorModulos {
 	/* Acciones Pizarra*/
 
 	/**
-	 * <p>Description: Realizas las acciones oportundas pertenecientes a esta vista</p>
+	 * <p>Realizas las acciones oportundas pertenecientes a esta vista</p>
 	 * La vista de pizarra puede comunicar dos operaciones: 1. aplicar cambios 
 	 *  de las representaciones gráficas de los grupos de población o zonas.
 	 *   2. Guardar los cambios efectuados en un nuevo fichero de tipo Mapa.
@@ -802,7 +802,7 @@ public class ControladorModulos {
 	/* Acciones Archivos */
 	
 	/**
-	 * <p>Description: Abre un fichero (módulo) desde disco.</p> 
+	 * Abre un fichero (módulo) desde disco.
 	 * @param ext Tipo de fichero/módulo a abrir.
 	 * @return TRUE si la operación se ha realizado correctamente. FALSE en otro caso.
 	 */
@@ -828,7 +828,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Recrea el módulo especificado con los parámetros básicos</p>
+	 * <p>Recrea el módulo especificado con los parámetros básicos</p>
 	 * Método diseñado para restablecer valroes por defecto cuando se elimina un 
 	 *  módulo considerado básico.
 	 *  <P>En función de las dependencias entre módulos, la función dispara la 
@@ -845,7 +845,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Elimina un módulo del proyecto.</p>
+	 * <p>Elimina un módulo del proyecto.</p>
 	 * Elimina tanto la referencia dentro del módulo del proyecto como del conjunto
 	 *  de módulos cargados. No elimina el fichero del disco. 
 	 * @param ext Tipo de módulo a eliminar.
@@ -873,7 +873,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Guarda los datos del módulo indicado en el disco.</p>
+	 * <p>Guarda los datos del módulo indicado en el disco.</p>
 	 * El método puede guardar en la ruta indicada dentro del propio módulo o
 	 *  realizar una consulta del lugar donde guardarlo. Este comportamiento es
 	 *   indicado mediante el parámetro 'as'. Si está activado (TRUE) abrirá
@@ -899,7 +899,7 @@ public class ControladorModulos {
 	}	
 	
 	/**
-	 * <p>Description: Función dedicada a la realización de las funciones de la
+	 * <p>Función dedicada a la realización de las funciones de la
 	 * la vista correspondiente.</p>
 	 * Recibiendo dos operadores por parámetros realiza las diferentes actividades
 	 * correspondientes al módulo correspondiente (entrada salida de archivos).
@@ -930,7 +930,7 @@ public class ControladorModulos {
 	/* Acciones TableEditor */
 	
 	/**
-	 * <p>Description: Abre el editor general de módulos con el módulo en cuestión.</p>
+	 * Abre el editor general de módulos con el módulo en cuestión.
 	 * @see modelo.ModuleType
 	 * @param ext Tipo de módulo a editar.
 	 */
@@ -941,8 +941,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Realizas las acciones oportundas pertenecientes al módulo
-	 *  editor de tablas.</p>
+	 * Realizas las acciones oportundas pertenecientes al módulo editor de tablas.
 	 * @param modulo Módulo con los datos que esperan ser guardados tras modificación.
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
@@ -961,7 +960,7 @@ public class ControladorModulos {
 	/* Acciones VistasZonas y Grupos */
 	
 	/**
-	 * <p>Description: Ajusta el número de columnas del módulo.</p>
+	 * <p>Ajusta el número de columnas del módulo.</p>
 	 * El método comprueba si el número de columnas existentes es menor que el 
 	 *  nuevo número de columnas indicado, en tal caso genera nuevas columnas y 
 	 *   las denomina por orden de indice poniendo como prefijo el texto pasado
@@ -984,8 +983,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Incluye el nombre de un grupo de población en la matriz de
-	 *  relaciones.</p> 
+	 *  Incluye el nombre de un grupo de población en la matriz de relaciones.
 	 * @param ID Identificador del grupo de población.
 	 */
 	private void setNameMAPinREL(int ID) {
@@ -997,7 +995,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * <p>Realizas las acciones oportundas pertenecientes a la vista
 	 * de Zonas</p>
 	 * La vista de zonas solo ejerce una opción, aplicar cambios de los campos.
 	 * Dichos cambios son efectuados en las referencias de las zonas por tanto 
@@ -1037,15 +1035,18 @@ public class ControladorModulos {
 		//Ajustar nombre de la zona con el de la relaciones por si se han realizado cambios.
 		setNameMAPinREL(ID);
 		
+		//Actualizar nombre del panel. Se da por sentado que ha sido cambiado incluso cuando no lo ha sido.
+		pgrupos.changeTabName(ID,zonas.get(ID).getName());
+		
 		archivos.enableBotonesGuardado(TypesFiles.MAP, true);
+		refresh();
 		return done;
 	}
-	
 	
 	/* Acciones VistaPaleta */
 	
 	/**
-	 * <p>Description: Realiza las acciones de actualización de datos de la vista
+	 * <p>Realiza las acciones de actualización de datos de la vista
 	 *  correspondiente a la paleta de colores o representación gráfica por colores 
 	 *   de los niveles de contagio.</p>
 	 *   El nivel de contagio es igual al número de casos por cada cien mil hábitantes. 
@@ -1075,7 +1076,7 @@ public class ControladorModulos {
 	/* Acciones VistaSIR */
 	
 	/**
-	 * <p>Description: Asigna un valor a una etiqueta en el módulo específicado.</p>
+	 * Asigna un valor a una etiqueta en el módulo específicado.
 	 * @param ext Extensión (etiqueta identificadora) del módulo objetivo.
 	 * @param label Etiqueta a la que modificar su valor asignado.
 	 * @param data Dato a insertar como nuevo valor de la etiqueta.
@@ -1090,7 +1091,7 @@ public class ControladorModulos {
 	}	
 	
 	/**
-	 * <p>Description: Recupera un valor de una etiqueta. Si la etiqueta no existe, devuelve null.</p>
+	 * Recupera un valor de una etiqueta. Si la etiqueta no existe, devuelve null.
 	 * @param ext Tipo de módulo (extensión) donde realizar la búsqueda.
 	 * @param label Etiqueta a buscar dentro de dicho módulo.
 	 * @return La cadena de texto cuyo valor está asociada a la etiqueta. NULL en otro caso.
@@ -1107,8 +1108,7 @@ public class ControladorModulos {
 	}
 		
 	/**
-	 * <p>Description: Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea.</p>
-	 * 
+	 * Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea.
 	 * @param ext Extensión (etiqueta identificadora) del módulo a editar.
 	 * @param label Etiqueta a buscar.
 	 * @param data Dato a insertar en la tabla.
@@ -1125,8 +1125,8 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Actualiza los datos de la tabla SIR con los datos que
-	 *  esten establecidos en las etiquetas correspondientes de la Vista.</p> 
+	 * Actualiza los datos de la tabla SIR con los datos que
+	 *  esten establecidos en las etiquetas correspondientes de la Vista.
 	 * @return TRUE si se han añadido los datos, FALSE en otro caso.
 	 */
 	private boolean updateMSIR() {
@@ -1147,7 +1147,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * <p>Realizas las acciones oportundas pertenecientes a la vista
 	 * de parámetros SIR</p>
 	 * La vista puede indicar dos acciones:
 	 * - 1. aplicar cambios de los campos.
@@ -1179,7 +1179,7 @@ public class ControladorModulos {
 	/* Acciones ParametrosProyecto */
 	
 	/**
-	 * <p>Description: Añade nuevas zonas hasta cubrir el total indicado.</p> 
+	 * Añade nuevas zonas hasta cubrir el total indicado.
 	 * @param index Indice de la última zona actual.
 	 * @param nNew Número total de zonas que deben haber en el sistema.
 	 */
@@ -1196,7 +1196,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Elimina las zonas extras. </p> 
+	 * Elimina las zonas extras.
 	 * @param index Último número de zona del sistema
 	 * @param nNew Nuevo número de zonas a establecer.
 	 */
@@ -1209,7 +1209,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Crea o elimina zonas del grupo de Zonas según sea necesario.</p>
+	 * <p>Crea o elimina zonas del grupo de Zonas según sea necesario.</p>
 	 * La modificación se realiza sobre el HashMap, no sobre el módulo (lo cual lo realizan
 	 *  las otras funciones de apoyo a este método).
 	 * @param newNG Nuevo número de zonas.
@@ -1229,7 +1229,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Realizas las acciones oportundas pertenecientes a la vista
+	 * <p>Realizas las acciones oportundas pertenecientes a la vista
 	 * de parámetros del modelo</p>
 	 * La vista solo ejerce una opción, aplicar cambios de los campos.
 	 * @param datos Datos contenidos en un mapa con sus etiquetas y valores correspondientes.
@@ -1266,7 +1266,7 @@ public class ControladorModulos {
 	
 	
 	/**
-	 * <p>Description: Importa los datos de un archivo de proyecto generado con alguna herramienta externa.</p>
+	 * <p>Importa los datos de un archivo de proyecto generado con alguna herramienta externa.</p>
 	 * Adquiere por tanto todos los valores de dicho proyecto disponibles, tales como la
 	 * matriz de contactos, R,S,I, tasas, etcetera.
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
@@ -1303,7 +1303,7 @@ public class ControladorModulos {
 	}
 	
 	/**
-	 * <p>Description: Ejecuta el cálculo de demolo SIR</p>
+	 * <p>Ejecuta el cálculo de demolo SIR</p>
 	 * La función no realiza comprobación de los valores iniciales. Dicha comprobación
 	 *  debe ser realizada previamente. 
 	 */

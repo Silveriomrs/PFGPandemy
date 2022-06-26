@@ -68,6 +68,7 @@ public class TablaEditor extends JPanel{
 	//
 	private JButton btnGuardarArchivo,btnGuardarCambios,btnBorrarTabla;
 	private JButton btnAddRow,btnAddCol,btnNuevaTabla,btnBorrarFila,btnBorrarColumna;
+	private JButton btnPrintTable;
 	private JScrollPane scrollPane;
 	private JTable tabla;
 	private CellRenderTableEditor cellRender;
@@ -190,7 +191,7 @@ public class TablaEditor extends JPanel{
 		btnGuardarArchivo = addBotonToolBar("Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoML(),null);
 		addBotonToolBar("Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoML(),null);
 		jtoolBar.addSeparator();
-		addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
+		btnPrintTable = addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -255,6 +256,8 @@ public class TablaEditor extends JPanel{
 		//Colocado fuera del condicional permite que se desactive al primer cambio
 		//en caso de no estar habilitada la opción de edición.
 		btnAddCol.setEnabled(editable);
+		//Botón de imprimir según tenga o no datos para imprimir.
+		btnPrintTable.setEnabled( tieneColumna && tieneFila);
 		if(editable) {
 			//Botones nueva tabla, fila, borrarTabla	
 			btnBorrarTabla.setEnabled(tieneColumna);							//Botón borrar columna => debe tener alguna columna.
@@ -705,7 +708,16 @@ public class TablaEditor extends JPanel{
 				//Mostrar dialogo de confirmación
 				int opt = cm.showMessage("¿Desea eliminar la tabla actual con sus datos?",3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
-				if(opt == JOptionPane.YES_OPTION) {	nuevaTabla(); }
+				if(opt == JOptionPane.YES_OPTION) {	
+					//Obtener atributos previos de la tabla anterior.
+					DCVS temp = dcvs;
+					nuevaTabla();
+					dcvs.setDirectorio(temp.getDirectorio());
+					dcvs.setTipo(temp.getTipo());
+					dcvs.setName(temp.getNombre());
+					dcvs.setDate(temp.getDate());
+					dcvs.setRuta(temp.getRuta());
+				}
 			}
 		}
 	}
