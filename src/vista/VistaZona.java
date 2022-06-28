@@ -137,6 +137,7 @@ public class VistaZona extends JPanel {
 		tf_R = iniciarTextField("Recuperados",posX, posY + gap*6, ancho, alto);
 		tf_P = iniciarTextField("Prevalencia",posX, posY + gap*7, ancho, alto);
 		tf_C100K = iniciarTextField("Nivel",152, posY + gap*8, 114, 19);
+		tf_P.setEditable(false);
 		tf_C100K.setEditable(false);
 		
 		JButton btnAplicar = new JButton("Aplicar Cambios");
@@ -173,7 +174,7 @@ public class VistaZona extends JPanel {
 			tf_S.setText("" + zona.getS());
 			tf_R.setText("" + zona.getR());
 			tf_I.setText("" + zona.getI());
-			tf_P.setText("" + zona.getP());		
+			tf_P.setText("" + zona.getP());
 			tf_C100K.setText("" + zona.getNivel());								//Nivel inicial de contagio.
 		}
 	}	
@@ -282,7 +283,8 @@ public class VistaZona extends JPanel {
 				zona.setS(s);
 				zona.setI(i);
 				zona.setR(r);
-				zona.setP(Double.parseDouble(tf_P.getText()));
+//				zona.setP(Double.parseDouble(tf_P.getText()));
+				zona.setP(i/(s+i+r)); /* Modificación para calcular la prevalencia inicial en vez de tomarla por constructor */
 				zona.setNivel(Integer.parseInt(tf_C100K.getText()));
 				
 			}catch(Exception e) {System.out.println("Valor incorrecto");}

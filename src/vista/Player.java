@@ -36,6 +36,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.border.EtchedBorder;
@@ -77,6 +78,7 @@ public class Player extends JPanel implements ActionListener{
 	private int primera;
 	/** Última columna a leer del histórico. */
 	private int ultima;
+	private HashMap<String,Integer> names;
 	private Mapa mapa;
 	private DCVS historico;
 	private boolean activo;														//Establece si el reproducctor esta activo o pausado.
@@ -260,13 +262,23 @@ public class Player extends JPanel implements ActionListener{
 		cm.getZonas().forEach((k,v)->{
 			v.getGrafica().reset();
 		});
-		
+		//Inicializar mapa con los nombres de las zonas por ID
+		int NG = cm.getNumberZonas();											//Obtención del número de zonas.
+		//Inicializar aquí para forzar la limpieza de datos
+		//En cada nueva reproducción, por si carga nuevos HST.
+		names = new HashMap<String,Integer>();									//Inicializar HashMap
+		for(int i= 1; i<=NG; i++ ) {
+			String name = cm.getZonas().get(i).getName();						//Obtener el nombre.
+			names.put(name,i);													//Guardado del nombre por posición del ID.
+		}
 		//Configuración del rango de fechas.
 		setDates();
 	}
 	
 	/**
-	 * Reproduce los datos almacenados en una línea de datos. 
+	 * Reproduce los datos almacenados en una línea de datos, actualiza la barra
+	 * de progresión, la fecha del calendario, la hora y manda al mapa los datos
+	 *  del slot de tiempo leído para su tratamiento.
 	 * @param pos Número de columna a leer de la entrada de datos.
 	 */
 	private void play(int pos) {
@@ -286,12 +298,13 @@ public class Player extends JPanel implements ActionListener{
 				nivel = getValor(v);											//Realizar conversión.
 				mapa.addZonaNivel(id, serie,pos, nivel);						//Otorgar nivel al mapa/zona
 				this.updateUI();
-			}	
+			}
 		}
 	
 		progressBar.setValue(pos);												//Actualización del la barra de progreso.
 		
-		//En caso de cierre del reproductor, pausar la reproducción y dejarlo listo para reanudar.
+		//En caso de cierre del reproductor, pausar la reproducción
+		//y dejarlo listo para reanudar.
 		if(!frame.isVisible()) {
 			btnPlayPause.setText("Reproducir");									//Estado siguiente: Parado.
 			timer.stop();
@@ -361,8 +374,12 @@ public class Player extends JPanel implements ActionListener{
 	 */
 	private int getID(String s) {
 		int id = -1;
-		String txt = s.split(" ")[1];
-		id = Integer.parseInt(txt.substring(1));
+		//Separar el nombre del operador.
+		int opL = s.split(" ")[0].length();										//Medir la longitud del operador
+		String name = s.substring(opL +1);										//Extraer el operador + un espacio.
+		//Comprobar que dicho nombre está contenido en el mapa de nombres.
+		//y en tal caso obtener ID mediante el nombre. 
+		if(names.containsKey(name)) id = names.get(name);
 		return id;
 	}
 	
@@ -480,16 +497,22 @@ public class Player extends JPanel implements ActionListener{
 	 */
 	private class Temporizador implements ActionListener {
 		@Override
-		public void actionPerformed(ActionEvent e) {  
+		public void actionPerformed(ActionEvent e) {
+			//Comprobar si existe el módulo histórico.
+			boolean isHST = cm.hasModule(TypesFiles.HST);
 			//Si es la última línea -> parar reproducción.
-			if(contador <= ultima) {
+			//Además debe cumplir que el histórico sigue existiendo.
+			if(contador <= ultima && isHST) {
 				play(contador);
 				contador++;
+			}else if (!isHST){
+				//Ocultar el reproductor en caso de no haber un HST.
+				setVisible(isHST);
 			}else {		
 				timer.stop();
 				btnPlayPause.setText("Repetir");
 				activo = !activo;
-				dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
+				dateChooser.getCalendarButton().setEnabled(!activo);			//Activa boton del dateChooser cuando la reproducción no está activa.
 			}
 	    }
 	}

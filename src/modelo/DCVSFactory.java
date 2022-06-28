@@ -112,7 +112,6 @@ public class DCVSFactory {
 		module.addFila(new String[]{Labels.FT,null});
 	}
 	
-	
 	/**
 	 * Genera una tabla de Histórico con la cabecera adecuada
 	 *  y ajustada al time slot definido por el parámetro FT (final time o tiempo

@@ -8,6 +8,9 @@
 */  
 package controlador;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import modelo.DCVS;
@@ -35,7 +38,6 @@ public class MotorSIR {
 	private HashMap<Integer,Zona> zonas;								//Zonas o grupos de población.
 	private DCVS mHST;													//Módulo histórico a obtener.
 	private int FT;
-	@SuppressWarnings("unused")
 	private int IT;
 
 	/**
@@ -50,18 +52,20 @@ public class MotorSIR {
 		if(mDEF != null) {
 			this.PTE = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.PTE));	
 			this.DME = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.DME));
+
 			this.TR = 1/DME;
 			this.IP = Boolean.parseBoolean( (String) mDEF.getDataFromRowLabel(Labels.IP));
 			//En caso de haber Inmunidad permanente, se ignora el parámetro DMI.
 			if(IP) {DMI = 1;}
-			else this.DMI = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.PTE));
+			else this.DMI = Double.parseDouble( (String) mDEF.getDataFromRowLabel(Labels.DMI));
 			this.IT = Integer.parseInt( (String) mDEF.getDataFromRowLabel(Labels.IT));
-		    this.FT = Integer.parseInt( (String) mDEF.getDataFromRowLabel(Labels.IT));
+		    this.FT = Integer.parseInt( (String) mDEF.getDataFromRowLabel(Labels.FT));
 			this.TVS = 1/DMI;
 		}
 		this.zonas = zonas;
 		this.matrizC = matrizC;
 		this.NG = zonas.size();
+		start();
 	}	
 
 	/**
@@ -98,7 +102,8 @@ public class MotorSIR {
 	 *  realiza una lectura inicial de los valores SIR.
 	 */
 	private void setUpHST() {
-		this.mHST = DCVSFactory.newHST(FT +1);
+		this.mHST = DCVSFactory.newHST(FT);
+		generateTimeStamps();
 		//Leer datos iniciales.
 		readXs(Labels.S);
 		readXs(Labels.I);
@@ -114,18 +119,52 @@ public class MotorSIR {
 	}
 	
 	/**
+	 * Genera tiempos en formato fecha, añadiendolos a la cabecera del histórico.
+	 * Esta función usa la fecha actual.
+	 */
+ 	private void generateTimeStamps() {
+		int contador = IT;
+		//Establecer el día de hoy como día inicial.
+		Date hoy = new Date();
+		//crear array con la secuencia de fechas en incrementos de 1 día.
+		while(contador < FT) {
+			//Añadimos el tiempo en el formato deseado.
+			String date =  new SimpleDateFormat("dd/MM/yyyy hh:mm").format(hoy);
+			//Renombrar la columna con la fecha.
+			mHST.setColumnName(contador + 1, date);
+			//Incrementar un día.
+			hoy = addDay(hoy);
+			//Siguiente línea.
+			contador++;
+		}
+	}
+	
+	/**
+	 * <p>Añade un día a la fecha en curso.</p>
+	 * Usada para dar un formato de fecha a las unidades tiempo. 
+	 * @param dt Fecha a la que agregar un día.
+	 * @return Fecha actualizada.
+	 */
+	private Date addDay(Date dt) {
+		 Calendar c = Calendar.getInstance();
+	        c.setTime(dt);
+	        c.add(Calendar.DATE, 1);
+	        return c.getTime();
+	}
+	
+	/**
 	 * Inicia la realización de los cálculos para cada uno de los parámetros del modelo.
 	 */
 	public void start() {
 		//Introducir datos de partida en la tabla.
 		setUpHST();
-		
-		for(int time = 1; time <= FT; time++) {									//Bucle para todas las líneas de tiempo.
+		//Bucle para todas las líneas de tiempo.
+		for(int time = 1; time <= FT; time++) {
 			//Cálculo de las prevalencias. Requiere cálculo antes que el resto.
 			//Cálculo P
 			calcP(time);
-			
-			for(int j = 1; j <= NG; j++) {										//Bucle para cada una de las zonas presentes.
+			//Bucle para cada una de las zonas presentes.
+			for(int j = 1; j <= NG; j++) {
 				Zona z = zonas.get(j);
 				String name = z.getName();	
 				
@@ -143,8 +182,8 @@ public class MotorSIR {
 				
 				//Cálculo de TC particular.
 				double TC = getTC(z,time);
-				int row = mHST.getFilaItem(Labels.TC + " " + name);
-				mHST.setValueAt("" + TC, row, time);
+				index = mHST.getFilaItem(Labels.TC + " " + name);
+				mHST.setValueAt("" + TC, index, time);
 				
 				//Cálculo TContagio
 				double TContagio = TC*PTE;
@@ -175,23 +214,19 @@ public class MotorSIR {
 				//valor Sj.
 				if(time < FT) {
 					index = mHST.getFilaItem(Labels.S + " " + name);
-					vs = vs + CVS - CI;
+					vs += CVS - CI;
 					mHST.setValueAt("" + vs, index, time + 1);
 					//valor Ij.
 					index = mHST.getFilaItem(Labels.I + " " + name);
-					vi = vi + CI - CC;
+					vi += CI - CC;
 					mHST.setValueAt("" + vi, index, time + 1);
 					//valor Rj.
 					index = mHST.getFilaItem(Labels.R + " " + name);
-					vr = vr +CC - CVS;
+					vr += CC - CVS;
 					mHST.setValueAt("" + vr, index, time + 1);
 				}
 			}
 		}
-		
-		System.out.println("\nConfigurado para obtener Histórico de 10 posiciones\n=======================================\n");
-		System.out.println( mHST.toString() );
-		System.out.println( "\n===============================================\n");
 	}
 	
 	/**
@@ -282,63 +317,4 @@ public class MotorSIR {
 		return z;
 	}
 
-	/* Funciones a modo de pruebas.*/
-	
-	
-	/**
-	 * Imprimir los datos iniciales de las pruebas. 
-	 */
-	public void imprimirDatos() {
-		//Ver Matriz de contactos.
-		System.out.println("Matriz de contactos:\n" + matrizC.toString());
-		//ver grupos de población (zonas)
-		System.out.println("\nGrupos (" + NG + "):");
-		for(int i = 1; i<=NG; i++) System.out.println(zonas.get(i).toString());
-		//Datos de pruebas:
-		//Hay que dar valores a las propiedades de la enfermedad:
-		PTE = 0.05;
-		DME = 8.0;
-		DMI = 50;
-		IP = false;
-		TR = 1/DME;
-		TVS = 1/DMI;
-		IT = 0;
-	    FT = 10;
-		//Imprimir parámetros de la enfermedad:
-		System.out.println("\nParámetros de la enfermedad:");
-		System.out.println("PTE: " + PTE);
-		System.out.println("DME: " + DME);
-		System.out.println("IP: " + IP);
-		System.out.println("DMI: " + DMI);
-	}	
-
-	/**
-	 * Función para las pruebas de implementación e integración.
-	 * Inicialmente las pruebas estarán acotadas a 4 grupos de población.
-	 * @param args ninguno.
-	 */
-	public static void main(String[] args) {
-		DCVS matrizC = new DCVS();
-		//Creación matriz de contactos.
-		matrizC.addCabecera(new String[] {"Grupos","G1","G2","G3","G4"});
-		matrizC.addFila(new String[] {"G1","4","1","1","1"});
-		matrizC.addFila(new String[] {"G2","1","4","2","2"});
-		matrizC.addFila(new String[] {"G3","1","2","4","3"});
-		matrizC.addFila(new String[] {"G4","1","2","3","4"});
-		
-		HashMap<Integer,Zona> zonas = new HashMap<Integer,Zona>();
-		//Creación de 4 zonas con las características de la prueba.
-		zonas.put(1,new Zona(1,"G1" , 1000,0 ,999,1,0,0,0, null));
-		zonas.put(2,new Zona(2,"G2" , 500,0 ,500,0,0,0,0, null));
-		zonas.put(3,new Zona(3,"G3" , 200,0 ,200,0,0,0,0, null));
-		zonas.put(4,new Zona(4,"G4" , 100,0 ,100,0,0,0,0, null));
-		
-		//PTE,DME,IP,DMI
-		MotorSIR msir = new MotorSIR(null, zonas, matrizC);
-
-		msir.imprimirDatos();
-		msir.start();
-		System.exit(0);
-	}
-	
 }

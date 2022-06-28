@@ -182,8 +182,8 @@ public class Principal extends JFrame {
 		jmitems.get("Matriz de Contactos").setEnabled(hasZonas);
 		//Desactivar vista de Parámetros de la enfermedad.
 		jmitems.get("Parámetros Enfermedad").setEnabled(cm.hasModule(TypesFiles.DEF));
-//		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
-		jmitems.get("Reproductor").setEnabled(hasZonas);
+		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
+//		jmitems.get("Reproductor").setEnabled(hasZonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
 		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);

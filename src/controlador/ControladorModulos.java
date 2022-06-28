@@ -217,6 +217,10 @@ public class ControladorModulos {
 		paleta.refresh();
 		vistaSIR.refresh();
 		pgrupos.refresh();
+		//Comprobar si el reproductor debe estar cerrado y ocultarlo en tal caso.
+		if(!isPlayable() && player.isVisible()) {
+			player.setVisible(isPlayable());
+		}
 	}
 	
 	/**
@@ -924,6 +928,8 @@ public class ControladorModulos {
 			boolean as = op.equals("Guardar como");
 			ok = saveModule(ext,as);
 		}
+		
+		refresh();
 		return ok;
 	} 
 	
@@ -1308,7 +1314,7 @@ public class ControladorModulos {
 	 *  debe ser realizada previamente. 
 	 */
 	private void runSIR() {	
-		MotorSIR motor = new MotorSIR(modulos.get(TypesFiles.DEF), zonas, modulos.get(TypesFiles.HST));
+		MotorSIR motor = new MotorSIR(modulos.get(TypesFiles.DEF), zonas, modulos.get(TypesFiles.REL));
 		motor.start();
 		//Establecer el historico de niveles.
 		establecerDatos(motor.getHST());

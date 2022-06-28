@@ -108,28 +108,16 @@ public abstract class ParserModelo {
 		readXs(Labels.CC);
 		readXs(Labels.CVS);
 		if(getPosOp(Labels.CI) > -1) {readXs(Labels.CI);}						//Añadir la serie localizada a la zona indicada	
-		else {
-			calcCI();
-			System.out.println("Este archivo no contiene etiqueta: " + Labels.CI +
-					" -> Calculando valores.");
-		}														//En otro caso calcular las prevalencias.
+		else {calcCI();	}														//En otro caso calcular las prevalencias.
 		
 		//Leer o calcular Prevalencia.
 		//Debe realizarse después de haber obtenido R,S,I e CI.
 		if(getPosOp(Labels.P) > -1) {readXs(Labels.P);}							//Añadir la serie localizada a la zona indicada	
-		else {
-			calcPs();
-			System.out.println("Este archivo no contiene etiqueta: " + Labels.P +
-					" -> Calculando valores.");
-		}														//En otro caso calcular las prevalencias.
+		else {calcPs();}														//En otro caso calcular las prevalencias.
 		
 		//Leer o calcular el nivel de contagio C100K
 		if(getPosOp(Labels.C100K) > -1) {readXs(Labels.C100K);}					//Añadir la serie localizada a la zona indicada	
-		else {
-			System.out.println("Este archivo no contiene etiqueta: " + Labels.C100K +
-					" -> Calculando valores.");
-			calcC100K();
-		}																		//En otro caso calcularos.
+		else {calcC100K();}														//En otro caso calcularos.
 		
 		//Leer casos de contactos de A con B y tasas de A con B
 		readXenZ(Labels.TCS);
@@ -248,7 +236,8 @@ public abstract class ParserModelo {
 	/* Funciones para la insercción de fechas en vez de unidades de tiempo*/
 	
 	/**
-	 * <p>Description: Genera tiempos en formato fecha.</p>
+	 * Genera tiempos en formato fecha, añadiendolos a la cabecera del histórico.
+	 * Esta función usa la fecha actual.
 	 */
  	private void generateTimeStamps() {
 		int contador = IT;
@@ -268,7 +257,7 @@ public abstract class ParserModelo {
 	}
 	
 	/**
-	 * <p>Description: Añade un día a la fecha en curso.</p>
+	 * <p>Añade un día a la fecha en curso.</p>
 	 * Usada para dar un formato de fecha a las unidades tiempo. 
 	 * @param dt Fecha a la que agregar un día.
 	 * @return Fecha actualizada.

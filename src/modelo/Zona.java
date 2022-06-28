@@ -69,7 +69,9 @@ public class Zona {
 		this.S0 = s;
 		this.I0 = i;
 		this.R0 = r;
-		this.P = p;
+		if((s+i+r) != 0) {
+			this.P = i/(s+i+r);
+		}else this.P = 0.0;
 		this.C100K = C100K;
 		//
 		this.poligono = poligono;
@@ -180,7 +182,7 @@ public class Zona {
 	/**
 	 * @return La prevalencia inicial.
 	 */
-	public double getP() {	return P;}
+	public double getP() {return P;}
 
 	/**
 	 * @param p Establece la prevalencia inicial.

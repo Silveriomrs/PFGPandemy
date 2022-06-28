@@ -394,10 +394,7 @@ public class VistaSIR extends JPanel{
 			String op = ((AbstractButton) evt.getSource()).getActionCommand();
 			OperationsType opt = OperationsType.UPDATE;
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
-
-
 			//Avisa al controlador de cambios.
-			System.out.println("VistaSir > BotonL > OP: " + op);
 			if(op.equals("Aplicar")){
 				mapaFields.forEach((label,field) ->{
 					String valor = getLabel(label);
