@@ -104,7 +104,7 @@ public class VistaZona extends JPanel {
 		addLabel("Superficie:",null,posXL,4*gap,81,15);
 		//
 		addLabel("Susceptibles:",null,posXL,5*gap,100,15);
-		addLabel("Incidentes:",null,posXL,6*gap,100,15);
+		addLabel("Infectados:",null,posXL,6*gap,100,15);
 		addLabel("Recuperados:",null,posXL,7*gap,100,15);
 		addLabel("Prevalencia:",null,posXL,8*gap,100,15);
 		addLabel("Nivel de incidencia:",null,posXL,9*gap,175,15);
@@ -129,14 +129,14 @@ public class VistaZona extends JPanel {
 		int alto = 19;
 		int ancho = 150;
 		tf_ID = iniciarTextField("ID",posX, posY, 114, alto);
-		tf_NAME = iniciarTextField("Nombre",posX, posY + gap*1, ancho, alto);
-		tf_PEOPLE = iniciarTextField("Población",posX, posY + gap*2, ancho, alto);
-		tf_AREA = iniciarTextField("Superficie",posX, posY + gap*3, ancho, alto);
-		tf_S = iniciarTextField("Susceptibles",posX, posY + gap*4, ancho, alto);
-		tf_I = iniciarTextField("Infectados",posX, posY + gap*5, ancho, alto);
-		tf_R = iniciarTextField("Recuperados",posX, posY + gap*6, ancho, alto);
-		tf_P = iniciarTextField("Prevalencia",posX, posY + gap*7, ancho, alto);
-		tf_C100K = iniciarTextField("Nivel",152, posY + gap*8, 114, 19);
+		tf_NAME = iniciarTextField("Nombre del grupo de población",posX, posY + gap*1, ancho, alto);
+		tf_PEOPLE = iniciarTextField("Población inicial",posX, posY + gap*2, ancho, alto);
+		tf_AREA = iniciarTextField("Superficie en kilomentros cuadrados",posX, posY + gap*3, ancho, alto);
+		tf_S = iniciarTextField("Número de personas susceptibles inicial",posX, posY + gap*4, ancho, alto);
+		tf_I = iniciarTextField("Número de personas infectadas incial",posX, posY + gap*5, ancho, alto);
+		tf_R = iniciarTextField("Número de personas recuperadas incialmente",posX, posY + gap*6, ancho, alto);
+		tf_P = iniciarTextField("Prevalencia obtenida",posX, posY + gap*7, ancho, alto);
+		tf_C100K = iniciarTextField("Nivel de incidencia",152, posY + gap*8, 114, 19);
 		tf_P.setEditable(false);
 		tf_C100K.setEditable(false);
 		
@@ -283,8 +283,7 @@ public class VistaZona extends JPanel {
 				zona.setS(s);
 				zona.setI(i);
 				zona.setR(r);
-//				zona.setP(Double.parseDouble(tf_P.getText()));
-				zona.setP(i/(s+i+r)); /* Modificación para calcular la prevalencia inicial en vez de tomarla por constructor */
+				zona.setP(i/(s+i+r));
 				zona.setNivel(Integer.parseInt(tf_C100K.getText()));
 				
 			}catch(Exception e) {System.out.println("Valor incorrecto");}

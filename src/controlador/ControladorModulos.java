@@ -710,6 +710,9 @@ public class ControladorModulos {
 			case "Formato Tablas":
 				cio.openPDF("mTablas");
 				break;
+			case "Manual de Usuario":
+				cio.openPDF("mUsuario");
+				break;
 			case "Acerca de...":
 				about.toggleVisible();
 				break;
@@ -794,9 +797,16 @@ public class ControladorModulos {
 			pgrupos.reset();
 			break;
 		case("Guardar"):
+			//Aplicar cambios a la tabla después de pedir confirmación.
+			int option = showMessage("Se escribirán los datos en disco\n¿continuar?",3);	
+			if(option == JOptionPane.YES_OPTION) {
+				//Añadir o eliminar polígono de/a la tabla.
+				zonas.forEach((k,v)->{
+					addPolygonToMap(k);
+				});
+			}
 			//Guardar los cambios efectuados en disco.
 			done = saveModule(TypesFiles.MAP,modulos.get(TypesFiles.MAP).getNombre() == null);
-			System.out.println("doActionPizarra > guardado en disco? " + done);
 			break;
 		}
 		return done;
@@ -999,6 +1009,39 @@ public class ControladorModulos {
 		//Cambiar el nombre de la columnna.
 		getModule(TypesFiles.REL).setColumnName(ID, name);
 	}
+
+	/**
+	 * Añade un polígono correspondiente a un grupo de población a la tabla MAP.
+	 * <p>Esta función no elimina las definiciones de punto sobrante, aunque estas
+	 *  estén sin un valor asignado en tabla.</p>
+	 * @param ID Identificador del grupo de población.
+	 */
+	private void addPolygonToMap(int ID) {
+		//Obtener zona del grupo con su ID y separar datos usando el separador tipo ','
+		String[] valores = zonas.get(ID).toString().split(",");
+		int sizeV = valores.length;
+		//Recalibrar número de columnas si es necesario (necesario por longitud del poligono)
+		//Añadiendo tantas nuevas columnas de puntos como sea necesario.
+		resizeDCVS(TypesFiles.MAP, sizeV, "Px;y");
+		//Localizar la posición en el módulo DCVS
+		int index = modulos.get(TypesFiles.MAP).getFilaItem("" + ID);
+		//Limpiar los datos anteriores que hubieran en la fila.
+		if(index > -1) modulos.get(TypesFiles.MAP).clearRow(index);
+		else {
+			//Sino existe tal entrada hay que crearla.
+			//No debería ser necesario crearla. Debería estar ya creada aunque
+			//fuera la primera vez. 
+			modulos.get(TypesFiles.MAP).addFila(null);
+			index = modulos.get(TypesFiles.MAP).getRowCount();
+			//Si el mensaje se dispara, es que se ha dado el caso de incoherencia de datos.
+			System.out.println("CM > doActionVistaZona > Atención! incoherencia de datos.");
+		}
+		
+		//Escribir datos.
+		for(int i = 0; i<sizeV; i++) {
+			modulos.get(TypesFiles.MAP).setValueAt(valores[i], index, i);
+		}
+	}
 	
 	/**
 	 * <p>Realizas las acciones oportundas pertenecientes a la vista
@@ -1014,30 +1057,8 @@ public class ControladorModulos {
 	public boolean doActionVistaZona(int ID) {
 		boolean done = true;
 		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		//Obtener zona del grupo con su ID y separar datos usando el separador tipo ','
-		String[] valores = zonas.get(ID).toString().split(",");
-		int sizeV = valores.length;
-		//Recalibrar número de columnas si es necesario (necesario por longitud del poligono)
-		done = resizeDCVS(TypesFiles.MAP, sizeV, "Px;y");
-		//Localizar la posición en el módulo DCVS
-		int index = modulos.get(TypesFiles.MAP).getFilaItem("" + ID);
-		//Limpiar los datos anteriores que hubieran en la fila.
-		if(index > -1) modulos.get(TypesFiles.MAP).clearRow(index);		
-		else {
-			//Sino existe tal entrada hay que crearla.
-			//No debería ser necesario crearla. Debería estar ya creada aunque
-			//fuera la primera vez. 
-			modulos.get(TypesFiles.MAP).addFila(null);
-			index = modulos.get(TypesFiles.MAP).getRowCount();
-			//Si el mensaje se dispara, es que se ha dado el caso de incoherencia de datos.
-			System.out.println("CM > doActionVistaZona > Atención! incoherencia de datos.");
-		}
-		
-		//Escribir datos.
-		for(int i = 0; i<sizeV; i++) {
-			modulos.get(TypesFiles.MAP).setValueAt(valores[i], index, i);
-		}
-		
+		//Añadir o eliminar polígono de/a la tabla.
+		addPolygonToMap(ID);
 		//Ajustar nombre de la zona con el de la relaciones por si se han realizado cambios.
 		setNameMAPinREL(ID);
 		

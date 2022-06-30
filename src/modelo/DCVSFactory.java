@@ -133,8 +133,7 @@ public class DCVSFactory {
 		module.addCabecera(cabecera);
 		return module;
 	}
-	
-	
+		
 	/**
 	 * Establece las propiedades para configurar el módulo como un
 	 *  módulo de definición de relaciones, es decir, matriz de contactos. 

@@ -181,20 +181,41 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Descripción: Comprobación de la extensión sea de los tipos aceptados
-	 * y además para los tipos de archivos imagen, comprobar los tres formatos
-	 * admitidos.</p> 
+	 * Extra de una cadena de texto la extensión del fichero (si tiene). No 
+	 *  acepta valores nulos de entrada.
+	 * @param ruta Cadena de texto con la ruta absoluta o relativa conteniendo el nombre del fichero y su extensión.
+	 * @return Extensión del fichero, Null en otro caso.
+	 */
+	private static String getExt(String ruta) {
+		String ext = null;
+		//Dividir cadena con separador "." por extensión.
+		String[] cadena = ruta.split("\\.");
+		//coger última parte en caso de que pueda tener extensión.
+		if(cadena.length > 0) {ext = cadena[cadena.length -1];}
+		return ext;
+	}
+	
+	/**
+	 * <p>Comprobación de la extensión sea de los tipos aceptados
+	 * y además para los tipos de archivos imagen, comprobar los formatos
+	 * admitidos.</p>
+	 * Esta función no sólo comprueba que la ruta contiene una extensión, además
+	 *  la compara con otra extensión y comprueba si coinciden.
 	 * @param ruta Nombre del archivo con su ruta completa.
 	 * @param ext Extensión con la que comparar.
 	 * @return True si las extensiones coinciden, False en otro caso.
 	 */
 	private static boolean checkExt(String ruta, String ext) {
 		boolean ok = true;
-		String ext2 = ruta.substring(ruta.length() -3).toLowerCase();
+		String ext2 = getExt(ruta);
+		if(ext2 != null) {
+			ok = TypesFiles.hasType(ext2);
+		} else {ok = false;}
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
-		if(ext.equals(TypesFiles.IMG) && !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
+		if(ext.equals(TypesFiles.IMG) && (ok != false) && !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
 			ok = false;
 		}
+		
 		return ok;
 	}
 	

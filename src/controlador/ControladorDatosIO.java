@@ -20,6 +20,8 @@ import modelo.TypesFiles;
 public class ControladorDatosIO {
 	/** io Instancia de entrada y salida de datos hacia un dispositivo de almacenamiento*/  
 	private IO io;
+	/** separador Contiene el separador usado por el sistema operativo anfitrión */  
+	public final String separador = System.getProperty("file.separator");
 
 	/**
 	 * Constructor principal de la clase.
@@ -70,15 +72,11 @@ public class ControladorDatosIO {
 	 * @param man Tipo de manual para abrir.
 	 */
 	public void openPDF(String man) {
-		//Composición de la ruta al manual.
-		String pathPDF = "src/modelo/Manuales/";
-		pathPDF += man + "." + TypesFiles.PDF;
+		//Composición de la ruta al manual con el separador por defecto del OS anfitrión.
+		String pathPDF = "Manuales" + separador + man + "." + TypesFiles.PDF;
 		//Apertura del PDF desde la propia aplicación del sistema.
 		try {
-			String r = IO.getFile(1, pathPDF, TypesFiles.PDF).getAbsolutePath();
-			String r2 = IO.getFile(1, pathPDF, TypesFiles.PDF).getPath();
-			/* El File se encuentra, pero la aplicación del OS no puede abrirlo dentro del JAR */
-			System.out.println("r = " + r + "\nr2 = " + r2);
+			String r2 = IO.getFile(1, pathPDF, TypesFiles.PDF).getPath();			/* FUNCIONA */
 			pathPDF = r2;
 			Desktop.getDesktop().open(IO.getFile(1, pathPDF, TypesFiles.PDF));
 		}catch (Exception ex) {

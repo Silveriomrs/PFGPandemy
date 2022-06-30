@@ -138,9 +138,9 @@ public class Principal extends JFrame {
 		
 		//Menu Ayuda
 		JMenu mnAyuda = new JMenu("Ayuda");
-		addJMenuItem(mnAyuda, "Formato Tablas","/vista/imagenes/LogoUNED.jpg" );
-		addJMenuItem(mnAyuda, "Manual de Usuario","/vista/imagenes/LogoUNED.jpg" );
-		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
+		addJMenuItem(mnAyuda, "Formato Tablas", "/vista/imagenes/Iconos/archivo_64px.png");
+		addJMenuItem(mnAyuda, "Manual de Usuario","/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg");
 		
 		//Añadir sub-menus a la barra de menus.
 		mBar.add(mnArchivo);
@@ -183,7 +183,6 @@ public class Principal extends JFrame {
 		//Desactivar vista de Parámetros de la enfermedad.
 		jmitems.get("Parámetros Enfermedad").setEnabled(cm.hasModule(TypesFiles.DEF));
 		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
-//		jmitems.get("Reproductor").setEnabled(hasZonas);
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
 		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);
