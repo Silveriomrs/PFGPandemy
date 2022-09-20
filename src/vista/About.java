@@ -16,6 +16,8 @@ import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 
 import controlador.IO;
+import modelo.Labels_GUI;
+import modelo.OperationsType;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -87,7 +89,7 @@ public class About extends JPanel {
 		etiqueta.setIcon(IO.getIcon(rutaImagen, etiqueta.getWidth(), etiqueta.getHeight()));
 		panel_animado.add(etiqueta);
 		
-		btnCerrar = new JButton("Cerrar");
+		btnCerrar = new JButton(OperationsType.CLOSE.toString());
 		btnCerrar.setBackground(UIManager.getColor("Button.background"));
 		btnCerrar.setBounds(191, 515, 79, 25);
 		add(btnCerrar);
@@ -100,35 +102,35 @@ public class About extends JPanel {
 		add(panel_datos);
 		panel_datos.setLayout(null);
 		
-		String texto = "<html><p style=\"text-align:center\">Simulación de Enfermedades Transmisibles";
-		texto += "<br>en";
-		texto += "<br>Varios Grupos de Población</p></html>";
+		String texto = Labels_GUI.TXT_1_ABOUT;
+		texto += Labels_GUI.TXT_2_ABOUT;
+		texto += Labels_GUI.TXT_3_ABOUT;
 		JLabel lblAplicacinDesarrolladaComo = new JLabel(texto);
 		lblAplicacinDesarrolladaComo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAplicacinDesarrolladaComo.setFont(new Font("DejaVu Sans Mono", Font.ITALIC, 13));
 		lblAplicacinDesarrolladaComo.setBounds(23, 12, 412, 51);
 		panel_datos.add(lblAplicacinDesarrolladaComo);
 		
-		JLabel lblDirectorDrFernando = new JLabel("Dr. Fernando Morilla García");
+		JLabel lblDirectorDrFernando = new JLabel(Labels_GUI.NAME_DIRECTOR_INITIAL);
 		lblDirectorDrFernando.setFont(new Font("Comic Sans MS", Font.PLAIN, 13));
 		lblDirectorDrFernando.setBounds(111, 75, 204, 15);
 		panel_datos.add(lblDirectorDrFernando);
 		
-		JLabel lblNewLabel = new JLabel("Silverio M.R.S.");
+		JLabel lblNewLabel = new JLabel(Labels_GUI.NAME_SILVERIO);
 		lblNewLabel.setFont(new Font("Comic Sans MS", Font.PLAIN, 13));
 		lblNewLabel.setBounds(111, 102, 108, 15);
 		panel_datos.add(lblNewLabel);
 		
-		JLabel lblDireccin = new JLabel("Dirección:");
+		JLabel lblDireccin = new JLabel(Labels_GUI.TXT_5_ABOUT);
 		lblDireccin.setBounds(29, 76, 70, 15);
 		panel_datos.add(lblDireccin);
 		
-		JLabel lblAutor = new JLabel("Autor:");
+		JLabel lblAutor = new JLabel(Labels_GUI.L_AUTHOR);
 		lblAutor.setBounds(29, 103, 70, 15);
 		panel_datos.add(lblAutor);
 		btnCerrar.addMouseListener(new BotonListener());
 	
-		frame.setTitle("Acerca de esta aplicación");
+		frame.setTitle(Labels_GUI.TXT_6_ABOUT);
 		frame.setSize(475,583);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.getContentPane().add(this);

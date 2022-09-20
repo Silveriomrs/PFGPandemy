@@ -26,6 +26,7 @@ import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.DCVS;
 import modelo.Labels;
+import modelo.Labels_GUI;
 import modelo.OperationsType;
 import modelo.TypesFiles;
 
@@ -87,31 +88,31 @@ public class VistaSIR extends JPanel{
 	 */
 	private void configurar() {
 		//Botón aplicar.
-		btnAplicar = new JButton("Aplicar");
+		btnAplicar = new JButton(OperationsType.APPLY.toString());
 		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
-		btnAplicar.setToolTipText("Aplica los cambios efectuados.");
+		btnAplicar.setToolTipText(Labels_GUI.TT_APPLY_CHANGES);
 		btnAplicar.setBounds(334, 252, 150, 87);
-		btnAplicar.setActionCommand("Aplicar");
+		btnAplicar.setActionCommand(OperationsType.APPLY.toString());
 		panelCentral.add(btnAplicar);
 		//Botón ejecutar simulación
-		btnExecute = new JButton("Ejecutar simulación");
+		btnExecute = new JButton(Labels_GUI.BTN_RUN_SIMULATION);
 		btnExecute.setBounds(44, 302, 207, 37);
 		btnExecute.setVisible(true);
 		btnExecute.setEnabled(false);
-		btnExecute.setActionCommand("Ejecutar");
-		btnExecute.setToolTipText("Ejecuta el cálculo del modelo.");
+		btnExecute.setActionCommand(OperationsType.EXECUTE.toString());
+		btnExecute.setToolTipText(Labels_GUI.TT_RUN_SIMULATION);
 		btnExecute.addMouseListener(new BotonL());
 		panelCentral.add(btnExecute);
 
 		//Configuración básica del panelCentral superior
-		setToolTipText("Visulación de los parámetros particulares de la enfermedad.");
+		setToolTipText(Labels_GUI.TT_PANEL_SIR);
 		panelCentral.setBounds(225, 200, 550, 400);								//Indicar donde colocar el panel central respecto al panel del que cuelga.
 		this.setBounds(220, 195, 560, 410);
-		setName("Vista parámetros SIR");
+		setName(Labels_GUI.NAME_PANEL_SIR);
 		setAutoscrolls(true);
 
-		panelCentral.setToolTipText("Parámetros SIR");
+		panelCentral.setToolTipText(Labels_GUI.NAME_PANEL_SIR);
 		panelCentral.setLayout(null);
 		add(panelCentral, BorderLayout.CENTER);
 
@@ -293,14 +294,14 @@ public class VistaSIR extends JPanel{
 		JLabel jl = iniciarLabels(null,"/vista/imagenes/Iconos/inmunidad_64px.png");
 		int posY = lineaBase + 30*contador;
 		jl.setBounds(30,posY, 25, hi);
-		chckbxIP = new JCheckBox("Inmunidad Permanente");
+		chckbxIP = new JCheckBox(Labels.getWord(Labels.IP));
 		chckbxIP.setBorder(null);
 		chckbxIP.setOpaque(false);
 		chckbxIP.setHorizontalAlignment(SwingConstants.LEFT);
 		chckbxIP.setBounds(55, posY, 196, 23);
 		chckbxIP.setHorizontalTextPosition(SwingConstants.LEFT);
 		chckbxIP.addMouseListener(new BotonL());
-		chckbxIP.setActionCommand("IP");
+		chckbxIP.setActionCommand(Labels.IP);
 		panelCentral.add(chckbxIP);
 	}
 
@@ -395,12 +396,12 @@ public class VistaSIR extends JPanel{
 			OperationsType opt = OperationsType.UPDATE;
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
 			//Avisa al controlador de cambios.
-			if(op.equals("Aplicar")){
+			if(op.equals(OperationsType.APPLY.toString())){
 				mapaFields.forEach((label,field) ->{
 					String valor = getLabel(label);
 					if(valor != null && !valor.equals("") && !checkValue(label)) {
 						setLabel(label,null);
-						cm.showMessage("El valor del campo " + Labels.getWord(label) + "  es incorrecto: " + valor, 0);
+						cm.showMessage(Labels_GUI.VALUE_FIELD + Labels.getWord(label) + Labels_GUI.VALUE_WRONG + valor, 0);
 					}
 				});
 			}else if(op.equals(Labels.IP)) {IP = chckbxIP.isSelected();}

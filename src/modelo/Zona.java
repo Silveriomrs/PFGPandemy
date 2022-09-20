@@ -76,10 +76,10 @@ public class Zona {
 		//
 		this.poligono = poligono;
 		//
-		this.chart = new GraficasChart("Tiempo (días)",
-				"Nivel",
-				"Zona: " + name,
-				"Evolución pandemica." + " ID: " + ID);
+		this.chart = new GraficasChart(Labels_GUI.L_Y.toString(),
+				Labels_GUI.L_X.toString(),
+				Labels_GUI.L_TITLE.toString() + name,
+				Labels_GUI.L_TITLE_FRAME + " " + Labels.ID + ": " + ID);
 	}
 
 	/**

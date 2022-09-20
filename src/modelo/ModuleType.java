@@ -21,23 +21,23 @@ package modelo;
  */
 public enum ModuleType {
 	/** Archivos generales formato CSV*/ 
-	CSV("General"),
+	CSV(Labels_GUI.CSV_2),
 	/** Archivo de proyecto que contiene el módelo PRJ*/  
-	PRJ("Modelo"),
+	PRJ(Labels_GUI.MDL),
 	/** Definición de los parámetros de la enfermedad DEF*/  
-	DEF("Definición"),
+	DEF(Labels_GUI.DEF_2),
 	/** Archivo historico con la salida generada HST*/ 
-	HST("Histórico"),
+	HST(Labels_GUI.HST),
 	/** Archivo configuración de la paleta de colores PAL*/ 
-	PAL("Paleta"),
+	PAL(Labels_GUI.PAL),
 	/** Archivo definición gráfica de las zonas MAP*/ 
-	MAP("Mapas"),
+	MAP(Labels_GUI.MAP),
 	/** Definición Relaciones entre zonas */
-	REL("Relaciones"),
+	REL(Labels_GUI.REL),
 	/** Definición grupos (zonas) de estudio */
-	GRP("Grupos"),
+	GRP(Labels_GUI.GRP_2),
 	/** Reproductor de histórico PLAYER*/  
-	PLAYER("Player");
+	PLAYER(Labels_GUI.PLAYER);
 
     private final String display;
     private ModuleType(String s) { display = s; }

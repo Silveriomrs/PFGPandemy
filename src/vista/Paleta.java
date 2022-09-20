@@ -14,6 +14,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import controlador.ControladorModulos;
+import modelo.Labels_GUI;
 import modelo.TypesFiles;
 
 import javax.swing.JLabel;
@@ -63,7 +64,7 @@ public class Paleta extends JPanel{
 		
 		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
-		TitledBorder tb = BorderFactory.createTitledBorder("Paleta");
+		TitledBorder tb = BorderFactory.createTitledBorder(Labels_GUI.W_PAL_TITLE);
 		this.setBorder(tb);
 		this.setLayout(null);
 		
@@ -82,7 +83,7 @@ public class Paleta extends JPanel{
 		frame = new JFrame();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		frame.getContentPane().add(this);
-		frame.setTitle("Paleta");												//Establecimiento del título.
+		frame.setTitle(Labels_GUI.W_PAL_TITLE);												//Establecimiento del título.
 		frame.setSize(w,h);														//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
@@ -232,7 +233,7 @@ public class Paleta extends JPanel{
 				//Obtención de su posición
 				String level = boton.getName();
 				//Obtención de un color desde el selector.
-				Color color = JColorChooser.showDialog(null, "Seleccione nuevo color", null);
+				Color color = JColorChooser.showDialog(null,Labels_GUI.SEL_COLOR, null);
 				//Establece color si no es nulo.
 				if(color != null) {
 					boton.setBackground(color);

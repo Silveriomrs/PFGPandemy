@@ -20,7 +20,7 @@ import java.util.HashMap;
  */
 public class Labels {
 
-	/* Etiquetas parámetros de la simulación */
+	/* Etiquetas parámetros del modelo */
 	/** CC Casos de curación*/  
 	public final static String CC = "CC";
 	/** CVS Casos de vuelta a la suceptibilidad*/  
@@ -30,7 +30,7 @@ public class Labels {
 	//Básicas
 	/** S Susceptibles*/  
 	public final static String S ="S";
-	/** I Incidentes*/  
+	/** I Infectados o sintomáticos*/  
 	public final static String I ="I";
 	/** R Recuperados*/  
 	public final static String R ="R";	
@@ -90,13 +90,14 @@ public class Labels {
 	/** DATE1 Fecha de modificación del proyecto*/  
 	public final static String DATE1 = "DATE1";
 	/* Etiquetas campos de los grupos de población */
-
 	/** ID Identificador de un grupo de población.*/  
 	public final static String ID = "ID";
 	/** PEOPLE Número de habitantes de una zona.*/  
 	public final static String PEOPLE = "PEOPLE";
 	/** AREA Superficie de una zona.*/  
 	public final static String AREA = "AREA";
+	/** Nivel en Paleta de colores*/
+	public final static String LEVEL = "L";
 	
 	private static HashMap<String,String> dic;
 //	private HashMap<String,Integer> nparametros;
@@ -117,12 +118,12 @@ public class Labels {
 	private static void addLabels(){
 		//Casos de.
 		dic.put(CC, "Casos de curación");
-		dic.put(CVS,"Casos de vuelta a la suceptibilidad");
+		dic.put(CVS, "Casos de vuelta a la suceptibilidad");
 		dic.put(CI, "Casos incidentes");
 		dic.put(C100K, "Nivel de incidencia");
 		//Básicas
 		dic.put(S, "Susceptibles");
-		dic.put(I, "Incidencias");
+		dic.put(I, "Infectados");
 		dic.put(R, "Recuperados");	
 		//Tasas
 		dic.put(P, "Prevalencia");
@@ -141,18 +142,18 @@ public class Labels {
 		dic.put(FT, "Tiempo final");
 		dic.put(IT, "Tiempo inicial");
 		//Parámetros de la enfermedad
-		dic.put(PTE,"Probabilidad de transmisión de la enfermedad");
-		dic.put(DME,"Duración media de la enfermedad");
+		dic.put(PTE, "Probabilidad de transmisión de la enfermedad");
+		dic.put(DME, "Duración media de la enfermedad");
 		dic.put(IP, "Inmunidad permanente");
-		dic.put(DMI,"Duración media de la inmunidad");
+		dic.put(DMI, "Duración media de la inmunidad");
 		//Etiquetas de propiedades del proyecto.
-		dic.put(NAME,"Nombre del proyecto" );
-		dic.put(AUTHOR,"Autor del proyecto");
-		dic.put(DESCRIPTION,"Descripción del proyecto" );
-		dic.put(VERSION,"Versión del proyecto" );
-		dic.put(NG,"Número de grupos de población" );
-		dic.put(DATE0,"Fecha creación del proyecto");
-		dic.put(DATE1,"Fecha modificación del proyecto");
+		dic.put(NAME, "Nombre del proyecto" );
+		dic.put(AUTHOR, "Autor del proyecto");
+		dic.put(DESCRIPTION, "Descripción del proyecto" );
+		dic.put(VERSION, "Versión del proyecto" );
+		dic.put(NG, "Número de grupos de población" );
+		dic.put(DATE0, "Fecha creación del proyecto");
+		dic.put(DATE1, "Fecha modificación del proyecto");
 		//Etiquetas particulares de las zonas.
 		dic.put(ID, "Indentificador");
 		dic.put(PEOPLE, "Número de habitantes");

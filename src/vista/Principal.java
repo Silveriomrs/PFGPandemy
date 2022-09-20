@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.Labels_GUI;
 import modelo.TypesFiles;
 
 import java.awt.BorderLayout;
@@ -55,7 +56,7 @@ public class Principal extends JFrame {
 		int h = 768;
 		this.cm = cm;
 		//Configurar frame.
-		this.setTitle("Simulación de enfermedades transmisibles en varios grupos de población");
+		this.setTitle(Labels_GUI.W_PLAYER_TITLE);
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
 		this.setBounds(0, 0, w, h + 45);
@@ -104,48 +105,54 @@ public class Principal extends JFrame {
 		this.jmitems = new HashMap<String,JMenuItem>();
 		this.mBar = new JMenuBar();
 		//Menu Archivo
-		JMenu mnArchivo = new JMenu("Archivo");
-		addJMenuItem(mnArchivo, "Nuevo Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		JMenu mnArchivo = new JMenu(Labels_GUI.MM_FILES);
+		addJMenuItem(mnArchivo, Labels_GUI.M_NEW_PRJ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo, "Abrir Proyecto","/vista/imagenes/Iconos/carpeta_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_OPEN_PRJ,"/vista/imagenes/Iconos/carpeta_64px.png" );
 		//SubMenu VenSIM
-		addJMenuItem(mnArchivo, "Importar Modelo A","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnArchivo, "Importar Modelo B","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PA,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PB,"/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
 		//
-		addJMenuItem(mnArchivo, "Guardar Proyecto","/vista/imagenes/Iconos/disquete_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_SAVE_PRJ,"/vista/imagenes/Iconos/disquete_64px.png" );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo, "Salir","/vista/imagenes/Iconos/salir_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_EXIT,"/vista/imagenes/Iconos/salir_64px.png" );
 		
 		//Menu Ver
-		JMenu mnVer = new JMenu("Parámetros modelo");
-		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );	
-		addJMenuItem(mnVer, "Parámetros Enfermedad","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnVer, "Grupos de Población","/vista/imagenes/Iconos/portapapeles_64px.png" );
-		addJMenuItem(mnVer, "Matriz de Contactos","/vista/imagenes/Iconos/nodos_64px.png" );
+		JMenu mnVer = new JMenu(Labels_GUI.MM_MODELO);
+		addJMenuItem(mnVer,Labels_GUI.MVER_PRJ ,"/vista/imagenes/Iconos/portapapeles_64px.png" );	
+		addJMenuItem(mnVer,Labels_GUI.W_DEF_TITLE ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_GRP_TITLE ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_REL_TITLE ,"/vista/imagenes/Iconos/nodos_64px.png" );
 		mnVer.addSeparator();
-		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
-		addJMenuItem(mnVer, "Leyenda","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
-		addJMenuItem(mnVer, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_MAP_TITLE ,"/vista/imagenes/Iconos/region_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_PAL_TITLE,"/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_PLAYER_TITLE ,"/vista/imagenes/Iconos/animar_128px.png" );
 			
 		
 		//Menu Herramientas
-		JMenu mnHerramientas = new JMenu("Herramientas");
-		addJMenuItem(mnHerramientas, "Editor de Tablas","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		JMenu mnHerramientas = new JMenu(Labels_GUI.MM_TOOLS);
+		addJMenuItem(mnHerramientas,Labels_GUI.W_TE_TITLE ,"/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
 		mnHerramientas.addSeparator();
-		addJMenuItem(mnHerramientas, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
-		addJMenuItem(mnHerramientas, "Editor Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		addJMenuItem(mnHerramientas,Labels_GUI.W_GE_TITLE ,"/vista/imagenes/Iconos/editorGrafico_128px.png" );
+		addJMenuItem(mnHerramientas,Labels_GUI.W_PE_TITLE,"/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		
+		//Menu Preferencias
+		JMenu mnPreferencias = new JMenu(Labels_GUI.MM_PREFERENCES);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_SPANISH ,null);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_ENGLISH ,null);
 		
 		//Menu Ayuda
-		JMenu mnAyuda = new JMenu("Ayuda");
-		addJMenuItem(mnAyuda, "Formato Tablas", "/vista/imagenes/Iconos/archivo_64px.png");
-		addJMenuItem(mnAyuda, "Manual de Usuario","/vista/imagenes/Iconos/archivo_64px.png" );
-		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg");
+		JMenu mnAyuda = new JMenu(Labels_GUI.MM_HELP);
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_TABLES , "/vista/imagenes/Iconos/archivo_64px.png");
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_USER_GUIDE ,"/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_ABOUT ,"/vista/imagenes/LogoUNED.jpg");
 		
 		//Añadir sub-menus a la barra de menus.
 		mBar.add(mnArchivo);
 		mBar.add(mnVer);
 		mBar.add(mnHerramientas);
+		mBar.add(mnPreferencias);
 		mBar.add(mnAyuda);
 		
 		//Configurar estados de cada JMenuItem y/o sus menús según el contexto.
@@ -173,19 +180,19 @@ public class Principal extends JFrame {
 		//En caso de no zonas:
 		boolean hasZonas = cm.hasZonas();
 		//Desactivar vista mapa.
-		jmitems.get("Mapa").setEnabled(hasZonas);
+		jmitems.get(Labels_GUI.W_MAP_TITLE).setEnabled(hasZonas);
 		//Desactivar editor de zonas gráfico.
-		jmitems.get("Editor Gráfico").setEnabled(hasZonas);
+		jmitems.get(Labels_GUI.W_GE_TITLE).setEnabled(hasZonas);
 		//Desactivar vistas de grupos.
-		jmitems.get("Grupos de Población").setEnabled(hasZonas);
+		jmitems.get(Labels_GUI.W_GRP_TITLE).setEnabled(hasZonas);
 		//Desactivar matriz de contactos.
-		jmitems.get("Matriz de Contactos").setEnabled(hasZonas);
+		jmitems.get(Labels_GUI.W_REL_TITLE).setEnabled(hasZonas);
 		//Desactivar vista de Parámetros de la enfermedad.
-		jmitems.get("Parámetros Enfermedad").setEnabled(cm.hasModule(TypesFiles.DEF));
-		jmitems.get("Reproductor").setEnabled(cm.isPlayable());
+		jmitems.get(Labels_GUI.W_DEF_TITLE).setEnabled(cm.hasModule(TypesFiles.DEF));
+		jmitems.get(Labels_GUI.W_PLAYER_TITLE).setEnabled(cm.isPlayable());
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
-		jmitems.get("Guardar Proyecto").setEnabled(hasZonas);
+		jmitems.get(Labels_GUI.M_SAVE_PRJ).setEnabled(hasZonas);
 	}
 
 	/**
@@ -254,7 +261,7 @@ public class Principal extends JFrame {
 			 */
 			@Override
 			public void windowClosing(WindowEvent e) {
-				cm.doActionPrincipal("Salir");
+				cm.doActionPrincipal(Labels_GUI.M_EXIT);
 		    }
 	}
 }

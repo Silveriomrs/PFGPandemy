@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.border.LineBorder;
 
 import controlador.ControladorModulos;
+import modelo.Labels_GUI;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
@@ -78,7 +79,7 @@ public class Mapa extends JPanel{
 	 */
 	public void iniciarFrame(int w, int h){
 		frame = new JFrame();
-		frame.setTitle("Mapa");
+		frame.setTitle(Labels_GUI.W_MAP_TITLE);
 		frame.setSize(w,h);
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(ControladorModulos.MinDim);

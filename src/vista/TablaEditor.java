@@ -46,7 +46,9 @@ import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.DCVS;
 import modelo.DCVSFactory;
+import modelo.Labels_GUI;
 import modelo.ModuleType;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 
 
@@ -98,7 +100,7 @@ public class TablaEditor extends JPanel{
 		this.cm = cm;
 		this.editable = true;
 		this.cellRender = new CellRenderTableEditor(editable);
-		setName("panel_tabla");
+		setName(Labels_GUI.PANEL_NAME_TE);
 		setMaximumSize(new Dimension(1024, 768));
 		setLayout(new BorderLayout(0, 0));
 		setBorder(null);
@@ -126,7 +128,7 @@ public class TablaEditor extends JPanel{
 	 * @param nombre Nombre a mostrar en el marco. El nombre del módulo.
 	 */
 	public void abrirFrame(String nombre) {
-		frame = new JFrame("Editor de tablas");
+		frame = new JFrame(Labels_GUI.W_TE_TITLE);
 		frame.setTitle(nombre);
 		frame.getContentPane().setBackground(Color.GRAY);
 		frame.setBounds(40, 50, 914, 610);
@@ -150,8 +152,8 @@ public class TablaEditor extends JPanel{
 		comboBox = new JComboBox<ModuleType>();
 		comboBox.setMaximumSize(new Dimension(102, 25));
 		comboBox.setMinimumSize(new Dimension(102, 25));
-		comboBox.setName("Asignar tabla");
-		comboBox.setToolTipText("Seleccione el tipo de tabla.");
+		comboBox.setName(Labels_GUI.COMBO_NAME_TE);
+		comboBox.setToolTipText(Labels_GUI.TT_SELECT_TYPE_TE);
 		comboBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		comboBox.setModel(new DefaultComboBoxModel<ModuleType>(ModuleType.values()));
 	}
@@ -174,24 +176,24 @@ public class TablaEditor extends JPanel{
 		jtoolBar = new JToolBar(JToolBar.VERTICAL);
 		jtoolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		jtoolBar.setForeground(Color.BLACK);
-		jtoolBar.setName("Barra Herramientas");
+		jtoolBar.setName(Labels_GUI.TOOLBAR_NAME_TE);
 		jtoolBar.setOpaque(false);
 
 		//Añadir los botones
-		btnNuevaTabla = addBotonToolBar("Crea una nueva tabla desde una plantilla","/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaML(),Color.GREEN);
-		btnAddRow= addBotonToolBar("Crear fila nueva","/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowML(),null);
-		btnAddCol = addBotonToolBar("Crear columna nueva","/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColML(),null);
+		btnNuevaTabla = addBotonToolBar(Labels_GUI.TT_NEW_TABLE_TE,"/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaML(),Color.GREEN);
+		btnAddRow= addBotonToolBar(Labels_GUI.TT_NEW_ROW,"/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowML(),null);
+		btnAddCol = addBotonToolBar(Labels_GUI.TT_NEW_COL,"/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColML(),null);
 		jtoolBar.addSeparator();
-		btnBorrarFila = addBotonToolBar("Elimina las filas marcadas","/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaML(),Color.ORANGE);
-		btnBorrarColumna = addBotonToolBar("Elimina las columnas indicas","/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaML(),Color.ORANGE);
-		btnBorrarTabla = addBotonToolBar("Borrar tabla","/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaML(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar(Labels_GUI.TT_DEL_ROW,"/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaML(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar(Labels_GUI.TT_DEL_COL,"/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaML(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar(Labels_GUI.TT_DEL_TABLE,"/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaML(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		btnGuardarCambios = addBotonToolBar("Guardar cambios","/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosML(),null);
-		btnGuardarArchivo = addBotonToolBar("Guardar tabla","/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoML(),null);
-		addBotonToolBar("Cargar tabla","/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoML(),null);
+		btnGuardarCambios = addBotonToolBar(Labels_GUI.TT_SAVE,"/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosML(),null);
+		btnGuardarArchivo = addBotonToolBar(Labels_GUI.TT_SAVE_TABLE,"/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoML(),null);
+		addBotonToolBar(Labels_GUI.TT_LOAD_TABLE,"/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoML(),null);
 		jtoolBar.addSeparator();
-		btnPrintTable = addBotonToolBar("Imprimir","/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
+		btnPrintTable = addBotonToolBar(Labels_GUI.TT_PRINT,"/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -201,11 +203,11 @@ public class TablaEditor extends JPanel{
 		
 		setUpComboBox();
 		
-		btnAsignarTabla = new JButton("Aplicar tipo");
+		btnAsignarTabla = new JButton(Labels_GUI.BTN_APPLY_TYPE_TE);
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAsignarTabla.addMouseListener(new BtnAplicarTablaML());
 		
-		lblAsignarTablaA = new JLabel("Asignar a modulo:");
+		lblAsignarTablaA = new JLabel(Labels_GUI.BTN_SET_TO_TE);
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
 		lblAsignarTablaA.setFont(new Font("Fira Code Retina", Font.BOLD, 15));
 		lblAsignarTablaA.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -270,7 +272,7 @@ public class TablaEditor extends JPanel{
 			btnAsignarTabla.setEnabled(tieneColumna && tieneFila);
 		}else {
 			btnAsignarTabla.setEnabled(true);
-			btnAsignarTabla.setText("Actualizar");
+			btnAsignarTabla.setText(OperationsType.UPDATE.toString());
 		}
 	}
 
@@ -443,7 +445,7 @@ public class TablaEditor extends JPanel{
 				ModuleType seleccion = (ModuleType) comboBox.getSelectedItem();
 				
 				if(seleccion != ModuleType.CSV) {
-					respuesta = cm.showMessage("Atención, esta acción sobreescribe los datos existentes en el módulo " + seleccion, 3);
+					respuesta = cm.showMessage(Labels_GUI.WARNING_1_TE + seleccion, 3);
 				}
 				
 				System.out.println(seleccion);
@@ -457,7 +459,7 @@ public class TablaEditor extends JPanel{
 				}
 				//En caso de haber aceptado, mensaje al usuario y actualizar estado de los controles.
 				if(actuar) {
-					cm.showMessage("Datos aplicados al módulo: " + seleccion, 1);
+					cm.showMessage(Labels_GUI.NOTIFY_1_TE + seleccion, 1);
 					estadoBotones();
 				}	
 			} else {cm.doActionTableEditor(null);}
@@ -504,7 +506,7 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				String txt = JOptionPane.showInputDialog("¿Nombre de la nueva columna?");
+				String txt = JOptionPane.showInputDialog(Labels_GUI.QUESTION_NEW_COL);
 				//Si no se ha cancelado o no se ha introducido texto -> procede
 				if(txt != null && !txt.equals("")){									
 					dcvs.addColumna(txt);										//Añade la columna.
@@ -539,7 +541,7 @@ public class TablaEditor extends JPanel{
 					dcvs.addFila(row);											//Se añade.
 					modificado = true;											//Activa la bandera de modificación.
 				}else {
-					cm.showMessage("Debe añadir alguna columna.", 0);
+					cm.showMessage(Labels_GUI.WARNING_2_TE, 0);
 				}
 				estadoBotones();												//Actualización de los estados de los botones.
 			}
@@ -571,7 +573,7 @@ public class TablaEditor extends JPanel{
 					dcvs = dcvs2;												//Establecer la nueva tabla como tabla activa.
 					modificado = false;											//Desactivar el registro de modificado.
 					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
-					cm.showMessage("Archivo Cargado", 1);
+					cm.showMessage(Labels_GUI.NOTIFY_FILE_LOADED, 1);
 					estadoBotones();											//Actualiza el estado de los botones.
 				}
 			}
@@ -601,10 +603,10 @@ public class TablaEditor extends JPanel{
 				if(dcvs.getRowCount() >0) {
 					// Sistema que era identico al de la clase BtnGuardarArchivoML.
 					cio.guardarArchivo(dcvs);
-					cm.showMessage("Archivo guardado", 1);
+					cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
 					modificado = false;
 					estadoBotones();
-				} else cm.showMessage("No hay datos que guardar",0);
+				} else cm.showMessage(Labels_GUI.NOTIFY_NO_DATA_TO_SAVE,0);
 			}
 		}
 	}
@@ -633,12 +635,12 @@ public class TablaEditor extends JPanel{
 					String rutaF = cio.guardarArchivo(dcvs);							//Obtención de la ruta de guardado.
 					//En caso de guardado correcto, proceder...
 					if(rutaF != null) {
-						cm.showMessage("Archivo guardado", 1);
+						cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
 						dcvs.setRuta(rutaF);									//Establecimiento de la nueva ruta al módulo.
 						modificado = false;										//Activación flag modificado.
 						estadoBotones();										//Actualización del estado de los botones.
 					}					
-				} else cm.showMessage("No hay datos que guardar",0);
+				} else cm.showMessage(Labels_GUI.NOTIFY_NO_DATA_TO_SAVE,0);
 			}
 		}
 	}
@@ -706,7 +708,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage("¿Desea eliminar la tabla actual con sus datos?",3);
+				int opt = cm.showMessage(Labels_GUI.WARNING_2_TE,3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {	
 					//Obtener atributos previos de la tabla anterior.
@@ -741,13 +743,13 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage("Eliminará la tabla actual con sus datos ¿Desea continuar?", 3);
+				int opt = cm.showMessage(Labels_GUI.WARNING_4_TE + " " + Labels_GUI.REQUEST_CONFIRM, 3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {
 					ModuleType[] options = new ModuleType[] {ModuleType.CSV,ModuleType.PRJ,ModuleType.DEF,ModuleType.PAL,ModuleType.MAP};
 					ModuleType opt2 = (ModuleType) JOptionPane.showInputDialog(getParent(),
-							"Escoja una plantilla",								//Mensaje de solicitud
-							"Selección de plantilla",							//Mensaje de ventana
+							Labels_GUI.MSG_CHOOSE_TEMPLATE_1,								//Mensaje de solicitud
+							Labels_GUI.MSG_CHOOSE_TEMPLATE_2,							//Mensaje de ventana
 							JOptionPane.QUESTION_MESSAGE,						//Tipo de mensaje (pregunta selección)
 							null,												//Icono personalizado
 							options,											//Array de opciones.

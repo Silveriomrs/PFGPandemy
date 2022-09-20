@@ -15,6 +15,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.Labels_GUI;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 
 import java.awt.Color;
@@ -103,12 +105,12 @@ public class Archivos extends JPanel {
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
-		iniciarLabels(TypesFiles.PRJ,"Modelo","Archivo con los parámetros del modelo.","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),"Grupos de población.","/vista/imagenes/Iconos/spain_128px.png");
-		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),"Archivo con la definición propia de la enfermedad.","/vista/imagenes/Iconos/adn_64px.png");
-		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),"Matriz de contactos. Refleja las relaciones entre los grupos","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),"Paleta de colores personalizada.","/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),"Histórico de evolución con los datos de la simulación.","/vista/imagenes/Iconos/animar_128px.png");
+		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL,Labels_GUI.TT_L_PRJ,"/vista/imagenes/Iconos/portapapeles_64px.png");
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),Labels_GUI.W_GRP_TITLE + ".","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),Labels_GUI.TT_L_DEF,"/vista/imagenes/Iconos/adn_64px.png");
+		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),Labels_GUI.TT_L_REL,"/vista/imagenes/Iconos/nodos_64px.png");
+		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),Labels_GUI.TT_L_PAL,"/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),Labels_GUI.TT_L_HST,"/vista/imagenes/Iconos/animar_128px.png");
 		contador = 0;															// Reiniciar el contardor de líneas a 0.
 	}
 
@@ -125,7 +127,7 @@ public class Archivos extends JPanel {
 	 * Visualiza los datos del módulo dentro de su propio marco.
 	 */
 	public void abrirFrame() {
-	    JFrame frame = new JFrame("Módulo de Archivos");
+	    JFrame frame = new JFrame(Labels_GUI.W_FILES_TITLE);
 	    Dimension m = getPreferredSize();
 	    int x = (int)m.getWidth();
 	    int y = (int)m.getHeight()+15;
@@ -168,20 +170,20 @@ public class Archivos extends JPanel {
 	 */
 	private void configuracion() {
 		//Configuración del borde.
-		tb = BorderFactory.createTitledBorder("Modulos");
+		tb = BorderFactory.createTitledBorder(Labels_GUI.W_MODULES_TITLE);
 		tb.setTitleColor(Color.BLUE);
 		panelCentral.setBorder(tb);
 		//Configuración básica del panelCentral superior
-		setToolTipText("Visulación de los ficheros asignados a cada módulo.");
+		setToolTipText(Labels_GUI.TT_W_FILES);
 		setSize(new Dimension(650, 400));
-		setName("Vista de módulos cargados");
+		setName(Labels_GUI.FILES_PANEL_NAME);
 		setMinimumSize(new Dimension(650, 500));
 		setMaximumSize(new Dimension(1024, 768));
 		setBorder(new EtchedBorder(EtchedBorder.RAISED, Color.BLACK, Color.GRAY));
 		setAutoscrolls(true);
 		setLayout(new BorderLayout(0, 0));	
 		
-		panelCentral.setToolTipText("Selección archivos asignados a los módulos.");
+		panelCentral.setToolTipText(Labels_GUI.TT_FILES_PANEL);
 		panelCentral.setLayout(null);
 		add(panelCentral, BorderLayout.CENTER);	
 
@@ -249,17 +251,17 @@ public class Archivos extends JPanel {
 	 * para múltiples instancias que deben tener facetas comunes.</p> 
 	 * La función devuelve la propia instancia del botón con el fin de facilitar
 	 * el evitar perdidas de referencias.
-	 * @param nombre Nombre del botón.
+	 * @param op Nombre de la acción.
 	 * @param ext Tipo de archivos o módulo particular.
 	 * @param ruta Ruta al archivo de imagen o icono que se adjunta en el botón.
 	 * @param posX Posición en la coordenada X del panelCentral.
 	 * @param posY Posición en la coordenada Y del panelCentral.
 	 * @param activado Habilita o desabilita incialmente el botón, TRUE activado, False en otro caso.
 	 */
-	private void iniciarBoton(String nombre, String ext, String ruta, int posX, int posY, boolean activado) {
+	private void iniciarBoton(OperationsType op, String ext, String ruta, int posX, int posY, boolean activado) {
 		JButton boton = new JButton();
-		String tt = nombre + " .";
-		boton.setActionCommand(nombre);
+		String tt = op.toString() + " .";
+		boton.setActionCommand(op.toString());  /*Punto clave, poner nombre o valor enum*/
 		boton.addMouseListener(new ArchivoML());
 		boton.setToolTipText(tt + ext);
 		addIconB(boton,ruta,wi,hi);
@@ -288,20 +290,20 @@ public class Archivos extends JPanel {
 		jtf.setEnabled(true);
 		jtf.setBounds(150,posY,300,hi);
 		jtf.setColumns(10);
-		jtf.setToolTipText("Archivo seleccionado");
+		jtf.setToolTipText(Labels_GUI.TT_FILE_SELECTED);
 		jtf.setHorizontalAlignment(SwingConstants.LEFT);
 		panelCentral.add(jtf);
 		mapaFields.put(ext,jtf);
 		
 		int xpos = 480;
 		int gap = 30;
-		iniciarBoton("Abrir",ext, iconAbrir,xpos,posY,true);
-		iniciarBoton("Guardar como",ext,iconGuardarComo,xpos + gap,posY,false);
-		iniciarBoton("Guardar cambios",ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
-		iniciarBoton("Editar",ext,iconEditar,xpos + 3*gap,posY,false);
+		iniciarBoton(OperationsType.OPEN,ext, iconAbrir,xpos,posY,true);
+		iniciarBoton(OperationsType.SAVE_AS,ext,iconGuardarComo,xpos + gap,posY,false);
+		iniciarBoton(OperationsType.SAVE,ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
+		iniciarBoton(OperationsType.EDIT,ext,iconEditar,xpos + 3*gap,posY,false);
 		//Para los módulos esenciales de cualquier proyecto, no incluir botones de borrado.
 		if(!ext.equals(TypesFiles.PRJ) && !ext.equals(TypesFiles.DEF) && !ext.equals(TypesFiles.MAP)) {
-			iniciarBoton("Borrar",ext,iconBorrar,xpos + 4*gap,posY,false);
+			iniciarBoton(OperationsType.DELETE,ext,iconBorrar,xpos + 4*gap,posY,false);
 		}
 	}
 		
@@ -312,18 +314,21 @@ public class Archivos extends JPanel {
 	 */
 	private void addBotonHM(JButton btn, String ext) {
 		String tipo = btn.getActionCommand();
-		switch(tipo) {
-		case ("Abrir"):
+		OperationsType op = OperationsType.getNum(tipo);
+		switch(op) {
+		case OPEN:
 			mBtnAbrir.put(ext, btn);
 			break;
-		case ("Guardar cambios"):
+		case SAVE:
 			mBtnGuardarCambios.put(ext, btn);
 			break;
-		case ("Guardar como"):
-		case ("Editar"):
-		case ("Borrar"):
+		case SAVE_AS:
+		case EDIT:
+		case DELETE:
 			//Estos botones ya tienen configurado su Command, se aprovecha para añadir distincción.
 			mBotones.put(btn.getActionCommand() + " " + ext, btn);
+			break;
+		default:
 			break;
 		}	
 	}
@@ -386,7 +391,7 @@ public class Archivos extends JPanel {
 			//En caso de que no tenga nombre definido mostrar texto al respecto.
 			hasName = nombre != null;
 			if(hasModule && !hasName) {
-				nombre = "Datos sin destino definido.";
+				nombre = Labels_GUI.PATH_NO_DEFINED;
 				elemento.setBackground(Color.LIGHT_GRAY);
 			}else if(hasModule && hasName) elemento.setBackground(elemento.getSelectionColor());
 			else elemento.setBackground(elemento.getCaretColor());

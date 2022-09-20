@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 import modelo.DCVS;
 import modelo.DCVSFactory;
 import modelo.Labels;
+import modelo.Labels_GUI;
 import modelo.ModuleType;
 import modelo.OperationsType;
 import modelo.TypesFiles;
@@ -42,7 +43,6 @@ public class ControladorModulos {
 
 	@SuppressWarnings("unused")
 	private Labels labels;														//Necesario iniciarlo al menos una vez en el proyecto.
-	
 	private Paleta paleta;
 	private ControladorDatosIO cio;
 	//Vistas
@@ -250,11 +250,11 @@ public class ControladorModulos {
 	 */
  	private void agregarPaneles() {
 		//Añadir paneles de los módulos.
-		addDefaultBorder(tablaEditor,"Editor General");
-		addDefaultBorder(mapa,"Visor de Mapa");
-		addDefaultBorder(pgrupos,"Visor Grupos de Poblaci\u00F3n");
-		addDefaultBorder(pproyecto,"Parámetros del Modelo");
-		addDefaultBorder(vistaSIR,"Configuraci\u00F3n SIR");
+		addDefaultBorder(tablaEditor,Labels_GUI.L_BORDER_PANEL_TE);
+		addDefaultBorder(mapa,Labels_GUI.L_BORDER_PANEL_MAP);
+		addDefaultBorder(pgrupos,Labels_GUI.L_BORDER_PANEL_GRP);
+		addDefaultBorder(pproyecto,Labels_GUI.L_BORDER_PANEL_PRJ);
+		addDefaultBorder(vistaSIR,Labels_GUI.L_BORDER_PANEL_DEF);
 		mostrarPanel(panelActivo);
 	}
 	
@@ -304,7 +304,7 @@ public class ControladorModulos {
 	public Color getLevelColor(int n) {
 		Color c = Color.GRAY;
 		if(hasModule(TypesFiles.PAL)) {
-			String label = "L" + String.valueOf(n);
+			String label = Labels.LEVEL + String.valueOf(n);
 			//Obtener línea
 			int index = getModule(TypesFiles.PAL).getFilaItem(label);
 			if(index > -1) {
@@ -409,7 +409,7 @@ public class ControladorModulos {
 			mapa.setPosicion(posX, posY);
 			break;
 		default:
-			System.out.println("Valor en el controlador de mapa no establecido: " + modulo);
+			System.out.println("CM > situarVentana > Valor en el controlador de mapa no establecido: " + modulo);
 		}
 	}
 	
@@ -563,7 +563,7 @@ public class ControladorModulos {
 				String ruta = wd + dato;
 				DCVS mAux = cio.abrirArchivo(ruta,etiq);						//Carga el módulo desde el sistema de archivos.
 				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
-				else showMessage("Archivo de proyecto incorrecto. \nReferencia un módulo que no está contenido en la misma carpeta:\n " + dato + "." + etiq,0);
+				else showMessage(Labels_GUI.ERR_MSG_1_CM + dato + "." + etiq,0);
 			}else if(etiq.equals(Labels.NG)){									
 				//Guardar el número de zonas que debe contener el proyecto.
 				NG = Integer.parseInt(dato);
@@ -645,79 +645,79 @@ public class ControladorModulos {
 	public void doActionPrincipal(String nombre) {
 		//
 		switch(nombre){
-			case "Reproductor":
+			case Labels_GUI.W_PLAYER_TITLE:
 				situarVentana(ModuleType.PLAYER, principal.getX() - 350, principal.getY() + h/3);
 				play();
-				mostrarPanel("Mapa");
+				mostrarPanel(Labels_GUI.W_MAP_TITLE);
 				break;
-			case "Editor Gráfico":
+			case Labels_GUI.W_GE_TITLE:
 				this.pizarra.reset();
 				this.pizarra.toogleVisible();
 				break;
-			case "Editor Paleta":
+			case Labels_GUI.W_PE_TITLE:
 				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(true);
 				paleta.setFrameVisible(true);
 				break;
-			case "Leyenda":
+			case Labels_GUI.W_PAL_TITLE:
 				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(false);
 				paleta.toggleFrameVisible();
 				break;
-			case "Mapa":
-			case "Grupos de Población":
-			case "Editor de Tablas":
-			case "Parámetros Enfermedad":
-			case "Proyecto":
+			case Labels_GUI.W_MAP_TITLE:
+			case Labels_GUI.W_GRP_TITLE:
+			case Labels_GUI.W_TE_TITLE:
+			case Labels_GUI.W_DEF_TITLE:
+			case Labels_GUI.MVER_PRJ:
 				mostrarPanel(nombre);
 				break;
-			case "Matriz de Contactos": editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
-			case "Abrir Proyecto":
+			case Labels_GUI.W_REL_TITLE: editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
+			case Labels_GUI.M_OPEN_PRJ:
 				DCVS prj = cio.abrirArchivo(null,TypesFiles.PRJ);
 				if(prj != null) {
 					clearProject();
 					abrirProyecto(prj);
 				}
 				break;
-			case "Importar Modelo A":
+			case Labels_GUI.M_IMPORT_PA:
 				DCVS pVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
 					clearProject();
-					importarModelo(pVS,"A");
+					importarModelo(pVS,TypesFiles.MODEL_A);
 				}
-				else if(pVS != null) showMessage("Archivo seleccionado no reconocido.",0);
+				else if(pVS != null) showMessage(Labels_GUI.ERR_FILE_UNKNOWN,0);
 				break;
-			case "Importar Modelo B":	
+			case Labels_GUI.M_IMPORT_PB:	
 				//Formato de importación CSV
 				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) {
 					clearProject();
-					importarModelo(hVS,"B");
+					importarModelo(hVS,TypesFiles.MODEL_B);
 				}
-				else if(hVS != null) showMessage("Archivo seleccionado no reconocido.",0);
+				else if(hVS != null) showMessage(Labels_GUI.ERR_FILE_UNKNOWN,0);
 				break;		
-			case "Nuevo Proyecto":
+			case Labels_GUI.M_NEW_PRJ:
 				generarModulosBasicos();
 				break;
-			case "Guardar Proyecto":
+			case Labels_GUI.M_SAVE_PRJ:
 				saveProjectAs(modulos.get(TypesFiles.PRJ));
 				break;
-			case "Salir":
-				if(showMessage("Los cambios no guardados se perderán\n¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
+			case Labels_GUI.M_EXIT:
+				if(showMessage(Labels_GUI.WARNING_1_DATA_LOSS + "\n" + Labels_GUI.REQUEST_EXIT_CONFIRM,3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
-			case "Formato Tablas":
+			case Labels_GUI.MHELP_TABLES:
 				cio.openPDF("mTablas");
 				break;
-			case "Manual de Usuario":
+			case Labels_GUI.MHELP_USER_GUIDE:
 				cio.openPDF("mUsuario");
 				break;
-			case "Acerca de...":
+			case Labels_GUI.MHELP_ABOUT:
 				about.toggleVisible();
 				break;
 			default:
-				System.out.println("Controlador Modulos > doPrincipal: " + nombre + ", opción no reconocida");
+				System.out.println("CM > doPrincipal: " + nombre + ", opción no reconocida");
 		}
 	}
 	
@@ -727,11 +727,11 @@ public class ControladorModulos {
 	 */
 	private void mostrarPanel(String nombre) {		
 		//Mostrar panel correspondiente y ocultación del resto.
-		mapa.setVisible(nombre.equals("Mapa"));					
-		tablaEditor.setVisible(nombre.equals("Editor de Tablas"));
-		pgrupos.setVisible(nombre.equals("Grupos de Población"));
-		pproyecto.setVisible(nombre.equals("Proyecto"));
-		vistaSIR.setVisible(nombre.equals("Parámetros Enfermedad"));
+		mapa.setVisible(nombre.equals(Labels_GUI.W_MAP_TITLE));					
+		tablaEditor.setVisible(nombre.equals(Labels_GUI.W_TE_TITLE));
+		pgrupos.setVisible(nombre.equals(Labels_GUI.W_GRP_TITLE));
+		pproyecto.setVisible(nombre.equals(Labels_GUI.MVER_PRJ));
+		vistaSIR.setVisible(nombre.equals(Labels_GUI.W_DEF_TITLE));
 	}
 	
 	/**
@@ -756,13 +756,13 @@ public class ControladorModulos {
 		Integer opcion = null;
 		
 		switch(tipo) {
-		case 0: titulo = "Error"; break;
-		case 1: titulo = "Información"; break;
-		case 2: titulo = "¡Antención!"; break;
-		case 3: titulo = "Consulta";
+		case 0: titulo = Labels_GUI.ERR; break;
+		case 1: titulo = Labels_GUI.INF; break;
+		case 2: titulo = Labels_GUI.WARN; break;
+		case 3: titulo = Labels_GUI.QST;
 			opcion = JOptionPane.showConfirmDialog(null, txt, titulo, JOptionPane.YES_NO_OPTION);
 		break;
-		case 4: titulo = "Acerca de..."; tipo = 1; break;
+		case 4: titulo = Labels_GUI.MHELP_ABOUT; tipo = 1; break;
 		default:
 			titulo = "";
 		}
@@ -789,16 +789,17 @@ public class ControladorModulos {
 	 */
 	public boolean doActionPizarra(String op) {
 		boolean done = true;
-		switch(op) {
-		case("Cambios"):
+		OperationsType opr = OperationsType.getNum(op);
+		switch(opr) {
+		case CHANGES:
 			//Actualiza el mapa.
 			mapa.reset();
 			//Actualizar Grupos.
 			pgrupos.reset();
 			break;
-		case("Guardar"):
+		case SAVE:
 			//Aplicar cambios a la tabla después de pedir confirmación.
-			int option = showMessage("Se escribirán los datos en disco\n¿continuar?",3);	
+			int option = showMessage(Labels_GUI.WARNING_2_OVERWRITE,3);	
 			if(option == JOptionPane.YES_OPTION) {
 				//Añadir o eliminar polígono de/a la tabla.
 				zonas.forEach((k,v)->{
@@ -807,6 +808,8 @@ public class ControladorModulos {
 			}
 			//Guardar los cambios efectuados en disco.
 			done = saveModule(TypesFiles.MAP,modulos.get(TypesFiles.MAP).getNombre() == null);
+			break;
+		default:
 			break;
 		}
 		return done;
@@ -830,9 +833,7 @@ public class ControladorModulos {
 			
 			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP))
 					&& dcvs.getRowCount() != NG ) {
-				showMessage("No se puede cargar el módulo: " + dcvs.getRuta() + "\n" + 
-							"dicho módulo no tiene definido suficientes parámetros para\n" + 
-							"el número de grupos de población indicados en el modelo",0);
+				showMessage(Labels_GUI.ERR_LOAD_MODULE + dcvs.getRuta() + "\n" + Labels_GUI.ERR_MODULE_LESS_NG,0);
 				ok = false;	
 				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
 			}	
@@ -926,16 +927,17 @@ public class ControladorModulos {
 	 */
 	public boolean doActionArchivos(String op, String ext) {
 		boolean ok = true;														//Indica si la operación ha tenido exito o no.
+		OperationsType opr = OperationsType.getNum(op);
 		//Opciones de Carga de módulo, NO módulo PRJ.
-		switch(op) {
-		case("Abrir"):  ok = openModule(ext); break;
-		case("Borrar"): ok = removeModule(ext); break;
-		case("Editar"): 
+		switch(opr) {
+		case OPEN:  ok = openModule(ext); break;
+		case DELETE: ok = removeModule(ext); break;
+		case EDIT: 
 			editModule(ext);
 			ok = false;															//Evitar desabilitar botón de guardar como.
 		break;
 		default:
-			boolean as = op.equals("Guardar como");
+			boolean as = opr == OperationsType.SAVE_AS;
 			ok = saveModule(ext,as);
 		}
 		
@@ -952,7 +954,7 @@ public class ControladorModulos {
 	 */
 	private void editModule(String ext) {
 		TablaEditor te = new TablaEditor(this);
-		te.abrirFrame("Editando modulo: " + TypesFiles.get(ext));
+		te.abrirFrame(Labels_GUI.TE_TITLE_EXTERNAL + TypesFiles.get(ext));
 		te.setModelo(modulos.get(ext),false);
 	}
 	
@@ -1091,12 +1093,8 @@ public class ControladorModulos {
 			//Variamos sus valores.
 			getModule(TypesFiles.PAL).setValueAt(String.valueOf(r), index, 1);
 			getModule(TypesFiles.PAL).setValueAt(String.valueOf(g), index, 2);
-			getModule(TypesFiles.PAL).setValueAt(String.valueOf(b), index, 3);
-			
+			getModule(TypesFiles.PAL).setValueAt(String.valueOf(b), index, 3);	
 		} else done = false;
-		
-		if(done) System.out.println("VistaPaleta > Color cambiado: Nivel: " + level + " (" +
-				r + "," + g + "," + b + ")");
 		return done;
 	}
 	
@@ -1214,7 +1212,7 @@ public class ControladorModulos {
 		for(int i = index; i < nNew; i++) {
 			int superficie = 0;											
 			int habitantes = 0;
-			Zona z = new Zona(i+1, "Grupo " + (i+1), habitantes, superficie,0,0,0,0,0, null);
+			Zona z = new Zona(i+1, Labels_GUI.DEFAULT_NAME_GRP + (i+1), habitantes, superficie,0,0,0,0,0, null);
 			zonas.put(i+1,z);
 			//Añadir nueva entrada al módulo de grupos (zonas).
 			String[] datos = z.toString().split(",");
@@ -1299,16 +1297,16 @@ public class ControladorModulos {
 	 * Esta opción elimina el resto de datos actuales de los módulos implicados.
 	 * @param prjV Conjunto de datos del archivo de entrada.
 	 * @param tipoModelo Cadena de texto con el tipo de modelo a cargar, siendo:
-	 *  <p>"A" tipo de modelo A (Etiquetado por columnas).</p>
-	 * 	<p>"B" tipo de modelo B (Etiquetado por filas).</p>
+	 *  <p>TypesFiles.MODEL_A tipo de modelo A (Etiquetado por columnas).</p>
+	 * 	<p>TypesFiles.MODEL_B tipo de modelo B (Etiquetado por filas).</p>
 	 */
 	private void importarModelo(DCVS prjV, String tipoModelo) {
 		ParserModelo parser = null;
 		//Limpiar todos los datos previos. No debe hacerse en otra parte pues
 		// impediría modularidad e independencia de módulos.
 		switch(tipoModelo) {
-		case("A"): parser = new ParserModeloA(prjV); break;
-		case("B"): parser = new ParserModeloB(prjV); break;
+		case(TypesFiles.MODEL_A): parser = new ParserModeloA(prjV); break;
+		case(TypesFiles.MODEL_B): parser = new ParserModeloB(prjV); break;
 		}
 		
 		//Establecer los datos del proyecto primero (provoca clear). 

@@ -46,6 +46,8 @@ import com.toedter.calendar.JTextFieldDateEditor;
 import controlador.ControladorModulos;
 import modelo.DCVS;
 import modelo.Labels;
+import modelo.Labels_GUI;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 
 import java.awt.Dimension;
@@ -98,22 +100,22 @@ public class Player extends JPanel implements ActionListener{
 		//Border: configuración de estilo
 		setOpaque(false);
 		setBackground(Color.LIGHT_GRAY);
-		tb = BorderFactory.createTitledBorder("Reproductor");
+		tb = BorderFactory.createTitledBorder(Labels_GUI.W_PLAYER_TITLE);
 		tb.setTitleColor(Color.BLUE);
 		setBorder(tb);
 		//Controles: creación.
-		btnPlayPause = new JButton("Reproducir");
+		btnPlayPause = new JButton(OperationsType.PLAY.toString());
 		slider = new JSlider(0,2000,1000);
 		slider.setBackground(new Color(255, 228, 225));
 		progressBar = new JProgressBar();
 		dateChooser = new JDateChooser();
 		frmtdtxtfldHoraMinuto = new JFormattedTextField();
 		//Etiquetas: Creación.
-		lblBarraDeProgresin = new JLabel("Barra de progresión");	
-		lblEscalaDeTiempos = new JLabel("Escala de tiempos:");
-		lblX = new JLabel("x 50 mSec/día");
-		lblFecha = new JLabel("Fecha:");
-		lblHora = new JLabel("Hora:");
+		lblBarraDeProgresin = new JLabel(Labels_GUI.L_PROGRESS);	
+		lblEscalaDeTiempos = new JLabel(Labels_GUI.L_TIME_SCALE);
+		lblX = new JLabel(Labels_GUI.L_SPEED);
+		lblFecha = new JLabel(Labels_GUI.L_DATE);
+		lblHora = new JLabel(Labels_GUI.L_TIME);
 		//Frame
 		frame = new JFrame();
 		configuracion();
@@ -127,7 +129,7 @@ public class Player extends JPanel implements ActionListener{
 	 */
 	private void iniciarFrame() {
 		frame.setContentPane(fondo);
-		frame.setTitle("Reproductor");											//Establecimiento del título.
+		frame.setTitle(Labels_GUI.W_PLAYER_TITLE.toString());							//Establecimiento del título.
 		frame.setSize(344,310);													//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
@@ -172,15 +174,15 @@ public class Player extends JPanel implements ActionListener{
 		dateChooser.addPropertyChangeListener(new DateChooserListener());
 		
 		//Establecimiento de los textos tooltips
-		btnPlayPause.setToolTipText("Reproduce o Pausa la animación.");
-		dateChooser.setToolTipText("Fecha representada");
-		dateChooser.getCalendarButton().setToolTipText("Introducción de fecha concreta");
-		slider.setToolTipText("Escala de tiempo en horas/segundo");	
-		progressBar.setToolTipText("Porcentaje de progreso de la reproducción del registro.");
-		lblFecha.setToolTipText("Ir a una fecha concreta");		
-		lblHora.setToolTipText("Hora de la representación");
-		frmtdtxtfldHoraMinuto.setToolTipText("Saltar a una hora concreta");
-		frmtdtxtfldHoraMinuto.setText("Hora Minuto");	
+		btnPlayPause.setToolTipText(Labels_GUI.TT_BTNPLAY);
+		dateChooser.setToolTipText(Labels_GUI.TT_GO_DATE);
+		dateChooser.getCalendarButton().setToolTipText(Labels_GUI.TT_BTN_DATECHOOSER);
+		slider.setToolTipText(Labels_GUI.TT_SLIDER);	
+		progressBar.setToolTipText(Labels_GUI.TT_PROGRESS);
+		lblFecha.setToolTipText(Labels_GUI.TT_GO_DATE);		
+		lblHora.setToolTipText(Labels_GUI.TT_TIME1);
+		frmtdtxtfldHoraMinuto.setToolTipText(Labels_GUI.TT_TIME2);
+		frmtdtxtfldHoraMinuto.setText(Labels_GUI.L_TIME2);	
 		
 		//Establecimiento de los Layouts
 		setLO();
@@ -306,7 +308,7 @@ public class Player extends JPanel implements ActionListener{
 		//En caso de cierre del reproductor, pausar la reproducción
 		//y dejarlo listo para reanudar.
 		if(!frame.isVisible()) {
-			btnPlayPause.setText("Reproducir");									//Estado siguiente: Parado.
+			btnPlayPause.setText(OperationsType.PLAY.toString());				//Estado siguiente: Parado.
 			timer.stop();
 		}
 	}
@@ -419,19 +421,21 @@ public class Player extends JPanel implements ActionListener{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			String estado = btnPlayPause.getText();
-			switch(estado){
-				case ("Reproducir"):											//Estado pausado, muestra 'Reproducir'
-					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.
+			OperationsType state = OperationsType.getNum(estado);
+			
+			switch(state){
+				case PLAY:														//Estado pausado, muestra 'Reproducir'
+					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.
 					timer.start();
 					break;
-				case ("Repetir"):												//Estado parado en final muestra y etiqueta 'Repetir'.
-					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.				
+				case REPLAY:													//Estado parado en final muestra y etiqueta 'Repetir'.
+					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.				
 					contador = primera;
 					setPlay();
 					timer.restart();
 					break;
 				default:														//Estado pausado/parado, muestra 'Reproducir'
-					btnPlayPause.setText("Reproducir");							//Estado siguiente: Parado.
+					btnPlayPause.setText(OperationsType.PLAY.toString());		//Estado siguiente: Parado.
 					timer.stop();						
 			}		
 			activo = !activo;
@@ -481,7 +485,7 @@ public class Player extends JPanel implements ActionListener{
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			int valor = slider.getValue();										//Obtención del valor establecido.
-			lblX.setText("x " + valor + " mSec/día");							//Mostrar valor de la escala en el slider.			
+			lblX.setText("x " + valor + Labels_GUI.L_TIME2);					//Mostrar valor de la escala en el slider.			
 			timer.setDelay(valor);												//Establece el timer con el nuevo valor.
 		}
 	}
@@ -510,7 +514,7 @@ public class Player extends JPanel implements ActionListener{
 				setVisible(isHST);
 			}else {		
 				timer.stop();
-				btnPlayPause.setText("Repetir");
+				btnPlayPause.setText(OperationsType.REPLAY.toString());
 				activo = !activo;
 				dateChooser.getCalendarButton().setEnabled(!activo);			//Activa boton del dateChooser cuando la reproducción no está activa.
 			}

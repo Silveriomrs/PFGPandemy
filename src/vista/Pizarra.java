@@ -40,6 +40,8 @@ import java.util.Map.Entry;
 
 import java.awt.event.MouseAdapter;
 
+import modelo.Labels_GUI;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 import modelo.Zona;
 
@@ -111,8 +113,8 @@ public class Pizarra extends JFrame {
 		comboBoxAsignar.removeAllItems();
 		comboBoxAsignados.removeAllItems();
 		//Puesta de Items 0, seleccionar.
-		comboBoxAsignados.addItem("Eliminar");
-		comboBoxAsignar.addItem("Asignar a");
+		comboBoxAsignados.addItem(Labels_GUI.L_DELETE);
+		comboBoxAsignar.addItem(Labels_GUI.L_ADD_TO);
 		//Limpieza de datos temporales.
 		listaPuntos.clear();
 		poligono = null;
@@ -245,23 +247,23 @@ public class Pizarra extends JFrame {
 	 */
 	private void crearBotones() {
 		//Configuración de los botones.
-	    bLimpiar = new JButton("Limpiar");
+	    bLimpiar = new JButton(Labels_GUI.BTN_CLEAR);
 	    bLimpiar.setIcon(IO.getIcon("/vista/imagenes/Iconos/limpiar_64px.png",25,25));
-	    bLimpiar.setToolTipText("Limpiar la pizarra y redibujar las zonas.");
-	    bAImagen = new JButton("Abrir");
+	    bLimpiar.setToolTipText(Labels_GUI.TT_CLEAR);
+	    bAImagen = new JButton(OperationsType.OPEN.toString());
 	    bAImagen.addMouseListener(new AbrirListener());
 	    bAImagen.setIcon(IO.getIcon("/vista/imagenes/Iconos/carpeta_64px.png",25,25));
-	    bAImagen.setToolTipText("Abre una imagen para establecer de papel de fondo.");
-	    bGuardar = new JButton("Guardar");
+	    bAImagen.setToolTipText(Labels_GUI.TT_OPEN);
+	    bGuardar = new JButton(OperationsType.SAVE.toString());
 	    bGuardar.setIcon(IO.getIcon("/vista/imagenes/Iconos/disquete_64px.png",25,25));
-	    bGuardar.setToolTipText("Guardar los cambios realizados.");
+	    bGuardar.setToolTipText(Labels_GUI.TT_SAVE);
 	    bGuardar.addMouseListener(new GuardarListener());
-        bCerrarPoligono = new JButton("Componer");
+        bCerrarPoligono = new JButton(Labels_GUI.BTN_COMPOSE);
         bCerrarPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/nodos_64px.png",25,25));
-        bCerrarPoligono.setToolTipText("Cierra la figura y crea el poligono.\nUna vez creado debe asignarse a una zona.");
+        bCerrarPoligono.setToolTipText(Labels_GUI.TT_COMPOSE);
         bBoxAplicar = new JButton("");
 	    bBoxAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/aplicando_64px.png",25,25));
-	    bBoxAplicar.setToolTipText("Aplica las asignaciones seleccionadas.");
+	    bBoxAplicar.setToolTipText(Labels_GUI.TT_APPLY);
 	}
 
 	/**
@@ -273,7 +275,7 @@ public class Pizarra extends JFrame {
 	 */
 	private String getMaxItem() {
 		int maxLargo = 0;
-		String item = "Zona: XX";												//Longitud mínima a comparar
+		String item = Labels_GUI.SAMPLE_TEXT;									//Longitud mínima a comparar
 		//Selección de la clave más larga.
 		for (Zona zona:cm.getZonas().values()) {
 			int l = zona.getName().length();
@@ -309,14 +311,14 @@ public class Pizarra extends JFrame {
 		//ComboBox zonas sin asignación.
 		comboBoxAsignar = new JComboBox<String>();
 		comboBoxAsignar.setModel(new DefaultComboBoxModel<String>());
-		comboBoxAsignar.setToolTipText("Seleccionar una zona para asignar la figura.");
+		comboBoxAsignar.setToolTipText(Labels_GUI.TT_SELECT_ZONE);
 		//ComboBox de asignaciones dadas.
 		comboBoxAsignados = new JComboBox<String>();
 		comboBoxAsignados.setModel(new DefaultComboBoxModel<String>());
-		comboBoxAsignados.setToolTipText("Seleccionar una zona a reasignar.");
+		comboBoxAsignados.setToolTipText(Labels_GUI.TT_REMOVE_ZONE);
 		//Puesta de Item 0, seleccionar.
-		comboBoxAsignados.addItem("Eliminar");
-		comboBoxAsignar.addItem("Asignar a");
+		comboBoxAsignados.addItem(Labels_GUI.L_DELETE);
+		comboBoxAsignar.addItem(Labels_GUI.L_ADD_TO);
 		// Ajustar largo máximo
 		String itemMax = getMaxItem();
 		comboBoxAsignar.setPrototypeDisplayValue(itemMax);
@@ -357,7 +359,7 @@ public class Pizarra extends JFrame {
 	 */
 	private void iniciarCanvas() {
 		c.setBounds(0, 0, dimX, dimY -25);
-		c.setName("pizarra");
+		c.setName(Labels_GUI.NAME_CANVAS);
 		c.setBackground(Color.LIGHT_GRAY);
 		c.addMouseListener(new SelectPointListener());
 	}
@@ -370,7 +372,7 @@ public class Pizarra extends JFrame {
 		if (poligono != null) {
 			Graphics g = c.getGraphics();
 			if (g == null) {
-				System.out.println("G es nulo");
+				System.out.println("Pizarra > G es nulo");
 				iniciarCanvas();
 				g = c.getGraphics();
 			} else {
@@ -378,7 +380,7 @@ public class Pizarra extends JFrame {
 				g.setColor(Color.BLUE);
 				g.drawPolygon(poligono);
 			}
-		} else {System.out.println("Poligono nulo");}
+		} else {System.out.println("Pizarra > Poligono nulo");}
 	}
 	
 	/**
@@ -512,7 +514,7 @@ public class Pizarra extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Activamos el botón de guardado en cuanto ha habido un cambio.
-			String op = "Cambios";
+			String op = OperationsType.CHANGES.toString();
 			modificado = true;
 			//Obtener los nombres de los items seleccionados en los ComboBox
 			String item1 = comboBoxAsignar.getSelectedItem().toString();
@@ -663,7 +665,7 @@ public class Pizarra extends JFrame {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Llamada al controlador para efectuar la acción pertinente.
-    		boolean resultado = cm.doActionPizarra("Guardar");
+    		boolean resultado = cm.doActionPizarra(OperationsType.SAVE.toString());
     		if(resultado) {
     			//Si se ha guardado, desactivar modificado => desactivar botón guardado.
     			modificado = !resultado;

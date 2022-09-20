@@ -26,6 +26,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import controlador.IO;
 import modelo.Labels;
+import modelo.Labels_GUI;
+
 import java.awt.BorderLayout;
 import javax.swing.JCheckBox;
 
@@ -87,9 +89,9 @@ public class GraficasChart{
 	 * Inicia los parámetros internos del menú adjunto a la gráfica.
 	 */
 	private void iniciarMenu() {	
-		mnVer = new JMenu("Ver");
-		mnCasos = new JMenu("Casos");
-		mnTasas = new JMenu("Tasas");
+		mnVer = new JMenu(Labels_GUI.M_VER);
+		mnCasos = new JMenu(Labels_GUI.M_CASOS);
+		mnTasas = new JMenu(Labels_GUI.M_TASAS);
 		menuBar.add(mnVer);
 		menuBar.add(mnCasos);
 		menuBar.add(mnTasas);
@@ -209,8 +211,8 @@ public class GraficasChart{
 			//Añadir una nueva serie al mapa de series.
 			seriesMap.put(nombre, new XYSeries(nombre));
 			//Nueva serie -> nueva opción de visualizar en el menú.
-			if(nombre.startsWith("Casos")) addJMenuItem(mnCasos,nombre,false,null);
-			else if(nombre.startsWith("Tasa")) addJMenuItem(mnTasas,nombre,false,null);
+			if(nombre.startsWith(Labels_GUI.M_CASOS)) addJMenuItem(mnCasos,nombre,false,null);
+			else if(nombre.startsWith(Labels_GUI.M_TASA)) addJMenuItem(mnTasas,nombre,false,null);
 			else if(nombre.equals(Labels.getWord( Labels.C100K ) )) {
 				//Añadir serie al menú
 				addJMenuItem(mnVer,nombre,true,null);

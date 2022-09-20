@@ -28,6 +28,7 @@ import com.toedter.calendar.JTextFieldDateEditor;
 import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.Labels;
+import modelo.Labels_GUI;
 import modelo.TypesFiles;
 
 import java.text.ParseException;
@@ -74,7 +75,7 @@ public class ParametrosProyecto extends JPanel {
 		this.cm = cm;
 		setAutoscrolls(true);
 		setSize(new Dimension(1024, 768));
-		setName("Propiedades_Proyecto");
+		setName(Labels_GUI.PROJECT_NAME);
 		archivos.setBounds(275, 323, 640, 347);
 		add(archivos);	
 		configurar();
@@ -123,11 +124,11 @@ public class ParametrosProyecto extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			boolean continuar = true;
-			String aviso = "El siguiente paso eliminará parcial o toltamente los datos almacenados previamente ¿desea continuar?";
+			String aviso = Labels_GUI.WARNING_1;
 			//Primer valor obligatorio.
 			try{NG = Integer.parseInt(fTFNGrupos.getText());}
 			catch(Exception e) {
-				String s = "Número de grupos de estudio incorrecto: " + fTFNGrupos.getText();
+				String s = Labels_GUI.WARNING_2 + fTFNGrupos.getText();
 				cm.showMessage(s, 0);
 				fTFNGrupos.setText(null);										//Le borramos texto introducido.
 				continuar = false;
@@ -138,11 +139,11 @@ public class ParametrosProyecto extends JPanel {
 
 			//Comprobación de valores obligatorios y emisión si procede de mensaje de error.
 			if(continuar && NG == 0) {
-				cm.showMessage("El número de grupos debe ser mayor de cero.", 0);
+				cm.showMessage(Labels_GUI.WARNING_3, 0);
 				continuar = false;
 			//Comprobación de nombre válido.
 			}else if(continuar && (name == null || name.equals(""))) {
-				cm.showMessage("El campo nombre no puede estar vacio.", 0);
+				cm.showMessage(Labels_GUI.WARNING_EMPTY_FIELD, 0);
 				continuar = false;
 			//Si no hubieron errores y hay confirmación -> proceder con la actualización de los datos.
 			}else if(continuar && cm.showMessage(aviso,3) == JOptionPane.OK_OPTION ){
@@ -164,7 +165,7 @@ public class ParametrosProyecto extends JPanel {
 			//Versión, sino hay datos, coloca una versión inicial.
 			String version = fTFVersion.getText();
 			if(version != null) datos.put(Labels.VERSION,version);
-			else datos.put(Labels.VERSION,"1.0");
+			else datos.put(Labels.VERSION,Labels_GUI.VERSION_NUMBER);
 			//Fechas, si no hay datos, coloca fecha actual.
 			Date d = dateChooser0.getDate();
 			if(d != null) datos.put(Labels.DATE0, dateToString( d));
@@ -211,10 +212,10 @@ public class ParametrosProyecto extends JPanel {
 	 *  posiciones, dimensiones, iconos, textos emergentes, etc.
 	 */
 	private void configurar() {
-		fTFNombre = setUpTextField(null,"Nombre del modelo, se usará para dar nombre a los archivos que lo componen.", SwingConstants.LEFT);
-		fTFAutor = setUpTextField(null,"Autor del modelo.",SwingConstants.LEFT);
-		fTFVersion = setUpTextField("1.0","Número de versión del modelo.",SwingConstants.CENTER);	
-		fTFNGrupos = setUpTextField(null,"Número de grupos de población que componen el modelo.",SwingConstants.CENTER);
+		fTFNombre = setUpTextField(null,Labels_GUI.TT_MODEL_NAME, SwingConstants.LEFT);
+		fTFAutor = setUpTextField(null,Labels_GUI.TT_AUTHOR,SwingConstants.LEFT);
+		fTFVersion = setUpTextField(Labels_GUI.VERSION_NUMBER,Labels_GUI.TT_VERSION_MODEL,SwingConstants.CENTER);	
+		fTFNGrupos = setUpTextField(null,Labels_GUI.TT_NG,SwingConstants.CENTER);
 
 		//
 		fTFNombre.setBounds(275, 83, 235, 19);
@@ -223,7 +224,7 @@ public class ParametrosProyecto extends JPanel {
 		fTFNGrupos.setBounds(275, 277, 63, 19);
 
 		//
-		setName("Módulos");
+		setName(Labels_GUI.NAME_MODULES);
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setBackground(Color.LIGHT_GRAY);
 		setAutoscrolls(true);
@@ -235,22 +236,22 @@ public class ParametrosProyecto extends JPanel {
 		add(fTFNGrupos);
 		
 
-		JLabel lblAutor = new JLabel("Autor/a:");
+		JLabel lblAutor = new JLabel(Labels_GUI.L_AUTHOR);
 		lblAutor.setBounds(53, 112, 57, 15);
 		add(lblAutor);
-		JLabel lblFechaDeltima = new JLabel("Fecha modificación:");
+		JLabel lblFechaDeltima = new JLabel(Labels_GUI.L_DATE_MODIFIED);
 		lblFechaDeltima.setBounds(556, 112, 147, 15);
 		add(lblFechaDeltima);
 		//
 		JLabel label_obligatorio_1 = new JLabel("");
-		label_obligatorio_1.setToolTipText("Campo obligatorio");
+		label_obligatorio_1.setToolTipText(Labels_GUI.L_MANDATORY_FIELD);
 		label_obligatorio_1.setHorizontalAlignment(SwingConstants.CENTER);
 		label_obligatorio_1.setBounds(new Rectangle(28, 277, 15, 15));
 		label_obligatorio_1.setIcon(IO.getIcon("/vista/imagenes/Iconos/obligatorio2_64px.png",20,20));
 		add(label_obligatorio_1);
 		
 		JLabel label_obligatorio = new JLabel("");
-		label_obligatorio.setToolTipText("Campo obligatorio");
+		label_obligatorio.setToolTipText(Labels_GUI.L_MANDATORY_FIELD);
 		label_obligatorio.setHorizontalAlignment(SwingConstants.CENTER);
 		label_obligatorio.setBounds(new Rectangle(28, 83, 15, 15));
 
@@ -265,20 +266,20 @@ public class ParametrosProyecto extends JPanel {
 		textArea.setBounds(275, 141, 235, 88);
 		textArea.setMinimumSize(new Dimension(200, 100));
 		textArea.setMaximumSize(new Dimension(2147, 2147));
-		textArea.setToolTipText("Introduzca cualquier texto descriptivo que crea necesario acerca del modelo.");
+		textArea.setToolTipText(Labels_GUI.TT_DESCRIPTION);
 		textArea.setBorder(new LineBorder(Color.BLACK, 1, true));
 		textArea.setBackground(Color.WHITE);
 
 		textArea.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		add(textArea);
 		
-		JLabel lblNombreDelProyecto = new JLabel("Título del Proyecto:");
+		JLabel lblNombreDelProyecto = new JLabel(Labels_GUI.PRJ_TITLE);
 		lblNombreDelProyecto.setBounds(53, 85, 153, 15);
 		add(lblNombreDelProyecto);		
 		
 		dateChooser1 = new JDateChooser();
 		dateChooser1.setBounds(721, 108, 194, 19);
-		dateChooser1.setToolTipText("Indica la última fecha de modificación.");
+		dateChooser1.setToolTipText(Labels_GUI.TT_DATE_MODIFIED);
 		dateChooser1.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		//Desactivar la edición de fechas de forma manual.
 		JTextFieldDateEditor editor = (JTextFieldDateEditor) dateChooser1.getDateEditor();
@@ -286,7 +287,7 @@ public class ParametrosProyecto extends JPanel {
 		add(dateChooser1);
 		
 		dateChooser0 = new JDateChooser();
-		dateChooser0.setToolTipText("Indica la fecha de creación.");
+		dateChooser0.setToolTipText(Labels_GUI.TT_DATE_CREATION);
 		dateChooser0.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		dateChooser0.setBounds(724, 83, 191, 19);
 		//Desactivar la edición de fechas de forma manual.
@@ -295,21 +296,21 @@ public class ParametrosProyecto extends JPanel {
 		add(dateChooser0);
 		
 		
-		JLabel lblDescripcin = new JLabel("Descripción del modelo:");
+		JLabel lblDescripcin = new JLabel(Labels_GUI.L_DESCRIPTION_MODEL);
 		lblDescripcin.setBounds(53, 137, 180, 15);
 		add(lblDescripcin);
-		JLabel lblNmeroDeGrupos = new JLabel("Número de Grupos de estudio:");
+		JLabel lblNmeroDeGrupos = new JLabel(Labels_GUI.L_NG);
 		lblNmeroDeGrupos.setBounds(53, 279, 217, 15);
 		add(lblNmeroDeGrupos);
-		JLabel lblArchivosDelProyecto = new JLabel("Archivos del modelo:");
+		JLabel lblArchivosDelProyecto = new JLabel(Labels_GUI.L_FILES);
 		lblArchivosDelProyecto.setBounds(53, 336, 157, 15);
 		add(lblArchivosDelProyecto);
 		JLabel txtVersion = new JLabel();
-		txtVersion.setText("Versión:");
+		txtVersion.setText(Labels_GUI.VERSION_TITLE);
 		txtVersion.setBounds(556, 155, 137, 19);
 		add(txtVersion);
 		
-		JLabel lblFechaDeCreacin = new JLabel("Fecha de creación: ");
+		JLabel lblFechaDeCreacin = new JLabel(Labels_GUI.L_DATE_CREATION);
 		lblFechaDeCreacin.setBounds(556, 85, 137, 15);
 		add(lblFechaDeCreacin);
 
@@ -320,10 +321,10 @@ public class ParametrosProyecto extends JPanel {
 		add(separator);
 		
 		
-		JButton btnAplicar = new JButton("Aplicar Cambios");
+		JButton btnAplicar = new JButton(Labels_GUI.BTN_APPLY);
 		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
-		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
+		btnAplicar.setToolTipText(Labels_GUI.TT_BTN_APPLY);
 		btnAplicar.setBounds(682, 201, 233, 74);
 		add(btnAplicar);
 		
@@ -381,35 +382,4 @@ public class ParametrosProyecto extends JPanel {
 		jtf.setColumns(10);
 		return jtf;
 	}
-	
-//	/**
-//	 * <p>Title: abrirFrame</p>  
-//	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
-//	 */
-//	public void abrirFrame() {
-//	    JFrame frame = new JFrame("Paneles de configuración");
-//	    Dimension m = getPreferredSize();
-//	    int x = (int)m.getWidth() +25;
-//	    int y = (int)m.getHeight()+15;
-//	    frame.setPreferredSize(new Dimension(x, y));
-//	    frame.setSize(new Dimension(x, y));
-//	    frame.setMaximumSize(new Dimension(2767, 2767));
-//		frame.setMinimumSize(new Dimension(800, 600));
-//	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//	    frame.setLocationRelativeTo(null);
-//	    frame.getContentPane().add(this);
-//		frame.pack();
-//        frame.setVisible(true);
-//	}
-	
-
-//	/**
-//	 * <p>Title: main</p>  
-//	 * <p>Description: Método para pruebas.</p> 
-//	 * @param args Nada
-//	 */
-//	public static void main(String[] args) {
-//		ParametrosProyecto pp = new ParametrosProyecto(new ControladorModulos(),new Archivos(null));
-//		pp.abrirFrame();
-//	}
 }

@@ -50,7 +50,10 @@ public class TypesFiles {
     public final static String IMG = "imagen";
     /** Archivo de lectura PDF*/
 	public final static String PDF = "pdf";
-
+	/** Tipo de archivo Modelo A*/
+	public final static String MODEL_A = "A";
+	/** Tipo de archivo Modelo B*/
+	public final static String MODEL_B = "B";
 	/**
 	 * Inicializa los valores aceptables para los tipos de archivos soportados por el sistema. 
 	 */
@@ -58,20 +61,22 @@ public class TypesFiles {
 	
     private static void configurar() {
     	tipos = new HashMap<String,String>();
-    	tipos.put(PAL, "Paleta");
-		tipos.put(DEF, "Enfermedad");
-		tipos.put(CSV, "Archivo general");
-		tipos.put(HST, "Histórico");
-		tipos.put(MAP, "Mapas");
-		tipos.put(GRP, "Poblaciones");
-		tipos.put(PRJ, "Proyecto");
-		tipos.put(REL, "Relaciones");
-		tipos.put(PNG, "Archivos de imagen PNG");
-		tipos.put(JPG, "Archivos de imagen JPG");
-		tipos.put(JPEG,"Archivos de imagen JPEG");
-		tipos.put(GIF, "Archivos de imagen GIF");
-		tipos.put(IMG, "Archivos de imagen PNG, JPG, JPEG o GIF");
-		tipos.put(PDF, "Archivo de manual PDF");
+    	tipos.put(PAL, Labels_GUI.PAL);
+		tipos.put(DEF, Labels_GUI.DEF);
+		tipos.put(CSV, Labels_GUI.CSV);
+		tipos.put(HST, Labels_GUI.HST);
+		tipos.put(MAP, Labels_GUI.MAP);
+		tipos.put(GRP, Labels_GUI.GRP);
+		tipos.put(PRJ, Labels_GUI.PRJ);
+		tipos.put(REL, Labels_GUI.REL);
+		tipos.put(PNG, Labels_GUI.PNG);
+		tipos.put(JPG, Labels_GUI.JPG);
+		tipos.put(JPEG, Labels_GUI.JPEG);
+		tipos.put(GIF, Labels_GUI.GIF);
+		tipos.put(IMG, Labels_GUI.IMG);
+		tipos.put(PDF, Labels_GUI.PDF);
+		tipos.put(MODEL_A, Labels_GUI.MODEL_A);
+		tipos.put(MODEL_B, Labels_GUI.MODEL_B);
     }
    
    /**

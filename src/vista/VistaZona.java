@@ -20,6 +20,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import modelo.Labels;
+import modelo.Labels_GUI;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -80,7 +82,7 @@ public class VistaZona extends JPanel {
 	 */
 	public VistaZona(Zona zona, ControladorModulos cm) {
 		this.cm = cm;
-		if(zona == null) this.zona = new Zona(0, "No asignado", 0, 0,0,0,0,0,0, null);	
+		if(zona == null) this.zona = new Zona(0,Labels_GUI.NO_ASSIGNED , 0, 0,0,0,0,0,0, null);	
 		else this.zona = zona;
 		panelCentral = new JPanel();
 		panelChart = new JPanel();
@@ -98,16 +100,16 @@ public class VistaZona extends JPanel {
 		add(panelCentral);
 		panelCentral.setLayout(null);	
 		
-		addLabel("ID:", null, posXL,gap,19,15);
-		addLabel("Nombre:",null,posXL,2*gap,172,15);
-		addLabel("Población:",null,posXL,3*gap,81,15);
-		addLabel("Superficie:",null,posXL,4*gap,81,15);
+		addLabel(Labels.ID + ":", null, posXL,gap,19,15);
+		addLabel(Labels_GUI.NAME,null,posXL,2*gap,172,15);
+		addLabel(Labels_GUI.POPULATON,null,posXL,3*gap,81,15);
+		addLabel(Labels_GUI.AREA,null,posXL,4*gap,81,15);
 		//
-		addLabel("Susceptibles:",null,posXL,5*gap,100,15);
-		addLabel("Infectados:",null,posXL,6*gap,100,15);
-		addLabel("Recuperados:",null,posXL,7*gap,100,15);
-		addLabel("Prevalencia:",null,posXL,8*gap,100,15);
-		addLabel("Nivel de incidencia:",null,posXL,9*gap,175,15);
+		addLabel(Labels.getWord(Labels.S) + ":",null,posXL,5*gap,100,15);
+		addLabel(Labels.getWord(Labels.I) + ":",null,posXL,6*gap,100,15);
+		addLabel(Labels.getWord(Labels.R) + ":",null,posXL,7*gap,100,15);
+		addLabel(Labels.getWord(Labels.P) + ":",null,posXL,8*gap,100,15);
+		addLabel(Labels.getWord(Labels.C100K) + ":",null,posXL,9*gap,175,15);
 		
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(0, 0, 139));
@@ -115,7 +117,7 @@ public class VistaZona extends JPanel {
 		separator.setBounds(posXL, 10*gap, 262, 13);
 		panelCentral.add(separator);
 		
-		JLabel lblRepresentacingrfica = new JLabel("Representación Gráfica");
+		JLabel lblRepresentacingrfica = new JLabel(Labels_GUI.L_GRAPHIC_THUMB);
 		lblRepresentacingrfica.setHorizontalAlignment(SwingConstants.LEFT);
 		lblRepresentacingrfica.setBounds(posXL, 11*gap, 166, 15);
 		panelCentral.add(lblRepresentacingrfica);
@@ -128,22 +130,22 @@ public class VistaZona extends JPanel {
 		int posY = 18;
 		int alto = 19;
 		int ancho = 150;
-		tf_ID = iniciarTextField("ID",posX, posY, 114, alto);
-		tf_NAME = iniciarTextField("Nombre del grupo de población",posX, posY + gap*1, ancho, alto);
-		tf_PEOPLE = iniciarTextField("Población inicial",posX, posY + gap*2, ancho, alto);
-		tf_AREA = iniciarTextField("Superficie en kilomentros cuadrados",posX, posY + gap*3, ancho, alto);
-		tf_S = iniciarTextField("Número de personas susceptibles inicial",posX, posY + gap*4, ancho, alto);
-		tf_I = iniciarTextField("Número de personas infectadas incial",posX, posY + gap*5, ancho, alto);
-		tf_R = iniciarTextField("Número de personas recuperadas incialmente",posX, posY + gap*6, ancho, alto);
-		tf_P = iniciarTextField("Prevalencia obtenida",posX, posY + gap*7, ancho, alto);
-		tf_C100K = iniciarTextField("Nivel de incidencia",152, posY + gap*8, 114, 19);
+		tf_ID = iniciarTextField(Labels.ID,posX, posY, 114, alto);
+		tf_NAME = iniciarTextField(Labels_GUI.L_NAME_Z,posX, posY + gap*1, ancho, alto);
+		tf_PEOPLE = iniciarTextField(Labels.getWord(Labels.PT0),posX, posY + gap*2, ancho, alto);
+		tf_AREA = iniciarTextField(Labels_GUI.L_AREA,posX, posY + gap*3, ancho, alto);
+		tf_S = iniciarTextField(Labels_GUI.L_S0,posX, posY + gap*4, ancho, alto);
+		tf_I = iniciarTextField(Labels_GUI.L_I0,posX, posY + gap*5, ancho, alto);
+		tf_R = iniciarTextField(Labels_GUI.L_R0,posX, posY + gap*6, ancho, alto);
+		tf_P = iniciarTextField(Labels_GUI.L_P0,posX, posY + gap*7, ancho, alto);
+		tf_C100K = iniciarTextField(Labels.getWord(Labels.C100K),152, posY + gap*8, 114, 19);
 		tf_P.setEditable(false);
 		tf_C100K.setEditable(false);
 		
-		JButton btnAplicar = new JButton("Aplicar Cambios");
+		JButton btnAplicar = new JButton(Labels_GUI.BTN_APPLY);
 		btnAplicar.addMouseListener(new BotonL());
 		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
-		btnAplicar.setToolTipText("Guarda los cambios efectuados.");
+		btnAplicar.setToolTipText(Labels_GUI.TT_SAVE);
 		btnAplicar.setBounds(374, 393, 233, 74);
 		panelCentral.add(btnAplicar);
 		//
@@ -185,7 +187,7 @@ public class VistaZona extends JPanel {
 	 * mejorando mucho la personalización de la aplicación.
 	 */
 	public void abrirFrame() {
-	    JFrame frame = new JFrame("Módulo de Archivos");
+	    JFrame frame = new JFrame(Labels_GUI.W_FILES_TITLE);
 	    Dimension m = getPreferredSize();
 	    int x = (int)m.getWidth();
 	    int y = (int)m.getHeight()+15;
@@ -286,7 +288,7 @@ public class VistaZona extends JPanel {
 				zona.setP(i/(s+i+r));
 				zona.setNivel(Integer.parseInt(tf_C100K.getText()));
 				
-			}catch(Exception e) {System.out.println("Valor incorrecto");}
+			}catch(Exception e) {System.out.println(Labels_GUI.WRONG_VALUE);}
 			cm.doActionVistaZona(zona.getID());
 		}
 	}

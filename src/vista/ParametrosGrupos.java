@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.Labels_GUI;
 import modelo.Zona;
 
 /**
@@ -109,7 +110,7 @@ public class ParametrosGrupos extends JPanel {
 	 * Visualiza los datos del módulo dentro de su propio marco.
 	 */
 	public void configurarFrame() {
-	    frame = new JFrame("Parámetros de los Grupos");
+	    frame = new JFrame(Labels_GUI.W_GRP_TITLE);
 	    Dimension m = getPreferredSize();
 	    int x = (int)m.getWidth()+ 20;
 	    int y = (int)m.getHeight()+15;
