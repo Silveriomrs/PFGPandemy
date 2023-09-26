@@ -45,6 +45,7 @@ import com.toedter.calendar.JTextFieldDateEditor;
 
 import controlador.ControladorModulos;
 import modelo.DCVS;
+import modelo.ImagesList;
 import modelo.Labels;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
@@ -67,7 +68,7 @@ public class Player extends JPanel implements ActionListener{
 	private JFrame frame;
 	private JButton btnPlayPause;
 	private Timer timer;
-	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/degradado.png");
+	private final FondoPanel fondo = new FondoPanel(ImagesList.BCKGND_PLAYER);
 	private TitledBorder tb;
 	private JSlider slider;
 	private JProgressBar progressBar;

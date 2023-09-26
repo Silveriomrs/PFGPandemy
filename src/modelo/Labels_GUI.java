@@ -155,11 +155,11 @@ public class Labels_GUI {
 	public final static String MHELP_TABLES = "Formato Tablas";
 	public final static String MHELP_USER_GUIDE = "Manual de Usuario";
 	public final static String MHELP_ABOUT = "Acerca de...";
-	public final static String MPREFERENCES_SPANISH = "Español";
-	public final static String MPREFERENCES_ENGLISH = "English";
-	public final static String MPREFERENCES_FRENCH = "French";
-	public final static String MPREFERENCES_GERMAN = "German";
-	public final static String MPREFERENCES_UKRANIAN = "Ukranian";
+	public final static String MPREFERENCES_ES = "Español";
+	public final static String MPREFERENCES_EN = "English";
+	public final static String MPREFERENCES_FR = "Français";
+	public final static String MPREFERENCES_DE = "Deutsch";
+	public final static String MPREFERENCES_UR = "Українська";
 	
 	/*TablaEditor*/
 	public final static String PANEL_NAME_TE = "panel_tabla";
@@ -280,6 +280,4 @@ public class Labels_GUI {
 	public final static String MODEL_A = "Archivo Modelo A";
 	public final static String MODEL_B = "Archivo Modelo B";
 	public final static String PLAYER = "Player";
-
-
 }

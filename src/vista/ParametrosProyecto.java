@@ -27,6 +27,7 @@ import com.toedter.calendar.JTextFieldDateEditor;
 
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.ImagesList;
 import modelo.Labels;
 import modelo.Labels_GUI;
 import modelo.TypesFiles;
@@ -53,7 +54,7 @@ public class ParametrosProyecto extends JPanel {
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -73292561581668096L;
 	private Image imagen;
-	private String ruta = "/vista/imagenes/agua_800px.png";
+	private String ruta = ImagesList.BCKGND_PARAMETERS;
 	private ControladorModulos cm;
 	private JFormattedTextField fTFNombre;
 	private JFormattedTextField fTFAutor;
@@ -247,7 +248,7 @@ public class ParametrosProyecto extends JPanel {
 		label_obligatorio_1.setToolTipText(Labels_GUI.L_MANDATORY_FIELD);
 		label_obligatorio_1.setHorizontalAlignment(SwingConstants.CENTER);
 		label_obligatorio_1.setBounds(new Rectangle(28, 277, 15, 15));
-		label_obligatorio_1.setIcon(IO.getIcon("/vista/imagenes/Iconos/obligatorio2_64px.png",20,20));
+		label_obligatorio_1.setIcon(IO.getIcon(ImagesList.MANDATORY,20,20));
 		add(label_obligatorio_1);
 		
 		JLabel label_obligatorio = new JLabel("");
@@ -255,7 +256,7 @@ public class ParametrosProyecto extends JPanel {
 		label_obligatorio.setHorizontalAlignment(SwingConstants.CENTER);
 		label_obligatorio.setBounds(new Rectangle(28, 83, 15, 15));
 
-		label_obligatorio.setIcon(IO.getIcon("/vista/imagenes/Iconos/obligatorio2_64px.png",20,20));
+		label_obligatorio.setIcon(IO.getIcon(ImagesList.MANDATORY,20,20));
 		add(label_obligatorio);
 		
 		
@@ -323,7 +324,7 @@ public class ParametrosProyecto extends JPanel {
 		
 		JButton btnAplicar = new JButton(Labels_GUI.BTN_APPLY);
 		btnAplicar.addMouseListener(new BotonL());
-		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
+		btnAplicar.setIcon(IO.getIcon( ImagesList.OK,64,64));
 		btnAplicar.setToolTipText(Labels_GUI.TT_BTN_APPLY);
 		btnAplicar.setBounds(682, 201, 233, 74);
 		add(btnAplicar);

@@ -46,6 +46,7 @@ import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.DCVS;
 import modelo.DCVSFactory;
+import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.ModuleType;
 import modelo.OperationsType;
@@ -66,7 +67,7 @@ public class TablaEditor extends JPanel{
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -3765555595448024955L;
 	//
-	private final String IVentana = "/vista/imagenes/Iconos/editorGrafico_128px.png";
+	private final String IVentana = ImagesList.PIZARRA;
 	//
 	private JButton btnGuardarArchivo,btnGuardarCambios,btnBorrarTabla;
 	private JButton btnAddRow,btnAddCol,btnNuevaTabla,btnBorrarFila,btnBorrarColumna;
@@ -85,7 +86,7 @@ public class TablaEditor extends JPanel{
 	private JPanel boxAsignacion;
 	private JFrame frame;
 	private Image imagen;
-	private String ruta = "/vista/imagenes/degradado.png";
+	private String fondo = ImagesList.BCKGND_TABLE_EDITOR;
 	
 	private boolean modificado;
 	private boolean editable; 													//Habilita la edición del número de columnas y filas.
@@ -115,8 +116,8 @@ public class TablaEditor extends JPanel{
 	 */
 	@Override
 	public void paint(Graphics g) {
-		if(ruta != null) {
-			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+		if(fondo != null) {
+			imagen = new ImageIcon(getClass().getResource(fondo)).getImage();
 			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
 			setOpaque(false);
 			super.paint(g);
@@ -180,20 +181,20 @@ public class TablaEditor extends JPanel{
 		jtoolBar.setOpaque(false);
 
 		//Añadir los botones
-		btnNuevaTabla = addBotonToolBar(Labels_GUI.TT_NEW_TABLE_TE,"/vista/imagenes/Iconos/nuevaTabla_64px.png",new BtnNuevaTablaML(),Color.GREEN);
-		btnAddRow= addBotonToolBar(Labels_GUI.TT_NEW_ROW,"/vista/imagenes/Iconos/nuevaFila_64px.png",new BtnAddRowML(),null);
-		btnAddCol = addBotonToolBar(Labels_GUI.TT_NEW_COL,"/vista/imagenes/Iconos/nuevaColumna_64px.png",new BtnAddColML(),null);
+		btnNuevaTabla = addBotonToolBar(Labels_GUI.TT_NEW_TABLE_TE, ImagesList.TE_NEW_TABLE,new BtnNuevaTablaML(),Color.GREEN);
+		btnAddRow= addBotonToolBar(Labels_GUI.TT_NEW_ROW, ImagesList.TE_NEW_ROW,new BtnAddRowML(),null);
+		btnAddCol = addBotonToolBar(Labels_GUI.TT_NEW_COL, ImagesList.TE_NEW_COL,new BtnAddColML(),null);
 		jtoolBar.addSeparator();
-		btnBorrarFila = addBotonToolBar(Labels_GUI.TT_DEL_ROW,"/vista/imagenes/Iconos/eliminarFila_64px.png",new BtnBorrarFilaML(),Color.ORANGE);
-		btnBorrarColumna = addBotonToolBar(Labels_GUI.TT_DEL_COL,"/vista/imagenes/Iconos/eliminarCol_64px.png",new BtnBorrarColumnaML(),Color.ORANGE);
-		btnBorrarTabla = addBotonToolBar(Labels_GUI.TT_DEL_TABLE,"/vista/imagenes/Iconos/borrarTabla_64px.png",new BtnBorrarTablaML(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar(Labels_GUI.TT_DEL_ROW, ImagesList.TE_DEL_ROW,new BtnBorrarFilaML(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar(Labels_GUI.TT_DEL_COL, ImagesList.TE_DEL_COL,new BtnBorrarColumnaML(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar(Labels_GUI.TT_DEL_TABLE, ImagesList.TE_DEL_TABLE,new BtnBorrarTablaML(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		btnGuardarCambios = addBotonToolBar(Labels_GUI.TT_SAVE,"/vista/imagenes/Iconos/guardarCambios_64px.png",new BtnGuardarCambiosML(),null);
-		btnGuardarArchivo = addBotonToolBar(Labels_GUI.TT_SAVE_TABLE,"/vista/imagenes/Iconos/disquete_64px.png",new BtnGuardarArchivoML(),null);
-		addBotonToolBar(Labels_GUI.TT_LOAD_TABLE,"/vista/imagenes/Iconos/carpeta_64px.png",new BtnAbrirArchivoML(),null);
+		btnGuardarCambios = addBotonToolBar(Labels_GUI.TT_SAVE, ImagesList.DISK_2, new BtnGuardarCambiosML(),null);
+		btnGuardarArchivo = addBotonToolBar(Labels_GUI.TT_SAVE_TABLE, ImagesList.DISK_1, new BtnGuardarArchivoML(),null);
+		addBotonToolBar(Labels_GUI.TT_LOAD_TABLE, ImagesList.FOLDER,new BtnAbrirArchivoML(), null);
 		jtoolBar.addSeparator();
-		btnPrintTable = addBotonToolBar(Labels_GUI.TT_PRINT,"/vista/imagenes/Iconos/impresora_64px.png",new BtnImprimirML(),null);
+		btnPrintTable = addBotonToolBar(Labels_GUI.TT_PRINT, ImagesList.PRINTER,new BtnImprimirML(),null);
 
 		//BoxAsignación (JPanel)
 		boxAsignacion = new JPanel();
@@ -748,8 +749,8 @@ public class TablaEditor extends JPanel{
 				if(opt == JOptionPane.YES_OPTION) {
 					ModuleType[] options = new ModuleType[] {ModuleType.CSV,ModuleType.PRJ,ModuleType.DEF,ModuleType.PAL,ModuleType.MAP};
 					ModuleType opt2 = (ModuleType) JOptionPane.showInputDialog(getParent(),
-							Labels_GUI.MSG_CHOOSE_TEMPLATE_1,								//Mensaje de solicitud
-							Labels_GUI.MSG_CHOOSE_TEMPLATE_2,							//Mensaje de ventana
+							Labels_GUI.MSG_CHOOSE_TEMPLATE_1,					//Mensaje de solicitud
+							Labels_GUI.MSG_CHOOSE_TEMPLATE_2,					//Mensaje de ventana
 							JOptionPane.QUESTION_MESSAGE,						//Tipo de mensaje (pregunta selección)
 							null,												//Icono personalizado
 							options,											//Array de opciones.

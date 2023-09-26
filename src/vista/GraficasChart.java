@@ -25,6 +25,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import controlador.IO;
+import modelo.ImagesList;
 import modelo.Labels;
 import modelo.Labels_GUI;
 
@@ -54,7 +55,7 @@ public class GraficasChart{
 	private JMenu mnVer;
 	private JMenu mnCasos;
 	private JMenu mnTasas;
-	private final String background = "/vista/imagenes/degradado.png";
+	private final String background = ImagesList.BCKGND_CHART;
 	
 	/**
 	 * Constructor del chart gráfico de línea.  

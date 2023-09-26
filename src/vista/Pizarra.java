@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 
 import java.awt.event.MouseAdapter;
 
+import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
 import modelo.TypesFiles;
@@ -248,21 +249,21 @@ public class Pizarra extends JFrame {
 	private void crearBotones() {
 		//Configuración de los botones.
 	    bLimpiar = new JButton(Labels_GUI.BTN_CLEAR);
-	    bLimpiar.setIcon(IO.getIcon("/vista/imagenes/Iconos/limpiar_64px.png",25,25));
+	    bLimpiar.setIcon(IO.getIcon(ImagesList.CLEAN,25,25));
 	    bLimpiar.setToolTipText(Labels_GUI.TT_CLEAR);
 	    bAImagen = new JButton(OperationsType.OPEN.toString());
 	    bAImagen.addMouseListener(new AbrirListener());
-	    bAImagen.setIcon(IO.getIcon("/vista/imagenes/Iconos/carpeta_64px.png",25,25));
+	    bAImagen.setIcon(IO.getIcon(ImagesList.FOLDER,25,25));
 	    bAImagen.setToolTipText(Labels_GUI.TT_OPEN);
 	    bGuardar = new JButton(OperationsType.SAVE.toString());
-	    bGuardar.setIcon(IO.getIcon("/vista/imagenes/Iconos/disquete_64px.png",25,25));
+	    bGuardar.setIcon(IO.getIcon(ImagesList.DISK_1,25,25));
 	    bGuardar.setToolTipText(Labels_GUI.TT_SAVE);
 	    bGuardar.addMouseListener(new GuardarListener());
         bCerrarPoligono = new JButton(Labels_GUI.BTN_COMPOSE);
-        bCerrarPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/nodos_64px.png",25,25));
+        bCerrarPoligono.setIcon(IO.getIcon(ImagesList.NODES,25,25));
         bCerrarPoligono.setToolTipText(Labels_GUI.TT_COMPOSE);
         bBoxAplicar = new JButton("");
-	    bBoxAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/aplicando_64px.png",25,25));
+	    bBoxAplicar.setIcon(IO.getIcon(ImagesList.APPLY,25,25));
 	    bBoxAplicar.setToolTipText(Labels_GUI.TT_APPLY);
 	}
 

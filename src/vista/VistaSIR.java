@@ -25,6 +25,7 @@ import javax.swing.border.LineBorder;
 import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.DCVS;
+import modelo.ImagesList;
 import modelo.Labels;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
@@ -58,7 +59,7 @@ public class VistaSIR extends JPanel{
 	private JPanel panelCentral;
 	private ControladorModulos cm;												//Controlador de módulos.
 	private boolean IP;
-	private String ruta = "/vista/imagenes/blueWind.png";
+	private String fondo = ImagesList.BCKGND_DEF;
 
 
 	/**
@@ -90,7 +91,7 @@ public class VistaSIR extends JPanel{
 		//Botón aplicar.
 		btnAplicar = new JButton(OperationsType.APPLY.toString());
 		btnAplicar.addMouseListener(new BotonL());
-		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
+		btnAplicar.setIcon(IO.getIcon( ImagesList.OK,64,64));
 		btnAplicar.setToolTipText(Labels_GUI.TT_APPLY_CHANGES);
 		btnAplicar.setBounds(334, 252, 150, 87);
 		btnAplicar.setActionCommand(OperationsType.APPLY.toString());
@@ -121,7 +122,7 @@ public class VistaSIR extends JPanel{
 
 		//Establecer el icono representación del módulo Archivos.
 		JLabel labelLogo = new JLabel("");
-		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/motor_512px.png",70,75));
+		labelLogo.setIcon(IO.getIcon(ImagesList.DEF_ICON,70,75));
 		labelLogo.setBounds(12, 20, 70, 75);
 		panelCentral.add(labelLogo);
 
@@ -135,8 +136,8 @@ public class VistaSIR extends JPanel{
 	 */
 	@Override
 	public void paint(Graphics g) {
-		if(ruta != null) {
-			Image imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+		if(fondo != null) {
+			Image imagen = new ImageIcon(getClass().getResource(fondo)).getImage();
 			g.drawImage(imagen,panelCentral.getX(),panelCentral.getY(),panelCentral.getWidth(),panelCentral.getHeight(),panelCentral);
 			panelCentral.setOpaque(false);
 			super.paint(g);
@@ -283,15 +284,15 @@ public class VistaSIR extends JPanel{
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
-		addNewControlLine(Labels.PTE,"/vista/imagenes/Iconos/probabilidad_64px.png");
-		addNewControlLine(Labels.DME,"/vista/imagenes/Iconos/duracion_64px.png");
-		addNewControlLine(Labels.DMI,"/vista/imagenes/Iconos/duracionMedia_64px.png");
-		addNewControlLine(Labels.IT,"/vista/imagenes/Iconos/startTime_64px.png");
-		addNewControlLine(Labels.FT,"/vista/imagenes/Iconos/stopTime_64px.png");
+		addNewControlLine(Labels.PTE,ImagesList.ICON_PTE);
+		addNewControlLine(Labels.DME,ImagesList.ICON_PTE);
+		addNewControlLine(Labels.DMI,ImagesList.ICON_DMI);
+		addNewControlLine(Labels.IT,ImagesList.ICON_IT);
+		addNewControlLine(Labels.FT,ImagesList.ICON_FT);
 		//Configuración específica para DMIP
 		mapaFields.get(Labels.DMI).setDisabledTextColor(Color.RED);
 		//Selector de IP (Checkbox) configuración específica.
-		JLabel jl = iniciarLabels(null,"/vista/imagenes/Iconos/inmunidad_64px.png");
+		JLabel jl = iniciarLabels(null,ImagesList.ICON_IP);
 		int posY = lineaBase + 30*contador;
 		jl.setBounds(30,posY, 25, hi);
 		chckbxIP = new JCheckBox(Labels.getWord(Labels.IP));

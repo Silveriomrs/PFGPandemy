@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.Zona;
 
@@ -153,7 +154,7 @@ public class ParametrosGrupos extends JPanel {
 		for(int i = 1; i <= cm.getNumberZonas(); i++) {
 			Zona z = t.get(i);
 			if(z != null && !vistasZonas.containsKey(i)) {
-				iniciarTabZona(z,"/vista/imagenes/Iconos/sinImg_256px.png");
+				iniciarTabZona(z,ImagesList.NO_IMG);
 			}else if(z != null){
 				vistasZonas.get(i).setZona(z);
 			}

@@ -725,7 +725,7 @@ public class ControladorModulos {
 	 * Establece la vista que debe ser visible.
 	 * @param nombre Nombre de la vista a hacer visible.
 	 */
-	private void mostrarPanel(String nombre) {		
+	private void mostrarPanel(String nombre) {
 		//Mostrar panel correspondiente y ocultación del resto.
 		mapa.setVisible(nombre.equals(Labels_GUI.W_MAP_TITLE));					
 		tablaEditor.setVisible(nombre.equals(Labels_GUI.W_TE_TITLE));

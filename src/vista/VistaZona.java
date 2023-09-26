@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import modelo.ImagesList;
 import modelo.Labels;
 import modelo.Labels_GUI;
 import modelo.Zona;
@@ -144,7 +145,7 @@ public class VistaZona extends JPanel {
 		
 		JButton btnAplicar = new JButton(Labels_GUI.BTN_APPLY);
 		btnAplicar.addMouseListener(new BotonL());
-		btnAplicar.setIcon(IO.getIcon("/vista/imagenes/Iconos/ok_64px.png",64,64));
+		btnAplicar.setIcon(IO.getIcon( ImagesList.OK,64,64));
 		btnAplicar.setToolTipText(Labels_GUI.TT_SAVE);
 		btnAplicar.setBounds(374, 393, 233, 74);
 		panelCentral.add(btnAplicar);
@@ -317,7 +318,7 @@ public class VistaZona extends JPanel {
 			//Etiqueta para mostrar en caso de falta de poligono.
 			lblSinPoligono = new JLabel();
 			lblSinPoligono.setBounds(new Rectangle(0, 0, w, h));
-			lblSinPoligono.setIcon(IO.getIcon("/vista/imagenes/Iconos/sinImg_256px.png",getWidth(),getHeight()));
+			lblSinPoligono.setIcon(IO.getIcon( ImagesList.NO_IMG,getWidth(),getHeight()));
 			add(lblSinPoligono);
 		}
 		

@@ -15,6 +15,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import controlador.ControladorModulos;
 import controlador.IO;
+import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
 import modelo.TypesFiles;
@@ -48,15 +49,15 @@ public class Archivos extends JPanel {
 	private static final long serialVersionUID = 5320403899683788073L;	
 	private TitledBorder tb;
 	private Image imagen;
-	private String ruta = "/vista/imagenes/lineasAzules.png";
+	private String fondo = ImagesList.BCKGND_FILES;
 	//
 	private final int hi;														//Altura de los elementos (principalmente iconos).
 	private final int wi;														//Anchura de los iconos.
-	private final String iconAbrir = "/vista/imagenes/Iconos/carpeta_64px.png";
-	private final String iconGuardarComo = "/vista/imagenes/Iconos/disquete_64px.png";
-	private final String iconGuardarCambios = "/vista/imagenes/Iconos/guardarCambios_64px.png";
-	private final String iconEditar = "/vista/imagenes/Iconos/editarTabla_64px.png";
-	private final String iconBorrar = "/vista/imagenes/Iconos/borrar_64px.png";
+	private final String iconAbrir = ImagesList.FOLDER;
+	private final String iconGuardarComo = ImagesList.DISK_1;
+	private final String iconGuardarCambios = ImagesList.DISK_2;
+	private final String iconEditar = ImagesList.EDIT_TABLE;
+	private final String iconBorrar = ImagesList.DELETE;
 	private final int lineaBase = 100;											//Primera línea a partir de la cual se dibujan todos los elementos.
 	private int contador = 0;													//Contador de elementos que se han adjuntado de un grupo.
 	private JPanel panelCentral;
@@ -85,8 +86,8 @@ public class Archivos extends JPanel {
 	
 	@Override
 	public void paint(Graphics g) {
-		if(ruta != null) {
-			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+		if(fondo != null) {
+			imagen = new ImageIcon(getClass().getResource(fondo)).getImage();
 			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
 			setOpaque(false);
 			super.paint(g);
@@ -105,12 +106,12 @@ public class Archivos extends JPanel {
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
-		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL,Labels_GUI.TT_L_PRJ,"/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),Labels_GUI.W_GRP_TITLE + ".","/vista/imagenes/Iconos/spain_128px.png");
-		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),Labels_GUI.TT_L_DEF,"/vista/imagenes/Iconos/adn_64px.png");
-		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),Labels_GUI.TT_L_REL,"/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),Labels_GUI.TT_L_PAL,"/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),Labels_GUI.TT_L_HST,"/vista/imagenes/Iconos/animar_128px.png");
+		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL,Labels_GUI.TT_L_PRJ, ImagesList.CLIPBOARD);
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),Labels_GUI.W_GRP_TITLE + ".", ImagesList.FILES_ICON_MAP);
+		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),Labels_GUI.TT_L_DEF, ImagesList.FILES_ICON_DEF);
+		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),Labels_GUI.TT_L_REL, ImagesList.NODES);
+		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),Labels_GUI.TT_L_PAL, ImagesList.PAL);
+		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),Labels_GUI.TT_L_HST, ImagesList.PLAYER);
 		contador = 0;															// Reiniciar el contardor de líneas a 0.
 	}
 
@@ -192,7 +193,7 @@ public class Archivos extends JPanel {
 
 		//Establecer el icono representación del módulo Archivos.
 		JLabel labelLogo = new JLabel("");
-		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/archivo_64px.png",70,75));
+		labelLogo.setIcon(IO.getIcon( ImagesList.BOOKS,70,75));
 		labelLogo.setBounds(12, 12, 70, 75);
 		panelCentral.add(labelLogo);
 	}
@@ -203,7 +204,7 @@ public class Archivos extends JPanel {
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro.</p>
 	 * @param componente Etiqueta a la que adjuntar el icono
-	 * @param ruta Nombre del archivo y su ruta.
+	 * @param ruta Nombre del archivo y su fondo.
 	 * @param w Ancho a escalar de la imagen original.
 	 * @param h Alto a escalar de la imagen original.
 	 */
@@ -217,7 +218,7 @@ public class Archivos extends JPanel {
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
 	 * @param componente Etiqueta a la que adjuntar el icono
-	 * @param ruta Nombre del archivo y su ruta.
+	 * @param ruta Nombre del archivo y su fondo.
 	 * @param w Ancho a escalar de la imagen original.
 	 * @param h Alto a escalar de la imagen original.
 	 */
@@ -353,7 +354,7 @@ public class Archivos extends JPanel {
 	 * <p>Configura los botones de guardado correspondientes
 	 * a la etiqueta indicada.</p>
 	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
-	 *  activados mientras no haya definida una ruta previamente en el correspondiente
+	 *  activados mientras no haya definida una fondo previamente en el correspondiente
 	 *  campo.
 	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos.
 	 * o módulo al que hace referencia.

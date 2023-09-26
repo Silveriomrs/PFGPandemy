@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 
 import controlador.IO;
+import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
 
@@ -39,8 +40,8 @@ public class About extends JPanel {
 	private JLabel etiqueta;
 	private JButton btnCerrar;
 	private JPanel panel_animado;
-	private final String rutaImagen = "/vista/imagenes/Charlestoon.gif";
-	private final String rutaFondo = "/vista/imagenes/Fondo_About.png";
+	private final String rutaImagen = ImagesList.ABOUT_IMG_1;
+	private final String rutaFondo = ImagesList.BCKGND_ABOUT;
 
 	/** serialVersionUID*/  
 	private static final long serialVersionUID = -4660754389327191558L;

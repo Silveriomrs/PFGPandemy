@@ -64,7 +64,9 @@ public class IO{
 		File f = getFile(1,ruta,ext);
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
-				lectorCSV =  new CSVReader(new FileReader(f));									//Abrir el archivo.
+				System.out.println("IO > abrirArchivo > OK1");
+				lectorCSV =  new CSVReader(new FileReader(f));					// Abrir el archivo.
+				System.out.println("IO > abrirArchivo > OK2");
 				List<String[]> datos = lectorCSV.readAll();
 				if(ruta == null) ruta2 = f.getPath();
 				dcvs = new DCVS();
@@ -79,6 +81,7 @@ public class IO{
 			catch (IOException e) {System.out.println("Error trying to open a file.");}
 			catch (CsvException e) {System.out.println("Error trying to open a CSV file.");}
 			finally {
+				System.out.println("IO > abrirArchivo > Error con el manejador de ficheros. Cerrandolo.");
 				if(lectorCSV != null) lectorCSV.close();
 			}
 		}
