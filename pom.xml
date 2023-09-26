@@ -13,7 +13,7 @@
 	<dependency>
 	  <groupId>org.netbeans.external</groupId>
 	  <artifactId>AbsoluteLayout</artifactId>
-	  <version>RELEASE125</version>
+	  <version>RELEASE190</version>
 	</dependency>
 	<dependency>
 	    <groupId>com.toedter</groupId>
@@ -23,12 +23,12 @@
 	<dependency>
 	  <groupId>com.opencsv</groupId>
 	  <artifactId>opencsv</artifactId>
-	  <version>5.5.1</version>
+	  <version>5.8</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.jfree</groupId>
 	    <artifactId>jfreechart</artifactId>
-	    <version>1.5.3</version>
+	    <version>1.5.4</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.jfree</groupId>
@@ -36,15 +36,20 @@
 	    <version>1.0.23</version>
 	</dependency>
 		<dependency>
-	    <groupId>com.jgoodies</groupId>
-	    <artifactId>jgoodies-forms</artifactId>
-	    <version>1.8.0</version>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-lang3</artifactId>
+	    <version>3.13.0</version>
 	</dependency>
-	<dependency>
-	    <groupId>com.miglayout</groupId>
-	    <artifactId>miglayout-swing</artifactId>
-	    <version>11.0</version>
-	</dependency>
+<!--		<dependency>-->
+<!--	    <groupId>com.jgoodies</groupId>-->
+<!--	    <artifactId>jgoodies-forms</artifactId>-->
+<!--	    <version>1.8.0</version>-->
+<!--	</dependency>-->
+<!--	<dependency>-->
+<!--	    <groupId>com.miglayout</groupId>-->
+<!--	    <artifactId>miglayout-swing</artifactId>-->
+<!--	    <version>11.0</version>-->
+<!--	</dependency>-->
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
