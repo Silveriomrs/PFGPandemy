@@ -12,49 +12,54 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /**
+ * Clase que soporta toda la parte del modelo de la aplicación. Contiene los datos
+ * en formato de tables y añade las funciones necesarias para facilitar su manipulación
+ * y lectura por los diferentes módulos que hacen uso de ella.
  * @author Silverio Manuel Rosales Santana
  * @date 2021.04.12
- * @version 2.7
- *
+ * @version 2.8
  */
 public class DCVS implements TableModel{
 	private DefaultTableModel modelo;
 	private String ruta;
+	private String directorio;
+	private String nombre;
 	private String tipo;
+	private String date;
+	private boolean editLabels;
 	private Object[] cabecera;
 	private Object datos[][];
-
-	/**
-	 * Constructor de la clase. Recepciona un objeto de la clase DefaultTable Model
-	 * y lo establece como su modelo por defecto. En caso de recepcionar 'null'
-	 * establece este como modelo.
-	 * @param modelo Objeto DefaultTableModel a establecer o null.
-	 */
-	public DCVS(DefaultTableModel modelo) {
-		super();
-		this.modelo = modelo;
-		ruta = null;
-		tipo = "";
-	}
 	
 	/**
-	 * <p>Title: Constructor básico</p>  
 	 * <p>Description: crea un nuevo modelo sin filas ni columnas</p>
 	 * Su ruta es null y su tipo de datos vacio.  
 	 */
 	public DCVS() {
 		super();
+		setEditLabels(true);
 		ruta = null;
 		tipo = "";
 		nuevoModelo();
 	}
 
+	
+	/**
+	 * Elimina los datos de la fila referenciada.
+	 * @param f fila a leer.
+	 */
+	public void clearRow(int f) {
+		int columnas = getColumnCount();
+		for(int i = 0; i<columnas;i++) {
+			modelo.setValueAt(null,f, i);
+		}
+	}
+	
 	/**
 	 * Devuelve la fila referenciada.
 	 * @param f fila a leer.
 	 * @return devuelve un array Object[] con los datos de una fila
 	 */
-	public String[] getFila(int f) {
+	public String[] getRow(int f) {
 		int columnas = getColumnCount();
 		String[] fila = new String[columnas];
 		for(int i = 0; i<columnas;i++) {
@@ -64,13 +69,16 @@ public class DCVS implements TableModel{
 	}
 
 	/**
-	 * Añade una nueva fila a la tabla.
-	 * @param f Array de objetos de la fila a añadir al modelo.
+	 * Añade una nueva fila a la tabla. Si la función recibe un array de datos
+	 *  este será usado para añadir a la nueva fila, en otro caso crea una fila vacia
+	 *   con referencias null en cada columna de la fila.
+	 * @param f Array de objetos de la fila a añadir al modelo. NULL para añadir una fila
+	 *  vacia.
 	 * @return TRUE si ha tenido exito la operación, FALSE en otro caso.
 	 */
 	public boolean addFila(Object[] f) {
 		boolean ok = false;
-		if(modelo != null && f != null) {
+		if(modelo != null) {
 			modelo.addRow(f);
 			ok = true;
 		}
@@ -87,9 +95,21 @@ public class DCVS implements TableModel{
 		int n = cabecera.length;												//Obtenemos la longitud actual.
 		Object[] c = new Object[n+1];											//Instancia para el nuevo tamaño.
 		for(int i=0;i<n;i++) { c[i] = cabecera[i];}								//Copia de los datos.
-		cabecera[n+1] = nombre;													//Añade el nuevo nombre al array cabecera.
 		modelo.addColumn(nombre);												//Añade la nueva columna al modelo.
 		cabecera = c;															//Actualiza la nueva cabecera.
+	}
+	
+	/**
+	 * Establece un nuevo nombre a una posición de la cebcera
+	 * La función en si misma realiza una copia de la antigua cabecera y sustituye
+	 *  el valor de la posición indicada por el nuevo valor.
+	 * @param index Posición de la columna cuyo nombre se quiere cambiar.
+	 * @param name Nuevo nombre a establecer en la columna.
+	 */
+	public void setColumnName(int index, String name) {
+		//Modificación del valor de la columna especificado.
+		cabecera[index] = name;				
+		addCabecera(cabecera);													//Añade la nueva columna al modelo.
 	}
 	
 	/**
@@ -99,6 +119,22 @@ public class DCVS implements TableModel{
 	public void addCabecera(Object[] c) {
 		this.cabecera = c;
 		modelo.setColumnIdentifiers(c);
+	}
+	
+	/**
+	 * Función que elimina una fila de la tabla. Para ello se le debe pasar
+	 * el índice de la fila a eliminar.
+	 * @param fila Indice de la fila a eliminar.
+	 * @return done TRUE si se ha realizado con exito la operación,
+	 * false en otro caso.
+	 */
+	public boolean delFila(int fila) {
+		boolean done = false;
+		if (fila > -1 && fila < modelo.getRowCount()) {
+			modelo.removeRow(fila);
+			done = true;
+		}
+		return done;
 	}
 	
 	/**
@@ -120,23 +156,6 @@ public class DCVS implements TableModel{
 	}
 	
 	/**
-	 * Función que elimina una fila de la tabla. Para ello se le debe pasar
-	 * el índice de la fila a eliminar.
-	 * @param fila Indice de la fila a eliminar.
-	 * @return done TRUE si se ha realizado con exito la operación,
-	 * false en otro caso.
-	 */
-	public boolean delFila(int fila) {
-		boolean done = false;
-		if (fila > -1 && fila < modelo.getRowCount()) {
-			System.out.println("DCVS delFila ->\nFila: " + fila + " > " + getFila(fila)[0]);
-			modelo.removeRow(fila);
-			done = true;
-		}
-		return done;
-	}
-	
-	/**
 	 * Elimina las columnas indicadas en un arreglo con los indices de las
 	 * columnas a eliminar del modelo.
 	 * @param cols arreglo de los indices de comlumnas a eliminar.
@@ -144,23 +163,24 @@ public class DCVS implements TableModel{
 	 */
 	public DefaultTableModel delColumnas(int[] cols) {
 		int ncols = cols.length;												//Número de columnas a borrar.
-		int ncols2 = modelo.getColumnCount();									//Número de columnas en origen.
+		int ncols2 = getColumnCount();											//Número de columnas en origen.
 		int nfilas = getRowCount();
-		Object datos[][] = new Object[nfilas][ncols2 - ncols];
-		Object cabecera[] = new Object[ncols2 - ncols];
+		Object datos[][] = new Object[nfilas][ncols2 - ncols];					//Ajuste de las dimensiones de la nueva tabla.
+		Object cabecera[] = new Object[ncols2 - ncols];							//Ajuste de la nueva cabecera
 		int contCols = 0;
-		if (ncols > 0) {	
-			for(int j = 0; j<ncols2; j++) {
-				if(!isListed(cols,j)) {
-					//Copiar cabecera.
-					cabecera[contCols] = modelo.getColumnName(j);
-					//Copiar los datos.
+		if (ncols > 0) {
+			for(int j = 0; j<ncols2; j++) {										//Bucle que debe copiar los datos que deben permanecer
+				if(!isListed(cols,j)) {											//Comprueba si la columna actual esta en la lista de columnas a eliminar.
+					//Copiar cabecera en caso de que esta columna no esté listada.
+					cabecera[contCols] = getColumnName(j);
+					//Copiar los datos de cada fila de dicha columnaen el mismo caso.
 					for(int i=0; i<nfilas;i++) {
-						datos[i][contCols] = modelo.getValueAt(i,j);	
+						datos[i][contCols] = getValueAt(i,j);	
 					}
 					contCols++;
 				}
 			}
+			//Compone la nueva tabla con la nueva cabecera y matriz.
 			this.cabecera = cabecera;
 			this.datos = datos;
 			modelo = new DefaultTableModel(datos,cabecera);
@@ -184,8 +204,7 @@ public class DCVS implements TableModel{
 		}
 		return encontrado;
 	}
-	
-	
+		
 	/**
 	 * Devuelve la el modelo da la JTable
 	 * @return  DefaultTableModel modelo con los datos de la tabla.
@@ -194,8 +213,9 @@ public class DCVS implements TableModel{
 	
 	/**
 	 * Establece una matriz de objetos como la matriz de datos de la instancia
-	 * DCVS. Recibirá un array bidimensional de objetos.
+	 * DCVS. Requiere un array bidimensional de objetos.
 	 * @param datos Array Bidimensional de datos.
+	 * @see #crearModelo()
 	 */
 	public void setDatos(Object[][] datos) {this.datos = datos;}
 	
@@ -225,27 +245,24 @@ public class DCVS implements TableModel{
 		}
 		return modelo;
 	}
-	
-	
+		
 	/**
-	 * <p>Title: crearModelo</p>  
-	 * <p>Description: Crea un modelo con los datos almacenados en la instancia</p> 
+	 * Crea un modelo con los datos almacenados en la instancia 
 	 * @return Modelo conformado.
 	 */
 	public DefaultTableModel crearModelo() {
-		this.modelo = new DefaultTableModel(datos,cabecera);				//Conformar modelo
+		this.modelo = new DefaultTableModel(datos,cabecera);					//Conformar modelo
 		return modelo;
 	}
 	
 	/**
-	 * <p>Title: nuevoModelo</p>  
-	 * <p>Description: Crea una nueva tabla/modelo vacia.</p> 
+	 * Crea una nueva tabla/modelo vacia.
 	 */
 	public void nuevoModelo() {
 		//Cuerpo de datos
-		Object[][] datos = new Object[][]{};	
+		datos = new Object[][]{};	
 		//Cabecera de datos.		
-		String[] cabecera = new String[] {};
+		cabecera = new String[] {};
 		this.modelo = new DefaultTableModel(datos,cabecera){
 			/** serialVersionUID*/  
 			private static final long serialVersionUID = -2383558100131841835L;
@@ -281,11 +298,43 @@ public class DCVS implements TableModel{
 		return texto;
 	}
 	
+	/**
+	 * Asigna un valor a una etiqueta.
+	 * Realiza una búsqueda por las filas buscando una etiqueta (que están situadas
+	 *  en la primera fila (indice 0) hasta encontrarla, el valor de dicha etiqueta
+	 *   esta almacenado en el segundo campo, y este dato será sobre escrito por
+	 *    el nuevo valor. En otro caso no realiza acción alguna. 
+	 * @param label Etiqueta a buscar.
+	 * @param data Dato a insertar en la tabla.
+	 * @return TRUE si la operación se ha realizado correctamente, FALSE en otro caso.
+	 */
+	public boolean setDataToLabel(String label, String data) {
+		boolean done = true;
+		int index = getFilaItem(label);
+		if( index >= 0) setValueAt(data,index,1);
+		else {done = false;}
+		return done;
+	}
 	
 	/**
-	 * <p>Title: getFilaItem</p>  
-	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
-	 * de la tabla.</p> 
+	 * Devuelve el valor asignado a una etiqueta horizontal.
+	 * Las estiquetas en los módulos pueden estar orientadas de forma vertical
+	 *  (una columna) u horizontal (en filas). Este método realiza el indexado
+	 *   en modo horizontal, cuando encuentra dicha etiqueta devuelve el valor
+	 *    asociado. En caso de no existir dicha etiqueta, devolverá NULL.
+	 * @param label Etiqueta a buscar.
+	 * @return El valor asociado a la etiqueta, NULL en otro caso.
+	 */
+	public Object getDataFromRowLabel(String label) {
+		Object data = null;
+		int index = getFilaItem(label);
+		if(index > -1) data = getValueAt(index,1);
+		return data;
+	}
+		
+	/**
+	 * Busca un elemento/valor en todas las primeras celdas
+	 * de la tabla.
 	 * @param v Valor a encontrar.
 	 * @return Número de la fila que contiene dicho valor. -1 En otro caso.
 	 */
@@ -306,20 +355,22 @@ public class DCVS implements TableModel{
 	}
 
 	/**
-	 * <p>Title: getColItem</p>  
-	 * <p>Description: Busca un elemento/valor en todas las primeras celdas
-	 * de cada columna en la tabla. Es decir sus nombres.</p> 
+	 * Busca un elemento/valor en la cabecera de las columnas
+	 *  de la tabla (etiquetas) y devuelve el indice de la columna que coincide
+	 *   con la etiqueta buscada. 
 	 * @param v Valor a encontrar.
 	 * @return Número de la columna que contiene dicho valor (nombre). -1 En otro caso.
 	 */
-	public int getColItem(String v) { /* Función no probada. */
+	public int getColItem(String v) {
 		int cols = getColumnCount();
 		int col = -1;
 		int indexC = 0;
 		boolean encontrado = false;
+		//Bucle de búsqueda hasta encontrar la cadena o llegar al final de las columnas.
 		while(!encontrado && cols > indexC) {
-			String dato = getColumnName(indexC);
-			if(dato.equals(v)) {
+			String dato = getColumnName(indexC);								//Obtiene el valor de dicha columna.
+			if(dato.equals(v)) {												//Comprueba los valores búscado y contenido.
+				//En caso de encontrado, devuelve el número de columna y sale del bucle.
 				col = indexC;
 				encontrado = true;
 			}
@@ -328,51 +379,156 @@ public class DCVS implements TableModel{
 		return col;
 	}
 	
+	/**
+	 * Añade un suscriptor a la tabla.
+	 * @param arg0 El suscriptor a añadir a la lista de observadores.
+	 */
 	@Override
 	public void addTableModelListener(TableModelListener arg0) {modelo.addTableModelListener(arg0);}
 
+	/**
+	 * Devuelve la clase general correspondiente una columna.
+	 * @param arg0 Índice de la columna de la que se desea obtener su definición de clase.
+	 * @return Tipo de clase al que corresponde la columna indicada.
+	 */
 	@Override
 	public Class<?> getColumnClass(int arg0) {return modelo.getColumnClass(arg0);}
 
+	/**
+	 * @return Número de columnas que contiene la tabla.
+	 */
 	@Override
 	public int getColumnCount() {return modelo.getColumnCount();}
 
+	/**
+	 * @param arg0 Número de la columna cuyo nombre se desea obtener.
+	 * @return Cadena de texto con el nombre de la columna.
+	 */
 	@Override
 	public String getColumnName(int arg0) {return modelo.getColumnName(arg0);}
 
+	/**
+	 * @return devuelve el número de filas contenido en la tabla.
+	 */
 	@Override
 	public int getRowCount() {return modelo.getRowCount();}
 
+	/**
+	 * Obtiene el valor en la posición indicada (No se tiene en cuenta la cabecera).
+	 * @param arg0 Número de fila.
+	 * @param arg1 Número de columna.
+	 * @return Dato almacenado en dicha posición.
+	 */
 	@Override
 	public Object getValueAt(int arg0, int arg1) {return modelo.getValueAt(arg0, arg1);}
 
+	/**
+	 * Permite conocer si una celda es editable o no lo es.
+	 * En caso de que el módulo tenga desactivado la función de editar las etiquetas
+	 *  la primera columna no será editable.
+	 *  @see #setEditLabels
+	 */
 	@Override
-	public boolean isCellEditable(int arg0, int arg1) {return modelo.isCellEditable(arg0, arg1);}
+	public boolean isCellEditable(int arg0, int arg1) {
+		boolean is = modelo.isCellEditable(arg0, arg1);
+		if(arg1 == 0 && !editLabels) is = false;
+		return is;		
+	}
 
+	/**
+	 * Elimina un suscriptor de la lista de observadores de la tabla.
+	 * @param arg0 Suscriptor a eliminar de la lista.
+	 */
 	@Override
 	public void removeTableModelListener(TableModelListener arg0) { modelo.removeTableModelListener(arg0);}
 
+	
+	/**
+	 * Establece el dato en la posición indicada dentro de la tabla.
+	 *  Si no existe la columna o la fila, mostrará el mensaje de aviso correspondiente
+	 *   y no realizará acción alguna.
+	 * @param arg0 Objeto o dato a establecer.
+	 * @param arg1 Número de fila.
+	 * @param arg2 Número de columna.
+	 */
 	@Override
-	public void setValueAt(Object arg0, int arg1, int arg2) {this.modelo.setValueAt(arg0, arg1, arg2);}
+	public void setValueAt(Object arg0, int arg1, int arg2) {
+		if(arg1 > this.getRowCount()) {
+			System.out.println("DCVS > setValueAt > Valor de número de fila incorrecto: " + arg1 + "/" + this.getRowCount());
+		}else if (arg2 > this.getColumnCount() ) {
+			System.out.println("DCVS > setValueAt > Valor de número de columna incorrecto: " + arg2 + "/" + this.getColumnCount());
+		}else {this.modelo.setValueAt(arg0, arg1, arg2);}
+		
+	}
+	
 
 	/**
-	 * @return El/la ruta
+	 * @return La ruta en el dispositivo, de la que procede la fuente de los datos.
 	 */
 	public String getRuta() {return ruta;}
 
 	/**
-	 * @param ruta El/la ruta a establecer
+	 * @param ruta La nueva ruta en el dispositivo de almacenamiento donde guardar
+	 * los datos.
 	 */
-	public void setRuta(String ruta) {this.ruta = ruta;	}
+	public void setRuta(String ruta) {	this.ruta = ruta;}
 
 	/**
-	 * @return El/la tipo
+	 * @return Devuelve el tipo de datos almacenados en esta instancia.
 	 */
 	public String getTipo() {return tipo;}
+	
 
 	/**
-	 * @param tipo El/la tipo a establecer
+	 * @param tipo El tipo de datos a establecer para esta instancia.
 	 */
 	public void setTipo(String tipo) {	this.tipo = tipo;}
+	
+	/**
+	 * Devuelve el nombre del archivo, con extensión inclusive 
+	 * @return Nombre del archivo.
+	 */
+	public String getNombre() {return this.nombre;}
+
+
+	/**
+	 * @param name Nombre del archivo.
+	 */
+	public void setName(String name) {this.nombre = name;}
+	
+	
+	/**
+	 * Devuelve el directorio del que ha sido cargado este módulo
+	 * No incluye nombre del fichero.
+	 * @return Directorio del módulo.
+	 */
+	public String getDirectorio() { return this.directorio;}
+	
+	/**
+	 * Establece su directorio de trabajo 
+	 * @param ruta Ruta desde el raíz hasta el directorio padre.
+	 */
+	public void setDirectorio(String ruta) {this.directorio = ruta;}
+
+
+	/**
+	 * @return La fecha del archivo en disco.
+	 */
+	public String getDate() {return date;}
+
+	/**
+	 * @param date La fecha a establecer del archivo.
+	 */
+	public void setDate(String date) {this.date = date;}
+
+
+	/**
+	 *  <P> Activa o desactiva la edición de la primera columna </P>
+	 * La primera columna es la columna donde van identificadas las filas por etiquetas. En general,
+	 *  al editar un archivo CSV es deseable permitir edición, no así cuando
+	 *   se editan los módulos del proyecto a fin de mantener la consistencia de datos.
+	 * @param editLabels TRUE si se desea permitir edición para la primera columna. FALSE en otro caso.
+	 */
+	public void setEditLabels(boolean editLabels) {this.editLabels = editLabels;}
 	
 }

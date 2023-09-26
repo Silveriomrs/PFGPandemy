@@ -1,9 +1,8 @@
 /**  
-* <p>Title: Player.java</p>  
-* <p>Description: Reproductor de la simulación creada.
+* Reproductor de la simulación creada.
 * Lee un registro y lo reproduce a la velocidad indicada con una barra de tiempos
 * y aquellos otros controles necesarios para una correcta visualización y análisis
-* del registro de modo visual.</p>    
+* del registro de modo visual.    
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 3 ago. 2021  
@@ -37,30 +36,38 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.border.EtchedBorder;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
+import controlador.ControladorModulos;
 import modelo.DCVS;
-import modelo.FondoPanel;
+import modelo.Labels;
+import modelo.Labels_GUI;
+import modelo.OperationsType;
+import modelo.TypesFiles;
 
 import java.awt.Dimension;
 import java.awt.Font;
 
 /**
- * <p>Title: Player</p>  
- * <p>Description: </p>  
+ * Esta clase representa la vista del reproductor, puede ser invocada de manera
+ *  independiente (por defecto) o dentro de otro marco.  
  * @author Silverio Manuel Rosales Santana
  * @date 3 ago. 2021
- * @version versión
+ * @version versión 4.6
  */
 public class Player extends JPanel implements ActionListener{
+	/** serialVersionUID*/  
+	private static final long serialVersionUID = 1L;
+	private ControladorModulos cm;
 	private JFrame frame;
 	private JButton btnPlayPause;
 	private Timer timer;
-	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/histograma2.png");
+	private final FondoPanel fondo = new FondoPanel("/vista/imagenes/degradado.png");
 	private TitledBorder tb;
 	private JSlider slider;
 	private JProgressBar progressBar;
@@ -69,46 +76,46 @@ public class Player extends JPanel implements ActionListener{
 	private JDateChooser dateChooser;
 	private GroupLayout groupLayout;
 	private int contador;
+	/** Primera columna a leer del histórico. */
+	private int primera;
+	/** Última columna a leer del histórico. */
 	private int ultima;
+	private HashMap<String,Integer> names;
 	private Mapa mapa;
 	private DCVS historico;
 	private boolean activo;														//Establece si el reproducctor esta activo o pausado.
-	
-	/** serialVersionUID*/  
-	private static final long serialVersionUID = 1L;
-
+	private Date d1,d2;
 
 	/**
-	 * <p>Title: </p>  
-	 * <p>Description: </p>  
-	 * @param width Ancho del panel de reproductor.
-	 * @param height Alto del panel de reproductor.
-	 * @param editable Indica cuando las propiedades de visualización como
-	 * dimensiones u otras son editables o no lo son, true si lo son,
-	 * false en otro caso.
+	 * Constructor del deproductor de secuencias en línea de tiempo.
+	 * Inicializa los parámetros iniciales.  
+	 * @param cm Controlador de módulos, necesario para integrarse con el resto de la aplicación.
+	 * @param mapa Vista del mapa donde se hará la representación gráfica secuenciada.
 	 */
-	public Player(int width, int height, boolean editable) {
+	public Player(ControladorModulos cm, Mapa mapa) {
 		super();
+		this.cm = cm;
+		this.mapa = mapa;
 		activo = false;
 		//Border: configuración de estilo
 		setOpaque(false);
 		setBackground(Color.LIGHT_GRAY);
-		tb = BorderFactory.createTitledBorder("Reproductor");
+		tb = BorderFactory.createTitledBorder(Labels_GUI.W_PLAYER_TITLE);
 		tb.setTitleColor(Color.BLUE);
 		setBorder(tb);
 		//Controles: creación.
-		btnPlayPause = new JButton("Reproducir");
+		btnPlayPause = new JButton(OperationsType.PLAY.toString());
 		slider = new JSlider(0,2000,1000);
 		slider.setBackground(new Color(255, 228, 225));
 		progressBar = new JProgressBar();
 		dateChooser = new JDateChooser();
 		frmtdtxtfldHoraMinuto = new JFormattedTextField();
 		//Etiquetas: Creación.
-		lblBarraDeProgresin = new JLabel("Barra de progresión");	
-		lblEscalaDeTiempos = new JLabel("Escala de tiempos:");
-		lblX = new JLabel("x 50 mSec/día");
-		lblFecha = new JLabel("Fecha:");
-		lblHora = new JLabel("Hora:");
+		lblBarraDeProgresin = new JLabel(Labels_GUI.L_PROGRESS);	
+		lblEscalaDeTiempos = new JLabel(Labels_GUI.L_TIME_SCALE);
+		lblX = new JLabel(Labels_GUI.L_SPEED);
+		lblFecha = new JLabel(Labels_GUI.L_DATE);
+		lblHora = new JLabel(Labels_GUI.L_TIME);
 		//Frame
 		frame = new JFrame();
 		configuracion();
@@ -116,27 +123,40 @@ public class Player extends JPanel implements ActionListener{
 	}
 	
 	/**
-	 * <p>Title: iniciarFrame</p>  
-	 * <p>Description: Inicia las propiedades del marco. </p>
+	 * Inicia las propiedades del marco, tal como la imagen de fondo, el título,
+	 *  las dimensiones, bloqueo de redimensionado y la operación por defecto al 
+	 *   cerrarse.
 	 */
 	private void iniciarFrame() {
 		frame.setContentPane(fondo);
-		frame.setTitle("Reproductor");											//Establecimiento del título.
+		frame.setTitle(Labels_GUI.W_PLAYER_TITLE.toString());							//Establecimiento del título.
 		frame.setSize(344,310);													//Establecimiento de las dimensiones.
 		frame.setResizable(false); 												//Dimesiones fijas.
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);				//Comportamiento al cerrar el frame.
-		frame.setAlwaysOnTop(false);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);					//Comportamiento al cerrar el frame.
+		frame.setAlwaysOnTop(false);		
+	}
+	
+	/**
+	 * <p>Elimina los datos temporales internos que pudieran estar
+	 *  etablecidos.</p>
+	 *  Función requerida antes de la carga de un nuevo proyecto. 
+	 */
+	public void clear() {
+		contador = primera = ultima = 0;
+		historico = null;
+		activo = false;
+		d1  = null;
+		d2 = null;
+		frame.setVisible(false);
 	}
 
 	/**
-	 * <p>Title: configuracion</p>  
-	 * <p>Description: Agrupación del código a fin de mejorar la legibilidad 
-	 * del código del constructor. </p>
+	 * Agrupación del código a fin de mejorar la legibilidad del código del constructor.
 	 */
 	private void configuracion() {
 		//Timer
 		contador = 0;
-		timer =  new Timer (1000, new Temporizador()); 
+		timer =  new Timer(1000, new Temporizador()); 
 		
 		btnPlayPause.addMouseListener(new BtnPlay());
 		progressBar.setStringPainted(true);
@@ -154,26 +174,35 @@ public class Player extends JPanel implements ActionListener{
 		dateChooser.addPropertyChangeListener(new DateChooserListener());
 		
 		//Establecimiento de los textos tooltips
-		btnPlayPause.setToolTipText("Reproduce o Pausa la animación.");
-		dateChooser.setToolTipText("Fecha representada");
-		dateChooser.getCalendarButton().setToolTipText("Introducción de fecha concreta");
-		slider.setToolTipText("Escala de tiempo en horas/segundo");	
-		progressBar.setToolTipText("Porcentaje de progreso de la reproducción del registro.");
-		lblFecha.setToolTipText("Ir a una fecha concreta");		
-		lblHora.setToolTipText("Hora de la representación");
-		frmtdtxtfldHoraMinuto.setToolTipText("Saltar a una hora concreta");
-		frmtdtxtfldHoraMinuto.setText("Hora Minuto");	
+		btnPlayPause.setToolTipText(Labels_GUI.TT_BTNPLAY);
+		dateChooser.setToolTipText(Labels_GUI.TT_GO_DATE);
+		dateChooser.getCalendarButton().setToolTipText(Labels_GUI.TT_BTN_DATECHOOSER);
+		slider.setToolTipText(Labels_GUI.TT_SLIDER);	
+		progressBar.setToolTipText(Labels_GUI.TT_PROGRESS);
+		lblFecha.setToolTipText(Labels_GUI.TT_GO_DATE);		
+		lblHora.setToolTipText(Labels_GUI.TT_TIME1);
+		frmtdtxtfldHoraMinuto.setToolTipText(Labels_GUI.TT_TIME2);
+		frmtdtxtfldHoraMinuto.setText(Labels_GUI.L_TIME2);	
 		
 		//Establecimiento de los Layouts
 		setLO();
 		iniciarFrame();
 	}
 	
+	/**
+	 * Controla el dibujado de los componentes de la vista.
+	 *  Se ha sobrescrito para forzar el redibujado del mapa constante.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		mapa.updateUI();
 	}
 	
+	/**
+	 * Establece la visibilidad de la ventana del reproductor.
+	 * @param ver TRUE para visibilidad activaida, FALSE en otro caso.
+	 */
 	@Override
 	public void setVisible(boolean ver) {frame.setVisible(ver);}
 
@@ -182,31 +211,38 @@ public class Player extends JPanel implements ActionListener{
 		//Obtención del botón pulsado	
 	}
 	
-	 /** <p>Title: setPosicion</p>  
-	 * <p>Description: Establece la posición para el frame</p> 
+	 /** 
+	 * Establece la posición para el frame. 
 	 * @param xPos Posición X relativa a la pantalla.
 	 * @param yPos Posición Y relativa a la pantalla.
 	 */
 	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
 	
 	/**
-	 * <p>Title: play</p>  
-	 * <p>Description: Establece la Reprodución del historico con el mapa de las zonas y 
-	 * la leyenda cargadas. </p> 
-	 * @param mapa Mapa con las zonas implicadas.
-	 * @param historico Datos historicos a reproductir.
+	 * Establece el tiempo inicial y el tiempo final absoluto del histórico.
+	 *  Para ello realiza búsqueda de las etiquetas IT e FT del histórico.
 	 */
-	public void setPlay(Mapa mapa, DCVS historico) {
-		//Activar visualizar mapa y leyenda.
-		this.mapa = mapa;
-		this.historico = historico;
-		this.mapa.setVisible(true);
-		ultima = this.historico.getRowCount() -1;
-		progressBar.setMinimum(0);
-		progressBar.setMaximum(ultima);
-		//Configuración del rango de fechas.
-		Date d1 = stringToDate((String) historico.getValueAt(0, 0));			//Obtener primera fecha.
-		Date d2 = stringToDate((String) historico.getValueAt(ultima, 0));		//Obtener segunda fecha.
+	private void setIFT() {
+		String sIT = (String) cm.getModule(TypesFiles.DEF).getDataFromRowLabel(Labels.IT);
+		String sFT = (String) cm.getModule(TypesFiles.DEF).getDataFromRowLabel(Labels.FT);
+		//Establecer primera posición a leer, se debe sumar una columna extra para comenzar después de las etiquetas.
+		primera = Integer.parseInt(sIT) +1;
+		//Establecer última columna. Tener en cuenta que el tiempo inicial (Time 0) y FT empieza de 1.
+		ultima = Integer.parseInt(sFT);
+		contador = primera;
+	}
+	
+	/**
+	 * <p>Establece las fechas iniciales y final del histórico</p>
+	 * En caso de no estar incluídas en el histórico, establece la actual y final
+	 *  en relación a la fecha actual.
+	 */
+	private void setDates() {
+		//Obtener la fecha inicial de la etiqueta del histórico
+		d1 = stringToDate(historico.getColumnName(primera));					//Obtener primera fecha.
+		//Obtener la fecha final búscando la etiqueta en el histórico.
+		d2 = stringToDate(historico.getColumnName(ultima));						//Obtener segunda fecha.
+		//Establecer los rangos de fechas del calendario.
 		activo = true;															//Activación temporal del player para evitar activación erronéa del búscador.
 		dateChooser.setSelectableDateRange(d1, d2);								//Establece rango de fechas.
 		dateChooser.setDate(d1);												//Establece la fecha de comienzo.
@@ -214,58 +250,91 @@ public class Player extends JPanel implements ActionListener{
 	}
 	
 	/**
-	 * <p>Title: play</p>  
-	 * <p>Description: Reproduce los datos almacenados en una línea de datos</p> 
-	 * @param linea Número de línea a leer de la entrada de datos.
+	 * Establece la Reprodución del historico con el mapa de las zonas y la leyenda cargadas. 
 	 */
-	private void play(int linea) {
-		String fila[] = historico.getFila(linea);								//Obtener fila.
-		int columnas = historico.getColumnCount();
-		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
-		//Actualizar fecha
-		String f = (String) historico.getValueAt(linea, 0);						//Obtención de la fecha almacenada en la posición 0 de la línea.
-		Date d = stringToDate(f);	
-		frmtdtxtfldHoraMinuto.setText(formato.format(d));
-		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
-		
-		for(int j = 1; j < columnas; j++) {		
-			int id = getID(historico.getColumnName(j));							//Obtener ID columna
-			int nivel = getValor(fila[j]);										//Obtener valor									
-			mapa.addZonaNivel(id, "Nivel", nivel);								//Otorgar nivel al mapa/zona
-			this.updateUI();
+	public void setPlay() {
+		//Activar visualizar mapa y leyenda.
+		this.historico = cm.getModule(TypesFiles.HST);
+		//Leer tiempos iniciales y finales.
+		setIFT();
+		//Con los tiempos iniciales se configura la barra de progreso.
+		progressBar.setMinimum(contador);
+		progressBar.setMaximum(ultima);
+		//Borrado de todas las gráficas dibujadas previamente.
+		cm.getZonas().forEach((k,v)->{
+			v.getGrafica().reset();
+		});
+		//Inicializar mapa con los nombres de las zonas por ID
+		int NG = cm.getNumberZonas();											//Obtención del número de zonas.
+		//Inicializar aquí para forzar la limpieza de datos
+		//En cada nueva reproducción, por si carga nuevos HST.
+		names = new HashMap<String,Integer>();									//Inicializar HashMap
+		for(int i= 1; i<=NG; i++ ) {
+			String name = cm.getZonas().get(i).getName();						//Obtener el nombre.
+			names.put(name,i);													//Guardado del nombre por posición del ID.
 		}
-		
-		//Si es la última línea -> parar reproducción.
-		if(linea == ultima) {
-			timer.stop();
-			btnPlayPause.setText("Repetir");
-			activo = !activo;
-			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
-		}
-		
-		progressBar.setValue(linea);											//Actualización del la barra de progreso.		
+		//Configuración del rango de fechas.
+		setDates();
 	}
 	
 	/**
-	 * <p>Title: getLineaDate</p>  
-	 * <p>Description: Realiza una búsqueda de una fecha concreta</p>
-	 * Realiza la búsqueda utilizando el algoritmo  
+	 * Reproduce los datos almacenados en una línea de datos, actualiza la barra
+	 * de progresión, la fecha del calendario, la hora y manda al mapa los datos
+	 *  del slot de tiempo leído para su tratamiento.
+	 * @param pos Número de columna a leer de la entrada de datos.
+	 */
+	private void play(int pos) {
+		SimpleDateFormat formato = new SimpleDateFormat("hh:mm");				//Formato de la fecha.
+		//Actualizar fecha
+		String f = historico.getColumnName(pos);								//Obtención de la fecha almacenada en la posición 0 de la línea.
+		Date d = stringToDate(f);	
+		frmtdtxtfldHoraMinuto.setText(formato.format(d));
+		dateChooser.setDate(d);													//Establecimiento de la fecha leida para mostrar en el dateChooser.
+		int rows = cm.getModule(TypesFiles.HST).getRowCount();
+		for(int row = 0; row < rows; row++) {
+			double nivel;
+			String serie = (String) historico.getValueAt(row, 0);
+			int id = getID(serie);												//Obtener ID columna.
+			String v = (String) historico.getValueAt(row, pos);					//Obtener valor.
+			if(v != null) {
+				nivel = getValor(v);											//Realizar conversión.
+				mapa.addZonaNivel(id, serie,pos, nivel);						//Otorgar nivel al mapa/zona
+				this.updateUI();
+			}
+		}
+	
+		progressBar.setValue(pos);												//Actualización del la barra de progreso.
+		
+		//En caso de cierre del reproductor, pausar la reproducción
+		//y dejarlo listo para reanudar.
+		if(!frame.isVisible()) {
+			btnPlayPause.setText(OperationsType.PLAY.toString());				//Estado siguiente: Parado.
+			timer.stop();
+		}
+	}
+	
+	/**
+	 * Realiza la búsqueda de una fecha utilizando una búsqueda binaria. 
 	 * @param d Date contenedora de la fecha seleccionada.
 	 * @return número de línea del historico de fechas que contiene dicha fecha, 
 	 * la fecha inferior más cercana en otro caso.
 	 */
-	private int getLineaDate(Date d) {		
+	private int getLineaDate(Date d) {
 		int linea = 0;															//Línea candidata
-		int inferior = 0;														//Límete inferior de búsqueda
-		int superior = this.ultima;												//Límite superior de búsqueda
+		//Límete inferior de búsqueda.
+		int inferior = this.primera;											
+		//Límite superior de búsqueda,
+		// se le suma 1 para que entre en la búsqueda la última fecha.
+		int superior = this.ultima+1;
 		int aux = superior/2;													//Punto medio de búsqueda.
 		Date dAux;
 		boolean encontrado = false;
 		if(d != null) {
 			while(!encontrado) {
-				String f = (String) historico.getValueAt(aux, 0);				//Obtención de la fecha almacenada en la posición 0 de la línea.
+				String f = historico.getColumnName(aux);						//Obtención de la fecha almacenada en la posición 0 de la línea.
 				dAux = stringToDate(f);
-				int resultado = dAux.compareTo(d);
+				int resultado = 0;
+				if(dAux != null) resultado = dAux.compareTo(d);
 				if(resultado < 0) {												//Si Aux es anterior a la fecha búscada
 					inferior = linea = aux;										//Ajuste de margenes inferiores de la búsqueda.
 					aux += (superior -aux)/2;									//Nuevo punto de búsqueda.
@@ -283,125 +352,177 @@ public class Player extends JPanel implements ActionListener{
 	}
 	
 	/**
-	 * <p>Title: stringToDate</p>  
-	 * <p>Description: Convierte una cadena de texto que contiene una fecha
-	 * en un objeto Date</p> 
+	 * Convierte una cadena de texto que contiene una fecha en un objeto Date. 
 	 * @param fecha Grupo fecha/hora en formato: "dd/MM/yyyy hh:mm"
 	 * @return Date con los valores leidos almacenados.
 	 */
 	@SuppressWarnings("finally")
 	private Date stringToDate(String fecha){
 		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
-		 Date date = null;
+		 Date date = new Date();
 		 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
-		 catch (ParseException ex) { ex.printStackTrace(); }
-		 finally {return date;} 
+		 catch (ParseException ex) {
+			System.out.println("Player > stringToDate > Valor de fecha incorrecto: " + fecha );
+		 }
+		 finally {return date;}
 	}
 
 	/**
-	 * <p>Title: getID</p>  
-	 * <p>Description: Devuelve el valor entero almacenado como texto.</p> 
+	 * <p>Devuelve el valor entero correspondiente como identificador.</p>
+	 * El identificador de un grupo de población es númerico, al contrario que el nombre, 
+	 *  el cual puede ser texto.
 	 * @param s Cadena de texto que representa al número entero.
-	 * @return valor del número entero. -1 en otro caso.
+	 * @return Identificador (número entero) del nombre que se le ha pasado. -1 en otro caso.
 	 */
 	private int getID(String s) {
 		int id = -1;
-		if(s != null) id = Integer.parseInt(s.split(" ")[0]);	
+		//Separar el nombre del operador.
+		int opL = s.split(" ")[0].length();										//Medir la longitud del operador
+		String name = s.substring(opL +1);										//Extraer el operador + un espacio.
+		//Comprobar que dicho nombre está contenido en el mapa de nombres.
+		//y en tal caso obtener ID mediante el nombre. 
+		if(names.containsKey(name)) id = names.get(name);
 		return id;
 	}
 	
 	/**
-	 * <p>Title: getValor</p>  
-	 * <p>Description: Convierte una cadena de texto, la cual contiene un valor
-	 * númerico en un entero. </p>
+	 * <p>Convierte una cadena de texto, la cual contiene un valor
+	 * númerico en un valor de tipo Double.</p>
 	 * El número representado debe usar como separador decimales la coma ','. 
-	 * @param v Valor a convertir de formato texto a int.
+	 * @param v Valor a convertir de formato texto a double.
 	 * @return el valor de la conversión. 0 en otro caso.
 	 */
-	private int getValor(String v) {
-		int nivel = 0;
-		Double vd = Double.parseDouble(v.replace(",", "."));					//Cambio de símbolo decimal y conversion a Double.
-		nivel = vd.intValue()/10;												//Conversión a int y reducción a nivel.
-		return nivel;
+	private double getValor(String v) {
+		double vd = 0.0;
+		//Cambio de símbolo decimal y conversion a Double.
+		try{
+			vd = Double.parseDouble(v.replace(",", "."));
+		}catch (Exception e) {
+			System.out.println("Error, Player > getValor: " + v);
+			e.printStackTrace();
+		}
+		return vd;
 	}
 	
 	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Devuelve el JPanel que contiene el reproductor,
-	 * de esta manera puede facilitarse su inclusión dentro otros Frames o JPanels
-	 * </p> 
+	 * Devuelve el JPanel que contiene el reproductor, de esta manera puede
+	 *  facilitarse su inclusión dentro otros Frames o JPanels 
 	 * @return JPanel contendor de este reproductor y su configuración.
 	 */
 	public JPanel getPanel() {return this;}
 	
+	/**
+	 * Clase controladora de los estados de la reproducción del player.
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 6 dic. 2021
+	 * @version versión 1.0
+	 */
 	private class BtnPlay extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			String estado = btnPlayPause.getText();
-			switch(estado){
-				case ("Reproducir"):											//Estado pausado, muestra 'Reproducir'
-					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.
+			OperationsType state = OperationsType.getNum(estado);
+			
+			switch(state){
+				case PLAY:														//Estado pausado, muestra 'Reproducir'
+					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.
 					timer.start();
 					break;
-				case ("Repetir"):												//Estado parado en final muestra y etiqueta 'Repetir'.
-					btnPlayPause.setText("Pausar");								//Estado siguiente: reproducir.				
-					contador = 0;
+				case REPLAY:													//Estado parado en final muestra y etiqueta 'Repetir'.
+					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.				
+					contador = primera;
+					setPlay();
 					timer.restart();
 					break;
 				default:														//Estado pausado/parado, muestra 'Reproducir'
-					btnPlayPause.setText("Reproducir");							//Estado siguiente: Parado.
+					btnPlayPause.setText(OperationsType.PLAY.toString());		//Estado siguiente: Parado.
 					timer.stop();						
 			}		
 			activo = !activo;
-			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.
-			
+			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.	
 		}
 	}
 	
+	/**
+	 * <p>Clase que maneja el selector de fechas y se encarga de
+	 *  avanzar o retroceder en el histórico hasta la fecha que se pueda seleccionar
+	 *   mediante el DateChooser.</p>
+	 * Actual únicamente cuando está activo y realiza cambios tanto en el progressBar
+	 *  como en el contador.
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 2.0
+	 */
 	private class DateChooserListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			int linea = contador;
-			SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
+//			SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");	//Formato de la fecha.
 			if(!activo && arg0.getPropertyName().equals("date") ) {
 				Date f = dateChooser.getDate();									//Obtención del valor establecido.				
 				linea = getLineaDate(f);
 				
-				String s = (String) historico.getValueAt(linea, 0);				//Obtención de la fecha almacenadala línea obtenida.
+				String s = historico.getColumnName(linea);						//Obtención de la fecha almacenadala línea obtenida.
+				System.out.println("Player > DateChooserL > s: " + s);
 				Date d = stringToDate(s);
-
-				System.out.println("Player > Fecha búscada  : " + formato.format(f));		
-				System.out.println("Player > Fecha propuesta: " + formato.format(d));
-				System.out.println("Player > Línea calculada: " + linea);
-	
 				progressBar.setValue(linea);									//Actualización del la barra de progreso.
 				contador = linea;												//Actualizar contador
 				play(contador);
-				if(d.compareTo(f) < 0) {dateChooser.setDate(d);	}				//Caso tener la fecha, actualiza con la más cercana inferior..	
+				//Caso tener la fecha, actualiza con la más cercana inferior..
+				if(d != null && d.compareTo(f) < 0) {dateChooser.setDate(d);}	
 			}
 		}
 	}
 	
+	/**
+	 * <p>Clase controladora de la barra de deslizamiento del
+	 *  reproductor.</p> 
+	 *  Su función principal es incrementar o reducir el tiempo de reproducción.
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 6 dic. 2021
+	 * @version versión 1.2
+	 */
 	private class SliderListener implements ChangeListener {
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			int valor = slider.getValue();									//Obtención del valor establecido.
-			lblX.setText("x " + valor + " mSec/día");							//Mostrar valor de la escala en el slider.			
+			int valor = slider.getValue();										//Obtención del valor establecido.
+			lblX.setText("x " + valor + Labels_GUI.L_TIME2);					//Mostrar valor de la escala en el slider.			
 			timer.setDelay(valor);												//Establece el timer con el nuevo valor.
 		}
 	}
 	
+	/**
+	 * <p>Temporizador encargado de realizar una reproducción a cada
+	 *  intervalo de tiempo.</p>
+	 *  Controla además cuando se debe parar la reproducción o termina su tarea
+	 *   en función de los parámetros iniciales de tiempo inicial y tiempo final.
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 6 dic. 2021
+	 * @version versión 1.0
+	 */
 	private class Temporizador implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-	        contador++;
-	        play(contador);
+			//Comprobar si existe el módulo histórico.
+			boolean isHST = cm.hasModule(TypesFiles.HST);
+			//Si es la última línea -> parar reproducción.
+			//Además debe cumplir que el histórico sigue existiendo.
+			if(contador <= ultima && isHST) {
+				play(contador);
+				contador++;
+			}else if (!isHST){
+				//Ocultar el reproductor en caso de no haber un HST.
+				setVisible(isHST);
+			}else {		
+				timer.stop();
+				btnPlayPause.setText(OperationsType.REPLAY.toString());
+				activo = !activo;
+				dateChooser.getCalendarButton().setEnabled(!activo);			//Activa boton del dateChooser cuando la reproducción no está activa.
+			}
 	    }
 	}
 	
 	/**
-	 * <p>Title: setLO</p>  
-	 * <p>Description: Establece los LayOuts por defecto del reproductor.</p>
+	 * <p>Establece los LayOuts por defecto del reproductor.</p>
 	 * Principalmente su función es aliviar de código innecesario las funciones 
 	 * principales.
 	 */

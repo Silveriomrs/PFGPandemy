@@ -1,215 +1,184 @@
 /**
- * 
+ * 	Módulo independiente cuya función es la representación gráfica de los polígonos
+ *  que representan los grupos de población o zonas geográficas. 
+ *  <p>Este módulo permite además seleccionar una zona representada y mostrar información adicional
+ *   sobre la misma. Puede ser utilizado de forma integrada en la aplicación principal
+ *    o en una ventana independiente.</p>
+ *  El mapa es capaz de realizar representaciones dinámicas de las zonas, es decir,
+ *   debe permitir la modificación en tiempo de ejecución de los colores que
+ *    representan los niveles de contagio con respecto al tiempo.
+ *  @author Silverio Manuel Rosales Santana
+ *  @version 1.6
  */
 package vista;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.border.LineBorder;
 
-import controlador.ControladorMapa;
+import controlador.ControladorModulos;
+import modelo.Labels_GUI;
 import modelo.Zona;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 
 /**
  * Clase para la representación en modo de mapa de los datos de un núcleo
- * poblacional (provincia o comunidad autónoma).
+ * poblacional (provincia o comunidad autónoma), además permite su coloreado.
  * @author Silverio Manuel Rosales Santana
  * @date 10/07/2021
- * @version 1.2
- *
+ * @version 1.6
  */
 public class Mapa extends JPanel{
 
 	private static final long serialVersionUID = 6251836932416777274L;
-	/** frame Marco para dibujado del mapa en modo flotante*/  
+	/** frame Marco para dibujado del mapa en modo flotante*/
 	private JFrame frame;
-	/** zonas Conjunto con las zonas que contiene el mapa.*/  
-	private HashMap<Integer,Zona> zonas;
-	/** leyenda Leyenda del mapa.*/
-	private Leyenda leyenda;
-	
+	private ControladorModulos cm;
+
 	/**
 	 * Creación del panel de dimensiones dadas (heigth, width).
 	 * @param width ancho del mapa.
 	 * @param height altura del mapa.
-	 * @param leyenda Leyenda con los colores y sus valores.
+	 * @param cm Controlador de módulos. Necesario para trabajar con la parte controladora.
 	 */
-	public Mapa(int width, int height, Leyenda leyenda) {
+	public Mapa(int width, int height,ControladorModulos cm) {
 		super();
-		setOpaque(false);
 		this.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		this.setPreferredSize(ControladorMapa.PanelCentralDim);
-		this.setMinimumSize(ControladorMapa.MinDim);
-		this.leyenda = leyenda;
-		this.zonas = new HashMap<Integer, Zona>();
+		this.setPreferredSize(ControladorModulos.PanelCentralDim);
+		this.setMinimumSize(ControladorModulos.MinDim);
+		this.cm = cm;
 		this.addMouseListener(new SelectorPoligono());
-		this.setBorder(new LineBorder(new Color(0, 0, 0)));	
+		this.setBorder(new LineBorder(new Color(0, 0, 0)));
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setLayout(new BorderLayout(0, 0));
 		iniciarFrame(width,height);
 	}
+
+	/**
+	 * <p>Reinicia la vista de este módulo.</p> 
+	 *  Elimina los datos almacenados en el mismo.
+	 */
+	public void reset() {updateUI();}
 	
 	/**
-	 * <p>Title: verFrame</p>  
+	 * <p>Title: verFrame</p>
 	 * <p>Description: Aunar códigos de las propiedades del frame.</p>
 	 * @param w Ancho del marco.
 	 * @param h Alto del marco.
 	 */
 	public void iniciarFrame(int w, int h){
 		frame = new JFrame();
-		frame.setTitle("Mapa");
+		frame.setTitle(Labels_GUI.W_MAP_TITLE);
 		frame.setSize(w,h);
 	    frame.setMaximumSize(new Dimension(2767, 2767));
-		frame.setMinimumSize(ControladorMapa.MinDim);
-		frame.getContentPane().add(this);
+		frame.setMinimumSize(ControladorModulos.MinDim);
 		frame.add(this);
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.pack();
 	}
-	
+
 	/**
-	 * <p>Title: verFrame</p>  
-	 * <p>Description: Activa o desactiva la visibilidad del frame.</p> 
+	 * Activa o desactiva la visibilidad del frame.
 	 * @param activado True para hacerlo visible, False en otro caso.
 	 */
 	public void verFrame(boolean activado) {frame.setVisible(activado);}
-	
+
 	/**
-	 * <p>Title: toogleVisible</p>  
-	 * <p>Description: Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
+	 * <p>Permite cambiar el modo de visibilidad del panel entre oculto y visible</p>
 	 * Para tal efecto consulta el estado previo y configura el estado actual en
-	 * función del anterior. 
+	 * función del anterior.
 	 */
 	public void toogleVisible() {this.setVisible(!this.isVisible());}
-	
-	 /** <p>Title: setPosicion</p>  
-	 * <p>Description: Establece la posición para el frame</p> 
+
+	 /**
+	 * Establece la posición para el frame.
 	 * @param xPos Posición X relativa a la pantalla.
 	 * @param yPos Posición Y relativa a la pantalla.
 	 */
 	public void setPosicion(int xPos, int yPos) {frame.setLocation(xPos,yPos);}
-	
+
+	/**
+	 * Sobrescibe la función para lograr el dibujado de los poligonos en tiempo real.
+	 * Obtiene tanto el poligono como el color mediante solicitudes al controlador.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		zonas.forEach((n,z) -> {
-			if(z.getZona() != null) {
-				g.setColor(leyenda.getColor(z.getNivel()));
-				g.fillPolygon(z.getZona());
-				g.setColor(Color.BLACK);
-				g.drawPolygon(z.getZona());
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+
+		cm.getZonas().forEach((n,z) -> {
+			if(z.getPoligono() != null) {
+				g2.setPaint(cm.getLevelColor(z.getNivel()));
+				g2.fill(z.getPoligono());
+				g2.setPaint(Color.BLACK);
+				g2.draw(z.getPoligono());
 			}
 		});
-//		System.out.println("Mapa - paintComponent > refrescando");
-		this.updateUI();														//Redibujado y actualización del panel.
 	}
-	
-	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Obtiene el JPanel contenedor del mapa </p> 
-	 * @return Mapa embebido dentro de un JPanel.
-	 */
-	public JPanel getPanel() {return this;}	
 
-	/**
-	 * Devuelve el poligono que representa una zona del mapa.
-	 * @param id Identificador de la zona.
-	 * @return devuelve zona del mapa.
-	 */
-	public Zona getZona(int id) {return zonas.get(id);}
-
-	/**
-	 * Añade una nueva zona al mapa. En caso de que exista una zona con el mismo
-	 * nombre, sobreescribirá la anterior.
-	 * @param z Zona que representa el poligono.
-	 */
-	public void addZona(Zona z) {if(z != null) zonas.put(z.getID(), z);}
-
-	/**
-	 * Devuelve el grado de contagio de una zona o null si esta no existe.
-	 * @param id ID de la zona.
-	 * @return Nivel asignado a una zona, null si dicha zona no existe.
-	 */
-	public int getZonaNivel(int id) {return zonas.get(id).getNivel();}
-	
 	/**
 	 * Establece el grado de contagio de una zona.
 	 * @param id ID de la zona.
 	 * @param serie Nombre de la serie asociada al nivel almacenado.
+	 * @param time Instante de tiempo en el que encuadrar dicho valor. Tiene equivalencia
+	 *  con la posición en el eje de coordenadas X de la gráfica.
 	 * @param n Nivel de asignación.
 	 */
-	public void addZonaNivel(int id, String serie, int n) {
-		if(zonas.containsKey(id)) {												//Comprobación de que existe.
-			zonas.get(id).addNivel(serie, n);									//Añadir valor a la serie que corresponda.
+	public void addZonaNivel(int id, String serie,int time, double n) {
+		if(cm.getZonas().containsKey(id)) {										//Comprobación de que existe.
+			cm.getZonas().get(id).addNivel(serie,time, n);						//Añadir valor a la serie que corresponda.
 		}
 	}
 
 	/**
-	 * Devuelve el número de zonas que contiene el mapa.
-	 * @return número de zonas que contiene el mapa.
+	 * <p>Clase usada para la detección de la selección de un grupo de
+	 *  población.</p>
+	 *  Basa su funcionamiento en las coordenadas de la pulsación en pantalla, recorriendo
+	 *   cada uno de los polígonos de las diferentes zonas y comprobando cual contiene dicho
+	 *    punto dentro de sus límintes.
+	 * <p>Una vez encontrada muestra la información deseada, en este caso el gráfico de línea
+	 *  asociado a dicha zona.</p>  
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.2
 	 */
-	public int getNumZones() {return zonas.size();}
-	
-	/**
-	 * <p>Title: getZonas</p>  
-	 * <p>Description: Devuelve las instancias de zonas en un HashMap cuya 
-	 * clave es el ID (Integer) y el valor es una instancia de la clase Zona</p> 
-	 * @return El conjunto de zonas.
-	 */
-	public HashMap<Integer,Zona> getZonas(){return this.zonas;}
-	
-	/**
-	 * <p>Title: setZonas</p>  
-	 * <p>Description: Establece el conjunto de zonas</p> 
-	 * @param zonas2 Mapa cuya clave es la ID de cada zona y valor la zona.
-	 */
-	public void setZonas(HashMap<Integer, Zona> zonas2) { this.zonas = zonas2;}
-	
 	private class SelectorPoligono extends MouseAdapter	{
 	    @Override
 		public void mousePressed(MouseEvent e)  {
 	    	//Obtención del punto del mapa que ha recibido la pulsación.
 	        Point p = e.getPoint();
 	        Zona z = getZona(p);
-	        if(z != null) {
-	        	GraficasChart chart = z.getGrafica();
-        		chart.genera();
-        		chart.setVisible(true);
-	        }
+	        if(z != null) z.getGrafica().setVisible(true);
 	    }
-	    
-//	    @Override
-//	    public void mouseEntered(MouseEvent e) {
-//	        //se llama cuando el mouse entra a los limites del componente.
-//	        //Cuando sale y entra de la ventana (en este caso).
-//	    	Point p = e.getPoint();
-//	        Zona z = getZona(p);
-//	    	if(z != null) {
-//	    		System.out.println("Acabas de entrar a la zona: " + z.getName());
-//	    	}else System.out.println("No sé a donde he entrado");
-//	    }
-	    
+
+	    /**
+	     * Devuelve la zona cuyo polígono de representación gráfica
+	     *  contenga el punto pásado por parámetro.
+	     * @param p Punto de coordenadas.
+	     * @return Zona que contiene dicho punto de coordenadas dentro de su representación.
+	     */
 	    private Zona getZona(Point p) {
 	    	boolean encontrado = false;
 	    	Zona zona = null;
 	    	Zona zAux = null;
 	        //Busqueda del poligono que contiene dicha coordenada.
-	        Iterator<Map.Entry<Integer, Zona>> it = zonas.entrySet().iterator();
+	        Iterator<Map.Entry<Integer, Zona>> it = cm.getZonas().entrySet().iterator();
 	        while (it.hasNext() && !encontrado) {
 	            zAux = it.next().getValue();									//Obtención del nuevo set sin el valor anterior.
 	            //Si se ha encontrado se termina la búsqueda.
-	            if(zAux.getZona() != null && zAux.getZona().contains(p)) {		//Evita evaluar valores nulos
+	            if(zAux.getPoligono() != null && zAux.getPoligono().contains(p)) {		//Evita evaluar valores nulos
 	        		zona = zAux;												//Valor final a devolver.
 	        		encontrado = true;											//Detenemos la búsqueda para ahorrar recursos.
 	            }
@@ -217,4 +186,5 @@ public class Mapa extends JPanel{
 	    	return zona;
 	    }
 	}
+
 }

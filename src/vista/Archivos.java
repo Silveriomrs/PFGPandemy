@@ -1,105 +1,140 @@
 /**  
-* <p>Title: Archivos.java</p>  
-* <p>Description: </p>    
+* Esta clase esta destinada a la carga de los diferentes
+*  módulos de la aplicación, mostrando en la vista aquellos módulos cargados
+*   además presentae una serie de controles comunes (guardar, guardar como, abrir)
+*    y unas opciones particulares (editar y borrar).
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
 * @date 26 ago. 2021  
-* @version 1.0  
+* @version 2.6  
 */  
 package vista;
 
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import controlador.ControladorDatosIO;
-import controlador.ControladorMapa;
-import modelo.DCVS;
-import modelo.IO;
+import controlador.ControladorModulos;
+import controlador.IO;
+import modelo.Labels_GUI;
+import modelo.OperationsType;
+import modelo.TypesFiles;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
 /**
- * <p>Title: Archivos</p>  
- * <p>Description: Vista de los archivos asociados a cada módulo del proyecto</p>  
+ * Vista de los archivos asociados a cada módulo del proyecto. 
  * @author Silverio Manuel Rosales Santana
  * @date 26 ago. 2021
- * @version 1.0
+ * @version 2.5
  */
 public class Archivos extends JPanel {
 
 	/** serialVersionUID*/  
-	private static final long serialVersionUID = 5320403899683788073L;
-	//Campos de texto que indicarán la ruta del fichero cargado.
-	private JTextField textFieldMapa,txtFieldProyecto,textFieldHistorico,textFieldLeyenda,textFieldRelaciones;
+	private static final long serialVersionUID = 5320403899683788073L;	
 	private TitledBorder tb;
-	// Etiquetas
-	private JLabel lblMapa, lblProyecto,lblRelaciones, lblPaleta, lblHistorico;
-	// Botones de abrir archivo
-	private JButton btnAbrirPRJ, btnAbrirMapa, btnAbrirRelaciones, btnAbrirPaleta, btnAbrirHistorico;
-	// Botones de guardar archivos como...
-	private JButton btnGuardarPRJ, btnGuardarMapa, btnGuardarRelaciones, btnGuardarPaleta, btnGuardarHistorico;
-	// Botonoes de guardar cambios.
-	private JButton btnGCPRJ, btnGCMAP, btnGCREL, btnGCPAL, btnGCHST;
+	private Image imagen;
+	private String ruta = "/vista/imagenes/lineasAzules.png";
 	//
-	private int hi;																//Altura de los elementos (principalmente iconos).
-	private int wi;																//Anchura de los iconos.
-	private final String IAbrir = "/vista/imagenes/Iconos/carpeta_64px.png";
-	private final String IGuardarA = "/vista/imagenes/Iconos/disquete_64px.png";
-	private final String IGuardarC = "/vista/imagenes/Iconos/guardarCambios_64px.png";
-	private int lineaBase = 100;												//Primera línea a partir de la cual se dibujan todos los elementos.
+	private final int hi;														//Altura de los elementos (principalmente iconos).
+	private final int wi;														//Anchura de los iconos.
+	private final String iconAbrir = "/vista/imagenes/Iconos/carpeta_64px.png";
+	private final String iconGuardarComo = "/vista/imagenes/Iconos/disquete_64px.png";
+	private final String iconGuardarCambios = "/vista/imagenes/Iconos/guardarCambios_64px.png";
+	private final String iconEditar = "/vista/imagenes/Iconos/editarTabla_64px.png";
+	private final String iconBorrar = "/vista/imagenes/Iconos/borrar_64px.png";
+	private final int lineaBase = 100;											//Primera línea a partir de la cual se dibujan todos los elementos.
 	private int contador = 0;													//Contador de elementos que se han adjuntado de un grupo.
-//	private boolean modificado = false;
 	private JPanel panelCentral;
-	private ControladorDatosIO cIO;
-	private ControladorMapa cMap;
+	private ControladorModulos cm;												//Controlador de módulos.
 	private HashMap<String,JButton> mBtnAbrir;
-	private HashMap<String,JButton> mBtnGuardar;
 	private HashMap<String,JButton> mBtnGuardarCambios;
+	private HashMap<String,JButton> mBotones;
 	private HashMap<String,JTextField> mapaFields;
-	private HashMap<String,DCVS> mapaModulos;
 	
-	
+
 	/**
 	 * Create the panelCentral.
-	 * @param cMap Controlador datos de mapeados.
+	 * @param cm Controlador datos de mapeados.
 	 */
-	public Archivos(ControladorMapa cMap) {
-		this.cIO = new ControladorDatosIO();
-		if(cMap != null) this.cMap = cMap;
+	public Archivos(ControladorModulos cm) {
+		if(cm != null) this.cm = cm;
 		mBtnAbrir = new HashMap<String,JButton>();
-		mBtnGuardar = new HashMap<String,JButton>();
 		mBtnGuardarCambios = new HashMap<String,JButton>();
+		mBotones = new HashMap<String,JButton>();
 		mapaFields = new HashMap<String,JTextField>();
-		mapaModulos = new HashMap<String,DCVS>();
-		panelCentral = new JPanel();	
+		panelCentral = new JPanel();
+		panelCentral.setOpaque(false);
 		hi = wi =  20;
 		configuracion();
 	}
 	
+	@Override
+	public void paint(Graphics g) {
+		if(ruta != null) {
+			imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
+			g.drawImage(imagen,0,0,getWidth(),getHeight(),this);
+			setOpaque(false);
+			super.paint(g);
+		}
+	}
+	
+	
+	/* Métodos principales para añadir nuevos elementos y sus controles */
+	
 	/**
-	 * <p>Title: abrirFrame</p>  
-	 * <p>Description: Visualiza los datos del módulo dentro de su propio marco</p> 
+	 * Agrega los elementos JTextField al grupo mapaFields.
+	 * Todo elemento que se desea agregar se añade aquí, basado en los elementos
+	 * añadidos en este punto se generarán tantos los botones como los controles
+	 * que sean necerios para el funcionamiento de este módulo.
+	 * @see #generateControls(String ext, int posX)
+	 */
+	private void createFieldsInMap() {
+		// Generación de sus nombres e iconos particulares.
+		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL,Labels_GUI.TT_L_PRJ,"/vista/imagenes/Iconos/portapapeles_64px.png");
+		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),Labels_GUI.W_GRP_TITLE + ".","/vista/imagenes/Iconos/spain_128px.png");
+		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),Labels_GUI.TT_L_DEF,"/vista/imagenes/Iconos/adn_64px.png");
+		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),Labels_GUI.TT_L_REL,"/vista/imagenes/Iconos/nodos_64px.png");
+		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),Labels_GUI.TT_L_PAL,"/vista/imagenes/Iconos/circulo-de-color_64px.png");
+		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),Labels_GUI.TT_L_HST,"/vista/imagenes/Iconos/animar_128px.png");
+		contador = 0;															// Reiniciar el contardor de líneas a 0.
+	}
+
+	
+	/* Métodos públicos */
+	
+	
+	/**
+	 * @return El mapaFields donde se referencian todas las etiquetas.
+	 */
+	public HashMap<String, JTextField> getMapaFields() {return mapaFields;}
+	
+	/**
+	 * Visualiza los datos del módulo dentro de su propio marco.
 	 */
 	public void abrirFrame() {
-	    JFrame frame = new JFrame("Módulo de Archivos");
+	    JFrame frame = new JFrame(Labels_GUI.W_FILES_TITLE);
 	    Dimension m = getPreferredSize();
 	    int x = (int)m.getWidth();
 	    int y = (int)m.getHeight()+15;
 	    frame.setPreferredSize(new Dimension(x, y));
 	    frame.setMaximumSize(new Dimension(2767, 2767));
 		frame.setMinimumSize(new Dimension(650, 400));
-	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);
 	    frame.getContentPane().add(this);
 		frame.pack();
@@ -107,255 +142,66 @@ public class Archivos extends JPanel {
 	}
 	
 	/**
-	 * @return El mapa de los módulos cargadoss
+	 * Desactiva todos los botones de guardado.
 	 */
-	public HashMap<String, DCVS> getMapaModulos() {	return mapaModulos;	}
-	
-
-	/**
-	 * @param mapaModulos El mapa con los Modulos a establecer
-	 */
-	public void setMapaModulos(HashMap<String, DCVS> mapaModulos) {	this.mapaModulos = mapaModulos;	}
+	public void disableAllSavers() {
+		//Desactivar todos los botones de guardado.
+		//Para evitar que se activen al cargar algún módulo del proyecto, se desactivan al final.
+		mBtnGuardarCambios.forEach((tipo,elemento) -> {elemento.setEnabled(false);});
+	}	
 	
 	/**
-	 * <p>Title: getPanel</p>  
-	 * <p>Description: Devuelve el panelCentral con su estado actual.</p> 
-	 * @return Panel actual.
+	 * Limpia los textos mostrados en cada etiqueta, sustituyéndolos
+	 * por cadenas vacias y posteriormente realiza una lectura de los módulos
+	 *  cargados en el sistema actualizando los campos correspondientes.
 	 */
-	public JPanel getPanel() { return this;}
+	public void reset() {
+		//En esta vista, no se almacenan datos => actualización de componentes.
+		//Principalmente: Campos y controles.
+		refresh();
+	}	
 	
-
+	/* Métodos privados */
+	
+	/**
+	 * Configura los atributos generales de la vista, tales como
+	 *  dimensiones, comportamiento, tipo de borde, imagen de fondo, etc.
+	 *  También llama a las funciones encargada de crear los controles y su configuración.
+	 */
 	private void configuracion() {
 		//Configuración del borde.
-		tb = BorderFactory.createTitledBorder("Ficheros");
+		tb = BorderFactory.createTitledBorder(Labels_GUI.W_MODULES_TITLE);
 		tb.setTitleColor(Color.BLUE);
 		panelCentral.setBorder(tb);
 		//Configuración básica del panelCentral superior
-		setToolTipText("Visulación de los ficheros asignados a cada módulo.");
+		setToolTipText(Labels_GUI.TT_W_FILES);
 		setSize(new Dimension(650, 400));
-		setName("Vista de módulos cargados");
-		setMinimumSize(new Dimension(650, 400));
+		setName(Labels_GUI.FILES_PANEL_NAME);
+		setMinimumSize(new Dimension(650, 500));
 		setMaximumSize(new Dimension(1024, 768));
 		setBorder(new EtchedBorder(EtchedBorder.RAISED, Color.BLACK, Color.GRAY));
 		setAutoscrolls(true);
 		setLayout(new BorderLayout(0, 0));	
 		
-		panelCentral.setToolTipText("Selección archivos asignados a los módulos.");
-		add(panelCentral, BorderLayout.CENTER);
+		panelCentral.setToolTipText(Labels_GUI.TT_FILES_PANEL);
 		panelCentral.setLayout(null);
-		
-		iniciarLabels(lblProyecto,"Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png");
-		iniciarLabels(lblMapa,"Mapa","/vista/imagenes/Iconos/region_64px.png");
-		iniciarLabels(lblRelaciones,"Relaciones","/vista/imagenes/Iconos/nodos_64px.png");
-		iniciarLabels(lblPaleta,"Leyenda","/vista/imagenes/Iconos/circulo-de-color_64px.png");
-		iniciarLabels(lblHistorico,"Histórico","/vista/imagenes/Iconos/animar_128px.png");		
-		//
-		txtFieldProyecto = iniciarTextField(txtFieldProyecto);
-		textFieldMapa= iniciarTextField(textFieldMapa);
-		textFieldRelaciones = iniciarTextField(textFieldRelaciones);
-		textFieldLeyenda = iniciarTextField(textFieldLeyenda);
-		textFieldHistorico = iniciarTextField(textFieldHistorico);
-		//
-		int gap = 30;
-		int x0 = 480;
-		btnAbrirPRJ = iniciarBoton(btnAbrirPRJ,"","Abrir proyecto.PRJ",IAbrir,x0,true);
-		btnAbrirMapa = iniciarBoton(btnAbrirMapa,"","Abrir mapa.MAP",IAbrir,x0,true);
-		btnAbrirRelaciones = iniciarBoton(btnAbrirRelaciones,"","Abrir relaciones.REL",IAbrir,x0,true);
-		btnAbrirPaleta = iniciarBoton(btnAbrirPaleta,"","Abrir paleta.PAL",IAbrir,x0,true);
-		btnAbrirHistorico = iniciarBoton(btnAbrirHistorico,"","Abrir historico.HST",IAbrir,x0,true);
-		//
-		x0 = x0 + gap;
-		btnGuardarPRJ = iniciarBoton(btnGuardarPRJ,"","Guardar como.PRJ",IGuardarA,x0,false);	
-		btnGuardarMapa = iniciarBoton(btnGuardarMapa,"","Guardar como.MAP",IGuardarA,x0,false);
-		btnGuardarRelaciones = iniciarBoton(btnGuardarRelaciones,"","Guardar como.REL",IGuardarA,x0,false);
-		btnGuardarPaleta = iniciarBoton(btnGuardarPaleta,"","Guardar como.PAL",IGuardarA,x0,false);
-		btnGuardarHistorico = iniciarBoton(btnGuardarHistorico,"","Guardar como.HST",IGuardarA,x0,false);
-		//
-		x0 = x0 + gap;
-		btnGCPRJ = iniciarBoton(btnGCPRJ,"","Guardar cambios.PRJ",IGuardarC,x0,false);
-		btnGCMAP = iniciarBoton(btnGCMAP,"","Guardar cambios.MAP",IGuardarC,x0,false);
-		btnGCREL = iniciarBoton(btnGCREL,"","Guardar cambios.REL",IGuardarC,x0,false);
-		btnGCPAL = iniciarBoton(btnGCPAL,"","Guardar cambios.PAL",IGuardarC,x0,false);
-		btnGCHST = iniciarBoton(btnGCHST,"","Guardar cambios.HST",IGuardarC,x0,false);
-		
-		
-		inicializarMapas();
-		
+		add(panelCentral, BorderLayout.CENTER);	
+
+		//Muy importante iniciar este método antes de proseguir.
+		createFieldsInMap();
+
+		//Establecer el icono representación del módulo Archivos.
 		JLabel labelLogo = new JLabel("");
 		labelLogo.setIcon(IO.getIcon("/vista/imagenes/Iconos/archivo_64px.png",70,75));
 		labelLogo.setBounds(12, 12, 70, 75);
 		panelCentral.add(labelLogo);
 	}
-	
+			
 	/**
-	 * <p>Title: abrirProyecto</p>  
-	 * <p>Description: Carga un proyecto con sus ficheros en los módulos
-	 * correspondientes.</p>
-	 * @param mp Archivo de proyecto con los datos del resto de módulos.
-	 */
-	public void abrirProyecto(DCVS mp) {
-		boolean traza = false;						 /* Bandera de registro */
-		
-		DCVS dcvs = mp;
-		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
-		//NO hace falta comparar a nulo, pues esa comprobación ya está hecha desde el Action Listener.
-		if(traza) System.out.println("Archivos - AbrirProyecto: " + dcvs.getRuta() + "\n");
-		//Borrado etiquetas actuales.
-		mapaFields.forEach((tipo,elemento) -> {	elemento.setText("");});
-		//Borrado de todos los módulos.
-		mapaModulos.clear();
-		
-		//Añadir ruta del proyecto a la etiqueta correspondiente.
-		mapaFields.get(dcvs.getTipo()).setText(dcvs.getRuta());
-		
-		//Lectura de los módulos a cargar
-		for(int i= 0;  i < nm; i++) {
-			String[] m = dcvs.getFila(i);
-			String ruta = m[1];
-			String tipo = m[0];
-			if(!tipo.equals(IO.PRJ)) {											//Nos asegurarmos que no cargue por error un PRJ.
-				DCVS mAux = cIO.abrirArchivo(ruta,tipo);						//Carga el módulo desde el sistema de archivos.
-				establecerDatos(mAux);											//Establecer el módulo.
-				if(traza) System.out.println("\nArchivos - Abrir Proyecto: Modulo a cargar: " + tipo + " - " + ruta);
-			}		
-		}
-		
-		//Desactivar todos los botones de guardado.
-		//Para evitar que se activen al cargar algún módulo del proyecto, se desactivan al final.
-		mBtnGuardar.forEach((tipo,elemento) -> {elemento.setEnabled(false);	});
-		mBtnGuardarCambios.forEach((tipo,elemento) -> {elemento.setEnabled(false);});
-		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
-		mapaModulos.put(dcvs.getTipo(), dcvs);
-	}
-	
-	/**
-	 * <p>Title: guardarModulo</p>  
-	 * <p>Description: Guardar los datos del módulo en el dispositivo indicado
-	 * u establecido en el propio modelo</p> 
-	 * @param dcvs Módulo DCVS a exportar a dispositivo de almacenamiento.
-	 */
-	private void guardarModulo(DCVS dcvs) {
-		String tipo = dcvs.getTipo();
-		//Desactivar sus botones.
-		mBtnGuardar.get(tipo).setEnabled(false);
-		mBtnGuardarCambios.get(tipo).setEnabled(false);
-		//Guardar los datos en el disco.
-		cIO.guardarArchivo(dcvs);												
-	}
-	
-	/* Esta función debe usarse para crear un módulo PRJ Básico para cuando no hay 
-	 * ninguno creado porque no se han cargado o no se ha generado.*/
-	private DCVS creaModuloProyecto() {
-		DCVS dcvs = new DCVS();
-		dcvs.nuevoModelo();
-		dcvs.setTipo(IO.PRJ);
-		dcvs.addCabecera(new Object[] {"Tipo","Ruta"});
-		//Bucle para añadir cada módulo al proyecto.
-		mapaModulos.forEach((tipo,modulo) -> {
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				dcvs.addFila(new Object[] {tipo, modulo.getRuta()});
-			}
-		});
-		dcvs.toString();
-		return dcvs;
-	}
-	
-/* Trabajando aquí para que cree una lista con
- *  todos los tipos y rutas de módulos cargados ¿Para qué? quizás para facilitar
- *  una actualización, reinicio de datos o guardado de los datos. */
-	
-	/* Función no probada. */
-	private String[][] getRutasModulos(){
-		int size = mapaModulos.size();
-		if(mapaModulos.containsKey(IO.PRJ)) size--;								//Si contiene un módulo PRJ -> descontarlo.
-		String[][] lista = new String[size][2];
-		
-		mapaModulos.forEach((tipo,modulo) -> {
-			int fil = 0;
-			if(tipo != IO.PRJ) {												//Evita introducir la ruta del propio archivo de proyecto.
-				lista[fil][0] = tipo;
-				lista[fil][1] = modulo.getRuta();
-				fil++;
-			}
-		});
-		
-		return lista;
-	}
-	
-	/**
-	 * <p>Title: guardarProyecto</p>  
-	 * <p>Description: Guarda la configuración del proyecto</p> En caso de que
-	 * el módulo recibido sea null, se crea un módulo nuevo con los valores de
-	 * ruta de los demás módulos.
-	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ o null si hay
-	 * que crear uno nuevo
-	 */
-	private void guardarProyecto(DCVS dcvsIn) {
-		DCVS dcvs = dcvsIn;
-		//Si se llama con null a la función crear nuevo módulo proyecto.	
-		if(dcvs == null) dcvs = creaModuloProyecto();
-		
-		//Guardado del fichero:
-		String ruta = cIO.guardarArchivo(dcvs);
-		if(ruta != null) {
-			//Configuración de la ruta
-			dcvs.setRuta(ruta);
-			//Mostrar ruta en Field.
-			mapaFields.get(IO.PRJ).setText(ruta);
-			mapaModulos.put(IO.PRJ, dcvs);
-			//Desactivación del botón de guardado de proyecto.
-			mBtnGuardar.get(IO.PRJ).setEnabled(false);
-			mBtnGuardarCambios.get(IO.PRJ).setEnabled(false);
-		}
-
-	}
-	
-	/**
-	 * <p>Title: establecerDatos</p>  
-	 * <p>Description: Establece el contenido del módulo cargado de acuerdo
-	 * con su tipo, actualiza los elementos del JPanel correspondientes</p> 
-	 * @param datos Conjunto de datos y cabecera encapsulados.
-	 */
-	public void establecerDatos(DCVS datos) {
-		String tipo = datos.getTipo();		
-		
-		//Actualizar etiqueta correspondiente con la ruta del archivo.
-		if(mapaFields.containsKey(tipo)) {
-			mapaFields.get(tipo).setText(datos.getRuta());
-		}
-		
-		//Añadir nuevo módulo al módulo del proyecto.
-		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
-		if(mapaModulos.containsKey(IO.PRJ)) {
-			String[] nuevaEntrada = {tipo,datos.getRuta()};
-			int linea = mapaModulos.get(IO.PRJ).getFilaItem(tipo);
-			boolean lineaDuplicada = linea > -1;
-			//Si hay un módulo ya cargado, hay que sustituirlo.
-			if(lineaDuplicada) {mapaModulos.get(IO.PRJ).delFila(linea);}		//Eliminar entrada duplicada.
-			mapaModulos.get(IO.PRJ).addFila(nuevaEntrada);						//Añadir nueva entrada.
-		}
-		
-		//Guardar los datos del módulo en su conjunto.
-		mapaModulos.put(tipo, datos);
-
-		//Operaciones extras según tipo de módulo.
-		switch(tipo) {
-			case (IO.MAP):
-				cMap.setPoligonos(datos.getModelo());
-				break;
-			default:
-				mBtnGuardar.get(IO.PRJ).setEnabled(true);
-				mBtnGuardarCambios.get(IO.PRJ).setEnabled(true);
-		}
-	}
-	
-	/* Métodos privados */
-	
-	/**
-	 * <p>Title: addIconL</p>  
-	 * <p>Description: Añade un icono a una etiqueta</p>
+	 * Añade un icono a una etiqueta
+	 * <p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
-	 * datos pasados por parámetro. 
+	 * datos pasados por parámetro.</p>
 	 * @param componente Etiqueta a la que adjuntar el icono
 	 * @param ruta Nombre del archivo y su ruta.
 	 * @param w Ancho a escalar de la imagen original.
@@ -364,12 +210,10 @@ public class Archivos extends JPanel {
 	private void addIconL(JLabel componente, String ruta, int w, int h) {
 		componente.setIconTextGap(5);
 		componente.setIcon(IO.getIcon(ruta,w,h));	
-	}
-	
+	}	
 	
 	/**
-	 * <p>Title: addIconB</p>  
-	 * <p>Description: Añade un icono a una botón</p>
+	 * <p>Añade un icono a una botón</p>
 	 * Los valores de dimensión de ancho y largo se establecen en función de los 
 	 * datos pasados por parámetro. 
 	 * @param componente Etiqueta a la que adjuntar el icono
@@ -381,164 +225,224 @@ public class Archivos extends JPanel {
 		componente.setIconTextGap(0);
 		componente.setIcon(IO.getIcon(ruta,w,h));	
 	}
-
-	
+		
 	/**
-	 * <p>Title: iniciarLabels</p>  
-	 * <p>Description: Establece las facetas de las etiquetas descripticas</p> 
-	 * @param jl Etiqueta a tratar.
+	 * <p>Establece las facetas de las etiquetas descripticas</p> 
+	 * @param ext Tipo de archivos que controla. Ver \ref modelo#TypesFiles .
 	 * @param nombre Nombre en la etiqueta.
+	 * @param tt Tooltip mensaje emergente.
 	 * @param ruta Ruta al icono de la etiqueta.
 	 */
-	private void iniciarLabels(JLabel jl, String nombre, String ruta) {
-		if(contador == 5) contador = 0;
+	private void iniciarLabels(String ext, String nombre, String tt, String ruta) {
+		JLabel jl = new JLabel(nombre);
 		int posY = lineaBase + 30*contador;
+		generateControls(ext,0);
 		contador++;
-		int w = 105;
+		int w = 120;
 		int posX = 12;
-		jl = new JLabel(nombre);
+		jl.setToolTipText(tt);
 		addIconL(jl,ruta,wi,hi);
 		jl.setBounds(posX, posY, w, hi);
 		panelCentral.add(jl);
 	}
-	
-	
-	private JTextField iniciarTextField(JTextField jtf){
-		if(contador == 5) contador = 0;
-		int posY = lineaBase + 30*contador;
-		contador++;
-		jtf = new JTextField();
-		jtf.setEditable(false);
-		jtf.setEnabled(true);
-		jtf.setBounds(129,posY,338,hi);
-		jtf.setColumns(10);
-		jtf.setToolTipText("Archivo seleccionado");
-		jtf.setHorizontalAlignment(SwingConstants.LEFT);
-		panelCentral.add(jtf);
-		return jtf;
-	}
-	
-	
+
 	/**
-	 * <p>Title: iniciarBoton</p>  
-	 * <p>Description: Inicia un botón con los parámetros generales que se requiere
+	 * <p>Inicia un botón con los parámetros generales que se requiere
 	 * para múltiples instancias que deben tener facetas comunes.</p> 
 	 * La función devuelve la propia instancia del botón con el fin de facilitar
 	 * el evitar perdidas de referencias.
-	 * @param boton Botón al que configurar las propiedades.
-	 * @param nombre Nombre del botón.
-	 * @param tt ToolTipText, texto añadido para cuando se pasa el ratón por encima.
+	 * @param op Nombre de la acción.
+	 * @param ext Tipo de archivos o módulo particular.
 	 * @param ruta Ruta al archivo de imagen o icono que se adjunta en el botón.
 	 * @param posX Posición en la coordenada X del panelCentral.
+	 * @param posY Posición en la coordenada Y del panelCentral.
 	 * @param activado Habilita o desabilita incialmente el botón, TRUE activado, False en otro caso.
-	 * @return la propia instancia del botón.
 	 */
-	private JButton iniciarBoton(JButton boton, String nombre,String tt,  String ruta, int posX, boolean activado) {
-		if(contador == 5) contador = 0;
-		int posY = lineaBase + 30*contador;
-		contador++;
-		boton = new JButton(nombre);
+	private void iniciarBoton(OperationsType op, String ext, String ruta, int posX, int posY, boolean activado) {
+		JButton boton = new JButton();
+		String tt = op.toString() + " .";
+		boton.setActionCommand(op.toString());  /*Punto clave, poner nombre o valor enum*/
 		boton.addMouseListener(new ArchivoML());
-		boton.setToolTipText(tt);
+		boton.setToolTipText(tt + ext);
 		addIconB(boton,ruta,wi,hi);
 		boton.setBounds(posX, posY, 27, hi);
 		boton.setEnabled(activado);
 		boton.setBorder(null);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		addBotonHM(boton,ext);
 		panelCentral.add(boton);
-		return boton;
 	}
-
 	
 	/**
-	 * <p>Title: inicializarMapas</p>  
-	 * <p>Description: Inicializa los mapas de los elementos característicos</p>
+	 * <p>Genera todos los JTextFields necesarios para cubrir
+	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
+	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
+	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
+	 * @param ext Tipo de datos al que generar el control.
+	 * @param posX Posición en las coordenadas X donde colocar el control.
+	 * @see #createFieldsInMap()
 	 */
-	private void inicializarMapas() {
-		mBtnAbrir.put(IO.PRJ, btnAbrirPRJ);
-		mBtnAbrir.put(IO.MAP, btnAbrirMapa);
-		mBtnAbrir.put(IO.REL, btnAbrirRelaciones);
-		mBtnAbrir.put(IO.PAL, btnAbrirPaleta);
-		mBtnAbrir.put(IO.HST, btnAbrirHistorico);
+	private void generateControls(String ext, int posX){
+		JTextField jtf =  new JTextField();
+		int posY = lineaBase + 30*contador;
+		jtf.setEditable(false);
+		jtf.setEnabled(true);
+		jtf.setBounds(150,posY,300,hi);
+		jtf.setColumns(10);
+		jtf.setToolTipText(Labels_GUI.TT_FILE_SELECTED);
+		jtf.setHorizontalAlignment(SwingConstants.LEFT);
+		panelCentral.add(jtf);
+		mapaFields.put(ext,jtf);
 		
-		mBtnGuardar.put(IO.PRJ, btnGuardarPRJ);
-		mBtnGuardar.put(IO.MAP, btnGuardarMapa);
-		mBtnGuardar.put(IO.REL, btnGuardarRelaciones);
-		mBtnGuardar.put(IO.PAL, btnGuardarPaleta);
-		mBtnGuardar.put(IO.HST, btnGuardarHistorico);
-		
-		mBtnGuardarCambios.put(IO.PRJ, btnGCPRJ);
-		mBtnGuardarCambios.put(IO.MAP, btnGCMAP);
-		mBtnGuardarCambios.put(IO.REL, btnGCREL);
-		mBtnGuardarCambios.put(IO.PAL, btnGCPAL);
-		mBtnGuardarCambios.put(IO.HST, btnGCHST);
-		
-		mapaFields.put(IO.PRJ, txtFieldProyecto);
-		mapaFields.put(IO.MAP, textFieldMapa);
-		mapaFields.put(IO.REL, textFieldRelaciones);
-		mapaFields.put(IO.PAL, textFieldLeyenda);
-		mapaFields.put(IO.HST, textFieldHistorico);
+		int xpos = 480;
+		int gap = 30;
+		iniciarBoton(OperationsType.OPEN,ext, iconAbrir,xpos,posY,true);
+		iniciarBoton(OperationsType.SAVE_AS,ext,iconGuardarComo,xpos + gap,posY,false);
+		iniciarBoton(OperationsType.SAVE,ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
+		iniciarBoton(OperationsType.EDIT,ext,iconEditar,xpos + 3*gap,posY,false);
+		//Para los módulos esenciales de cualquier proyecto, no incluir botones de borrado.
+		if(!ext.equals(TypesFiles.PRJ) && !ext.equals(TypesFiles.DEF) && !ext.equals(TypesFiles.MAP)) {
+			iniciarBoton(OperationsType.DELETE,ext,iconBorrar,xpos + 4*gap,posY,false);
+		}
 	}
 		
+	/**
+	 * <p>Inicializa los mapas de los elementos característicos</p>
+	 * @param btn JButton a introducir en el grupo correspondiente.
+	 * @param ext Tipo de archivos a los que hace referencia dicho boton.
+	 */
+	private void addBotonHM(JButton btn, String ext) {
+		String tipo = btn.getActionCommand();
+		OperationsType op = OperationsType.getNum(tipo);
+		switch(op) {
+		case OPEN:
+			mBtnAbrir.put(ext, btn);
+			break;
+		case SAVE:
+			mBtnGuardarCambios.put(ext, btn);
+			break;
+		case SAVE_AS:
+		case EDIT:
+		case DELETE:
+			//Estos botones ya tienen configurado su Command, se aprovecha para añadir distincción.
+			mBotones.put(btn.getActionCommand() + " " + ext, btn);
+			break;
+		default:
+			break;
+		}	
+	}
+	
+	/**
+	 * <p>Particularación de la función isEmpty de los componentes</p>
+	 * La particularización estriba en que previamente comprueba que existe dicho
+	 * campo mendiante la etiqueta (extensión) y obtiene el componente en caso 
+	 *  de exitir de su campo.
+	 * @param ext Extensión particular del campo.
+	 * @return TRUE si dicho campo esta vacio o no esta contenido. FALSE en otro caso.
+	 */
+	private boolean isFieldEmpty(String ext) {
+		boolean isEmpty = true;
+		if(mapaFields.containsKey(ext)) {
+			isEmpty =  mapaFields.get(ext).getText().isBlank();
+		}
+		return isEmpty;
+	}
+	
+	/**
+	 * <p>Configura los botones de guardado correspondientes
+	 * a la etiqueta indicada.</p>
+	 * Particularmente los botones de guardado rápido (Guardar cambios) no estarán
+	 *  activados mientras no haya definida una ruta previamente en el correspondiente
+	 *  campo.
+	 * @param ext Etiqueta correspondiente con la extensión de tipo de archivos.
+	 * o módulo al que hace referencia.
+	 * @param activar TRUE si se desea habilitar, FALSE en otro caso.
+	 */
+	public void enableBotonesGuardado(String ext, boolean activar) {
+		mBtnGuardarCambios.get(ext).setEnabled(activar && !isFieldEmpty(ext));
+	}
+	
+	/**
+	 * <p>Actualiza el estado de los botones Editar y Borrar de cada
+	 *  tipo de fichero.</p> 
+	 */
+	private void refreshEditarBorrar() {
+		mBotones.forEach((key,btn) -> {
+			//Extraer su extensión.
+			String ext = key.substring(key.length() -3,key.length());
+			btn.setEnabled(cm.hasModule(ext));
+		});
+	}
+	
+	/**
+	 * <p>Actualiza el estado de los campos de cada
+	 *  tipo de fichero.</p> 
+	 */
+	private void refreshFields() {
+		//Reasignación de cada campo de los módulos existentes en el Controlador.
+		mapaFields.forEach((tipo,elemento) -> {
+			//Sin nombre en principio.
+			String nombre = null;
+			boolean hasModule = cm.hasModule(tipo);
+			boolean hasName = true;
+			//Si existe el módulo, obtiene el nombre del mismo.
+			if(hasModule) nombre = cm.getModule(tipo).getNombre();
+			//En caso de que no tenga nombre definido mostrar texto al respecto.
+			hasName = nombre != null;
+			if(hasModule && !hasName) {
+				nombre = Labels_GUI.PATH_NO_DEFINED;
+				elemento.setBackground(Color.LIGHT_GRAY);
+			}else if(hasModule && hasName) elemento.setBackground(elemento.getSelectionColor());
+			else elemento.setBackground(elemento.getCaretColor());
+			//Asigna el nombre al campo correspondiente.
+			elemento.setText(nombre);
+		});
+	}
+	
+	/**
+	 * <p>Actualiza el estado de todos los componentes de la vista </p>
+	 * La actualización de los componentes se basa en los datos relacionados con
+	 *  el controlador. No elimina datos. 
+	 */
+	public void refresh() {
+		refreshFields();														//Primero actualizar los campos.
+		refreshEditarBorrar();													//Actualizar estados de botones.
+		updateUI();
+	}
 	
 	/* Clases privadas */
 	
+	/**
+	 * <p>Captura un evento de pulsación sobre un control (botón)
+	 *  y procesa la acción correspondiente mediante la llamada a la clase controladora</p>
+	 *  Para realizar dicha labor determina que botón ha sido pulsado mediante el análisis
+	 *  del tooltiptext asociado al control, extrayendo su extensión asociada y el tipo de control
+	 *   asociado al nombre, ext y op. Si el botón está habilitado procede con la operación. En otro 
+	 *    caso ingnora la acción.
+	 *  <p>Una vez realizada la acción procede a la actualización de los controles en función del
+	 *   nuevo estado de la aplicación.</p>
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 2.1
+	 */
 	private class ArchivoML extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			DCVS dcvs = null;			
+			boolean realizado = false;
 			JButton btn = (JButton) e.getSource();								//Identificar botón.
 			String tt = btn.getToolTipText();
 			//Los valores de tipos van en minúscula.
 			String ext = tt.substring(tt.length() -3, tt.length()).toLowerCase();
 			//Identificador de operación (abrir o guardar).
-			String op = tt.split(" ")[0];
-			String aux = tt.split(" ")[1];
-			int size = aux.length() -4;
-			String op2 = aux.substring(0, size);								//Identificar guardado rápido o guardar como.						
-			
-			
-			boolean traza = false;													/* No olvidar borrar flag de traza */
-			if(traza) System.out.println(op + " " + op2 + " " + ext);
-			//Opciones de Carga de módulo, NO módulo PRJ.
-			if(op.equals("Abrir") && !ext.equals(IO.PRJ)) {
-				dcvs = cIO.abrirArchivo(null,ext);
-				if(dcvs != null) {
-	//				modificado = true;
-					establecerDatos(dcvs);
-				}
-				if(traza) System.out.println("Archivos - AL OK 2");
-			//Opciones de carga de módulo PRJ
-			}else if(op.equals("Abrir") && ext.equals(IO.PRJ)) {
-				dcvs = cIO.abrirArchivo(null,ext);
-				if(traza) System.out.println("Archivos - AL OK 3");
-				if(dcvs != null) {
-					abrirProyecto(dcvs);
-				}
-			//Opciones de Guarga de módulo.
-			}else if(btn.isEnabled()){											//Comprobación de guardado activado.		
-				//Optención del módulo correspondiente
-				if(traza) System.out.println("Archivos - AL OK 4");
-				if(mapaModulos.containsKey(ext)) {
-					dcvs = mapaModulos.get(ext);
-					//Si es guardar como, poner ruta a null. En otro caso guardará con la ruta que contiene.
-					if(op2.equals("como")) { dcvs.setRuta(null); }
-				}
-				//
-				if(ext.equals(IO.PRJ)) guardarProyecto(dcvs);
-				else guardarModulo(dcvs);
+			String op = btn.getActionCommand();		
+			if(btn.isEnabled()){	
+				realizado = cm.doActionArchivos(op, ext);
 			}
-			if(traza) System.out.println("Archivos - AL OK 5");
+			
+			refresh();
+			if(op.equals("Abrir") && realizado) enableBotonesGuardado(TypesFiles.PRJ, realizado);
+			else if(realizado) enableBotonesGuardado(ext,false);
 		}
-	}
-	
-	/**
-	 * <p>Title: main</p>  
-	 * <p>Description: Función a efecto de pruebas</p> 
-	 * @param args Nada.
-	 */
-	public static void main(String[] args) {
-		Archivos archivos = new Archivos(new ControladorMapa(0,0));
-		archivos.abrirFrame();	
 	}
 	
 }

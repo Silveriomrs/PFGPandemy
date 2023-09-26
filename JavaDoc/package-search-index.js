@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"m":"pfgPandemy","l":"controlador"},{"m":"pfgPandemy","l":"modelo"},{"m":"pfgPandemy","l":"vista"}]

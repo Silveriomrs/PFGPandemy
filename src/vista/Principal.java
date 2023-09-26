@@ -5,82 +5,75 @@ package vista;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import controlador.ControladorDatosIO;
-import controlador.ControladorMapa;
-import modelo.DCVS;
-import modelo.FondoPanel;
-import modelo.IO;
+import controlador.ControladorModulos;
+import controlador.IO;
+import modelo.Labels_GUI;
+import modelo.TypesFiles;
 
 import java.awt.BorderLayout;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 /**
- * Clase de la vista principal donde se modelan las tablas
- * que sean necesarias.
+ * Clase de la vista principal donde se cargan los menús y los elementos que siver de
+ * soporte al resto de vistas de la aplicación.
  * @author Silverio Manuel Rosales Santana.
  * @date 2021/04/10
- * @version 2.8
+ * @version 2.9
  *
  */
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
-
-	private Archivos archivos;
-	private ControladorDatosIO cio;
-	private TablaEditor tablaEditor;
+	/** FRAME Configuración del tamaño en pixels de la aplicación con el marco.*/  
+	public static Dimension FRAME = new Dimension(1024,768);
+	
 	private HashMap<String, JMenuItem> jmitems;
-	private Pizarra pizarra;
-	private Parametros pparametros;
-
-	private About about;
-	private FondoPanel fondo = new FondoPanel("/vista/imagenes/imagen4.jpg");
+	private FondoPanel fondo = new FondoPanel("/vista/imagenes/agua_800px.png");
 	private JPanel panelCentral;
-	private ControladorMapa cMap;
-	private String panelActivo;
+	private ControladorModulos cm;
 	//
-	private JMenuBar menuBar;
-	private final int w = 1024;
-	private final int h = 768;
+	private JMenuBar mBar;
 
 	/**
 	 * Crea el módulo principal de la aplicación.
+	 * @param cm Controlador de las vistas y módulos.
 	 */
-	public Principal() {
-		cio = new ControladorDatosIO();
-		cMap = new ControladorMapa(w,h);
-		//cMap = new ControladorMapa(panelCentralW,panelCentralH);
-		archivos = new Archivos(cMap);
-		tablaEditor = new TablaEditor(cMap);
-		pizarra = new Pizarra(cMap.getZonas());
-		pparametros = new Parametros("Test",4);
-		about = new About();
-		panelActivo = "Mapa";
-		this.setTitle("Simulador de Pandemias");
+	public Principal(ControladorModulos cm) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/vista/imagenes/LogoUNED.jpg")));
+		int w = 1024;
+		int h = 768;
+		this.cm = cm;
+		//Configurar frame.
+		this.setTitle(Labels_GUI.W_PLAYER_TITLE);
 		this.getContentPane().setBackground(Color.GRAY);
 		this.setContentPane(fondo);	
-		this.setBounds(0, 0, w + 25, h + 15);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setBounds(0, 0, w, h + 45);
 		this.setLocationRelativeTo(null);
-		this.setResizable(true);
-		initialize();
+		this.setResizable(false);
+		configurar();
 		this.setVisible(true);
+		//Clase privada para salir controlando guardar o no los cambios realizados.
+		this.addWindowListener(new WindowListener());
+		//Desactivar el cierre automático para relizar un cierre controlado.
+	    this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
 
 	/**
 	 * Inicialización de los contenidos del frame.
 	 */
-	private void initialize() {		
+	private void configurar() {		
 		fondo.setLayout(new BorderLayout(0, 0));	
 		iniciarMenuBar();
 		
@@ -89,93 +82,125 @@ public class Principal extends JFrame {
 		panelCentral.setMaximumSize(new Dimension(2767, 2767));
 		panelCentral.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);	
 		panelCentral.setLayout(new BorderLayout(0, 0));
-		
-		//Añadir paneles de los módulos.
-		panelCentral.add(tablaEditor, null);
-		panelCentral.add(archivos, null);
-		panelCentral.add(cMap.getJMapa(), null);
-		panelCentral.add(pparametros,null);
 
 		//Añadir elementos al JPanel principal.
-		fondo.add(menuBar, BorderLayout.NORTH);
+		fondo.add(mBar,BorderLayout.NORTH);
 		fondo.add(panelCentral, BorderLayout.CENTER);
-		
-		//Ocultar JPanels no primarios y mostrar el panel por defecto.
-		mostrarPanel(panelActivo);
 	}
 	
 	/**
-	 * <p>Title: iniciarMenuBar</p>  
-	 * <p>Description: Genera una barra de herramientas y la añade
-	 * al JPanel principal, localización Norte.</p> 
+	 * Agrega un panel a la vista central. 
+	 * @param panel JPanel o vista para agregar.
+	 */
+	public void addPanelToView(JPanel panel) {
+		panel.setVisible(false);
+		panelCentral.add(panel,BorderLayout.CENTER);
+	}
+	
+	/**
+	 * Genera una barra de herramientas y la añade al JPanel principal, localización Norte. 
 	 */
 	private void iniciarMenuBar() {
 		//Inicializar el HashMap
-		jmitems = new HashMap<String,JMenuItem>();
-		//Barra de menus.
-		menuBar = new JMenuBar();
-		getContentPane().add(menuBar, BorderLayout.NORTH);
-
+		this.jmitems = new HashMap<String,JMenuItem>();
+		this.mBar = new JMenuBar();
 		//Menu Archivo
-		JMenu mnArchivo = new JMenu("Archivo");
-		addJMenuItem(mnArchivo, "Nuevo Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		JMenu mnArchivo = new JMenu(Labels_GUI.MM_FILES);
+		addJMenuItem(mnArchivo, Labels_GUI.M_NEW_PRJ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo, "Abrir Proyecto","/vista/imagenes/Iconos/carpeta_64px.png" );
-		addJMenuItem(mnArchivo, "Importar Proyecto Vensim","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_OPEN_PRJ,"/vista/imagenes/Iconos/carpeta_64px.png" );
+		//SubMenu VenSIM
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PA,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PB,"/vista/imagenes/Iconos/portapapeles_64px.png" );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo, "Guardar Proyecto","/vista/imagenes/Iconos/disquete_64px.png" );
+		//
+		addJMenuItem(mnArchivo,Labels_GUI.M_SAVE_PRJ,"/vista/imagenes/Iconos/disquete_64px.png" );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo, "Salir","/vista/imagenes/Iconos/salir_64px.png" );
+		addJMenuItem(mnArchivo,Labels_GUI.M_EXIT,"/vista/imagenes/Iconos/salir_64px.png" );
 		
 		//Menu Ver
-		JMenu mnVer = new JMenu("Ver");
-		addJMenuItem(mnVer, "Mapa","/vista/imagenes/Iconos/region_64px.png" );
-		addJMenuItem(mnVer, "Tabla","/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
-		addJMenuItem(mnVer, "Archivos","/vista/imagenes/Iconos/archivo_64px.png" );
-		addJMenuItem(mnVer, "Proyecto","/vista/imagenes/Iconos/portapapeles_64px.png" );
+		JMenu mnVer = new JMenu(Labels_GUI.MM_MODELO);
+		addJMenuItem(mnVer,Labels_GUI.MVER_PRJ ,"/vista/imagenes/Iconos/portapapeles_64px.png" );	
+		addJMenuItem(mnVer,Labels_GUI.W_DEF_TITLE ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_GRP_TITLE ,"/vista/imagenes/Iconos/portapapeles_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_REL_TITLE ,"/vista/imagenes/Iconos/nodos_64px.png" );
+		mnVer.addSeparator();
+		addJMenuItem(mnVer,Labels_GUI.W_MAP_TITLE ,"/vista/imagenes/Iconos/region_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_PAL_TITLE,"/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		addJMenuItem(mnVer,Labels_GUI.W_PLAYER_TITLE ,"/vista/imagenes/Iconos/animar_128px.png" );
+			
 		
-		//Menu Ejecutar
-		JMenu mnEjecutar = new JMenu("Ejecutar Modulo");
-		addJMenuItem(mnEjecutar, "Reproductor","/vista/imagenes/Iconos/animar_128px.png" );
-		addJMenuItem(mnEjecutar, "Editor Gráfico","/vista/imagenes/Iconos/editorGrafico_128px.png" );
-		addJMenuItem(mnEjecutar, "Paleta","/vista/imagenes/Iconos/circulo-de-color_64px.png" );
+		//Menu Herramientas
+		JMenu mnHerramientas = new JMenu(Labels_GUI.MM_TOOLS);
+		addJMenuItem(mnHerramientas,Labels_GUI.W_TE_TITLE ,"/vista/imagenes/Iconos/hoja-de-calculo_64px.png" );
+		mnHerramientas.addSeparator();
+		addJMenuItem(mnHerramientas,Labels_GUI.W_GE_TITLE ,"/vista/imagenes/Iconos/editorGrafico_128px.png" );
+		addJMenuItem(mnHerramientas,Labels_GUI.W_PE_TITLE,"/vista/imagenes/Iconos/circulo-de-color_64px.png" );
 		
-		//Menu Ejecutar
-		JMenu mnAyuda = new JMenu("Ayuda");
-		addJMenuItem(mnAyuda, "Acerca de...","/vista/imagenes/LogoUNED.jpg" );
+		//Menu Preferencias
+		JMenu mnPreferencias = new JMenu(Labels_GUI.MM_PREFERENCES);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_SPANISH ,null);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_ENGLISH ,null);
+		
+		//Menu Ayuda
+		JMenu mnAyuda = new JMenu(Labels_GUI.MM_HELP);
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_TABLES , "/vista/imagenes/Iconos/archivo_64px.png");
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_USER_GUIDE ,"/vista/imagenes/Iconos/archivo_64px.png" );
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_ABOUT ,"/vista/imagenes/LogoUNED.jpg");
 		
 		//Añadir sub-menus a la barra de menus.
-		menuBar.add(mnArchivo);
-		menuBar.add(mnVer);
-		menuBar.add(mnEjecutar);
-		menuBar.add(mnAyuda);
+		mBar.add(mnArchivo);
+		mBar.add(mnVer);
+		mBar.add(mnHerramientas);
+		mBar.add(mnPreferencias);
+		mBar.add(mnAyuda);
 		
 		//Configurar estados de cada JMenuItem y/o sus menús según el contexto.
 		actualizarJMItems();
 	}
 	
 	/**
-	 * <p>Title: actualizarJMItems</p>  
-	 * <p>Description: Actualiza los JMenuItems en función del contexto de la aplicación</p>
+	 * <p>Reinia la vista.</p>
+	 * Provoca una lectura de los datos requeridos para que la cosistencia de
+	 *  la vista sea adecuada. 
+	 */
+	public void reset() {	actualizarJMItems();}
+	
+	/**
+	 * Refresca la vista con los datos del módulo. 
+	 */
+	public void refresh() {	actualizarJMItems();}
+	
+	/**
+	 * <p>Actualiza los JMenuItems en función del contexto de la aplicación.</p>
 	 * Actua leyendo el estado de la aplicación y activando o desactivado las funciones
 	 * de los menús en base a los datos cargados y el estado previo de los diferentes módulos.
 	 */
 	private void actualizarJMItems() {
 		//En caso de no zonas:
-		boolean nozonas = cMap.getZonas().size() > 0;
+		boolean hasZonas = cm.hasZonas();
 		//Desactivar vista mapa.
-		jmitems.get("Mapa").setEnabled(nozonas);
+		jmitems.get(Labels_GUI.W_MAP_TITLE).setEnabled(hasZonas);
 		//Desactivar editor de zonas gráfico.
-		jmitems.get("Editor Gráfico").setEnabled(nozonas);
-		//Desactivar reproductor.
-	//	jmitems.get("Reproductor").setEnabled(cMap.isPlayable());
-		jmitems.get("Reproductor").setEnabled(nozonas);
+		jmitems.get(Labels_GUI.W_GE_TITLE).setEnabled(hasZonas);
+		//Desactivar vistas de grupos.
+		jmitems.get(Labels_GUI.W_GRP_TITLE).setEnabled(hasZonas);
+		//Desactivar matriz de contactos.
+		jmitems.get(Labels_GUI.W_REL_TITLE).setEnabled(hasZonas);
+		//Desactivar vista de Parámetros de la enfermedad.
+		jmitems.get(Labels_GUI.W_DEF_TITLE).setEnabled(cm.hasModule(TypesFiles.DEF));
+		jmitems.get(Labels_GUI.W_PLAYER_TITLE).setEnabled(cm.isPlayable());
 		//En caso de no tener abierto proyecto (y luego no cambios)
 		//Desactivar Guardar proyecto.
-		jmitems.get("Guardar Proyecto").setEnabled(nozonas);
-		
+		jmitems.get(Labels_GUI.M_SAVE_PRJ).setEnabled(hasZonas);
 	}
 
+	/**
+	 * Añade un elemento a la barra de menú.
+	 * @param padre Elemento padre del que colgará la opción de menú.
+	 * @param nombre Nombre con el que aparecerá en el menú.
+	 * @param rutaIcon Ruta a un icono que será añadido a la opción.
+	 */
 	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
 		JMenuItem item = new JMenuItem(new VerMenuListener(nombre));
 		if(rutaIcon != null)  item.setIcon(IO.getIcon(rutaIcon,20,20));
@@ -183,162 +208,61 @@ public class Principal extends JFrame {
 		padre.add(item);
 	}
 	
-	private int getPosX() {	return (int) this.getBounds().getX();}
-	
-	private int getPosY() {	return (int) this.getBounds().getY();}
-	
 	 /**
-	 * <p>Title: VerMenuListener</p>  
-	 * <p>Description: Clase dedicada al establecimiento de los datos en los
-	 * apartados o módulos oportunos.</p>  
+	 * Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos.  
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
-	 * @version versión
+	 * @version versión 1.1
 	 */
 	private class VerMenuListener extends AbstractAction {
 		/** serialVersionUID*/  
 		private static final long serialVersionUID = -5103462996882781094L;
 		private String name;
 		
+		/**
+		 * Esstablece como propiedad el nombre de la clase con el que se
+		 *  identificará ante el controlador de módulos y así identificar la acción
+		 *   requerida.  
+		 * @param name Nombre del control al que se asocia.
+		 */
 		public VerMenuListener(String name) {
 			super(name);
 			this.name = name;
 		}
 		
+		/**
+		 * Sobrescritura del método heredado, le pasa el nombre del control asociado
+		 *  al controlador de módulos y actualiza los menús de la barra en función
+		 *   del contexto actual.
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
-			System.out.println("Principal AL: " + name);
-			//En cualquier caso actualizar.
-			cMap.setModulos(archivos.getMapaModulos());
-			//
-			switch(name){
-				case "Reproductor":
-					//Pasar mapa de módulos al controlar de mapa.
-					if(cMap.isPlayable()) {
-						cMap.play();
-						mostrarPanel("Reproductor");
-					}
-					break;
-				case "Editor Gráfico":				
-					pizarra = new Pizarra(cMap.getZonas());
-					pizarra.abrirFrame();
-					break;
-				case "Mapa":
-					cMap.getMapa().setVisible(true);
-					cMap.setVisibleMapa(true);
-				//	cMap.getMapa().verFrame(true);
-					mostrarPanel(name);
-					break;
-				case "Paleta":
-				case "Tabla":
-				case "Archivos":
-				case "Proyecto":
-					mostrarPanel(name);
-					break;
-				case "Abrir Proyecto":
-					DCVS prj = cio.abrirArchivo(null,IO.PRJ);
-					if(prj != null) archivos.abrirProyecto(prj);
-					break;
-				case "Importar Proyecto Vensim":
-					//Hay que conocer la extensión que usa VenSim en sus proyectos.
-//					DCVS prjV = cio.abrirArchivo(null,IO.PRJ);
-					//Requiere nuevo parser completo.
-//					if(prjV != null) archivos.abrirProyecto(prjV);
-					break;
-				case "Nuevo Proyecto":
-					Parametros.main(null);
-					break;
-				case "Salir":
-					if(mostrar("¿Desea salir del programa?",3) == JOptionPane.YES_OPTION) System.exit(0);
-					break;
-				case "Acerca de...":
-					about.toggleVisible();
-					break;
-				default:
-					System.out.println(name + ", tipo no reconocido");
-			}
+			cm.doActionPrincipal(name);
 			actualizarJMItems();
 		}
 	}
 	
-	private void mostrarPanel(String nombre) {
-		boolean traza = false;
-		
-		switch(nombre){
-		case "Reproductor":
-			cMap.situarVentana(ControladorMapa.REPRODUCTOR,getPosX() - 350, getPosY() + h/3);
-			mostrarPanel("Mapa");
-			break;
-		case "Editor Gráfico":
-			break;
-		case "Paleta":
-			cMap.situarVentana(ControladorMapa.LEYENDA,getPosX() + w + 10, getPosY());
-			cMap.getPaleta().toggleVisible();
-			break;
-		case "Mapa":
-		case "Tabla":
-		case "Archivos":
-		case "Proyecto":	
-			cMap.getMapa().setVisible(nombre.equals("Mapa"));					//Activación del panel correspondiente y desactivación del resto.
-			archivos.setVisible(nombre.equals("Archivos"));
-			tablaEditor.setVisible(nombre.equals("Tabla"));
-			pparametros.setVisible(nombre.equals("Proyecto"));
-			break;
-		}
-		
-		if(traza) System.out.println("Principal - Mostrar Panel > " + nombre);
-		
-		fondo.updateUI();
-		panelCentral.updateUI();
-	}
-	
 	/**
-	 * Función auxiliar. Muestra cuadros de mensajes. Los cuadros de mensajes
-	 * no están enlazados con un hilo padre (null). Un número no definido se
-	 * mostrará como información.
-	 *
-	 * El tipo 4 es usado para el botón "Acerca de...", re-escrito para mostrar un
-	 * mensaje tipo 1.
-	 * @param txt Texto a mostrar.
-	 * @param tipo Es el tipo de cuadro de mensaje. Siendo:
-	 *  0 showMessageDialog ERROR_MESSAGE
-	 *  1 showMessageDialog INFORMATION_MESSAGE
-	 *  2 showMessageDialog WARNING_MESSAGE
-	 *  3 showConfirmDialog YES_NO_OPTION
-	 *  4 showMessageDialog PLAIN_MESSAGE
-	 * @return En caso de un mensaje de confirmación devuelve el valor Integer
-	 * de la opción escogida.
+	 * <p>Clase privada para controlar el cierre de la aplicación.</p>
+	 * El objetivo principal es permitir a la clase controladora interrogar sobre
+	 * la operación, así como realizar el guardado de los datos antes de salir
+	 * de manera abrupta o incontrolada.  
+	 * @author Silverio Manuel Rosales Santana
+	 * @date 18 nov. 2021
+	 * @version versión 1.0
 	 */
-	private Integer mostrar(String txt, int tipo ) {
-		String titulo = "";
-		Integer opcion = null;
+	private class WindowListener extends WindowAdapter {
 		
-		switch(tipo) {
-		case 0: titulo = "Error"; break;
-		case 1: titulo = "Información"; break;
-		case 2: titulo = "¡Antención!"; break;
-		case 3: titulo = "Consulta";
-			opcion = JOptionPane.showConfirmDialog(null, txt, titulo, JOptionPane.YES_NO_OPTION);
-		break;
-		case 4: titulo = "Acerca de..."; tipo = 1; break;
-		default:
-			titulo = "";
-		}
-		
-		if(tipo != 3) JOptionPane.showMessageDialog(null, txt, titulo, tipo);
-		
-		return opcion;
-	}
-
-	
-	/**
-	 * Método main de la clase.
-	 * @param args no usado.
-	 */
-	public static void main(String[] args) {
-		Principal ventana = new Principal();
-		ventana.setVisible(true);	
+			/**
+			 * Al sobrescribir este método se fuerza que la aplicación fuerce al
+			 *  usuario a confirmar la acción, de esta manera se da seguridad extra
+			 *   al eviar la perdida accidental de datos.
+			 */
+			@Override
+			public void windowClosing(WindowEvent e) {
+				cm.doActionPrincipal(Labels_GUI.M_EXIT);
+		    }
 	}
 }
 
