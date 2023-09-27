@@ -1,0 +1,6 @@
+Al crear un nuevo proyecto:
+Corregir:
+1. PAL adquiere la misma extensión que el proyecto.
+
+Al guardar el proyecto creado:
+1. Los módulos no están guardando su extensión y no se están almacenando.

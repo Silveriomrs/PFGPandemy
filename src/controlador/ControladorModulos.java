@@ -115,6 +115,9 @@ public class ControladorModulos {
 	 */
 	private void generarModulosBasicos() {
 		DCVS proyecto = DCVSFactory.newModule(TypesFiles.PRJ);
+		//Establecer último directorio de trabajo.
+		String wd = IO.WorkingDirectory + separador;
+		proyecto.setDirectorio(wd);
 		//Procesarlo.
 		abrirProyecto(proyecto);
 		//Módulo de parámetros SIR.
@@ -131,7 +134,6 @@ public class ControladorModulos {
 	 */
 	private void generarModuloDEF() {
 		DCVS pSIR = DCVSFactory.newModule(TypesFiles.DEF);
-		//Procesarlo.
 		establecerDatos(pSIR);
 	}
 	
@@ -153,9 +155,6 @@ public class ControladorModulos {
 	 */
 	private void generarModuloMAP() {
 		DCVS moduloZonas = DCVSFactory.newModule(TypesFiles.MAP);
-		//Añadir datos para el guardado  e identifación.
-		setProjectParameters(moduloZonas);
-		//Procesarlo.
 		establecerDatos(moduloZonas);
 	}
 	
@@ -169,7 +168,6 @@ public class ControladorModulos {
 	private void generarModuloREL(){
 		//Añadimos nueva matriz de contactos.
 		DCVS relaciones = DCVSFactory.newREL(zonas);
-		setProjectParameters(relaciones);
 		establecerDatos(relaciones);
 	}
 			
@@ -182,22 +180,25 @@ public class ControladorModulos {
 	 * @param module Módulo DCVS al que añadir los parámetros.
 	 */
 	private void setProjectParameters(DCVS module) {
-		//Directorio de trabajo
+		//Obteción de datos generales del módulo.
 		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
 		String name = module.getNombre();
-		if(wd != null && !wd.equals("")) {
-			//Establecer directorio de trabajo.
-			module.setDirectorio(wd);
-			//Nombre con el nombre del proyecto sino posee propio.
-			if(name == null || name.equals("") ) {
-				name = modulos.get(TypesFiles.PRJ).getNombre();
-				module.setName(name);
-			}
-	
-			//Ruta absoluta.
-			module.setRuta(module.getDirectorio() +
-					separador + module.getNombre() + "." + module.getTipo());
+		String ruta = module.getRuta();
+		//Establecer directorio de trabajo.
+		// TASK: no está bien, ambos pueden ser null y no se pondría una correcta.
+		if(wd != null && !wd.equals("")) {module.setDirectorio(wd);}
+		
+		//Nombre con el nombre del proyecto sino posee propio.
+		if(name == null || name.equals("") ) {
+			name = modulos.get(TypesFiles.PRJ).getNombre();
+			module.setName(name);
 		}
+		//Ruta absoluta.
+		if(ruta == null || ruta.equals("")) {
+			module.setRuta(module.getDirectorio() +
+					separador + name + "." + module.getTipo());
+		}
+		
 	}
 	
 	/**
@@ -566,7 +567,7 @@ public class ControladorModulos {
 		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
 		archivos.disableAllSavers();
 		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
-		modulos.put(dcvs.getTipo(), dcvs);
+		modulos.put(TypesFiles.PRJ, dcvs);
 		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
 		//Sino coinciden el número de zonas, re-ajustar.
 		if(NG != getNumberZonas()) resizeZonas(NG);
@@ -601,7 +602,7 @@ public class ControladorModulos {
 	private void establecerDatos(DCVS datos) {
 		String tipo = datos.getTipo();
 		//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
-		
+		setProjectParameters(datos);
 		
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
@@ -1266,8 +1267,8 @@ public class ControladorModulos {
 		datos.forEach((label,data) ->{
 			setValueAtLabel(TypesFiles.PRJ ,label ,data);
 		});
-		
-		//Establece por defecto el nombre del archivo el del proyecto en todos los archivos.
+	
+		//Establece por defecto el nombe del proyecto como nombre de archivo.
 		getModule(TypesFiles.PRJ).setName(name);
 		
 		//En caso de no haber un módulo de grupos de población, generar y agregarlo.
@@ -1275,6 +1276,9 @@ public class ControladorModulos {
 			generarModuloMAP();
 			generarModuloREL();
 		}
+		
+		//Establecer nombre del proyecto al módulo DEF
+		establecerDatos(getModule(TypesFiles.DEF));
 		
 		//Ajustar el número de zonas o crearlas si es necesario.
 		if(getNumberZonas() != NG) { 
