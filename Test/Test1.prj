@@ -1,0 +1,12 @@
+Tipo,Dato
+NAME,Test
+AUTHOR,Silverio
+DESCRIPTION,Test de pruebas para mejorar el proyecto original.
+DATE0,26/09/2023
+DATE1,26/09/2023
+VERSION,1.0
+NG,4
+def,Test1.def
+rel,Test1.rel
+pal,Test1.pal
+map,Test1.map

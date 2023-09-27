@@ -485,7 +485,7 @@ public class DCVS implements TableModel{
 	public void setTipo(String tipo) {	this.tipo = tipo;}
 	
 	/**
-	 * Devuelve el nombre del archivo, con extensión inclusive 
+	 * Devuelve el nombre del archivo. Sin extensión. 
 	 * @return Nombre del archivo.
 	 */
 	public String getNombre() {return this.nombre;}

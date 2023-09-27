@@ -155,8 +155,6 @@ public class ControladorModulos {
 		DCVS moduloZonas = DCVSFactory.newModule(TypesFiles.MAP);
 		//Añadir datos para el guardado  e identifación.
 		setProjectParameters(moduloZonas);
-		//añadir el módulo al conjunto de módulos.
-		modulos.put(moduloZonas.getTipo(),moduloZonas);
 		//Procesarlo.
 		establecerDatos(moduloZonas);
 	}
@@ -186,24 +184,19 @@ public class ControladorModulos {
 	private void setProjectParameters(DCVS module) {
 		//Directorio de trabajo
 		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
+		String name = module.getNombre();
 		if(wd != null && !wd.equals("")) {
-			//Tipo
-			String type = module.getTipo();
+			//Establecer directorio de trabajo.
 			module.setDirectorio(wd);
 			//Nombre con el nombre del proyecto sino posee propio.
-			if(module.getNombre() == null || module.getNombre().equals("") ) {
-				String name = modulos.get(TypesFiles.PRJ).getNombre();
-				//Quitar extensión
-				int size = name.length();
-				name = name.substring(0,size -4);
-				//Añadir nueva extensión.
-				name = name + "." + type;
+			if(name == null || name.equals("") ) {
+				name = modulos.get(TypesFiles.PRJ).getNombre();
 				module.setName(name);
 			}
 	
 			//Ruta absoluta.
 			module.setRuta(module.getDirectorio() +
-					separador + module.getNombre());
+					separador + module.getNombre() + "." + module.getTipo());
 		}
 	}
 	
@@ -607,6 +600,8 @@ public class ControladorModulos {
 	 */
 	private void establecerDatos(DCVS datos) {
 		String tipo = datos.getTipo();
+		//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
+		
 		
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
@@ -1101,7 +1096,7 @@ public class ControladorModulos {
 	/* Acciones VistaSIR */
 	
 	/**
-	 * Asigna un valor a una etiqueta en el módulo específicado.
+	 * Asigna un valor a una etiqueta en el módulo específicado. No crea campo nuevo en caso de no existir.
 	 * @param ext Extensión (etiqueta identificadora) del módulo objetivo.
 	 * @param label Etiqueta a la que modificar su valor asignado.
 	 * @param data Dato a insertar como nuevo valor de la etiqueta.
@@ -1133,7 +1128,7 @@ public class ControladorModulos {
 	}
 		
 	/**
-	 * Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea.
+	 * Asigna un valor a una etiqueta. Si la etiqueta no existe, la crea y asigna el valor indicado.
 	 * @param ext Extensión (etiqueta identificadora) del módulo a editar.
 	 * @param label Etiqueta a buscar.
 	 * @param data Dato a insertar en la tabla.
@@ -1262,12 +1257,18 @@ public class ControladorModulos {
 	 */
 	public boolean doActionPProyecto(HashMap<String,String> datos) {
 		boolean done = true;
+		//Número de Grupos de población, importante para dimensionar el proyecto.
 		int NG  = Integer.parseInt(datos.get(Labels.NG));
+		//Nombre del proyecto, immportante para asignar al resto de módulos.
+		String name = datos.get(Labels.NAME);
 		
 		//Actualizar datos de las etiquetas del módulo del proyecto.
 		datos.forEach((label,data) ->{
 			setValueAtLabel(TypesFiles.PRJ ,label ,data);
 		});
+		
+		//Establece por defecto el nombre del archivo el del proyecto en todos los archivos.
+		getModule(TypesFiles.PRJ).setName(name);
 		
 		//En caso de no haber un módulo de grupos de población, generar y agregarlo.
 		if(!modulos.containsKey(TypesFiles.MAP)) {

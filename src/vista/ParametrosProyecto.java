@@ -97,85 +97,6 @@ public class ParametrosProyecto extends JPanel {
 		}
 	}
 	
-
-	/* Clases privadas */
-	
-	/**
-	 * Clase privada que hereda de la clase MouseADapter para lograr aplicar un
-	 * patrón observer con el objetivo de poder manejar los eventos que el usuario realiza
-	 *  con el ratón sobre los controles de la vista.
-	 * @author Silverio Manuel Rosales Santana
-	 * @version versión 1.0
-	 */
-	private class BotonL extends MouseAdapter {
-		private HashMap<String,String> datos;
-		private int NG;
-		private String name;
-		
-		public BotonL() {
-			datos = new HashMap<String,String>();
-		}
-		
-		/**
-		 * Método sobrescrito de captura de la pulsación del ratón sobre el control.
-		 *  Antes de proceder con la acción muestra un aviso de las consecuencias de dicha acción.
-		 *   Si es aprovada dicha acción, comprueba la corrección de los datos almacenados en los campos de la vista,
-		 *    finalmente, procede con la ejecución de las acciones pertinentes.
-		 */
-		@Override
-		public void mouseClicked(MouseEvent evt) {
-			boolean continuar = true;
-			String aviso = Labels_GUI.WARNING_1;
-			//Primer valor obligatorio.
-			try{NG = Integer.parseInt(fTFNGrupos.getText());}
-			catch(Exception e) {
-				String s = Labels_GUI.WARNING_2 + fTFNGrupos.getText();
-				cm.showMessage(s, 0);
-				fTFNGrupos.setText(null);										//Le borramos texto introducido.
-				continuar = false;
-			}
-			
-			//Siguiente valor obligatorio.
-			if(continuar) name = fTFNombre.getText();
-
-			//Comprobación de valores obligatorios y emisión si procede de mensaje de error.
-			if(continuar && NG == 0) {
-				cm.showMessage(Labels_GUI.WARNING_3, 0);
-				continuar = false;
-			//Comprobación de nombre válido.
-			}else if(continuar && (name == null || name.equals(""))) {
-				cm.showMessage(Labels_GUI.WARNING_EMPTY_FIELD, 0);
-				continuar = false;
-			//Si no hubieron errores y hay confirmación -> proceder con la actualización de los datos.
-			}else if(continuar && cm.showMessage(aviso,3) == JOptionPane.OK_OPTION ){
-				proceed();
-				cm.doActionPProyecto(datos);
-			}
-		}
-		
-		/**
-		 * Recolecta los datos de los campos y los introduce en el HashMap.
-		 */
-		private void proceed() {
-			//Si se ha pulsado el botón de aplicar... recolectar datos.
-			datos.clear();
-			datos.put(Labels.NAME, name);
-			datos.put(Labels.AUTHOR,"" + fTFAutor.getText());
-			datos.put(Labels.NG, "" + NG);		
-			datos.put(Labels.DESCRIPTION,"" + textArea.getText());
-			//Versión, sino hay datos, coloca una versión inicial.
-			String version = fTFVersion.getText();
-			if(version != null) datos.put(Labels.VERSION,version);
-			else datos.put(Labels.VERSION,Labels_GUI.VERSION_NUMBER);
-			//Fechas, si no hay datos, coloca fecha actual.
-			Date d = dateChooser0.getDate();
-			if(d != null) datos.put(Labels.DATE0, dateToString( d));
-			else datos.put(Labels.DATE0, dateToString( new Date()));
-			d =  dateChooser1.getDate();
-			if(d != null) datos.put(Labels.DATE1, dateToString(d));
-			else datos.put(Labels.DATE1, dateToString( new Date()));
-		}
-	}
 	
 	/**
 	 * <p>Reinicia la vista de este módulo.</p> 
@@ -382,5 +303,84 @@ public class ParametrosProyecto extends JPanel {
 		jtf.setToolTipText(tt);
 		jtf.setColumns(10);
 		return jtf;
+	}
+	
+	/* Clases privadas */
+	
+	/**
+	 * Clase privada que hereda de la clase MouseADapter para lograr aplicar un
+	 * patrón observer con el objetivo de poder manejar los eventos que el usuario realiza
+	 *  con el ratón sobre los controles de la vista.
+	 * @author Silverio Manuel Rosales Santana
+	 * @version versión 1.0
+	 */
+	private class BotonL extends MouseAdapter {
+		private HashMap<String,String> datos;
+		private int NG;
+		private String name;
+		
+		public BotonL() {
+			datos = new HashMap<String,String>();
+		}
+		
+		/**
+		 * Método sobrescrito de captura de la pulsación del ratón sobre el control.
+		 *  Antes de proceder con la acción muestra un aviso de las consecuencias de dicha acción.
+		 *   Si es aprovada dicha acción, comprueba la corrección de los datos almacenados en los campos de la vista,
+		 *    finalmente, procede con la ejecución de las acciones pertinentes.
+		 */
+		@Override
+		public void mouseClicked(MouseEvent evt) {
+			boolean continuar = true;
+			String aviso = Labels_GUI.WARNING_1;
+			//Primer valor obligatorio.
+			try{NG = Integer.parseInt(fTFNGrupos.getText());}
+			catch(Exception e) {
+				String s = Labels_GUI.WARNING_2 + fTFNGrupos.getText();
+				cm.showMessage(s, 0);
+				fTFNGrupos.setText(null);										//Le borramos texto introducido.
+				continuar = false;
+			}
+			
+			//Siguiente valor obligatorio.
+			if(continuar) name = fTFNombre.getText();
+
+			//Comprobación de valores obligatorios y emisión si procede de mensaje de error.
+			if(continuar && NG == 0) {
+				cm.showMessage(Labels_GUI.WARNING_3, 0);
+				continuar = false;
+			//Comprobación de nombre válido.
+			}else if(continuar && (name == null || name.equals(""))) {
+				cm.showMessage(Labels_GUI.WARNING_EMPTY_FIELD, 0);
+				continuar = false;
+			//Si no hubieron errores y hay confirmación -> proceder con la actualización de los datos.
+			}else if(continuar && cm.showMessage(aviso,3) == JOptionPane.OK_OPTION ){
+				proceed();
+				cm.doActionPProyecto(datos);
+			}
+		}
+		
+		/**
+		 * Recolecta los datos de los campos y los introduce en el HashMap.
+		 */
+		private void proceed() {
+			//Si se ha pulsado el botón de aplicar... recolectar datos.
+			datos.clear();
+			datos.put(Labels.NAME, name);
+			datos.put(Labels.AUTHOR,"" + fTFAutor.getText());
+			datos.put(Labels.NG, "" + NG);		
+			datos.put(Labels.DESCRIPTION,"" + textArea.getText());
+			//Versión, sino hay datos, coloca una versión inicial.
+			String version = fTFVersion.getText();
+			if(version != null) datos.put(Labels.VERSION,version);
+			else datos.put(Labels.VERSION,Labels_GUI.VERSION_NUMBER);
+			//Fechas, si no hay datos, coloca fecha actual.
+			Date d = dateChooser0.getDate();
+			if(d != null) datos.put(Labels.DATE0, dateToString( d));
+			else datos.put(Labels.DATE0, dateToString( new Date()));
+			d =  dateChooser1.getDate();
+			if(d != null) datos.put(Labels.DATE1, dateToString(d));
+			else datos.put(Labels.DATE1, dateToString( new Date()));
+		}
 	}
 }
