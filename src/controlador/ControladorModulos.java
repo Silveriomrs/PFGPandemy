@@ -181,22 +181,24 @@ public class ControladorModulos {
 	 */
 	private void setProjectParameters(DCVS module) {
 		//Obteción de datos generales del módulo.
-		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
-		String name = module.getNombre();
-		String ruta = module.getRuta();
+		String wd = module.getDirectorio();
+		String name = module.getName();
+		String ruta = module.getPath();
 		//Establecer directorio de trabajo.
-		// TASK: no está bien, ambos pueden ser null y no se pondría una correcta.
-		if(wd != null && !wd.equals("")) {module.setDirectorio(wd);}
+		if(wd == null || wd.equals("")) {
+			wd = modulos.get(TypesFiles.PRJ).getDirectorio();
+			module.setDirectorio(wd);
+		}
 		
 		//Nombre con el nombre del proyecto sino posee propio.
 		if(name == null || name.equals("") ) {
-			name = modulos.get(TypesFiles.PRJ).getNombre();
+			name = modulos.get(TypesFiles.PRJ).getName();
 			module.setName(name);
 		}
 		//Ruta absoluta.
 		if(ruta == null || ruta.equals("")) {
-			module.setRuta(module.getDirectorio() +
-					separador + name + "." + module.getTipo());
+			module.setPath(module.getDirectorio() +
+					separador + name + "." + module.getType());
 		}
 		
 	}
@@ -459,50 +461,16 @@ public class ControladorModulos {
 	 * \see TypesFiles
 	 */
 	public boolean hasModule(String tipo) {	return modulos.containsKey(tipo);}
-	
+
 	/**
-	 * <p>Guarda la configuración del proyecto.</p> En caso de que
-	 * el módulo recibido sea null, no realizará operación alguna. Cuando dicho
-	 *  módulo no tiene establecido un directorio de trabajo, lo obtendrá del 
-	 *   resultado de la operación.
-	 * <P>Cuando se guarda los módulos existentes serán guardados en el mismo
-	 * mismo directorio de trabajo, además de variar sus propiedades internas para
-	 *  conservar dichos cambios.</P>
-	 * Aquellos módulos creados pero sin nombre asignado obtendrán el nombre del
-	 *  proyecto con la extensión propia de cada módulo.
-	 * @param dcvsIn Módulo DCVS de entrada con configuración PRJ.
-	 * @return TRUE si la operación se ha realizado correctamente. False en otro caso.
-	 */
-	private boolean saveProjectAs(DCVS dcvsIn) {
-		boolean done = true;
-		DCVS dcvs = dcvsIn;
-		//Guardado del fichero: En name se almacena el nombre elegido con su extensión.
-		String name = cio.guardarArchivo(dcvs);
-		//Si no es nulo el módulo y no se ha cancelado el guardado -> procede.
-		if(dcvs != null && name != null) {
-			//Obtener nuevo nombre y directorio de trabajo usado en este guardado.
-			String wd = IO.WorkingDirectory;
-			//Configuración de la ruta
-			dcvs.setRuta(wd + separador + name);
-			dcvs.setName(name);
-			dcvs.setDirectorio(wd);
-			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
-			saveAllTogether();													//Guardar resto	
-			//Mostrar rutas en Field.
-			archivos.refresh();
-		}else done = false;
-		
-		return done;
-	}
-	
-	/**
-	 * Almacena los módulos actuales del sistema en el mismo
+	 * Almacena los módulos actuales (excepto PRJ) del sistema en el mismo
 	 *  directorio de trabajo que el módulo principal (proyecto).
+	 * <P>Este método requiere por tanto que el proyecto haya sido grabado
+	 *  previamente.</P>
 	 */
 	private void saveAllTogether() {
 		modulos.forEach((type,module)->{
 			if(!type.equals(TypesFiles.PRJ)) {
-				setProjectParameters(module);;
 				//Re-integrar el módulo en el entorno.
 				establecerDatos(module);
 				//Guardar en el directorio de trabajo.
@@ -583,9 +551,9 @@ public class ControladorModulos {
 	 * @param datos Módulo a referenciar dentro del módulo del proyecto.
 	 */
 	private void insertInProjectModule(DCVS datos) {
-		String tipo = datos.getTipo();
+		String tipo = datos.getType();
 		if(modulos.containsKey(TypesFiles.PRJ)) {
-			String[] nuevaEntrada = {tipo,datos.getNombre()};
+			String[] nuevaEntrada = {tipo,datos.getName()};
 			int linea = modulos.get(TypesFiles.PRJ).getFilaItem(tipo);
 			boolean lineaDuplicada = linea > -1;
 			//Si hay un módulo ya cargado, hay que sustituirlo.
@@ -600,10 +568,17 @@ public class ControladorModulos {
 	 * @param datos Conjunto de datos y cabecera encapsulados.
 	 */
 	private void establecerDatos(DCVS datos) {
-		String tipo = datos.getTipo();
+		String tipo = datos.getType();
+		
+		if(datos.getType().equals(TypesFiles.PAL)){
+			System.out.println("CM > establecerDatos >\nNombre módulo PAL: " +
+			datos.getName() + 
+			" / Tipo: " + datos.getType());
+		}
+		
 		//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
 		setProjectParameters(datos);
-		
+
 		//Añadir la ruta del módulo al módulo del proyecto.
 		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
 		insertInProjectModule(datos);
@@ -625,6 +600,8 @@ public class ControladorModulos {
 		case (TypesFiles.DEF):
 			break;
 		case (TypesFiles.PAL):
+			System.out.println("CM > establecerDatos 2 >\nNombre módulo PAL: " + datos.getName()+ " / Tipo: " + datos.getType());
+
 			break;
 		default:
 		}
@@ -698,7 +675,7 @@ public class ControladorModulos {
 				generarModulosBasicos();
 				break;
 			case Labels_GUI.M_SAVE_PRJ:
-				saveProjectAs(modulos.get(TypesFiles.PRJ));
+				saveModule(TypesFiles.PRJ,true);
 				break;
 			case Labels_GUI.M_EXIT:
 				if(showMessage(Labels_GUI.WARNING_1_DATA_LOSS + "\n" + Labels_GUI.REQUEST_EXIT_CONFIRM,3) == JOptionPane.YES_OPTION) System.exit(0);
@@ -780,7 +757,7 @@ public class ControladorModulos {
 	 * quedan establecidas directamente en el grupo en el que están almacenadas.
 	 * Si bien, es necesario detectar tales cambios a efectos de actualizar los
 	 *  controles.</p>
-	 * @param op Tipo de operación a realizar. (Guardar o Aplicar cambios de poligonos).
+	 * @param op Tipo de operación a realizar. (Ej: Guardar o Aplicar cambios de poligonos).
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
 	public boolean doActionPizarra(String op) {
@@ -803,8 +780,16 @@ public class ControladorModulos {
 				});
 			}
 			//Guardar los cambios efectuados en disco.
-			done = saveModule(TypesFiles.MAP,modulos.get(TypesFiles.MAP).getNombre() == null);
+			done = saveModule(TypesFiles.MAP,modulos.get(TypesFiles.MAP).getName() == null);
 			break;
+		case OPEN: 
+			//Apertura de una imagen para usar de fondo.
+    		String ruta = cio.selFile(1, TypesFiles.IMG);
+    		// En caso de tener una ruta correcta se procede a la carga.
+    		if(ruta != null && !ruta.equals("")) {
+    			pizarra.setFondo(ruta);
+    		}
+    		break;
 		default:
 			break;
 		}
@@ -827,9 +812,8 @@ public class ControladorModulos {
 			// como haiga definido en el proyecto.
 			int NG = getNumberZonas();
 			
-			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP))
-					&& dcvs.getRowCount() != NG ) {
-				showMessage(Labels_GUI.ERR_LOAD_MODULE + dcvs.getRuta() + "\n" + Labels_GUI.ERR_MODULE_LESS_NG,0);
+			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP)) && dcvs.getRowCount() != NG ) {
+				showMessage(Labels_GUI.ERR_LOAD_MODULE + dcvs.getPath() + "\n" + Labels_GUI.ERR_MODULE_LESS_NG,0);
 				ok = false;	
 				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
 			}	
@@ -895,17 +879,29 @@ public class ControladorModulos {
 	 * @return TRUE si la operación se ha relizado correctamente. FALSE en otro caso.
 	 */
 	private boolean saveModule(String ext, boolean as) {
-		//Optención del módulo correspondiente
+		//Obtención del módulo correspondiente
 		DCVS dcvs = getModule(ext);
 		boolean done = dcvs != null;
-		if(done && !ext.equals(TypesFiles.PRJ)) {
-			//Ruta a null. En otro caso guardará con la ruta definida en dicho módulo.
-			if(as) dcvs.setRuta(null);
-			//
-			cio.guardarArchivo(dcvs);
-		}else {
-			done = saveProjectAs(dcvs);
+		String pathAs = null;
+		//Pedir nueva ubicación / nombre en caso as = true.
+		if (as) {
+			pathAs = cio.selFile(2, ext);
+			if(pathAs != null) {
+				dcvs.setPath(pathAs);
+			}else {done = false;}
 		}
+
+		//Si es un módulo particular
+		if(done && !ext.equals(TypesFiles.PRJ)) {
+			done = cio.guardarModulo(dcvs);
+		//En otro caso es un PRJ.
+		} else {
+			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
+			saveAllTogether();
+			//Mostrar rutas en Field.
+			archivos.refresh();
+		}
+
 		return done;
 	}	
 	
@@ -965,7 +961,7 @@ public class ControladorModulos {
 			establecerDatos(modulo);
 			//indicar al módulo de archivos que modulo se ha modificado para activar 
 			//El botón de guardar correspondiente.
-			archivos.enableBotonesGuardado(modulo.getTipo(), true);
+			archivos.enableBotonesGuardado(modulo.getType(), true);
 		}
 		refresh();	
 		return done;

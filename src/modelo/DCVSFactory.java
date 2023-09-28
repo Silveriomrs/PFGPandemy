@@ -38,7 +38,7 @@ public class DCVSFactory {
 	 */
 	public static DCVS newModule(String type) {
 		DCVS module = new DCVS();
-		module.setTipo(type);
+		module.setType(type);
 		setType(module);
 		module.setEditLabels(false);
 		return module;
@@ -49,13 +49,13 @@ public class DCVSFactory {
 	 *  a para el módulo que se especifique.
 	 */
 	private static void setType(DCVS module) {
-		switch(module.getTipo()) {
+		switch(module.getType()) {
 		case(TypesFiles.PRJ): setPRJ(module); break;
 		case(TypesFiles.MAP): setMAP(module); break;
 		case(TypesFiles.DEF): setDEF(module); break;
 		case(TypesFiles.PAL): setPAL(module); break;
 		default:
-			System.out.println("DCVSFactory > type not implemented yet: " + module.getTipo());
+			System.out.println("DCVSFactory > type not implemented yet: " + module.getType());
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class DCVSFactory {
 	 */
 	public static DCVS newHST(int FT) {
 		DCVS module = new DCVS();
-		module.setTipo(TypesFiles.HST);
+		module.setType(TypesFiles.HST);
 		//Crear cabecera		
 		String[] cabecera = new String[FT + 1];
 		cabecera[0] = "TIME";
@@ -142,7 +142,7 @@ public class DCVSFactory {
 	 */
 	public static DCVS newREL(HashMap<Integer,Zona> grupos) {
 		DCVS module = new DCVS();
-		module.setTipo(TypesFiles.REL);
+		module.setType(TypesFiles.REL);
 		
 		int NG = grupos.size();													//Restar etiqueta inicial.
 		

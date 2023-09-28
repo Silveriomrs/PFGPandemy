@@ -254,7 +254,7 @@ public class TablaEditor extends JPanel{
 		boolean tieneFila = dcvs.getRowCount() > 0;
 		//Botones de guardado.
 		btnGuardarArchivo.setEnabled(modificado);
-		btnGuardarCambios.setEnabled(modificado && dcvs.getRuta() != null && dcvs.getTipo() != null);
+		btnGuardarCambios.setEnabled(modificado && dcvs.getPath() != null && dcvs.getType() != null);
 		//Por ser primer boton en ejecutarse por defecto aparece activo,
 		//Colocado fuera del condicional permite que se desactive al primer cambio
 		//en caso de no estar habilitada la opción de edición.
@@ -339,7 +339,7 @@ public class TablaEditor extends JPanel{
 		this.editable = editable;
 		this.dcvs = dcvsIn;
 		//Obtener valor Enúmerado.
-		String tipo = dcvs.getTipo();
+		String tipo = dcvs.getType();
 		ModuleType mt = ModuleType.valueOf(tipo.toUpperCase());
 		//Establecer en el selector el tipo.
 		comboBox.setSelectedItem(mt);
@@ -361,7 +361,7 @@ public class TablaEditor extends JPanel{
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {};
 		dcvs = new DCVS();
-		dcvs.setTipo(TypesFiles.CSV);
+		dcvs.setType(TypesFiles.CSV);
 		dcvs.setModelo(new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
 		});
@@ -454,7 +454,7 @@ public class TablaEditor extends JPanel{
 				// Si se acepta ...
 				if(respuesta == JOptionPane.OK_OPTION) {
 					// Establecer tipo.
-					dcvs.setTipo(setTipo(seleccion));
+					dcvs.setType(setTipo(seleccion));
 					// Mandarlo a procesar al CM.	
 					actuar = cm.doActionTableEditor(dcvs);			
 				}
@@ -567,8 +567,8 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());				//Abre la nueva tabla en una variable temporal.
+				if(dcvs.getType() == null) dcvs.setType(TypesFiles.CSV);
+				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getType());				//Abre la nueva tabla en una variable temporal.
 				//En caso de ser una tabla no nula...
 				if(dcvs2 != null) {
 					dcvs = dcvs2;												//Establecer la nueva tabla como tabla activa.
@@ -603,7 +603,7 @@ public class TablaEditor extends JPanel{
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
 				if(dcvs.getRowCount() >0) {
 					// Sistema que era identico al de la clase BtnGuardarArchivoML.
-					cio.guardarArchivo(dcvs);
+					cio.guardarModulo(dcvs);
 					cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
 					modificado = false;
 					estadoBotones();
@@ -629,15 +629,15 @@ public class TablaEditor extends JPanel{
 		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			boolean ok = false;
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Sino tiene de un tipo se le asigna el tipo general.
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
+				if(dcvs.getType() == null) dcvs.setType(TypesFiles.CSV);	
 				if(dcvs.getRowCount() >0) {										//Comprobación de número de filas mínimo.
-					String rutaF = cio.guardarArchivo(dcvs);							//Obtención de la ruta de guardado.
+					ok = cio.guardarModulo(dcvs);							//Obtención de la ruta de guardado.
 					//En caso de guardado correcto, proceder...
-					if(rutaF != null) {
+					if(ok) {
 						cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
-						dcvs.setRuta(rutaF);									//Establecimiento de la nueva ruta al módulo.
 						modificado = false;										//Activación flag modificado.
 						estadoBotones();										//Actualización del estado de los botones.
 					}					
@@ -716,10 +716,10 @@ public class TablaEditor extends JPanel{
 					DCVS temp = dcvs;
 					nuevaTabla();
 					dcvs.setDirectorio(temp.getDirectorio());
-					dcvs.setTipo(temp.getTipo());
-					dcvs.setName(temp.getNombre());
+					dcvs.setType(temp.getType());
+					dcvs.setName(temp.getName());
 					dcvs.setDate(temp.getDate());
-					dcvs.setRuta(temp.getRuta());
+					dcvs.setPath(temp.getPath());
 				}
 			}
 		}

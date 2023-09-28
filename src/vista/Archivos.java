@@ -388,7 +388,7 @@ public class Archivos extends JPanel {
 			boolean hasModule = cm.hasModule(tipo);
 			boolean hasName = true;
 			//Si existe el módulo, obtiene el nombre del mismo.
-			if(hasModule) nombre = cm.getModule(tipo).getNombre();
+			if(hasModule) nombre = cm.getModule(tipo).getName();
 			//En caso de que no tenga nombre definido mostrar texto al respecto.
 			hasName = nombre != null;
 			if(hasModule && !hasName) {

@@ -47,10 +47,20 @@ public class ControladorDatosIO {
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
 	 * @param modulo Modulo a guardar en el disco.
-	 * @return La ruta al archivo guardado. Null en otro caso.
+	 * @return Boolean True en caso de operación realizada. False en otro caso.
 	 */
-	public String guardarArchivo(DCVS modulo) {
-		return io.grabarArchivo(modulo.toString(),modulo.getRuta(),modulo.getTipo());
+	public boolean guardarModulo(DCVS modulo) {	return io.saveModule(modulo);	}
+	
+	/**
+	 * Función general para guardar datos en formato texto en el disco.
+	 * @param datos Tipo de datos a guardar. Pueden ser de configuración, datos, etc.
+	 * @param ruta Ruta completa incluyendo nombre con extensión al fichero.
+	 * @param name Nombre del fichero donde se almacenará.
+	 * @param ext Extensión del fichero.
+	 * @return Ruta completa al fichero donde se han almacenado los datos. Null en otro caso.
+	 */
+	public String guardarArchivo(String datos, String ruta, String name, String ext) {
+		return io.saveFile(datos,ruta,name,ext);
 	}
 	
 	/**

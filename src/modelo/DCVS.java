@@ -465,30 +465,30 @@ public class DCVS implements TableModel{
 	/**
 	 * @return La ruta en el dispositivo, de la que procede la fuente de los datos.
 	 */
-	public String getRuta() {return ruta;}
+	public String getPath() {return ruta;}
 
 	/**
 	 * @param ruta La nueva ruta en el dispositivo de almacenamiento donde guardar
 	 * los datos.
 	 */
-	public void setRuta(String ruta) {	this.ruta = ruta;}
+	public void setPath(String ruta) {	this.ruta = ruta;}
 
 	/**
 	 * @return Devuelve el tipo de datos almacenados en esta instancia.
 	 */
-	public String getTipo() {return tipo;}
+	public String getType() {return tipo;}
 	
 
 	/**
 	 * @param tipo El tipo de datos a establecer para esta instancia.
 	 */
-	public void setTipo(String tipo) {	this.tipo = tipo;}
+	public void setType(String tipo) {	this.tipo = tipo;}
 	
 	/**
 	 * Devuelve el nombre del archivo. Sin extensión. 
 	 * @return Nombre del archivo.
 	 */
-	public String getNombre() {return this.nombre;}
+	public String getName() {return this.nombre;}
 
 
 	/**

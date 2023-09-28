@@ -64,18 +64,16 @@ public class IO{
 		File f = getFile(1,ruta,ext);
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
-				System.out.println("IO > abrirArchivo > OK1");
 				lectorCSV =  new CSVReader(new FileReader(f));					// Abrir el archivo.
-				System.out.println("IO > abrirArchivo > OK2");
 				List<String[]> datos = lectorCSV.readAll();
 				if(ruta == null) ruta2 = f.getPath();
 				dcvs = new DCVS();
 				dcvs.crearModelo(datos);
-				dcvs.setRuta(ruta2);
-				dcvs.setTipo(ext);
+				dcvs.setPath(ruta2);
+				dcvs.setType(ext);
 				dcvs.setName(f.getName());
 				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
-				dcvs.setDirectorio(WorkingDirectory);
+				dcvs.setDirectorio(f.getParent());
 				dcvs.setDate("" + f.lastModified());
 			}
 			catch (IOException e) {System.out.println("Error trying to open a file.");}
@@ -87,20 +85,63 @@ public class IO{
 		}
 		return dcvs;
 	}
-	    
+
 	/**
 	 * Metodo para almacenar en un archivo un texto.
 	 * Este método en caso de no tener asignado el nombre completo del fichero
 	 * de destino con una extensión, le añade la extensión pasada por parámetro.
 	 * En caso de no coincidir la extensión de la ruta completa con la extensión
 	 * deseada, sustituye la primera por la segunda.
-	 * @param bd los datos a guardar.
-	 * @param ruta uta completa con el nombre del fichero. Null si se
+	 * @param modulo Módulo para almacenar en disco.
+	 * @param ruta ruta completa con el nombre del fichero. Null si se
 	 * desea que muestre dialogo de selección.
+	 * @return ok, True en caso de operación realizada, False en otro caso.
+	 */
+	public boolean saveModule(DCVS modulo) {
+		boolean ok = false;
+		File f = null;
+		String path = modulo.getPath();
+		String type = modulo.getType();
+		//Comprobación de extensión coincida con extensión de la ruta.
+		if(path != null && checkExt(path,type)) {
+			f = getFile(2,path,type);
+			ok = true;
+		}
+		
+		//Escribir el archivo.
+		if(f != null){
+		    try(FileWriter fw = new FileWriter(f)){	
+		    	//Escribimos el texto en el fichero.
+		    	fw.write(modulo.toString());
+		    	//Si se ha guardado un proyecto establecer nuevo WD.
+		    	if(type.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
+		    	//Establecer datos del fichero en el módulo.
+		    	modulo.setName(f.getName());  // TODO: Hay que extraer extensión.
+		    	modulo.setDirectorio(f.getParent());
+		    	modulo.setPath(f.getPath());
+		    	modulo.setDate("" + f.lastModified());
+		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
+		}
+		
+		return ok;
+	}
+	
+	
+	/**
+	 * Metodo para almacenar en un archivo un texto.
+	 * Este método en caso de no tener asignado el nombre completo del fichero
+	 * de destino con una extensión, le añade la extensión pasada por parámetro.
+	 * En caso de no coincidir la extensión de la ruta completa con la extensión
+	 * deseada, sustituye la primera por la segunda.
+	 * @param datos los datos a guardar.
+	 * @param ruta ruta completa con el nombre del fichero. Null si se
+	 * desea que muestre dialogo de selección.
+	 * @param name Nombre con el que se almacenará el fichero.
 	 * @param ext extensión del archivo.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
-	public String grabarArchivo(String bd, String ruta, String ext) {
+	public String saveFile(String datos, String ruta, String name, String ext) {
+		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
 		String ruta2 = ruta;
 		String ext2 = ext;
 		//Comprobación de extensión coincida con extensión de la ruta.
@@ -115,14 +156,17 @@ public class IO{
 			}
 		}
 		
-		
+		//Escribir el archivo.
 		File f = getFile(2,ruta2,ext2);
 		if(f != null){
 		    try(FileWriter fw = new FileWriter(f)){	 
 		    	ruta2 = f.getPath();
 		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
-		    	fw.write(bd);													//Escribimos el texto en el fichero.
-		    	ruta2 = f.getName();											//Ahora devolvemos el nombre del fichero.
+		    	fw.write(datos);													//Escribimos el texto en el fichero.
+		    	String name2 = f.getName();
+		    	ruta2 = name2.substring(name2.length() -3).toLowerCase();		//Ahora devolvemos el nombre del fichero.
+		    	
+		    	System.out.println("IO > grabarArchivo > ruta2 (f.name): " + ruta2);
 		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
 		}
 		return ruta2;
@@ -140,6 +184,7 @@ public class IO{
 		File f = null;
 		String ruta = path;
 		if(ruta == null || ruta.equals("")) {ruta = selFile(sel,ext);}				// Obtención del archivo.	
+		//En caso de haber cancelado en la selección, no ejecuta este condicional.
 		if(ruta != null) f = new File(ruta);
 		return f;
 	}
@@ -177,14 +222,14 @@ public class IO{
 			//Comprobación de elección de archivo correcta.
 			if(!checkExt(ruta,ext)) {
 				ruta = ruta + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
-				System.out.println("Añadida extensión: " + ext + " al archivo.");
+				System.out.println("IO > selFile: Añadida extensión: " + ext + " al archivo.");
 			}					
 	    }
 		return ruta;
 	}
 	
 	/**
-	 * Extra de una cadena de texto la extensión del fichero (si tiene). No 
+	 * Extrae de una cadena de texto la extensión del fichero (si tiene). No 
 	 *  acepta valores nulos de entrada.
 	 * @param ruta Cadena de texto con la ruta absoluta o relativa conteniendo el nombre del fichero y su extensión.
 	 * @return Extensión del fichero, Null en otro caso.
@@ -197,6 +242,7 @@ public class IO{
 		if(cadena.length > 0) {ext = cadena[cadena.length -1];}
 		return ext;
 	}
+	
 	
 	/**
 	 * <p>Comprobación de la extensión sea de los tipos aceptados
@@ -215,7 +261,7 @@ public class IO{
 			ok = TypesFiles.hasType(ext2);
 		} else {ok = false;}
 		// Comprobar que la extensión pueda ser JPG, JPEG, PNG o GIF
-		if(ext.equals(TypesFiles.IMG) && (ok != false) && !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
+		if((ok != false) && ext.equals(TypesFiles.IMG) &&  !(ext2.equals(TypesFiles.JPG) || ext2.equals(TypesFiles.PNG) || ext2.equals(TypesFiles.JPEG) || ext2.equals(TypesFiles.GIF))) {
 			ok = false;
 		}
 		
@@ -242,6 +288,7 @@ public class IO{
 		return img;
 	}
 	
+
 	/**
 	 * <p>Description: Devuelve un icono escalado a las medidas obtenidas
 	 * por parámetros, de la imagen fuente..</p> 
