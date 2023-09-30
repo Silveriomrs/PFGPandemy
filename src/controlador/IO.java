@@ -136,7 +136,7 @@ public class IO{
 	 * @param ext extensión del archivo.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
-	public String saveFile(String datos, String ruta, String name, String ext) {
+	public String saveFile2(String datos, String ruta, String name, String ext) {
 		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
 		String ruta2 = ruta;
 		String ext2 = ext;

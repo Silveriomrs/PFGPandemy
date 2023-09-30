@@ -35,7 +35,7 @@ public class ControladorDatosIO {
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
 	 * @param ruta Ruta y nombre completo del archivo.
 	 * @param ext Extensión del archivo.
-	 * @return DefaultTableModel modelo con los datos del archivo abierto.
+	 * @return DefaultTableModel modelo con los datos del archivo abierto. Null en otro caso.
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
 		DCVS dcvs = null;
@@ -59,8 +59,9 @@ public class ControladorDatosIO {
 	 * @param ext Extensión del fichero.
 	 * @return Ruta completa al fichero donde se han almacenado los datos. Null en otro caso.
 	 */
-	public String guardarArchivo(String datos, String ruta, String name, String ext) {
-		return io.saveFile(datos,ruta,name,ext);
+	public String guardarArchivo2(String datos, String ruta, String name, String ext) {
+		//TODO: Mal como en IO. Hay que restructurarlo del todo.
+		return io.saveFile2(datos,ruta,name,ext);
 	}
 	
 	/**

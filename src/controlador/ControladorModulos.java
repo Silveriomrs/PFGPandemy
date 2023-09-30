@@ -523,7 +523,7 @@ public class ControladorModulos {
 			String dato = m[1];
 			
 			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
-			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) ) {			
+			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) && dato != null) {			
 				String path = wd + dato + "." + etiq;
 				//Como es un módulo, que esta dentro del proyecto, al nombre del archivo
 				//Le añadimos al directorio de trabajo. Esa será la ruta donde debe
@@ -808,11 +808,13 @@ public class ControladorModulos {
 	 * @return TRUE si la operación se ha realizado correctamente. FALSE en otro caso.
 	 */
 	private boolean openModule(String ext) {
-		DCVS dcvs = cio.abrirArchivo(null,ext);
+		//Selección de fichero.
+		String path = cio.selFile(1, ext)[0];
+		DCVS dcvs = cio.abrirArchivo(path,ext);
 		boolean ok = dcvs != null;
 		if(ok && !ext.equals(TypesFiles.PRJ)) {
 			//En caso de mapa o de relaciones, el módulo debe tener definidos tantos grupos
-			// como haiga definido en el proyecto.
+			// como esten definidos en el proyecto.
 			int NG = getNumberZonas();
 			
 			if((ext.equals(TypesFiles.REL) || ext.equals(TypesFiles.MAP)) && dcvs.getRowCount() != NG ) {
@@ -820,6 +822,7 @@ public class ControladorModulos {
 				ok = false;	
 				System.out.println("CM > OpenModule > Tipo: " + ext + ", NG: " + NG + " / filas de datos: " + dcvs.getRowCount());
 			}	
+			
 			establecerDatos(dcvs);	
 		}else if(ok) {abrirProyecto(dcvs);}
 		return ok;
