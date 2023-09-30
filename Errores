@@ -1,12 +1,13 @@
 Al crear un nuevo proyecto:
 Corregir:
-0. No se guardan los archivos ni el proyecto al crear un PRJ nuevo y guardarlo.
-1. Al guardar con otro nombre un proyecto (diferente al establecido), no realiza acción.
-2. Pal parece seguir sin guardarse.
++Al cargar un proyecto hay módulos que no están cargado.
+Falta cargar con: 
+Test 1: MAP, REL
+Test 2: DEF, **Pal no carga pero da el Warning y lo maneja correctamente.
+Orden de carga con:
+Test 1: DEF, REL, PAL, MAP
+Test 2: PAL, MAP, DEF, REL 
 
-Log:
-IO > selFile: Añadida extensión: prj al archivo.
-Error, file couldn't be open: //null.def
-Error, file couldn't be open: //test2.rel
-Error, file couldn't be open: //null.pal
-Error, file couldn't be open: //test2.map
++El archivo PRJ puede contener referencias nulas o erróneas. ¿Cómo manejarlas? ¿qué política aplicar?
+
++Si estoy abriendo un proyecto ¿por qué hay que establecer los atributos de fichero del proyecto? => revisar.

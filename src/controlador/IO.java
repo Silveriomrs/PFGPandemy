@@ -38,7 +38,7 @@ import modelo.TypesFiles;
  */
 public class IO{
 	/** WorkingDirectory Directorio de trabajo del proyecto actual*/  
-	public static String WorkingDirectory = "";
+	public static String WorkingDirectory = null;
 	
     /**
      * Constructor de la clase IO
@@ -50,38 +50,34 @@ public class IO{
 	 * Metodo que lee un archivo del disco en formato CVS con separación de comas
 	 * ',' almacenandolos en un Objeto del tipo DCVS.
 	 * En caso de error lanza un mensaje y el error de excepcion. 
-	 * @param ruta Ruta completa con el nombre del archivo a cargar. Null si se
-	 * desea que muestre dialogo de selección.
+	 * @param ruta Ruta completa con el nombre del archivo (con extensión) a cargar.
 	 * @param ext extensión del archivo.
-	 * @return tabla de datos en formato ArrayList de ArrayList (ColumnasxFilas),
-	 *  null en otro caso.
+	 * @return DCVS módulo con sus atributos de fichero configurados y los datos contenidos. Null en otro caso.
 	 * @throws IOException  Ecepción en caso de que el fichero no sea legible desde el dispositivo.
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) throws IOException {
 		DCVS dcvs = null;
-		String ruta2 = ruta;
 		CSVReader lectorCSV = null;
+
+		//Búsqueda del fichero. getFile() comprueba también que la ruta no sea Null.
 		File f = getFile(1,ruta,ext);
+		//Ahora en el caso de que el fichero sea correcto y no sea Null => procede.
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
 				lectorCSV =  new CSVReader(new FileReader(f));					// Abrir el archivo.
 				List<String[]> datos = lectorCSV.readAll();
-				if(ruta == null) ruta2 = f.getPath();
 				dcvs = new DCVS();
 				dcvs.crearModelo(datos);
-				dcvs.setPath(ruta2);
-				dcvs.setType(ext);
-				dcvs.setName(f.getName());
-				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
+				dcvs.setPath(ruta);
 				dcvs.setDirectorio(f.getParent());
+				dcvs.setName(extractName(f.getName()));
+				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
+				dcvs.setType(ext);
 				dcvs.setDate("" + f.lastModified());
 			}
 			catch (IOException e) {System.out.println("Error trying to open a file.");}
 			catch (CsvException e) {System.out.println("Error trying to open a CSV file.");}
-			finally {
-				System.out.println("IO > abrirArchivo > Error con el manejador de ficheros. Cerrandolo.");
-				if(lectorCSV != null) lectorCSV.close();
-			}
+			finally {if(lectorCSV != null) lectorCSV.close();}
 		}
 		return dcvs;
 	}
@@ -102,25 +98,22 @@ public class IO{
 		File f = null;
 		String path = modulo.getPath();
 		String type = modulo.getType();
+		
 		//Comprobación de extensión coincida con extensión de la ruta.
 		if(path != null && checkExt(path,type)) {
 			f = getFile(2,path,type);
 			ok = true;
 		}
-		
+
 		//Escribir el archivo.
 		if(ok && f != null){
 		    try(FileWriter fw = new FileWriter(f)){	
 		    	//Escribimos el texto en el fichero.
 		    	fw.write(modulo.toString());
 		    	//Si se ha guardado un proyecto establecer nuevo WD.
-		    	if(type.equals(TypesFiles.PRJ)) {
-		    		WorkingDirectory = f.getParent();
-		    		System.out.println("IO > saveModule > guardando PRJ como:\nPath: " + path + 
-		    				"\nNombre: " + f.getName());
-		    	}
+		    	if(type.equals(TypesFiles.PRJ)) {WorkingDirectory = f.getParent();}
 		    	//Establecer datos del fichero en el módulo.
-		    	modulo.setName(f.getName());  // TODO: Hay que extraer extensión.
+		    	modulo.setName(extractName(f.getName()));
 		    	modulo.setDirectorio(f.getParent());
 		    	modulo.setPath(f.getPath());
 		    	modulo.setDate("" + f.lastModified());
@@ -138,8 +131,7 @@ public class IO{
 	 * En caso de no coincidir la extensión de la ruta completa con la extensión
 	 * deseada, sustituye la primera por la segunda.
 	 * @param datos los datos a guardar.
-	 * @param ruta ruta completa con el nombre del fichero. Null si se
-	 * desea que muestre dialogo de selección.
+	 * @param ruta ruta completa con el nombre del fichero.
 	 * @param name Nombre con el que se almacenará el fichero.
 	 * @param ext extensión del archivo.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
@@ -177,19 +169,15 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Description: Obtiene un enlace a un archivo en disco dentro de una instanccia
-	 *  File..</p> 
+	 * <p>Description: Obtiene un enlace a un archivo en disco dentro de una instancia File.</p> 
 	 * @param sel Tipo de dialogo a mostrar: 1 Abrir archivo, 2 Guardar archivo.
-	 * @param path ruta al fichero en disco. Null si se desea seleccionar un nuevo fichero.
+	 * @param path ruta al fichero en disco.
 	 * @param ext Tipo de fichero a abrir.
 	 * @return Instancia File apuntando al fichero en disco. Null en otro caso.
 	 */
 	public static File getFile(int sel, String path,String ext) {
 		File f = null;
-		String ruta = path;
-		if(ruta == null || ruta.equals("")) {ruta = selFile(sel,ext);}				// Obtención del archivo.	
-		//En caso de haber cancelado en la selección, no ejecuta este condicional.
-		if(ruta != null) f = new File(ruta);
+		if(path != null) f = new File(path);
 		return f;
 	}
 	
@@ -199,10 +187,14 @@ public class IO{
 	 * para selección.
 	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
 	 * @param ext Extensión del archivo.
-	 * @return Ruta del archivo seleccionado, null en otro caso.
+	 * @return fileAttr Un array de Strings con los atributos de ubicación del fichero o null en otro caso:
+	 * 		[ruta,directorio,nombre].
+	 * 		La ruta contiene todo el nombre, incluyendo la extensión.
 	 */
-	public static String selFile(int sel, String ext) {
-		String ruta  = null;
+	public static String[] selFile(int sel, String ext) {
+		String path  = null;
+		//fileAttr [ruta,directorio,nombre,ext]
+		String[] fileAttr = {null,null,null,null};
 		FileNameExtensionFilter filtro = null;
 		//Comprobación de filtro para imagenes soportadas u otros tipos.
 		if(!ext.equals(TypesFiles.IMG)) {
@@ -222,28 +214,56 @@ public class IO{
 		//Elección del archivo.
 	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
 	        File f = sf.getSelectedFile();										//Obtenemos el archivo.
-			ruta = f.getPath();													//Obtención de la ruta del archivo.
+			path = f.getPath();													//Obtención de la ruta del archivo.
 			//Comprobación de elección de archivo correcta.
-			if(!checkExt(ruta,ext)) {
-				ruta = ruta + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
+			if(!checkExt(path,ext)) {
+				path = path + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
 				System.out.println("IO > selFile: Añadida extensión: " + ext +
 						" al archivo con path: " + f.getPath() +
-						"\nResultando: " + ruta);
-			}					
+						"\nResultando: " + path);
+			}
+			//Otorgar los valores.
+			fileAttr[0] = path;
+			fileAttr[1] = f.getParent();
+			fileAttr[2] = extractName(f.getName());
 	    }
-		return ruta;
+		return fileAttr;
+	}
+	
+	/**
+	 * Función que retira la extensión de un fichero del resto del nombre.
+	 *  Un nombre puede tener varios separadores tipo punto '.'. Esta función lo tiene en cuenta
+	 *   y extrae unicamente la extensión (ultimos tres carácteres y el punto) del resto del nombre
+	 *    del archivo (cadena de texto de entrada). También tiene en cuenta que puede no tenerla.
+	 * @param nameIn Nombre del fichero con extensión (puede no contenerla).
+	 * @return Nombre del fichero sin extensión.
+	 */
+	private static String extractName(String nameIn) {
+		String nameOut = null;
+		//Name puede ser: algo.algomas.ext   o    algo.ext    o  algo   (sin extensión)
+		String[] cadena = nameIn.split("\\.");
+		//coger la penúltima parte en caso de que pueda tener extensión.
+		switch(cadena.length) {
+		case(1):
+		case(2): nameOut = cadena[0]; break;
+		default: //En caso de ser un nombre complejo (varios separadores punto), retira los últimos.
+			System.out.println("IO > extractName > Default: Complex name: " + nameIn);
+			nameOut = nameIn.substring(0, nameIn.length() - 3);
+			System.out.println("IO > extractName > Default: > nameOut" + nameOut);
+		}
+		return nameOut;
 	}
 	
 	/**
 	 * Extrae de una cadena de texto la extensión del fichero (si tiene). No 
 	 *  acepta valores nulos de entrada.
-	 * @param ruta Cadena de texto con la ruta absoluta o relativa conteniendo el nombre del fichero y su extensión.
+	 * @param nameIn Cadena de texto con el nombre del fichero y su extensión (si la tiene).
 	 * @return Extensión del fichero, Null en otro caso.
 	 */
-	private static String getExt(String ruta) {
+	private static String getExt(String nameIn) {
 		String ext = null;
 		//Dividir cadena con separador "." por extensión.
-		String[] cadena = ruta.split("\\.");
+		String[] cadena = nameIn.split("\\.");
 		//coger última parte en caso de que pueda tener extensión.
 		if(cadena.length > 0) {ext = cadena[cadena.length -1];}
 		return ext;

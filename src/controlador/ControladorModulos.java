@@ -105,19 +105,22 @@ public class ControladorModulos {
 		parserPoly = new ParserPoly();
 		parserPoly.setEscala(1);
 		agregarPaneles();
-		generarModulosBasicos();
+		newProject();
 		refresh();
 	}
 	
 	/**
 	 * <p>Genera los módulos básicos para operar con el sistema</p>
-	 * Estos son los del proyecto y los parámetros de la enfermedad.
+	 * Estos son los del proyecto, paleta de colores y los parámetros de la enfermedad.
+	 *  Borra todos los datos anteriores que estén en cargados.
 	 */
-	private void generarModulosBasicos() {
+	private void newProject() {
 		DCVS proyecto = DCVSFactory.newModule(TypesFiles.PRJ);
 		//Establecer último directorio de trabajo.
 		String wd = IO.WorkingDirectory + separador;
 		proyecto.setDirectorio(wd);
+		//Borrar todo lo anterior.
+		clearProject();
 		//Procesarlo.
 		abrirProyecto(proyecto);
 		//Módulo de parámetros SIR.
@@ -182,22 +185,22 @@ public class ControladorModulos {
 	private void setProjectParameters(DCVS module) {
 		//Obteción de datos generales del módulo.
 		String name = module.getName();
-		String ruta = module.getPath();
+		String pName = getModule(TypesFiles.PRJ).getName();
+		String path = module.getPath();
 		//Establecer directorio de trabajo.
-		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
+		String wd = IO.WorkingDirectory;
 		module.setDirectorio(wd);
 		
-		//Nombre con el nombre del proyecto sino posee propio.
-		if(name == null || name.equals("") ) {
+		//Nombre con el nombre del proyecto sino posee propio. si pName es null es porque no se ha establecido todavía.
+		if((name == null || name.equals("")) && (pName != null) ) {
 			name = modulos.get(TypesFiles.PRJ).getName();
 			module.setName(name);
 		}
-		//Ruta absoluta.
-		if(ruta == null || ruta.equals("")) {
-			module.setPath(wd +
-					separador + name + "." + module.getType());
+		//Ruta absoluta. Si wd es null es porque no se ha indicado un directorio de trabajo todavía.
+		if((path == null || path.equals("")) && (wd != null)) {
+			path = wd +	separador + name + "." + module.getType();
+			module.setPath(path);
 		}
-		
 	}
 	
 	/**
@@ -468,8 +471,11 @@ public class ControladorModulos {
 	private void saveAllTogether() {
 		modulos.forEach((type,module)->{
 			if(!type.equals(TypesFiles.PRJ)) {
-				//Re-integrar el módulo en el entorno.
-				establecerDatos(module);
+				//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
+				setProjectParameters(module);
+				//Añadir la ruta del módulo al módulo del proyecto.
+				//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
+				insertInProjectModule(module);
 				//Guardar en el directorio de trabajo.
 				saveModule(type,false);
 			}
@@ -506,19 +512,23 @@ public class ControladorModulos {
 		int NG = 0;																//Número de zonas que tiene definido el proyecto.
 		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
 		String wd = IO.WorkingDirectory + separador;
-
+		
+		//Añadir este nuevo módulo al sistema para que el resto ded módulos puedo usar sus atributos de fichero.
+		modulos.put(TypesFiles.PRJ, dcvs);
+		
 		//Lectura de los módulos a cargar
 		for(int i= 0;  i < nm; i++) {
 			String[] m = dcvs.getRow(i);
-			String dato = m[1];
 			String etiq = m[0];
+			String dato = m[1];
+			
 			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
-			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq)) {			//Nos asegurarmos que no cargue por error un PRJ.
+			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) ) {			
+				String path = wd + dato + "." + etiq;
 				//Como es un módulo, que esta dentro del proyecto, al nombre del archivo
 				//Le añadimos al directorio de trabajo. Esa será la ruta donde debe
 				//Estar el otro archivo.
-				String ruta = wd + dato;
-				DCVS mAux = cio.abrirArchivo(ruta,etiq);						//Carga el módulo desde el sistema de archivos.
+				DCVS mAux = cio.abrirArchivo(path,etiq);						//Carga el módulo desde el sistema de archivos.
 				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
 				else showMessage(Labels_GUI.ERR_MSG_1_CM + dato + "." + etiq,0);
 			}else if(etiq.equals(Labels.NG)){									
@@ -529,8 +539,6 @@ public class ControladorModulos {
 		
 		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
 		archivos.disableAllSavers();
-		//Añadir este nuevo módulo al conjunto después de añadir el resto para evitar redundancias.
-		modulos.put(TypesFiles.PRJ, dcvs);
 		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
 		//Sino coinciden el número de zonas, re-ajustar.
 		if(NG != getNumberZonas()) resizeZonas(NG);
@@ -640,7 +648,8 @@ public class ControladorModulos {
 				break;
 			case Labels_GUI.W_REL_TITLE: editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
 			case Labels_GUI.M_OPEN_PRJ:
-				DCVS prj = cio.abrirArchivo(null,TypesFiles.PRJ);
+				String path = cio.selFile(1, TypesFiles.PRJ)[0];
+				DCVS prj = cio.abrirArchivo(path,TypesFiles.PRJ);
 				if(prj != null) {
 					clearProject();
 					abrirProyecto(prj);
@@ -666,7 +675,7 @@ public class ControladorModulos {
 				else if(hVS != null) showMessage(Labels_GUI.ERR_FILE_UNKNOWN,0);
 				break;		
 			case Labels_GUI.M_NEW_PRJ:
-				generarModulosBasicos();
+				newProject();
 				break;
 			case Labels_GUI.M_SAVE_PRJ:
 				saveModule(TypesFiles.PRJ,true);
@@ -778,7 +787,7 @@ public class ControladorModulos {
 			break;
 		case OPEN: 
 			//Apertura de una imagen para usar de fondo.
-    		String ruta = cio.selFile(1, TypesFiles.IMG);
+    		String ruta = cio.selFile(1, TypesFiles.IMG)[0];
     		// En caso de tener una ruta correcta se procede a la carga.
     		if(ruta != null && !ruta.equals("")) {
     			pizarra.setFondo(ruta);
@@ -875,25 +884,28 @@ public class ControladorModulos {
 	private boolean saveModule(String ext, boolean as) {
 		//Obtención del módulo correspondiente
 		DCVS dcvs = getModule(ext);
+		String[] fileAttr = null;
 		boolean done = dcvs != null;
-		String pathAs = null;
 		//Pedir nueva ubicación / nombre en caso as = true.
 		if (as) {
-			pathAs = cio.selFile(2, ext);
-			System.out.println("CM > saveModule > pathAS: " + pathAs);
-			if(pathAs != null) {
-				dcvs.setPath(pathAs);
-			}else {done = false;}
+			fileAttr = cio.selFile(2, ext);
+			if(fileAttr[0] != null) {
+				// [ruta,directorio trabajo (parent),nombre]
+				dcvs.setPath(fileAttr[0]);
+				dcvs.setDirectorio(fileAttr[1]);
+				dcvs.setName(fileAttr[2]);		
+			}
+			else {done = false;}
 		}
 
 		//Si es un módulo particular
 		if(done && !ext.equals(TypesFiles.PRJ)) {
 			done = cio.guardarModulo(dcvs);
 		//En otro caso es un PRJ.
-		} else {
+		} else if (done){
 			//Guardar PRJ
 			done = cio.guardarModulo(dcvs);
-			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
+			//Guardar todos los módulos en el mismo directorio de trabajo.
 			saveAllTogether();
 			//Mostrar rutas en Field.
 			archivos.refresh();

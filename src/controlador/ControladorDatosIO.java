@@ -70,11 +70,11 @@ public class ControladorDatosIO {
 	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
 	 * desea que muestre dialogo de selección.
 	 * @param ext extensión del archivo a modo de filtro.
-	 * @return Ruta del archivo seleccionado, null en otro caso.
+	 * @return Un array de Strings con los atributos de ubicación del fichero:
+	 * 		[ruta,directorio,nombre].
+	 * 		La ruta contiene todo el nombre, incluyendo la extensión.
 	 */
-	public String selFile(int sel, String ext) {
-		return IO.selFile(sel, ext);
-	}
+	public String[] selFile(int sel, String ext) {	return IO.selFile(sel, ext);}
 	
 	/**
 	 * Abre un fichero PDF del sistema.
