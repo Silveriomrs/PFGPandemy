@@ -1,6 +1,12 @@
 Al crear un nuevo proyecto:
 Corregir:
-1. PAL adquiere la misma extensión que el proyecto.
+0. No se guardan los archivos ni el proyecto al crear un PRJ nuevo y guardarlo.
+1. Al guardar con otro nombre un proyecto (diferente al establecido), no realiza acción.
+2. Pal parece seguir sin guardarse.
 
-Al guardar el proyecto creado:
-1. Los módulos no están guardando su extensión y no se están almacenando.
+Log:
+IO > selFile: Añadida extensión: prj al archivo.
+Error, file couldn't be open: //null.def
+Error, file couldn't be open: //test2.rel
+Error, file couldn't be open: //null.pal
+Error, file couldn't be open: //test2.map

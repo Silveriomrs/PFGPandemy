@@ -181,14 +181,11 @@ public class ControladorModulos {
 	 */
 	private void setProjectParameters(DCVS module) {
 		//Obteción de datos generales del módulo.
-		String wd = module.getDirectorio();
 		String name = module.getName();
 		String ruta = module.getPath();
 		//Establecer directorio de trabajo.
-		if(wd == null || wd.equals("")) {
-			wd = modulos.get(TypesFiles.PRJ).getDirectorio();
-			module.setDirectorio(wd);
-		}
+		String wd = modulos.get(TypesFiles.PRJ).getDirectorio();
+		module.setDirectorio(wd);
 		
 		//Nombre con el nombre del proyecto sino posee propio.
 		if(name == null || name.equals("") ) {
@@ -197,7 +194,7 @@ public class ControladorModulos {
 		}
 		//Ruta absoluta.
 		if(ruta == null || ruta.equals("")) {
-			module.setPath(module.getDirectorio() +
+			module.setPath(wd +
 					separador + name + "." + module.getType());
 		}
 		
@@ -509,8 +506,6 @@ public class ControladorModulos {
 		int NG = 0;																//Número de zonas que tiene definido el proyecto.
 		int nm = dcvs.getRowCount();											//Número de datos (módulos) especificados.
 		String wd = IO.WorkingDirectory + separador;
-		//Reiniciar todas las vistas y borrar datos anteriores.
-		clearProject();	
 
 		//Lectura de los módulos a cargar
 		for(int i= 0;  i < nm; i++) {
@@ -543,6 +538,7 @@ public class ControladorModulos {
 		refresh();
 	}
 	
+
 	/**
 	 * <p>Introduce los datos (tipo y nombre del archivo del módulo)
 	 *  en el módulo del proyecto. Su finalidad es la carga de este módulo al abrir
@@ -553,15 +549,21 @@ public class ControladorModulos {
 	private void insertInProjectModule(DCVS datos) {
 		String tipo = datos.getType();
 		if(modulos.containsKey(TypesFiles.PRJ)) {
+			//Formato y datos de la línea a insertar [Etiqueta (type), nombre]
 			String[] nuevaEntrada = {tipo,datos.getName()};
+			//Buscar pos de la etiqueta
 			int linea = modulos.get(TypesFiles.PRJ).getFilaItem(tipo);
+			//Comprobar si existe la entrada.
 			boolean lineaDuplicada = linea > -1;
 			//Si hay un módulo ya cargado, hay que sustituirlo.
-			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	//Eliminar entrada duplicada.
-			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					//Añadir nueva entrada.
+			//Eliminar entrada duplicada.
+			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	
+			//Añadir nueva entrada.
+			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					
 		}
 	}
 		
+	
 	/**
 	 * Establece el contenido del módulo cargado de acuerdo
 	 * con su tipo, actualiza los elementos del JPanel correspondientes.
@@ -569,12 +571,6 @@ public class ControladorModulos {
 	 */
 	private void establecerDatos(DCVS datos) {
 		String tipo = datos.getType();
-		
-		if(datos.getType().equals(TypesFiles.PAL)){
-			System.out.println("CM > establecerDatos >\nNombre módulo PAL: " +
-			datos.getName() + 
-			" / Tipo: " + datos.getType());
-		}
 		
 		//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
 		setProjectParameters(datos);
@@ -600,8 +596,6 @@ public class ControladorModulos {
 		case (TypesFiles.DEF):
 			break;
 		case (TypesFiles.PAL):
-			System.out.println("CM > establecerDatos 2 >\nNombre módulo PAL: " + datos.getName()+ " / Tipo: " + datos.getType());
-
 			break;
 		default:
 		}
@@ -886,6 +880,7 @@ public class ControladorModulos {
 		//Pedir nueva ubicación / nombre en caso as = true.
 		if (as) {
 			pathAs = cio.selFile(2, ext);
+			System.out.println("CM > saveModule > pathAS: " + pathAs);
 			if(pathAs != null) {
 				dcvs.setPath(pathAs);
 			}else {done = false;}
@@ -896,6 +891,8 @@ public class ControladorModulos {
 			done = cio.guardarModulo(dcvs);
 		//En otro caso es un PRJ.
 		} else {
+			//Guardar PRJ
+			done = cio.guardarModulo(dcvs);
 			//Guardar todos los módulos en el mismo directorio de trabajo.												//Guardar proyecto
 			saveAllTogether();
 			//Mostrar rutas en Field.
@@ -928,9 +925,10 @@ public class ControladorModulos {
 			editModule(ext);
 			ok = false;															//Evitar desabilitar botón de guardar como.
 		break;
+		case SAVE_AS: ok = saveModule(ext,true); break;
+		case SAVE: ok = saveModule(ext,false); break;
 		default:
-			boolean as = opr == OperationsType.SAVE_AS;
-			ok = saveModule(ext,as);
+			System.out.println("CM > doActionArchivos > Unknown option: " + opr.toString());
 		}
 		
 		refresh();

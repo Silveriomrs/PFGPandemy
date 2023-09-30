@@ -109,18 +109,22 @@ public class IO{
 		}
 		
 		//Escribir el archivo.
-		if(f != null){
+		if(ok && f != null){
 		    try(FileWriter fw = new FileWriter(f)){	
 		    	//Escribimos el texto en el fichero.
 		    	fw.write(modulo.toString());
 		    	//Si se ha guardado un proyecto establecer nuevo WD.
-		    	if(type.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
+		    	if(type.equals(TypesFiles.PRJ)) {
+		    		WorkingDirectory = f.getParent();
+		    		System.out.println("IO > saveModule > guardando PRJ como:\nPath: " + path + 
+		    				"\nNombre: " + f.getName());
+		    	}
 		    	//Establecer datos del fichero en el módulo.
 		    	modulo.setName(f.getName());  // TODO: Hay que extraer extensión.
 		    	modulo.setDirectorio(f.getParent());
 		    	modulo.setPath(f.getPath());
 		    	modulo.setDate("" + f.lastModified());
-		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
+		    } catch (IOException e1) {System.out.println("Error, file couldn't be saved: " + path);}
 		}
 		
 		return ok;
@@ -222,7 +226,9 @@ public class IO{
 			//Comprobación de elección de archivo correcta.
 			if(!checkExt(ruta,ext)) {
 				ruta = ruta + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
-				System.out.println("IO > selFile: Añadida extensión: " + ext + " al archivo.");
+				System.out.println("IO > selFile: Añadida extensión: " + ext +
+						" al archivo con path: " + f.getPath() +
+						"\nResultando: " + ruta);
 			}					
 	    }
 		return ruta;
