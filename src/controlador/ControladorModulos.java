@@ -567,6 +567,10 @@ public class ControladorModulos {
 			//Eliminar entrada duplicada.
 			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	
 			//Añadir nueva entrada.
+			//TODO: Eliminar cuando se haya terminado de estructurar el módulo IO.
+//			if(tipo.equals(TypesFiles.PAL)) System.out.println("CM > insertProjectModule > Línea: " + linea +  
+//					" , Duplicada: " + lineaDuplicada +
+//					" , Dato: " + datos.getName());
 			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					
 		}
 	}
@@ -906,10 +910,11 @@ public class ControladorModulos {
 			done = cio.guardarModulo(dcvs);
 		//En otro caso es un PRJ.
 		} else if (done){
-			//Guardar PRJ
-			done = cio.guardarModulo(dcvs);
 			//Guardar todos los módulos en el mismo directorio de trabajo.
 			saveAllTogether();
+			//Guardar PRJ después del resto de módulos para garantizar el correcto guardado de PRJ.
+			//Con sus tablas actualizadas después de establecer los parámetros de ficheros (path,wd,name) y tablas en PRJ.
+			done = cio.guardarModulo(dcvs);
 			//Mostrar rutas en Field.
 			archivos.refresh();
 		}

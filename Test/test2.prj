@@ -2,11 +2,11 @@ Tipo,Dato
 NAME,test2
 AUTHOR,
 DESCRIPTION,
-DATE0,30/09/2023
-DATE1,30/09/2023
+DATE0,02/10/2023
+DATE1,02/10/2023
 VERSION,1.0
 NG,4
-pal,
-map,test2
 def,test2
 rel,test2
+pal,test2
+map,test2

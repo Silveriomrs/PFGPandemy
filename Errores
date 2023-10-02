@@ -1,12 +1,7 @@
 Al crear un nuevo proyecto:
 Corregir:
-+Al cargar un proyecto hay módulos que no están cargado.
-Falta cargar con: 
-Test 1: MAP, REL
-Test 2: DEF, **Pal no carga pero da el Warning y lo maneja correctamente.
-Orden de carga con:
-Test 1: DEF, REL, PAL, MAP
-Test 2: PAL, MAP, DEF, REL 
+
++Al cargar el PRJ del punto anterior, no carga MAP, ni DEF. A pesar de existir y estar definido (aunque sin datos, logicamente).
 
 +El archivo PRJ puede contener referencias nulas o erróneas. ¿Cómo manejarlas? ¿qué política aplicar?
 
