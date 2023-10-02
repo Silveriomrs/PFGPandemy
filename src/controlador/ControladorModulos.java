@@ -521,7 +521,7 @@ public class ControladorModulos {
 			String[] m = dcvs.getRow(i);
 			String etiq = m[0];
 			String dato = m[1];
-			
+			System.out.println("CM > abrirProyecto > [etiq,dato] " + "[" + m[0] + "," + m[1] + "]");
 			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
 			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) && dato != null) {			
 				String path = wd + dato + "." + etiq;
