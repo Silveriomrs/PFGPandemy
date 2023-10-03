@@ -122,7 +122,8 @@ public class ControladorModulos {
 		//Borrar todo lo anterior.
 		clearProject();
 		//Procesarlo.
-		abrirProyecto(proyecto);
+		//Añadir este nuevo módulo al sistema para que el resto ded módulos puedo usar sus atributos de fichero.
+		modulos.put(TypesFiles.PRJ, proyecto);
 		//Módulo de parámetros SIR.
 		generarModuloDEF();
 		//Módulo de paleta de colores.
@@ -521,20 +522,26 @@ public class ControladorModulos {
 			String[] m = dcvs.getRow(i);
 			String etiq = m[0];
 			String dato = m[1];
-			System.out.println("CM > abrirProyecto > [etiq,dato] " + "[" + m[0] + "," + m[1] + "]");
+			
+			//Eliminar espacios en blanco al inicio y final.
+			if(dato != null) dato = dato.strip();
+			
 			//Si la etiqueta es de un módulo cargar el módulo correspondiente.
-			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) && dato != null) {			
+			//Filtro al corte teniendo en cuenta el valor del dato.
+			if(!etiq.equals(TypesFiles.PRJ) && archivos.getMapaFields().containsKey(etiq) &&
+					dato != null && !dato.equals("")) {
+				//Composiciónm de la ruta para cargar desde el DD el fichero.
 				String path = wd + dato + "." + etiq;
-				//Como es un módulo, que esta dentro del proyecto, al nombre del archivo
-				//Le añadimos al directorio de trabajo. Esa será la ruta donde debe
-				//Estar el otro archivo.
-				DCVS mAux = cio.abrirArchivo(path,etiq);						//Carga el módulo desde el sistema de archivos.
-				if(mAux != null) establecerDatos(mAux);							//Establecer el módulo.
+				//Carga el módulo desde el sistema de archivos.
+				DCVS mAux = cio.abrirArchivo(path,etiq);	
+				//Establecer el módulo.
+				if(mAux != null) establecerDatos(mAux);							
 				else showMessage(Labels_GUI.ERR_MSG_1_CM + dato + "." + etiq,0);
 			}else if(etiq.equals(Labels.NG)){									
 				//Guardar el número de zonas que debe contener el proyecto.
 				NG = Integer.parseInt(dato);
 			}
+			
 		}
 		
 		//Desactivar los botones de guardado -> se han reiniciado todos, no hay nada que guardar.
@@ -542,10 +549,28 @@ public class ControladorModulos {
 		//Ahora hay que comprobar que el número de zonas coincide con el cargado en el sub-modulo mapas.
 		//Sino coinciden el número de zonas, re-ajustar.
 		if(NG != getNumberZonas()) resizeZonas(NG);
+		//Si ha faltado  algún módulo básico por cargar, genera uno nuevo sin datos.
+		checkBasicModule();
 		//Refrescar vista de Proyecto
 		refresh();
 	}
 	
+	/**
+	 * Función auxiliar, genera aquellos módulos básicos que por alguna razón no estén generados o cargados.
+	 * En algunas ocasiones, sucede que no existe al cargar un proyecto la definición de un módulo básico. Esto
+	 * generalmente se debe a un error del usuario. En estos casos, la solución es generar un módulo autoomático
+	 *  sin datos generados.
+	 */
+	private void checkBasicModule() {
+		//Comprobación un a uno de que existen los módulos básicos (Exepto PRJ).
+		//En caso de que no exista uno, genera y almacena sin atributos de ningún tipo.
+		if(!hasModule(TypesFiles.DEF)) generarModuloDEF(); 
+		if(!hasModule(TypesFiles.PAL)) generarModuloPAL();
+		// Los siguientes módulos están comentados porque su generación implica conocer el valor de NG, y puede producir errores
+		//if(!hasModule(TypesFiles.MAP)) generarModuloMAP();
+		//if(!hasModule(TypesFiles.REL)) generarModuloREL();
+
+	}
 
 	/**
 	 * <p>Introduce los datos (tipo y nombre del archivo del módulo)
@@ -567,10 +592,6 @@ public class ControladorModulos {
 			//Eliminar entrada duplicada.
 			if(lineaDuplicada) {modulos.get(TypesFiles.PRJ).delFila(linea);}	
 			//Añadir nueva entrada.
-			//TODO: Eliminar cuando se haya terminado de estructurar el módulo IO.
-//			if(tipo.equals(TypesFiles.PAL)) System.out.println("CM > insertProjectModule > Línea: " + linea +  
-//					" , Duplicada: " + lineaDuplicada +
-//					" , Dato: " + datos.getName());
 			modulos.get(TypesFiles.PRJ).addFila(nuevaEntrada);					
 		}
 	}
@@ -583,13 +604,6 @@ public class ControladorModulos {
 	 */
 	private void establecerDatos(DCVS datos) {
 		String tipo = datos.getType();
-		
-		//Si el módulo no tiene un nombre o ruta darles los que tenga el proyecto establecidos.
-		setProjectParameters(datos);
-
-		//Añadir la ruta del módulo al módulo del proyecto.
-		//Los módulos PRJ están filtrados desde abrirProyecto y el ActionListener.
-		insertInProjectModule(datos);
 		
 		//Guardar los datos del módulo en su conjunto.
 		modulos.put(tipo, datos);

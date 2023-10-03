@@ -1,24 +1,7 @@
 Al crear un nuevo proyecto:
 Corregir:
 
-+Al cargar el PRJ del punto anterior, no carga MAP, ni DEF. A pesar de existir y estar definido (aunque sin datos, logicamente).
-> Al cargar está cargando mal los módulos, def está repetido multiples veces, pero no lo está en el archivo de disco, ni en el módulo
-cargado PRJ desde DD.
-> ¿Cómo es pues que lo interpreta así?
-
-CM > abrirProyecto > [etiq,dato] [NG,0]
-CM > abrirProyecto > [etiq,dato] [NAME,test2]
-CM > abrirProyecto > [etiq,dato] [AUTHOR,]
-CM > abrirProyecto > [etiq,dato] [DESCRIPTION,]
-CM > abrirProyecto > [etiq,dato] [DATE0,02/10/2023]
-CM > abrirProyecto > [etiq,dato] [DATE1,02/10/2023]
-CM > abrirProyecto > [etiq,dato] [VERSION,1.0]
-CM > abrirProyecto > [etiq,dato] [NG,4]
-CM > abrirProyecto > [etiq,dato] [def,test2]
-CM > abrirProyecto > [etiq,dato] [pal,test2]
-CM > abrirProyecto > [etiq,dato] [def,test2]
-CM > abrirProyecto > [etiq,dato] [def,test2]
-
 +El archivo PRJ puede contener referencias nulas o erróneas. ¿Cómo manejarlas? ¿qué política aplicar?
 
-+Si estoy abriendo un proyecto ¿por qué hay que establecer los atributos de fichero del proyecto? => revisar.
++Editor de tablas no me permite asignar un DEF a su módulo, modificar de manera que una vez generada una plantilla, el asignador
+quede desactivado hasta cambiar de tabla y permita aplicar.
