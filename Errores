@@ -5,3 +5,5 @@ Corregir:
 
 +Editor de tablas no me permite asignar un DEF a su módulo, modificar de manera que una vez generada una plantilla, el asignador
 quede desactivado hasta cambiar de tabla y permita aplicar.
+
+*actualizado
