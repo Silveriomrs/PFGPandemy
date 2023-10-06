@@ -1,9 +1,11 @@
-Al crear un nuevo proyecto:
+[actualizado 05/10/2023]
+
 Corregir:
 
 +El archivo PRJ puede contener referencias nulas o erróneas. ¿Cómo manejarlas? ¿qué política aplicar?
 
++Editor de tablas el selector de asignar módulo no se establece de manera automática para DEF al crear una tabla desde plantilla para DEF.
+
 +Editor de tablas no me permite asignar un DEF a su módulo, modificar de manera que una vez generada una plantilla, el asignador
 quede desactivado hasta cambiar de tabla y permita aplicar.
 
-*actualizado
