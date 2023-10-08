@@ -9,3 +9,7 @@ Corregir:
 +Editor de tablas no me permite asignar un DEF a su módulo, modificar de manera que una vez generada una plantilla, el asignador
 quede desactivado hasta cambiar de tabla y permita aplicar.
 
++Para poder usar multiples idiomas hace falta desacoplar las etiquetas usadas para el idioma de la clase usada para ello. 
+>Una manera de hacerlo es crear una clase que sea independiente del tipo de idioma (su nombre) y según el CM indica el idioma 
+> a usar, carga desde un HashMap el idioma que se ha seleccionado entre los disponibles.
+> Separar en dos ramas como se comenzó en su momento y no se terminó... textos y operaciones.

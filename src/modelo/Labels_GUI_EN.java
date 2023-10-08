@@ -21,14 +21,14 @@ public class Labels_GUI_EN {
 	public final static String FILES_PANEL_NAME = "Vista de módulos cargados";
 	public final static String TT_FILES_PANEL = "Selección archivos asignados a los módulos.";
 	public final static String TT_W_FILES = "Visulación de los ficheros asignados a cada módulo.";
-	public final static String TT_FILE_SELECTED = "Archivo seleccionado";
+	public final static String TT_FILE_SELECTED = "Selected file.";
 	public final static String TT_L_PRJ = "Archivo con los parámetros del modelo.";
 	public final static String TT_L_DEF = "Archivo con la definición propia de la enfermedad.";
 	public final static String TT_L_REL = "Matriz de contactos. Refleja las relaciones entre los grupos";
-	public final static String TT_L_PAL = "Paleta de colores personalizada.";
+	public final static String TT_L_PAL = "Custom colors scale.";
 	public final static String TT_L_HST = "Histórico de evolución con los datos de la simulación.";
 	public final static String PATH_NO_DEFINED = "Datos sin destino definido.";
-	public final static String ERR_FILE_UNKNOWN = "Archivo seleccionado no reconocido.";
+	public final static String ERR_FILE_UNKNOWN = "Unknown file.";
 	
 	/*ControladorModulos*/
 	/** Mensaje de error de proyecto que hace referencia a un módulo no encontrado*/
@@ -36,33 +36,33 @@ public class Labels_GUI_EN {
 	public final static String WARNING_1_DATA_LOSS = "Los cambios no guardados se perderán";
 	public final static String REQUEST_EXIT_CONFIRM = "¿Desea salir del programa?";
 	public final static String ERR = "Error";
-	public final static String INF = "Información";
-	public final static String WARN = "¡Antención!";
-	public final static String QST = "Consulta";
+	public final static String INF = "Information";
+	public final static String WARN = "Warning!";
+	public final static String QST = "Question";
 	public final static String WARNING_2_OVERWRITE = "Se escribirán los datos en disco\n¿continuar?";
 	public final static String ERR_LOAD_MODULE = "No se puede cargar el módulo: ";
 	public final static String ERR_MODULE_LESS_NG = "dicho módulo no tiene definido suficientes parámetros para\nel número de grupos de población indicados en el modelo";
-	public final static String L_BORDER_PANEL_TE = "Editor General";
-	public final static String L_BORDER_PANEL_MAP = "Visor de Mapa";
+	public final static String L_BORDER_PANEL_TE = "General Editor";
+	public final static String L_BORDER_PANEL_MAP = "Map Viewer";
 	public final static String L_BORDER_PANEL_GRP = "Visor Grupos de Poblaci\u00F3n";
-	public final static String L_BORDER_PANEL_PRJ = "Parámetros del Modelo";
-	public final static String L_BORDER_PANEL_DEF = "Configuraci\u00F3n SIR";
+	public final static String L_BORDER_PANEL_PRJ = "Parameters Module";
+	public final static String L_BORDER_PANEL_DEF = "SIR Configuration";
 	/** Usado en el CM cuando se edita un módulo de manera externa en el TE*/
 	public final static String TE_TITLE_EXTERNAL = "Editando modulo: ";
-	public final static String DEFAULT_NAME_GRP = "Grupo ";
+	public final static String DEFAULT_NAME_GRP = "Group ";
 	
 	/*Graficas Chart*/
-	public final static String M_VER = "Ver";
-	public final static String M_CASOS = "Casos";
+	public final static String M_VER = "Show";
+	public final static String M_CASOS = "Cases";
 	public final static String M_TASAS = "Tasas";
 	public final static String M_TASA = "Tasa";
-	public final static String L_X = "Nivel";
-	public final static String L_Y = "Tiempo  = días)";
-	public final static String L_TITLE = "Zona: ";
+	public final static String L_X = "Level";
+	public final static String L_Y = "Time  = days)";
+	public final static String L_TITLE = "Zone: ";
 	public final static String L_TITLE_FRAME = "Evolución pandemica.";
 	
 	/*Paleta*/
-	public final static String SEL_COLOR = "Seleccione nuevo color";
+	public final static String SEL_COLOR = "Select new color";
 	
 	/*ParametrosProyecto*/
 	public final static String PROJECT_NAME = "Propiedades Proyecto";
@@ -73,10 +73,10 @@ public class Labels_GUI_EN {
 	/** Aviso NG <= 0 */
 	public final static String WARNING_3 = "El número de grupos debe ser mayor de cero.";
 	public final static String WARNING_EMPTY_FIELD = "El campo nombre no puede estar vacio.";
-	public final static String VERSION_TITLE = "Versión:";
+	public final static String VERSION_TITLE = "Version:";
 	public final static String VERSION_NUMBER = "1.0";
 	public final static String NAME_MODULES = "Módulos";
-	public final static String L_AUTHOR = "Autor/a:";
+	public final static String L_AUTHOR = "Author:";
 	public final static String L_DATE_MODIFIED = "Fecha modificación:";
 	public final static String L_DATE_CREATION = "Fecha de creación: ";
 	public final static String L_MANDATORY_FIELD = "Campo obligatorio";
@@ -95,10 +95,10 @@ public class Labels_GUI_EN {
 	public final static String PRJ_TITLE = "Título del Proyecto:";
 
 	/*Pizarra*/
-	public final static String L_DELETE = "Eliminar";
-	public final static String L_ADD_TO = "Asignar a";
-	public final static String BTN_CLEAR = "Limpiar";
-	public final static String BTN_COMPOSE = "Componer";
+	public final static String L_DELETE = "Delete";
+	public final static String L_ADD_TO = "Link to";
+	public final static String BTN_CLEAR = "Clear";
+	public final static String BTN_COMPOSE = "Componse";
 	public final static String TT_COMPOSE = "Cierra la figura y crea el poligono.\nUna vez creado debe asignarse a una zona.";
 	public final static String TT_APPLY = "Aplica las asignaciones seleccionadas.";
 	public final static String TT_CLEAR = "Limpiar la pizarra y redibujar las zonas.";
@@ -107,20 +107,20 @@ public class Labels_GUI_EN {
 	public final static String TT_SELECT_ZONE = "Seleccionar una zona para asignar la figura.";
 	public final static String TT_REMOVE_ZONE = "Seleccionar una zona a reasignar.";
 	public final static String NAME_CANVAS = "pizarra";
-	public final static String SAMPLE_TEXT = "Zona: XX";
+	public final static String SAMPLE_TEXT = "Zone: XX";
 	
 	/*Player*/
-	public final static String W_PLAYER_TITLE = "Reproductor";
-	public final static String L_PROGRESS = "Barra de progresión";
+	public final static String W_PLAYER_TITLE = "Player";
+	public final static String L_PROGRESS = "Progress bar";
 	/**Etiqueta descriptiva de la escala de tiempos*/
-	public final static String L_TIME_SCALE = "Escala de tiempos:";
+	public final static String L_TIME_SCALE = "Time scale:";
 	/**La escala de tiempos del reproductor*/
-	public final static String L_TIME_SCALE2 = " mSec/día";
-	public final static String L_SPEED = "x 50 mSec/día";
-	public final static String L_DATE = "Fecha:";
-	public final static String L_TIME = "Hora:";
+	public final static String L_TIME_SCALE2 = " mSec/day";
+	public final static String L_SPEED = "x 50 mSec/day";
+	public final static String L_DATE = "Date:";
+	public final static String L_TIME = "Time:";
 	/**Texto del campo*/
-	public final static String L_TIME2 = "Hora Minuto";
+	public final static String L_TIME2 = "Hour Minute";
 	public final static String TT_BTNPLAY = "Reproduce o Pausa la animación.";
 	public final static String TT_DATECHOOSER1 = "Fecha representada";
 	public final static String TT_BTN_DATECHOOSER = "Introducción de fecha concreta";
@@ -135,26 +135,26 @@ public class Labels_GUI_EN {
 	public final static String W_DEF_TITLE = "Parámetros Enfermedad";
 	public final static String W_GRP_TITLE = "Grupos de Población";
 	public final static String W_REL_TITLE = "Matriz de Contactos";
-	public final static String W_MAP_TITLE = "Mapa";
+	public final static String W_MAP_TITLE = "Map";
 	public final static String W_PAL_TITLE = "Leyenda";
-	public final static String W_TE_TITLE = "Editor de Tablas";
-	public final static String W_GE_TITLE = "Editor Gráfico";
-	public final static String W_PE_TITLE = "Editor Paleta";
-	public final static String M_NEW_PRJ = "Nuevo Proyecto";
-	public final static String M_OPEN_PRJ = "Abrir Proyecto";
+	public final static String W_TE_TITLE = "Table Editor";
+	public final static String W_GE_TITLE = "Graphic Editor";
+	public final static String W_PE_TITLE = "Color Editor";
+	public final static String M_NEW_PRJ = "New Project";
+	public final static String M_OPEN_PRJ = "Open Project";
 	public final static String M_IMPORT_PA = "Importar Modelo A";
 	public final static String M_IMPORT_PB = "Importar Modelo B";
-	public final static String M_SAVE_PRJ = "Guardar Proyecto";
-	public final static String M_EXIT = "Salir";
-	public final static String MVER_PRJ = "Proyecto";
+	public final static String M_SAVE_PRJ = "Save Project";
+	public final static String M_EXIT = "Exit";
+	public final static String MVER_PRJ = "Project";
 	public final static String MM_MODELO = "Parámetros modelo";
-	public final static String MM_FILES = "Archivo";
-	public final static String MM_TOOLS = "Herramientas";
-	public final static String MM_PREFERENCES = "Preferencias";
-	public final static String MM_HELP = "Ayuda";
+	public final static String MM_FILES = "File";
+	public final static String MM_TOOLS = "Tools";
+	public final static String MM_PREFERENCES = "Preferences";
+	public final static String MM_HELP = "Help";
 	public final static String MHELP_TABLES = "Formato Tablas";
-	public final static String MHELP_USER_GUIDE = "Manual de Usuario";
-	public final static String MHELP_ABOUT = "Acerca de...";
+	public final static String MHELP_USER_GUIDE = "User Guide";
+	public final static String MHELP_ABOUT = "About...";
 	public final static String MPREFERENCES_ES = "Español";
 	public final static String MPREFERENCES_EN = "English";
 	public final static String MPREFERENCES_FR = "Français";
@@ -232,31 +232,31 @@ public class Labels_GUI_EN {
 	
 	/* Operaciones */
 	/** Operación de actualizar datos o vista.*/ 
-	public final static String UPDATE = "Actualizar";
+	public final static String UPDATE = "Update";
 	/** Operación de abrir un componente o un fichero*/
-	public final static String OPEN = "Abrir";
+	public final static String OPEN = "Open";
 	/** Guardar un fichero*/
-	public final static String SAVE = "Guardar";
+	public final static String SAVE = "Save";
 	/** Guardar como un fichero en donde se especifique*/
-	public final static String SAVE_AS = "Guardar como";
+	public final static String SAVE_AS = "Save as";
 	/** Eliminar un dato o fichero*/
-	public final static String DELETE = "Borrar";
+	public final static String DELETE = "Delete";
 	/** Editar un dato o fichero*/
-	public final static String EDIT = "Editar";
+	public final static String EDIT = "Edit";
 	/** Ejecutar una acción*/  
-	public final static String EXECUTE = "Ejecutar";
+	public final static String EXECUTE = "Run";
 	/** Acción de reproducir en el player*/
-	public final static String PLAY = "Reproducir";
+	public final static String PLAY = "Play";
 	/** Acción de pausar la reproducción en el player*/
-	public final static String PAUSE = "Pausar";
+	public final static String PAUSE = "Pause";
 	/** Acción de repetir la reproducción del player*/
-	public final static String REPLAY = "Repetir";
+	public final static String REPLAY = "Repeat";
 	/** Acción de notificación de cambios*/
-	public final static String CHANGES = "Cambios";
+	public final static String CHANGES = "Changes";
 	/** Acción de aplicar un cambio*/
-	public final static String APPLY = "Aplicar";
+	public final static String APPLY = "Apply";
 	/** Acción de cerrar una ventana*/
-	public final static String CLOSE = "Cerrar";
+	public final static String CLOSE = "Close";
 	
 	/* Tipos de archivos y módulos */
 	public final static String MDL = "Modelo";
