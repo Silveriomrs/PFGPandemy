@@ -577,8 +577,6 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			boolean ok = false;
 			if(((JButton) e.getSource()).isEnabled()) {
-				//TODO: Eliminar código comentado al final.
-//				if(dcvs.getType() == null) dcvs.setType(TypesFiles.CSV);
 				ok = cm.doActionTableEditor(OperationsType.OPEN);
 				//En caso de operación realizada correctamente.
 				if(ok) { cm.showMessage(Labels_GUI.NOTIFY_FILE_LOADED, 1);}

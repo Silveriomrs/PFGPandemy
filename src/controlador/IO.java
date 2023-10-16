@@ -72,7 +72,7 @@ public class IO{
 				dcvs.setDirectorio(f.getParent());
 				dcvs.setName(extractName(f.getName()));
 				if(ext.equals(TypesFiles.PRJ))  WorkingDirectory = f.getParent();
-				dcvs.setType(ext);
+				dcvs.setType(getExt(f.getName()));
 				dcvs.setDate("" + f.lastModified());
 			}
 			catch (IOException e) {System.out.println("Error trying to open a file.");}
@@ -208,11 +208,10 @@ public class IO{
 		
 		JFileChooser sf = new JFileChooser(".");								//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
-		//Aplicar filtros excepto si es una carga de cualquier tipo de fichoro (ANY).
-//		if(!ext.equals(TypesFiles.ANY)) {
-			sf.setFileFilter(filtro);												//Establecimiento del filtro
-			sf.setAcceptAllFileFilterUsed(false);									//Indicamos que no permita elegir otros archivos.
-//		}
+		//Aplicar filtros. En caso de ANY filtro es null.
+		sf.setFileFilter(filtro);												//Establecimiento del filtro
+		sf.setAcceptAllFileFilterUsed(false);									//Indicamos que no permita elegir otros archivos.
+
 
 		sf.setDialogTitle(TypesFiles.get(ext));
 		int seleccion;
@@ -223,15 +222,6 @@ public class IO{
 	    if(seleccion == JFileChooser.APPROVE_OPTION) {							//En caso de haber elegido archivo.
 	        File f = sf.getSelectedFile();										//Obtenemos el archivo.
 			path = f.getPath();													//Obtención de la ruta del archivo.
-			//Comprobación de elección de archivo correcta.
-			//TODO: Ahora esta parte no parece tener sentido al impedir con setAcceptAllFileFilterUsed la selección de otro
-			//Tipo de archivo, por lo tanto, tras pruebas, eliminar.
-//			if(!checkExt(path,ext)) {
-//				path = path + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
-//				System.out.println("IO > selFile: Añadida extensión: " + ext +
-//						" al archivo con path: " + f.getPath() +
-//						"\nResultando: " + path);
-//			}
 			//Otorgar los valores.
 			fileAttr[0] = path;
 			fileAttr[1] = f.getParent();

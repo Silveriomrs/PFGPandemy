@@ -73,8 +73,8 @@ public class Labels_GUI {
 	/** Aviso NG <= 0 */
 	public final static String WARNING_3 = "El número de grupos debe ser mayor de cero.";
 	public final static String WARNING_EMPTY_FIELD = "El campo nombre no puede estar vacio.";
-	public final static String VERSION_TITLE = "Versión:";
-	public final static String VERSION_NUMBER = "1.0";
+	public final static String VERSION_TITLE = "Versi\u00F3n ";
+	public final static String VERSION_NUMBER = "1.2";
 	public final static String NAME_MODULES = "Módulos";
 	public final static String L_AUTHOR = "Autor/a:";
 	public final static String L_DATE_MODIFIED = "Fecha modificación:";

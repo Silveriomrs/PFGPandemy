@@ -996,7 +996,6 @@ public class ControladorModulos {
 		case OPEN:
 			//Selección de fichero.
 			String[] file = cio.selFile(1, TypesFiles.ANY);
-			//TODO: Plantear ¿Y si file = null?
 			String path = file[0];
 			String ext = file[2];
 			DCVS dcvs = cio.abrirArchivo(path,ext);
