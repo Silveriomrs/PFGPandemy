@@ -1,14 +1,56 @@
-[actualizado 05/10/2023]
+[actualizado 16/10/2023]
 
-Corregir:
+======================================================================================================
+Corregir
+=========
+General
+--------
++El archivo PRJ puede contener referencias nulas o erróneas.
+++¿Cómo manejarlas? Avisar, en caso de ser un dato crítico, no continuar con la carga u ofrecer corrección
+	a través del TableEditor.
+++¿Qué política aplicar? Ignorar, no cargar.
 
-+El archivo PRJ puede contener referencias nulas o erróneas. ¿Cómo manejarlas? ¿qué política aplicar?
++Al cargar un MAP (grupo de población) desde Archivos, da warning (si NG != NGprevio), indica que no lo cargará, 
+	pero lo carga y no modifica el NG del proyecto, tampoco genera el REL adecuado.
+	
+	> NG == NGPrevio > avisar de modificaciones en el proyecto y proceder generando REL en concordancia y
+		eliminando (si existe) el HST correspondiente.
+	> NG != NGPrevio && NGPRevio == 0 > lo mismo que el punto anterior.
+	> NG != NGPrevio > Avisar de incompatibilidad, interrogar sobre si continuar.
+		>Continuar > modificar etiqueta NG de PRJ, eliminar HST y regenerar REL.
+		>No Continuar > no cargar.
+ejemplo:
+Mapas
+CM > OpenModule > Tipo: map, NG: 0 / filas de datos: 4
+CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2
 
-+Editor de tablas el selector de asignar módulo no se establece de manera automática para DEF al crear una tabla desde plantilla para DEF.
+TableEditor
+------------
++No funciona la opción de abrir fichero (cargar desde disco)
 
-+Editor de tablas no me permite asignar un DEF a su módulo, modificar de manera que una vez generada una plantilla, el asignador
-quede desactivado hasta cambiar de tabla y permita aplicar.
 
+
+======================================================================================================
+Modificar
+=========
+
+TableEditor
+------------
++ Para crear tablas tipo REL, MAP o HST, es necesario conocer datos de otros módulos primero,
+	por tanto, se hace prioritario determinar políticas.
+	>HST es un resultado de un motor, no para definir un contexto => no generable.
+	>REL, requiere conocer el número y nombre (por las cabeceras) de los grupos de población previamente.
+	>MAP, requiere coincidir el número de grupos de población con los del proyecto (en caso de querer aplicar).
+
++ Al crear una nueva tabla, sino hay tabla previa > no realizar advertencia.
+
++ Al aplicar un MAP al Controlador, este aplica sin comprobar restricciones previas del proyecto (como el NG),
+	resultando en incoherencia grave. Es necesario comprobaciones antes de aplicar y aviso de intervención al usuario
+	para actuar coherentemente.
+
+
+General
+--------	
 +Para poder usar multiples idiomas hace falta desacoplar las etiquetas usadas para el idioma de la clase usada para ello. 
 >Una manera de hacerlo es crear una clase que sea independiente del tipo de idioma (su nombre) y según el CM indica el idioma 
 > a usar, carga desde un HashMap el idioma que se ha seleccionado entre los disponibles.

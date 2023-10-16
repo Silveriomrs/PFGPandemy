@@ -22,6 +22,7 @@ public class TypesFiles {
 	
 	private static HashMap<String,String> tipos;
     
+	public final static String ANY = "*";
     /** Archivos generales formato CSV*/  
     public final static String CSV = "csv";
     /** Archivo de proyecto PRJ*/  
@@ -61,6 +62,7 @@ public class TypesFiles {
 	
     private static void configurar() {
     	tipos = new HashMap<String,String>();
+    	tipos.put(ANY, Labels_GUI.ANY);
     	tipos.put(PAL, Labels_GUI.PAL);
 		tipos.put(DEF, Labels_GUI.DEF);
 		tipos.put(CSV, Labels_GUI.CSV);

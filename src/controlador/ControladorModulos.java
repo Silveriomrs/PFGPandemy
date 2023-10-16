@@ -53,7 +53,7 @@ public class ControladorModulos {
 	private Mapa mapa;
 	private Archivos archivos;
 	private VistaSIR vistaSIR;
-	private TablaEditor tablaEditor;
+	private TablaEditor tableEditor;
 	private ParametrosGrupos pgrupos;
 	private ParametrosProyecto pproyecto;
 	private Pizarra pizarra;
@@ -93,7 +93,7 @@ public class ControladorModulos {
 		cio = new ControladorDatosIO();
 		//Inicio de las vistas
 		archivos = new Archivos(this);
-		tablaEditor = new TablaEditor(this);
+		tableEditor = new TablaEditor(this);
 		pgrupos = new ParametrosGrupos(this);
 		pproyecto = new ParametrosProyecto(this,archivos);
 		about = new About();
@@ -249,7 +249,7 @@ public class ControladorModulos {
 	 */
  	private void agregarPaneles() {
 		//Añadir paneles de los módulos.
-		addDefaultBorder(tablaEditor,Labels_GUI.L_BORDER_PANEL_TE);
+		addDefaultBorder(tableEditor,Labels_GUI.L_BORDER_PANEL_TE);
 		addDefaultBorder(mapa,Labels_GUI.L_BORDER_PANEL_MAP);
 		addDefaultBorder(pgrupos,Labels_GUI.L_BORDER_PANEL_GRP);
 		addDefaultBorder(pproyecto,Labels_GUI.L_BORDER_PANEL_PRJ);
@@ -494,7 +494,7 @@ public class ControladorModulos {
 		//Borrado de las zonas cargadas.
 		zonas.clear();
 		//Limpieza de las etiquetas de las vistas de diferentes módulos.
-		tablaEditor.reset();
+		tableEditor.reset();
 		archivos.reset();
 		vistaSIR.reset();
 		pproyecto.reset();
@@ -724,7 +724,7 @@ public class ControladorModulos {
 	private void mostrarPanel(String nombre) {
 		//Mostrar panel correspondiente y ocultación del resto.
 		mapa.setVisible(nombre.equals(Labels_GUI.W_MAP_TITLE));					
-		tablaEditor.setVisible(nombre.equals(Labels_GUI.W_TE_TITLE));
+		tableEditor.setVisible(nombre.equals(Labels_GUI.W_TE_TITLE));
 		pgrupos.setVisible(nombre.equals(Labels_GUI.W_GRP_TITLE));
 		pproyecto.setVisible(nombre.equals(Labels_GUI.MVER_PRJ));
 		vistaSIR.setVisible(nombre.equals(Labels_GUI.W_DEF_TITLE));
@@ -989,15 +989,37 @@ public class ControladorModulos {
 	 * @param modulo Módulo con los datos que esperan ser guardados tras modificación.
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
-	public boolean doActionTableEditor(DCVS modulo) {
+	public boolean doActionTableEditor(OperationsType op) {
 		boolean done = true;
-		if(modulo != null) {
-			establecerDatos(modulo);
-			//indicar al módulo de archivos que modulo se ha modificado para activar 
-			//El botón de guardar correspondiente.
-			archivos.enableBotonesGuardado(modulo.getType(), true);
+		
+		switch(op) {
+		case OPEN:
+			//Selección de fichero.
+			String[] file = cio.selFile(1, TypesFiles.ANY);
+			//TODO: Plantear ¿Y si file = null?
+			String path = file[0];
+			String ext = file[2];
+			DCVS dcvs = cio.abrirArchivo(path,ext);
+			done = dcvs != null;
+			//En caso de ser una tabla no nula...
+			if(done) {
+				tableEditor.setModelo(dcvs, true);							//Establecer la nueva tabla como tabla activa.
+			}
+			
+			break;
+		case APPLY:
+			DCVS module = tableEditor.getDCVS();
+			if(module != null) {
+				establecerDatos(module);
+				//indicar al módulo de archivos que modulo se ha modificado para activar 
+				//El botón de guardar correspondiente.
+				archivos.enableBotonesGuardado(module.getType(), true);
+			}
+			break;
+		default:
 		}
-		refresh();	
+		
+		refresh();
 		return done;
 	}
 

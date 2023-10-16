@@ -271,6 +271,7 @@ public class Labels_GUI {
 	public final static String GRP_2 = "Grupos";
 	public final static String PRJ = "Proyecto";
 	public final static String REL = "Relaciones";
+	public final static String ANY = "Cualquiera";
 	public final static String PNG = "Archivos de imagen PNG";
 	public final static String JPG = "Archivos de imagen JPG";
 	public final static String JPEG = "Archivos de imagen JPEG";
