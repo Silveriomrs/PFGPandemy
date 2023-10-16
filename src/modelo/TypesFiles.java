@@ -22,7 +22,8 @@ public class TypesFiles {
 	
 	private static HashMap<String,String> tipos;
     
-	public final static String ANY = "*";
+	/** Cualquier tipo de fichero. Útil para cargar desde el TableEditor.*/
+	public final static String ANY = ".";
     /** Archivos generales formato CSV*/  
     public final static String CSV = "csv";
     /** Archivo de proyecto PRJ*/  

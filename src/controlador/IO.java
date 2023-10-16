@@ -195,17 +195,25 @@ public class IO{
 		String path  = null;
 		//fileAttr [ruta,directorio,nombre,ext]
 		String[] fileAttr = {null,null,null,null};
+		//Filtro de los tipos de fichero para el dialogo de los emergente.
 		FileNameExtensionFilter filtro = null;
-		//Comprobación de filtro para imagenes soportadas u otros tipos.
-		if(!ext.equals(TypesFiles.IMG)) {
-			filtro = new FileNameExtensionFilter(TypesFiles.get(ext),ext);
-		}else {
+		switch(ext) {
+		case(TypesFiles.ANY): break;
+		case(TypesFiles.IMG): 
 			filtro = new FileNameExtensionFilter(TypesFiles.get(ext), TypesFiles.PNG, TypesFiles.JPG, TypesFiles.JPEG, TypesFiles.GIF);
+			break;
+		default:
+			filtro = new FileNameExtensionFilter(TypesFiles.get(ext),ext);
 		}
 		
 		JFileChooser sf = new JFileChooser(".");								//Directorio local.
 		sf.setFileSelectionMode(JFileChooser.FILES_ONLY);						//Selección de ficheros unicamente.
-		sf.setFileFilter(filtro);												//Establecimiento del filtro
+		//Aplicar filtros excepto si es una carga de cualquier tipo de fichoro (ANY).
+//		if(!ext.equals(TypesFiles.ANY)) {
+			sf.setFileFilter(filtro);												//Establecimiento del filtro
+			sf.setAcceptAllFileFilterUsed(false);									//Indicamos que no permita elegir otros archivos.
+//		}
+
 		sf.setDialogTitle(TypesFiles.get(ext));
 		int seleccion;
 		//Apertura del dialogo correspondiente a la selección indicada.
@@ -216,17 +224,20 @@ public class IO{
 	        File f = sf.getSelectedFile();										//Obtenemos el archivo.
 			path = f.getPath();													//Obtención de la ruta del archivo.
 			//Comprobación de elección de archivo correcta.
-			if(!checkExt(path,ext)) {
-				path = path + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
-				System.out.println("IO > selFile: Añadida extensión: " + ext +
-						" al archivo con path: " + f.getPath() +
-						"\nResultando: " + path);
-			}
+			//TODO: Ahora esta parte no parece tener sentido al impedir con setAcceptAllFileFilterUsed la selección de otro
+			//Tipo de archivo, por lo tanto, tras pruebas, eliminar.
+//			if(!checkExt(path,ext)) {
+//				path = path + "." + ext;										//En caso de omisión de la extensión o discordancia, se le añade la indicada.
+//				System.out.println("IO > selFile: Añadida extensión: " + ext +
+//						" al archivo con path: " + f.getPath() +
+//						"\nResultando: " + path);
+//			}
 			//Otorgar los valores.
 			fileAttr[0] = path;
 			fileAttr[1] = f.getParent();
 			fileAttr[2] = extractName(f.getName());
 	    }
+	    
 		return fileAttr;
 	}
 	
