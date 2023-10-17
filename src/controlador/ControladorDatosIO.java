@@ -59,9 +59,9 @@ public class ControladorDatosIO {
 	 * @param ext Extensión del fichero.
 	 * @return Ruta completa al fichero donde se han almacenado los datos. Null en otro caso.
 	 */
-	public String guardarArchivo2(String datos, String ruta, String name, String ext) {
+	public boolean guardarArchivo2(String datos, String[] fileAttr) {
 		//TODO: Mal como en IO. Hay que restructurarlo del todo.
-		return io.saveFile2(datos,ruta,name,ext);
+		return io.saveFile2(datos,fileAttr);
 	}
 	
 	/**

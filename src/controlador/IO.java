@@ -135,7 +135,7 @@ public class IO{
 	 * @param Atributos del fichero {ruta completa, directorio, nombre, extensión}.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
-	public String saveFile2(String datos, String[] attrFile) {
+	public boolean saveFile2(String datos, String[] attrFile) {
 		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
 		String ruta = attrFile[0];
 		String ext = attrFile[3];
