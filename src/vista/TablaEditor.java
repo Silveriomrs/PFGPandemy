@@ -425,6 +425,8 @@ public class TablaEditor extends JPanel{
 		return tipo;
 	}
 	
+	/* CLASES PRIVADAS */
+	
 	/**
 	 * Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
 	 *  comunicación con el módulo controlador.
@@ -712,7 +714,7 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage(Labels_GUI.WARNING_2_TE,3);
+				int opt = cm.showMessage(Labels_GUI.WARNING_3_TE,3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {	
 					//Obtener atributos previos de la tabla anterior.
@@ -749,16 +751,33 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage(Labels_GUI.WARNING_4_TE + " " + Labels_GUI.REQUEST_CONFIRM, 3);
-				//Caso afirmativo borrar el modelo y crear uno nuevo.
-				if(opt == JOptionPane.YES_OPTION) {
+				//Mostrar dialogo de confirmación (si procede).
+				//en caso afirmativo borrar el modelo y crear uno nuevo.
+				if(showWarning() == JOptionPane.YES_OPTION) {
 					//Interrogar por el tipo de tabla a crear.
 					ModuleType opt2 = askType();
 					//Crear tabla adecuada con atributos de modificación (si requerido).
-					generateTable(opt2);
+					if(opt2 != null) generateTable(opt2);
 				}
 			}
+		}
+		
+		/**
+		 * Asegura que el mensaje de advertencia sólo sea mostrado en caso necesario.
+		 *  Para ello, evalua si la tabla actual tiene alguna fila o columna, en caso
+		 *  de tener una fila o columna muestra una advertencia, en otro caso devuelve el 
+		 *  equivalente a una confirmación del usuario para eliminar tabla actual.
+		 * 
+		 * @return YES_OPTION en caso de aceptación de eliminación, opciones de CANCEL/NO en otro caso.
+		 */
+		private int showWarning() {
+			boolean tieneColumna = dcvs.getColumnCount() > 0;
+			boolean tieneFila = dcvs.getRowCount() > 0;
+			int opt = JOptionPane.YES_OPTION;
+			if(tieneColumna || tieneFila) {
+				opt = cm.showMessage(Labels_GUI.WARNING_4_TE + " " + Labels_GUI.REQUEST_CONFIRM, 3);
+			}
+			return opt;
 		}
 		
 		/**

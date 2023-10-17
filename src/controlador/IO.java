@@ -125,47 +125,46 @@ public class IO{
 	
 	
 	/**
-	 * Metodo para almacenar en un archivo un texto.
-	 * Este método en caso de no tener asignado el nombre completo del fichero
-	 * de destino con una extensión, le añade la extensión pasada por parámetro.
-	 * En caso de no coincidir la extensión de la ruta completa con la extensión
-	 * deseada, sustituye la primera por la segunda.
-	 * @param datos los datos a guardar.
-	 * @param ruta ruta completa con el nombre del fichero.
-	 * @param name Nombre con el que se almacenará el fichero.
-	 * @param ext extensión del archivo.
+	 * Metodo para almacenar en un archivo un texto cualquiera (no módulo).
+	 *  Este método en caso de no tener asignado el nombre completo del fichero 
+	 * 	de destino con una extensión, le añade la extensión pasada por parámetro.
+	 * 	En caso de no coincidir la extensión de la ruta completa con la extensión
+	 * 	deseada, sustituye la primera por la segunda.
+	 * <P>Principalmente dota de flexibilidad en el guardado de datos no estructurados como módulos.</p>
+	 * @param Datos a guardar en formato texto.
+	 * @param Atributos del fichero {ruta completa, directorio, nombre, extensión}.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
-	public String saveFile2(String datos, String ruta, String name, String ext) {
+	public String saveFile2(String datos, String[] attrFile) {
 		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
-		String ruta2 = ruta;
-		String ext2 = ext;
+		String ruta = attrFile[0];
+		String ext = attrFile[3];
 		//Comprobación de extensión coincida con extensión de la ruta.
 		if(ruta != null && !checkExt(ruta,ext)) {								//Si son diferentes
-			ext2 = ruta.substring(ruta.length() -3).toLowerCase();
+			ext = ruta.substring(ruta.length() -3).toLowerCase();
 			//Comprobación de que es una extensión registrada
-			if (!TypesFiles.hasType(ext2)) {									//Sino esta registrada, tomar como no añadida.
-				ruta2 = ruta + ext;												//Añade la extensión.
+			if (!TypesFiles.hasType(ext)) { 									//Sino esta registrada, tomar como no añadida.
+				ruta = ruta + ext;												//Añade la extensión.
 			}else {																//En otro caso remover la que tiene por la nueva.
-				ruta2 = ruta.substring(0, ruta.length() -3);					//Eliminar 3 últimos carácteres.
-				ruta2 = ruta2 + ext;
+				ruta = ruta.substring(0, ruta.length() -3); 					//Eliminar 3 últimos carácteres.
+				ruta = ruta + ext;
 			}
 		}
 		
 		//Escribir el archivo.
-		File f = getFile(2,ruta2,ext2);
+		File f = getFile(2,ruta,ext);
 		if(f != null){
 		    try(FileWriter fw = new FileWriter(f)){	 
-		    	ruta2 = f.getPath();
+		    	ruta = f.getPath();
 		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
 		    	fw.write(datos);													//Escribimos el texto en el fichero.
 		    	String name2 = f.getName();
-		    	ruta2 = name2.substring(name2.length() -3).toLowerCase();		//Ahora devolvemos el nombre del fichero.
+		    	ruta = name2.substring(name2.length() -3).toLowerCase();		//Ahora devolvemos el nombre del fichero.
 		    	
-		    	System.out.println("IO > grabarArchivo > ruta2 (f.name): " + ruta2);
+		    	System.out.println("IO > grabarArchivo > ruta2 (f.name): " + ruta);
 		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
 		}
-		return ruta2;
+		return ruta;
 	}
 	
 	/**
@@ -226,6 +225,7 @@ public class IO{
 			fileAttr[0] = path;
 			fileAttr[1] = f.getParent();
 			fileAttr[2] = extractName(f.getName());
+			fileAttr[3] = getExt(fileAttr[2]);
 	    }
 	    
 		return fileAttr;

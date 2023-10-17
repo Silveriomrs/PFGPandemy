@@ -1,4 +1,4 @@
-[actualizado 16/10/2023]
+[actualizado 17/10/2023]
 
 ======================================================================================================
 Corregir
@@ -43,11 +43,12 @@ TableEditor
 	>REL, requiere conocer el número y nombre (por las cabeceras) de los grupos de población previamente.
 	>MAP, requiere coincidir el número de grupos de población con los del proyecto (en caso de querer aplicar).
 
-+ Al crear una nueva tabla, sino hay tabla previa > no realizar advertencia.
-
 + Al aplicar un MAP al Controlador, este aplica sin comprobar restricciones previas del proyecto (como el NG),
 	resultando en incoherencia grave. Es necesario comprobaciones antes de aplicar y aviso de intervención al usuario
 	para actuar coherentemente.
+
+** Al seleccionar abrir, se podría dejar que el selector permitiera abrir cualquier archivo o uno de los archivos conocidos
+	mediante el desplegable => pasar un array con los tipos compatibles. (Poco importante)
 
 
 General
@@ -56,3 +57,5 @@ General
 >Una manera de hacerlo es crear una clase que sea independiente del tipo de idioma (su nombre) y según el CM indica el idioma 
 > a usar, carga desde un HashMap el idioma que se ha seleccionado entre los disponibles.
 > Separar en dos ramas como se comenzó en su momento y no se terminó... textos y operaciones.
+
+
