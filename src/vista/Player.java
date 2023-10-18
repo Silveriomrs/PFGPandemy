@@ -67,6 +67,7 @@ public class Player extends JPanel implements ActionListener{
 	private ControladorModulos cm;
 	private JFrame frame;
 	private JButton btnPlayPause;
+	private OperationsType opBtnPlay;
 	private Timer timer;
 	private final FondoPanel fondo = new FondoPanel(ImagesList.BCKGND_PLAYER);
 	private TitledBorder tb;
@@ -105,7 +106,8 @@ public class Player extends JPanel implements ActionListener{
 		tb.setTitleColor(Color.BLUE);
 		setBorder(tb);
 		//Controles: creación.
-		btnPlayPause = new JButton(OperationsType.PLAY.toString());
+		btnPlayPause = new JButton(Labels_GUI.PLAY);
+		opBtnPlay = OperationsType.PLAY;
 		slider = new JSlider(0,2000,1000);
 		slider.setBackground(new Color(255, 228, 225));
 		progressBar = new JProgressBar();
@@ -157,7 +159,7 @@ public class Player extends JPanel implements ActionListener{
 	private void configuracion() {
 		//Timer
 		contador = 0;
-		timer =  new Timer(1000, new Temporizador()); 
+		timer =  new Timer(1000, new Temporizador());
 		
 		btnPlayPause.addMouseListener(new BtnPlay());
 		progressBar.setStringPainted(true);
@@ -419,28 +421,31 @@ public class Player extends JPanel implements ActionListener{
 	 * @version versión 1.0
 	 */
 	private class BtnPlay extends MouseAdapter {
+		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			String estado = btnPlayPause.getText();
-			OperationsType state = OperationsType.getNum(estado);
 			
-			switch(state){
-				case PLAY:														//Estado pausado, muestra 'Reproducir'
-					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.
+			switch(opBtnPlay){
+				case PLAY:										//Estado pausado, muestra 'Reproducir'
+					opBtnPlay = OperationsType.PAUSE;
+					btnPlayPause.setText(Labels_GUI.PAUSE);		//Estado siguiente: reproducir.
 					timer.start();
 					break;
-				case REPLAY:													//Estado parado en final muestra y etiqueta 'Repetir'.
-					btnPlayPause.setText(OperationsType.PAUSE.toString());		//Estado siguiente: reproducir.				
+				case REPLAY:									//Estado parado en final muestra y etiqueta 'Repetir'.
+					opBtnPlay = OperationsType.PAUSE;
+					btnPlayPause.setText(Labels_GUI.PAUSE);		//Estado siguiente: reproducir.				
 					contador = primera;
 					setPlay();
 					timer.restart();
 					break;
-				default:														//Estado pausado/parado, muestra 'Reproducir'
-					btnPlayPause.setText(OperationsType.PLAY.toString());		//Estado siguiente: Parado.
+				default:										//Estado pausado/parado, muestra 'Reproducir'
+					opBtnPlay = OperationsType.PLAY;
+					btnPlayPause.setText(Labels_GUI.PLAY);		//Estado siguiente: Parado.
 					timer.stop();						
 			}		
 			activo = !activo;
-			dateChooser.getCalendarButton().setEnabled(!activo);				//Activa boton del dateChooser cuando la reproducción no está activa.	
+			//Activa boton del dateChooser cuando la reproducción no está activa.
+			dateChooser.getCalendarButton().setEnabled(!activo);	
 		}
 	}
 	
@@ -515,7 +520,8 @@ public class Player extends JPanel implements ActionListener{
 				setVisible(isHST);
 			}else {		
 				timer.stop();
-				btnPlayPause.setText(OperationsType.REPLAY.toString());
+				opBtnPlay = OperationsType.REPLAY;
+				btnPlayPause.setText(Labels_GUI.REPLAY);
 				activo = !activo;
 				dateChooser.getCalendarButton().setEnabled(!activo);			//Activa boton del dateChooser cuando la reproducción no está activa.
 			}

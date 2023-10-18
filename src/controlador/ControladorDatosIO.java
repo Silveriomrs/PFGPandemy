@@ -83,9 +83,9 @@ public class ControladorDatosIO {
 		String pathPDF = "Manuales" + separador + man + "." + TypesFiles.PDF;
 		//Apertura del PDF desde la propia aplicación del sistema.
 		try {
-			String r2 = IO.getFile(1, pathPDF, TypesFiles.PDF).getPath();			/* FUNCIONA */
+			String r2 = IO.getFile(pathPDF, TypesFiles.PDF).getPath();			/* FUNCIONA */
 			pathPDF = r2;
-			Desktop.getDesktop().open(IO.getFile(1, pathPDF, TypesFiles.PDF));
+			Desktop.getDesktop().open(IO.getFile(pathPDF, TypesFiles.PDF));
 		}catch (Exception ex) {
 			System.out.println("ControladorDatosIO > openPDF > Error, No encontrado fichero: " + pathPDF);
 		}

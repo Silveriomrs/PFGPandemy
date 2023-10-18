@@ -9,102 +9,75 @@
 */  
 package modelo;
 
-/**  
+/** 
+ * Esta clase enumerada contiene todas las operaciones que pueda usar la aplicación y cada una de sus partes.
+ *  Las acciones tienen caracter general evitando redundancias, aunque en aquellas acciones donde sea necesario
+ *  especificar el receptor o el disparador de la acción, tendrá creada una entrada específica (ej. los idiomas).
  * @author Silverio Manuel Rosales Santana
  * @date 17 oct. 2023
- * @version versión 1.2
+ * @version versión 2.0
  */
 public enum OperationsType {
 	//TODO: Añadir comentarios JavaDOC a las nuevas entradas.
 	/** Acción de aplicar un cambio*/
-	APPLY(Labels_GUI.APPLY),
+	APPLY,
 	/** Acción de notificación de cambios*/
-	CHANGES(Labels_GUI.CHANGES),
+	CHANGES,
 	/** Acción de cerrar una ventana*/
-	CLOSE(Labels_GUI.CLOSE),
+	CLOSE,
 	/** Eliminar un dato o fichero*/
-	DELETE(Labels_GUI.DELETE),
+	DELETE,
 	/** Editar un dato o fichero*/
-	EDIT(Labels_GUI.EDIT),
+	EDIT,
 	/** Editar gráfico*/
-	EDIT_GRAPHIC(Labels_GUI.W_GE_TITLE),
+	EDIT_GRAPHIC,
 	/** Editar Paleta de colores / Escala de valores*/
-	EDIT_PAL(Labels_GUI.W_PE_TITLE),
+	EDIT_PAL,
 	/** Ejecutar una acción*/  
-	EXECUTE(Labels_GUI.EXECUTE),
+	EXECUTE,
 	/** Acción de salir*/
-	EXIT(Labels_GUI.M_EXIT),
-	HELP_ABOUT(Labels_GUI.MHELP_ABOUT),
-	HELP_TABLES(Labels_GUI.MHELP_TABLES),
-	HELP_USER_GUIDE(Labels_GUI.MHELP_USER_GUIDE),
+	EXIT,
+	HELP_ABOUT,
+	HELP_TABLES,
+	HELP_USER_GUIDE,
 	/** Importar tabla Vensim tipo A*/
-	IMPORT_A(Labels_GUI.M_IMPORT_PA),
+	IMPORT_A,
 	/** Importar tabla Vensim tipo B*/
-	IMPORT_B(Labels_GUI.M_IMPORT_PB),
+	IMPORT_B,
 	/** Selección idioma Español*/
-	LANG_ES(Labels_GUI.MPREFERENCES_ES),
+	LANG_ES,
 	/** Selección idioma Inglés*/
-	LANG_EN(Labels_GUI.MPREFERENCES_EN),
+	LANG_EN,
 	/** Selección idioma Francés*/
-	LANG_FR(Labels_GUI.MPREFERENCES_FR),
+	LANG_FR,
 	/** Selección idioma Alemán*/
-	LANG_DE(Labels_GUI.MPREFERENCES_DE),
+	LANG_DE,
 	/** Selección idioma Ucraniano*/
-	LANG_UR(Labels_GUI.MPREFERENCES_UR),
+	LANG_UR,
 	/** Nuevo elemento (Módulo u otro)*/
-	//TODO: Ojo! esto puede causar problemas a futuro.
-	NEW(null),
+	NEW,
 	/** Operación de abrir un componente o un fichero*/
-	OPEN(Labels_GUI.OPEN),
+	OPEN,
 	/** Acción de reproducir en el player*/
-	PLAY(Labels_GUI.PLAY),
+	PLAY,
 	/** Acción de pausar la reproducción en el player*/
-	PAUSE(Labels_GUI.PAUSE),
+	PAUSE,
 	/** Acción de repetir la reproducción del player*/
-	REPLAY(Labels_GUI.REPLAY),
+	REPLAY,
 	/** Guardar un fichero*/
-	SAVE(Labels_GUI.SAVE),
+	SAVE,
 	/** Guardar como un fichero en donde se especifique*/
-	SAVE_AS(Labels_GUI.SAVE_AS),
+	SAVE_AS,
 	/** Operación de actualizar datos o vista.*/ 
-	UPDATE(Labels_GUI.UPDATE),
-	VIEW_PRJ(Labels_GUI.MVER_PRJ),
-	VIEW_DEF(Labels_GUI.W_DEF_TITLE),
-	VIEW_GRP(Labels_GUI.W_GRP_TITLE),
-	VIEW_MAP(Labels_GUI.W_MAP_TITLE),
-	VIEW_PAL(Labels_GUI.W_PAL_TITLE),
-	VIEW_REL(Labels_GUI.W_REL_TITLE),
+	UPDATE,
+	VIEW_PRJ,
+	VIEW_DEF,
+	VIEW_GRP,
+	VIEW_MAP,
+	VIEW_PAL,
+	VIEW_REL,
 	/** Etiqueta final a eliminar cuando este todo hecho*/
-	END("Final");
-
-    private final String display;
-    private OperationsType(String s) { display = s; }
-
-    @Override
-    public String toString() { return display; }
+	END;
     
-    /**
-     * Devuelve el enumerado al que pertenece la descripción.
-     * @param value Valor del enúmerado (descripción)
-     * @return Enumerado. Null en otro caso.
-     */
-    public static OperationsType getNum(String value) {
-    	OperationsType[] values = values();
-    	OperationsType op = null;
-    	boolean done = false;	
-    	int max = values.length;
-    	int i = 0;
-    	//Bucle para recorrer el array hasta encontrar la coincidencia.
-    	while(!done && i < max) {
-    		String aux = values[i].toString();
-    		if(value.equals(aux)){
-    			op = values[i];
-    			done = true;
-    		}		
-    		i++;
-    	}
-    	if(op == null) System.out.println("OperationsType > getNum > Error, valor no encontrado para: " + value);
-    	return op;
-    }
 
 }

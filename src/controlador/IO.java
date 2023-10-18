@@ -60,7 +60,7 @@ public class IO{
 		CSVReader lectorCSV = null;
 
 		//Búsqueda del fichero. getFile() comprueba también que la ruta no sea Null.
-		File f = getFile(1,ruta,ext);
+		File f = getFile(ruta,ext);
 		//Ahora en el caso de que el fichero sea correcto y no sea Null => procede.
 		if ((f != null) && f.exists() && f.isFile() ) {							// muestra error si es inválido			
 			try {
@@ -101,7 +101,7 @@ public class IO{
 		
 		//Comprobación de extensión coincida con extensión de la ruta.
 		if(path != null && checkExt(path,type)) {
-			f = getFile(2,path,type);
+			f = getFile(path,type);
 			ok = true;
 		}
 
@@ -136,13 +136,12 @@ public class IO{
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
 	public boolean saveFile(String datos, String[] attrFile) {
-		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
 		boolean done = false;
 		String ruta = attrFile[0];
 		String ext = attrFile[3];
 		
 		//Escribir el archivo.
-		File f = getFile(2,ruta,ext);
+		File f = getFile(ruta,ext);
 		if(f != null){
 		    try(FileWriter fw = new FileWriter(f)){	 
 		    	//Escribimos el texto en el fichero.
@@ -158,13 +157,12 @@ public class IO{
 	}
 	
 	/**
-	 * <p>Description: Obtiene un enlace a un archivo en disco dentro de una instancia File.</p> 
-	 * @param sel Tipo de dialogo a mostrar: 1 Abrir archivo, 2 Guardar archivo.
+	 * Description: Obtiene un enlace a un archivo en disco dentro de una instancia File.
 	 * @param path ruta al fichero en disco.
 	 * @param ext Tipo de fichero a abrir.
 	 * @return Instancia File apuntando al fichero en disco. Null en otro caso.
 	 */
-	public static File getFile(int sel, String path,String ext) {
+	public static File getFile(String path,String ext) {
 		File f = null;
 		if(path != null) f = new File(path);
 		return f;
