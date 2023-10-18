@@ -29,7 +29,7 @@ CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2
 
 Modulo Enfermedad
 ------------------
-Cuando se cargan todos los módulos y se genera un HST, si luego se carga otra DEF vacio (osea, se dejan campos en blanco), 
+Cuando se cargan todos los módulos y se genera un HST, si luego se dejan campos en blanco, 
 	el botón de generar HST sigue activo y al pulsarse se produce un error.
 
 

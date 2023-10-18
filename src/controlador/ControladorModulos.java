@@ -1226,21 +1226,26 @@ public class ControladorModulos {
 	 */
 	public boolean doActionVistaSIR(OperationsType op) {
 		//extraer datos de los fields y actualizar con los mismos el módulo.
-		boolean done = true;
-		
+		boolean done = true;	
 		System.out.println(op);
 		
-		if(op == OperationsType.UPDATE) done = updateMSIR();
-		else {
+		switch(op) {
+		case APPLY: 
+			done = updateMSIR();
+			//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
+			archivos.enableBotonesGuardado(TypesFiles.DEF, true);
+			break;
+		case EXECUTE:
+			//TODO: Aquí este update no tiene sentido. Repensar.
 			done = updateMSIR();
 			//Checar si valores OK
 			// Si valores OK. Ejecutar motorSIR
 			// runSIR(double pte, double dme, boolean ip, double dmi) 
 			runSIR();
+			break;
+		default:
 		}
 		
-		//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
-		archivos.enableBotonesGuardado(TypesFiles.DEF, true);
 		return done;
 	}
 	
