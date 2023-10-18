@@ -18,7 +18,6 @@ package modelo;
  * @version versión 2.0
  */
 public enum OperationsType {
-	//TODO: Añadir comentarios JavaDOC a las nuevas entradas.
 	/** Acción de aplicar un cambio*/
 	APPLY,
 	/** Acción de notificación de cambios*/
@@ -37,8 +36,11 @@ public enum OperationsType {
 	EXECUTE,
 	/** Acción de salir*/
 	EXIT,
+	/** Instanciar a la ventana Acerca de.*/
 	HELP_ABOUT,
+	/** Instanciar al manual de ayuda de las tablas.*/
 	HELP_TABLES,
+	/** Instanciar el manual de usuario.*/
 	HELP_USER_GUIDE,
 	/** Importar tabla Vensim tipo A*/
 	IMPORT_A,
@@ -70,11 +72,17 @@ public enum OperationsType {
 	SAVE_AS,
 	/** Operación de actualizar datos o vista.*/ 
 	UPDATE,
+	/** Instanciar a la vista del proyecto.*/
 	VIEW_PRJ,
+	/** Instancia a la vista de definición de la enfermedad.*/
 	VIEW_DEF,
+	/** Instancia a la vista de los grupos de población.*/
 	VIEW_GRP,
+	/** Instancia a la vista del mapa.*/
 	VIEW_MAP,
+	/** Instancia a la vista de la paleta de colores/escala.*/
 	VIEW_PAL,
+	/** Instancia a la vista de relaciones entre los grupos de población.*/
 	VIEW_REL,
 	/** Etiqueta final a eliminar cuando este todo hecho*/
 	END;

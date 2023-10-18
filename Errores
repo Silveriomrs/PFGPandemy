@@ -3,6 +3,8 @@
 ======================================================================================================
 Corregir
 =========
+
+
 General
 --------
 +El archivo PRJ puede contener referencias nulas o erróneas.
@@ -25,14 +27,19 @@ CM > OpenModule > Tipo: map, NG: 0 / filas de datos: 4
 CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2
 
 
-Player
-------------
-Al abrir el reproductor, no salta a la vista de Mapa de manera automática. El problema debe estar en CM.
-
 Modulo Enfermedad
 ------------------
 Cuando se cargan todos los módulos y se genera un HST, si luego se carga otra DEF vacio (osea, se dejan campos en blanco), 
 	el botón de generar HST sigue activo y al pulsarse se produce un error.
+
+
+CM
+------------------
+Al importar un proyecto en ParametrosProyecto se llama demasiadas veces al parser. ¿por qué?
+	Para detectarlo se reproduce un error que hace saltar el parser y de esa forma detectar el excesivo número de llamadas.
+	ParametrosProyecto > Error de parser de fechas: 
+	> ¿Por qué repite el error tantas veces si sólo hay dos fechas? 12 veces se repite => 6 llamadas al cargar.
+
 
 ======================================================================================================
 Modificar

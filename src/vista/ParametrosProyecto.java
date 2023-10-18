@@ -262,10 +262,10 @@ public class ParametrosProyecto extends JPanel {
 	private Date stringToDate(String fecha){
 		 SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");	//Formato de la fecha.
 		 Date date = new Date();
-		 if(fecha != null) {
+		 if(fecha != null && !fecha.equals("")) {
 			 try { date = formato.parse(fecha);	}									//Conversión tipo de datos.
 			 catch (ParseException ex) { 
-				 System.out.println("ParametrosProyecto > Error de parser de fechas: " + fecha);
+				 System.out.println("ParametrosProyecto > StringToDate > Error de parser de fechas: " + fecha);
 				 return date;
 			 }
 		 }

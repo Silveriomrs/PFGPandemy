@@ -383,7 +383,7 @@ public class VistaSIR extends JPanel{
 	 * @version versión 1.0
 	 */
 	private class BotonL extends MouseAdapter {
-
+//TODO: Está acoplado en cierto modo. Quitar esos toString para OpeartionsType
 		/**
 		 * Sobrescribe la función heredada. Comprueba el operador asociado al
 		 *  botón al que ha sido agregado el observador y en función del control

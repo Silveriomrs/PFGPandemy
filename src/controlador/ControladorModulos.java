@@ -43,7 +43,6 @@ public class ControladorModulos {
  
 	@SuppressWarnings("unused")
 	private Labels labels;														//Necesario iniciarlo al menos una vez en el proyecto.
-//	private modelo.Labels_GUI labels_GUI;
 	private Paleta paleta;
 	private ControladorDatosIO cio;
 	//Vistas
@@ -83,12 +82,11 @@ public class ControladorModulos {
 	 */
 	public ControladorModulos() {
 		labels = new Labels();
-//		labels_GUI = new modelo.Labels_GUI();
 		//Inicio del mapa de módulos.
 		modulos = new HashMap<String, DCVS>();
 		zonas = new HashMap<Integer,Zona>();
 		@SuppressWarnings("unused")
-		TypesFiles typesFiles = new TypesFiles();												//Necesario para inicializar las funciones correctamente de la clase TypesFiles.
+		TypesFiles typesFiles = new TypesFiles();					//Necesario para inicializar las funciones correctamente de la clase TypesFiles.
 		//Inicio de los controladores
 		cio = new ControladorDatosIO();
 		//Inicio de las vistas
@@ -723,7 +721,7 @@ public class ControladorModulos {
 	 */
 	private void mostrarPanel(OperationsType nombre) {
 		//Mostrar panel correspondiente y ocultación del resto.
-		mapa.setVisible(nombre == OperationsType.VIEW_MAP);					
+		mapa.setVisible(nombre == OperationsType.VIEW_MAP || nombre == OperationsType.PLAY);					
 		tableEditor.setVisible(nombre == OperationsType.EDIT);
 		pgrupos.setVisible(nombre == OperationsType.VIEW_GRP);
 		pproyecto.setVisible(nombre == OperationsType.VIEW_PRJ);
