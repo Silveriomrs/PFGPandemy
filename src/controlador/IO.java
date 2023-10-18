@@ -135,36 +135,26 @@ public class IO{
 	 * @param Atributos del fichero {ruta completa, directorio, nombre, extensión}.
 	 * @return Ruta en caso de operación realizada, Null en otro caso.
 	 */
-	public boolean saveFile2(String datos, String[] attrFile) {
+	public boolean saveFile(String datos, String[] attrFile) {
 		// TODO: MAl, está mal hecho y mal planteado. Reformar!!!
+		boolean done = false;
 		String ruta = attrFile[0];
 		String ext = attrFile[3];
-		//Comprobación de extensión coincida con extensión de la ruta.
-		if(ruta != null && !checkExt(ruta,ext)) {								//Si son diferentes
-			ext = ruta.substring(ruta.length() -3).toLowerCase();
-			//Comprobación de que es una extensión registrada
-			if (!TypesFiles.hasType(ext)) { 									//Sino esta registrada, tomar como no añadida.
-				ruta = ruta + ext;												//Añade la extensión.
-			}else {																//En otro caso remover la que tiene por la nueva.
-				ruta = ruta.substring(0, ruta.length() -3); 					//Eliminar 3 últimos carácteres.
-				ruta = ruta + ext;
-			}
-		}
 		
 		//Escribir el archivo.
 		File f = getFile(2,ruta,ext);
 		if(f != null){
 		    try(FileWriter fw = new FileWriter(f)){	 
-		    	ruta = f.getPath();
-		    	if(ext.equals(TypesFiles.PRJ)) WorkingDirectory = f.getParent();
-		    	fw.write(datos);													//Escribimos el texto en el fichero.
-		    	String name2 = f.getName();
-		    	ruta = name2.substring(name2.length() -3).toLowerCase();		//Ahora devolvemos el nombre del fichero.
-		    	
-		    	System.out.println("IO > grabarArchivo > ruta2 (f.name): " + ruta);
-		    } catch (IOException e1) {System.out.println("Error, file couldn't be open.");}
+		    	//Escribimos el texto en el fichero.
+		    	fw.write(datos);													
+		    	done = true;
+		    	System.out.println("IO > saveFile > ruta2 (f.name): " + ruta);
+		    } catch (IOException e1) {
+		    	System.out.println("Error, file couldn't be open.");
+		    	return done;
+		    }
 		}
-		return ruta;
+		return done;
 	}
 	
 	/**

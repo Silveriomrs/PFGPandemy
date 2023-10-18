@@ -40,8 +40,8 @@ import java.util.HashMap;
 /**
  * Vista de los archivos asociados a cada módulo del proyecto. 
  * @author Silverio Manuel Rosales Santana
- * @date 26 ago. 2021
- * @version 2.5
+ * @date 17 nov. 2023
+ * @version 2.8
  */
 public class Archivos extends JPanel {
 
@@ -106,13 +106,116 @@ public class Archivos extends JPanel {
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.
-		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL,Labels_GUI.TT_L_PRJ, ImagesList.CLIPBOARD);
-		iniciarLabels(TypesFiles.MAP,TypesFiles.get(TypesFiles.GRP),Labels_GUI.W_GRP_TITLE + ".", ImagesList.FILES_ICON_MAP);
-		iniciarLabels(TypesFiles.DEF,TypesFiles.get(TypesFiles.DEF),Labels_GUI.TT_L_DEF, ImagesList.FILES_ICON_DEF);
-		iniciarLabels(TypesFiles.REL,TypesFiles.get(TypesFiles.REL),Labels_GUI.TT_L_REL, ImagesList.NODES);
-		iniciarLabels(TypesFiles.PAL,TypesFiles.get(TypesFiles.PAL),Labels_GUI.TT_L_PAL, ImagesList.PAL);
-		iniciarLabels(TypesFiles.HST,TypesFiles.get(TypesFiles.HST),Labels_GUI.TT_L_HST, ImagesList.PLAYER);
+		//Las etiquetas son más generales que los botones => 
+		//Formato (tipo, nombre, tooltip, icono).
+		iniciarLabels(TypesFiles.PRJ,Labels_GUI.MDL, Labels_GUI.TT_L_PRJ, ImagesList.CLIPBOARD);
+		iniciarLabels(TypesFiles.MAP,Labels_GUI.GRP,Labels_GUI.W_GRP_TITLE, ImagesList.FILES_ICON_MAP);
+		iniciarLabels(TypesFiles.DEF,Labels_GUI.DEF,Labels_GUI.TT_L_DEF, ImagesList.FILES_ICON_DEF);
+		iniciarLabels(TypesFiles.REL,Labels_GUI.REL,Labels_GUI.TT_L_REL, ImagesList.NODES);
+		iniciarLabels(TypesFiles.PAL,Labels_GUI.PAL,Labels_GUI.TT_L_PAL, ImagesList.PAL);
+		iniciarLabels(TypesFiles.HST,Labels_GUI.HST,Labels_GUI.TT_L_HST, ImagesList.PLAYER);
 		contador = 0;															// Reiniciar el contardor de líneas a 0.
+	}
+	
+	/**
+	 * <p>Establece las facetas de las etiquetas descripticas</p> 
+	 * @param tipo Tipo de archivos que controla. Ver \ref modelo#TypesFiles .
+	 * @param nombre Nombre en la etiqueta.
+	 * @param tt Tooltip mensaje emergente.
+	 * @param ruta Ruta al icono de la etiqueta.
+	 */
+	private void iniciarLabels(String tipo, String nombre, String tt, String ruta) {
+		JLabel jl = new JLabel(nombre);
+		int posY = lineaBase + 30*contador;
+		generateControls(nombre.toLowerCase(),tipo,0);
+		contador++;
+		int w = 120;
+		int posX = 12;
+		jl.setToolTipText(tt);
+		addIconL(jl,ruta,wi,hi);
+		jl.setBounds(posX, posY, w, hi);
+		panelCentral.add(jl);
+	}
+	
+	/**
+	 * Genera todos los JTextFields necesarios para cubrir
+	 * tantos tipos de módulos como se añadan al grupo de elementos.
+	 *  Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
+	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
+	 * @param name Nombre del módulo sobre el que se realiza la acción.
+	 * @param type Tipo de datos al que generar el control.
+	 * @param posX Posición en las coordenadas X donde colocar el control.
+	 * @see #createFieldsInMap()
+	 */
+	private void generateControls(String name, String type, int posX){
+		JTextField jtf =  new JTextField();
+		int posY = lineaBase + 30*contador;
+		jtf.setEditable(false);
+		jtf.setEnabled(true);
+		jtf.setBounds(150,posY,300,hi);
+		jtf.setColumns(10);
+		jtf.setToolTipText(Labels_GUI.TT_FILE_SELECTED + " " + name);
+		jtf.setHorizontalAlignment(SwingConstants.LEFT);
+		panelCentral.add(jtf);
+		mapaFields.put(type,jtf);
+		
+		int xpos = 480;
+		int gap = 30;
+		iniciarBoton(OperationsType.OPEN, name, type, iconAbrir,xpos,posY,true);
+		iniciarBoton(OperationsType.SAVE_AS,name, type,iconGuardarComo,xpos + gap,posY,false);
+		iniciarBoton(OperationsType.SAVE, name, type,iconGuardarCambios,xpos + 2*gap,posY,false);		
+		iniciarBoton(OperationsType.EDIT, name, type,iconEditar,xpos + 3*gap,posY,false);
+		//Para los módulos esenciales de cualquier proyecto, no incluir botones de borrado.
+		if(!type.equals(TypesFiles.PRJ) && !type.equals(TypesFiles.DEF) && !type.equals(TypesFiles.MAP)) {
+			iniciarBoton(OperationsType.DELETE, name, type,iconBorrar,xpos + 4*gap,posY,false);
+		}
+	}
+
+	/**
+	 * <p>Inicia un botón con los parámetros generales que se requiere
+	 * para múltiples instancias que deben tener facetas comunes.</p> 
+	 * La función devuelve la propia instancia del botón con el fin de facilitar
+	 * el evitar perdidas de referencias.
+	 * @param op Nombre de la acción.
+	 * @param name Nombre del módulo al que se asocia el botón.
+	 * @param type Tipo de archivos o módulo particular.
+	 * @param ruta Ruta al archivo de imagen o icono que se adjunta en el botón.
+	 * @param posX Posición en la coordenada X del panelCentral.
+	 * @param posY Posición en la coordenada Y del panelCentral.
+	 * @param activado Habilita o desabilita incialmente el botón, TRUE activado, False en otro caso.
+	 */
+	private void iniciarBoton(OperationsType op, String name, String type, String ruta, int posX, int posY, boolean activado) {
+		//Creación y configuración del botón.
+		JButton boton = new JButton();
+		String tt = op.toString() + " " + name;
+		boton.setActionCommand(op.toString());
+		boton.addMouseListener(new ArchivoML(op, type));
+		boton.setToolTipText(tt);
+		addIconB(boton,ruta,wi,hi);
+		boton.setBounds(posX, posY, 27, hi);
+		boton.setEnabled(activado);
+		boton.setBorder(null);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		//Guardado del botón en el hashmap.
+		switch(op) {
+		case OPEN:
+			mBtnAbrir.put(type, boton);
+			break;
+		case SAVE:
+			mBtnGuardarCambios.put(type, boton);
+			break;
+		case SAVE_AS:
+		case EDIT:
+		case DELETE:
+			//Estos botones ya tienen configurado su Command, se aprovecha para añadir distincción.
+			mBotones.put(boton.getActionCommand() + " " + type, boton);
+			break;
+		default:
+			break;
+		}
+		//Añadirlo al panel
+		panelCentral.add(boton);
 	}
 
 	
@@ -228,113 +331,6 @@ public class Archivos extends JPanel {
 	}
 		
 	/**
-	 * <p>Establece las facetas de las etiquetas descripticas</p> 
-	 * @param ext Tipo de archivos que controla. Ver \ref modelo#TypesFiles .
-	 * @param nombre Nombre en la etiqueta.
-	 * @param tt Tooltip mensaje emergente.
-	 * @param ruta Ruta al icono de la etiqueta.
-	 */
-	private void iniciarLabels(String ext, String nombre, String tt, String ruta) {
-		JLabel jl = new JLabel(nombre);
-		int posY = lineaBase + 30*contador;
-		generateControls(ext,0);
-		contador++;
-		int w = 120;
-		int posX = 12;
-		jl.setToolTipText(tt);
-		addIconL(jl,ruta,wi,hi);
-		jl.setBounds(posX, posY, w, hi);
-		panelCentral.add(jl);
-	}
-
-	/**
-	 * <p>Inicia un botón con los parámetros generales que se requiere
-	 * para múltiples instancias que deben tener facetas comunes.</p> 
-	 * La función devuelve la propia instancia del botón con el fin de facilitar
-	 * el evitar perdidas de referencias.
-	 * @param op Nombre de la acción.
-	 * @param ext Tipo de archivos o módulo particular.
-	 * @param ruta Ruta al archivo de imagen o icono que se adjunta en el botón.
-	 * @param posX Posición en la coordenada X del panelCentral.
-	 * @param posY Posición en la coordenada Y del panelCentral.
-	 * @param activado Habilita o desabilita incialmente el botón, TRUE activado, False en otro caso.
-	 */
-	private void iniciarBoton(OperationsType op, String ext, String ruta, int posX, int posY, boolean activado) {
-		JButton boton = new JButton();
-		String tt = op.toString() + " .";
-		boton.setActionCommand(op.toString());  /*Punto clave, poner nombre o valor enum*/
-		boton.addMouseListener(new ArchivoML());
-		boton.setToolTipText(tt + ext);
-		addIconB(boton,ruta,wi,hi);
-		boton.setBounds(posX, posY, 27, hi);
-		boton.setEnabled(activado);
-		boton.setBorder(null);
-		boton.setBorderPainted(false);
-		boton.setContentAreaFilled(false);
-		addBotonHM(boton,ext);
-		panelCentral.add(boton);
-	}
-	
-	/**
-	 * <p>Genera todos los JTextFields necesarios para cubrir
-	 * tantos tipos de módulos como se añadan al grupo de elementos.</p>
-	 * Los tipos de elementos están almacenados inicialmente en el mapaFields interno.
-	 * <p>Para crear los controles ver {@link #createFieldsInMap} </p>
-	 * @param ext Tipo de datos al que generar el control.
-	 * @param posX Posición en las coordenadas X donde colocar el control.
-	 * @see #createFieldsInMap()
-	 */
-	private void generateControls(String ext, int posX){
-		JTextField jtf =  new JTextField();
-		int posY = lineaBase + 30*contador;
-		jtf.setEditable(false);
-		jtf.setEnabled(true);
-		jtf.setBounds(150,posY,300,hi);
-		jtf.setColumns(10);
-		jtf.setToolTipText(Labels_GUI.TT_FILE_SELECTED);
-		jtf.setHorizontalAlignment(SwingConstants.LEFT);
-		panelCentral.add(jtf);
-		mapaFields.put(ext,jtf);
-		
-		int xpos = 480;
-		int gap = 30;
-		iniciarBoton(OperationsType.OPEN,ext, iconAbrir,xpos,posY,true);
-		iniciarBoton(OperationsType.SAVE_AS,ext,iconGuardarComo,xpos + gap,posY,false);
-		iniciarBoton(OperationsType.SAVE,ext,iconGuardarCambios,xpos + 2*gap,posY,false);		
-		iniciarBoton(OperationsType.EDIT,ext,iconEditar,xpos + 3*gap,posY,false);
-		//Para los módulos esenciales de cualquier proyecto, no incluir botones de borrado.
-		if(!ext.equals(TypesFiles.PRJ) && !ext.equals(TypesFiles.DEF) && !ext.equals(TypesFiles.MAP)) {
-			iniciarBoton(OperationsType.DELETE,ext,iconBorrar,xpos + 4*gap,posY,false);
-		}
-	}
-		
-	/**
-	 * <p>Inicializa los mapas de los elementos característicos</p>
-	 * @param btn JButton a introducir en el grupo correspondiente.
-	 * @param ext Tipo de archivos a los que hace referencia dicho boton.
-	 */
-	private void addBotonHM(JButton btn, String ext) {
-		String tipo = btn.getActionCommand();
-		OperationsType op = OperationsType.getNum(tipo);
-		switch(op) {
-		case OPEN:
-			mBtnAbrir.put(ext, btn);
-			break;
-		case SAVE:
-			mBtnGuardarCambios.put(ext, btn);
-			break;
-		case SAVE_AS:
-		case EDIT:
-		case DELETE:
-			//Estos botones ya tienen configurado su Command, se aprovecha para añadir distincción.
-			mBotones.put(btn.getActionCommand() + " " + ext, btn);
-			break;
-		default:
-			break;
-		}	
-	}
-	
-	/**
 	 * <p>Particularación de la función isEmpty de los componentes</p>
 	 * La particularización estriba en que previamente comprueba que existe dicho
 	 * campo mendiante la etiqueta (extensión) y obtiene el componente en caso 
@@ -427,22 +423,31 @@ public class Archivos extends JPanel {
 	 * @version versión 2.1
 	 */
 	private class ArchivoML extends MouseAdapter {
+		private String tipo;
+		private OperationsType op;
+		
+		/**
+		 * Constructor de la clase que gestiona la acción del control al que se asocia.
+		 * @param op Tipo de operación que gestiona el botón.
+		 * @param type Tipo de módulo sobre el que se gestiona la acción.
+		 */
+		public ArchivoML(OperationsType op, String type) {
+			this.tipo = type;
+			this.op = op;
+		}
+		
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			boolean realizado = false;
-			JButton btn = (JButton) e.getSource();								//Identificar botón.
-			String tt = btn.getToolTipText();
-			//Los valores de tipos van en minúscula.
-			String ext = tt.substring(tt.length() -3, tt.length()).toLowerCase();
-			//Identificador de operación (abrir o guardar).
-			String op = btn.getActionCommand();		
+			//Identificar botón.
+			JButton btn = (JButton) e.getSource();
 			if(btn.isEnabled()){	
-				realizado = cm.doActionArchivos(op, ext);
+				realizado = cm.doActionArchivos(op, tipo);
 			}
-			
+					
+			if(op == OperationsType.OPEN && realizado) enableBotonesGuardado(TypesFiles.PRJ, realizado);
+			else if(realizado) enableBotonesGuardado(tipo,false);
 			refresh();
-			if(op.equals("Abrir") && realizado) enableBotonesGuardado(TypesFiles.PRJ, realizado);
-			else if(realizado) enableBotonesGuardado(ext,false);
 		}
 	}
 	

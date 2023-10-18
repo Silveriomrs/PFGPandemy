@@ -543,7 +543,6 @@ public class Pizarra extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Activamos el botón de guardado en cuanto ha habido un cambio.
-			String op = OperationsType.CHANGES.toString();
 			modificado = true;
 			//Obtener los nombres de los items seleccionados en los ComboBox
 			String item1 = comboBoxAsignar.getSelectedItem().toString();
@@ -559,7 +558,7 @@ public class Pizarra extends JFrame {
 			//Actualización de los controles en función del nuevo contexto.
 			updateControls();
 			//Avisar al controlador de que se ha producido un cambio.
-			cm.doActionPizarra(op);
+			cm.doActionPizarra(OperationsType.CHANGES);
 		}
 
 		/**
@@ -666,7 +665,7 @@ public class Pizarra extends JFrame {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Selección de imagen de fondo.
-    		cm.doActionPizarra(OperationsType.OPEN.toString());
+    		cm.doActionPizarra(OperationsType.OPEN);
     	}
     }
     
@@ -687,7 +686,7 @@ public class Pizarra extends JFrame {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Llamada al controlador para efectuar la acción pertinente.
-    		boolean resultado = cm.doActionPizarra(OperationsType.SAVE.toString());
+    		boolean resultado = cm.doActionPizarra(OperationsType.SAVE);
     		if(resultado) {
     			//Si se ha guardado, desactivar modificado => desactivar botón guardado.
     			modificado = !resultado;

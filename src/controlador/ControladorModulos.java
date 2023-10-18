@@ -75,7 +75,7 @@ public class ControladorModulos {
 	
 	private int w = 1024;
 	private int h = 768;
-	private String panelActivo = "None";
+	private OperationsType panelActivo = null;
 	
 	
 	/**
@@ -635,39 +635,39 @@ public class ControladorModulos {
 	
 	/**
 	 *  Realiza la acción concreta indicada desde la vista que ha realizado la llamada.
-	 * @param nombre Nombre de la acción.
+	 * @param op Nombre de la acción.
 	 */
-	public void doActionPrincipal(String nombre) {
+	public void doActionPrincipal(OperationsType op) {
 		//
-		switch(nombre){
-			case Labels_GUI.W_PLAYER_TITLE:
+		switch(op){
+			case PLAY:
 				situarVentana(ModuleType.PLAYER, principal.getX() - 350, principal.getY() + h/3);
 				play();
-				mostrarPanel(Labels_GUI.W_MAP_TITLE);
+				mostrarPanel(op);
 				break;
-			case Labels_GUI.W_GE_TITLE:
+			case EDIT_GRAPHIC:
 				this.pizarra.reset();
 				this.pizarra.toogleVisible();
 				break;
-			case Labels_GUI.W_PE_TITLE:
+			case EDIT_PAL:
 				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(true);
 				paleta.setFrameVisible(true);
 				break;
-			case Labels_GUI.W_PAL_TITLE:
+			case VIEW_PAL:
 				situarVentana(ModuleType.PAL, principal.getX() + w + 10, principal.getY());
 				paleta.setEditable(false);
 				paleta.toggleFrameVisible();
 				break;
-			case Labels_GUI.W_MAP_TITLE:
-			case Labels_GUI.W_GRP_TITLE:
-			case Labels_GUI.W_TE_TITLE:
-			case Labels_GUI.W_DEF_TITLE:
-			case Labels_GUI.MVER_PRJ:
-				mostrarPanel(nombre);
+			case VIEW_MAP:
+			case VIEW_GRP:
+			case EDIT:
+			case VIEW_DEF:
+			case VIEW_PRJ:
+				mostrarPanel(op);
 				break;
-			case Labels_GUI.W_REL_TITLE: editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
-			case Labels_GUI.M_OPEN_PRJ:
+			case VIEW_REL: editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
+			case OPEN:
 				String path = cio.selFile(1, TypesFiles.PRJ)[0];
 				DCVS prj = cio.abrirArchivo(path,TypesFiles.PRJ);
 				if(prj != null) {
@@ -675,7 +675,7 @@ public class ControladorModulos {
 					abrirProyecto(prj);
 				}
 				break;
-			case Labels_GUI.M_IMPORT_PA:
+			case IMPORT_A:
 				DCVS pVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
@@ -684,7 +684,7 @@ public class ControladorModulos {
 				}
 				else if(pVS != null) showMessage(Labels_GUI.ERR_FILE_UNKNOWN,0);
 				break;
-			case Labels_GUI.M_IMPORT_PB:	
+			case IMPORT_B:	
 				//Formato de importación CSV
 				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
@@ -694,26 +694,26 @@ public class ControladorModulos {
 				}
 				else if(hVS != null) showMessage(Labels_GUI.ERR_FILE_UNKNOWN,0);
 				break;		
-			case Labels_GUI.M_NEW_PRJ:
+			case NEW:
 				newProject();
 				break;
-			case Labels_GUI.M_SAVE_PRJ:
+			case SAVE:
 				saveModule(TypesFiles.PRJ,true);
 				break;
-			case Labels_GUI.M_EXIT:
+			case EXIT:
 				if(showMessage(Labels_GUI.WARNING_1_DATA_LOSS + "\n" + Labels_GUI.REQUEST_EXIT_CONFIRM,3) == JOptionPane.YES_OPTION) System.exit(0);
 				break;
-			case Labels_GUI.MHELP_TABLES:
+			case HELP_TABLES:
 				cio.openPDF("mTablas");
 				break;
-			case Labels_GUI.MHELP_USER_GUIDE:
+			case HELP_USER_GUIDE:
 				cio.openPDF("mUsuario");
 				break;
-			case Labels_GUI.MHELP_ABOUT:
+			case HELP_ABOUT:
 				about.toggleVisible();
 				break;
 			default:
-				System.out.println("CM > doPrincipal: " + nombre + ", opción no reconocida");
+				System.out.println("CM > doPrincipal: " + op + ", opción no reconocida");
 		}
 	}
 	
@@ -721,13 +721,13 @@ public class ControladorModulos {
 	 * Establece la vista que debe ser visible.
 	 * @param nombre Nombre de la vista a hacer visible.
 	 */
-	private void mostrarPanel(String nombre) {
+	private void mostrarPanel(OperationsType nombre) {
 		//Mostrar panel correspondiente y ocultación del resto.
-		mapa.setVisible(nombre.equals(Labels_GUI.W_MAP_TITLE));					
-		tableEditor.setVisible(nombre.equals(Labels_GUI.W_TE_TITLE));
-		pgrupos.setVisible(nombre.equals(Labels_GUI.W_GRP_TITLE));
-		pproyecto.setVisible(nombre.equals(Labels_GUI.MVER_PRJ));
-		vistaSIR.setVisible(nombre.equals(Labels_GUI.W_DEF_TITLE));
+		mapa.setVisible(nombre == OperationsType.VIEW_MAP);					
+		tableEditor.setVisible(nombre == OperationsType.EDIT);
+		pgrupos.setVisible(nombre == OperationsType.VIEW_GRP);
+		pproyecto.setVisible(nombre == OperationsType.VIEW_PRJ);
+		vistaSIR.setVisible(nombre == OperationsType.VIEW_DEF);
 	}
 	
 	/**
@@ -783,10 +783,10 @@ public class ControladorModulos {
 	 * @param op Tipo de operación a realizar. (Ej: Guardar o Aplicar cambios de poligonos).
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
-	public boolean doActionPizarra(String op) {
+	public boolean doActionPizarra(OperationsType op) {
 		boolean done = true;
-		OperationsType opr = OperationsType.getNum(op);
-		switch(opr) {
+//TODO: Eliminar después de que funcione  OperationsType opr = OperationsType.getNum(op);
+		switch(op) {
 		case CHANGES:
 			//Actualiza el mapa.
 			mapa.reset();
@@ -945,30 +945,29 @@ public class ControladorModulos {
 	 * correspondientes al módulo correspondiente (entrada salida de archivos).
 	 * Finalmente devolverá el resultado de la carga o guardado de la operación
 	 * desde la ruta especifícada.
-	 * @param op Operación a realizar "Abrir", "Guardar", "Guardar como".
+	 * @param op Operación a realizar "Abrir", "Guardar", "Guardar como". @see modelo#OperationsType
 	 * @param ext Extensión del tipo de datos, equivalente a los disponibles en
 	 * la clase IO.
 	 * @return TRUE si la operación ha concluido correctamente, FALSE en otro caso.
 	 */
-	public boolean doActionArchivos(String op, String ext) {
-		boolean ok = true;														//Indica si la operación ha tenido exito o no.
-		OperationsType opr = OperationsType.getNum(op);
+	public boolean doActionArchivos(OperationsType op, String ext) {
+		boolean done = true;														//Indica si la operación ha tenido exito o no.
 		//Opciones de Carga de módulo, NO módulo PRJ.
-		switch(opr) {
-		case OPEN:  ok = openModule(ext); break;
-		case DELETE: ok = removeModule(ext); break;
+		switch(op) {
+		case OPEN:  done = openModule(ext); break;
+		case DELETE: done = removeModule(ext); break;
 		case EDIT: 
 			editModule(ext);
-			ok = false;															//Evitar desabilitar botón de guardar como.
+			done = false;															//Evitar desabilitar botón de guardar como.
 		break;
-		case SAVE_AS: ok = saveModule(ext,true); break;
-		case SAVE: ok = saveModule(ext,false); break;
+		case SAVE_AS: done = saveModule(ext,true); break;
+		case SAVE: done = saveModule(ext,false); break;
 		default:
-			System.out.println("CM > doActionArchivos > Unknown option: " + opr.toString());
+			System.out.println("CM > doActionArchivos > Unknown option: " + op);
 		}
 		
 		refresh();
-		return ok;
+		return done;
 	} 
 	
 	/* Acciones TableEditor */

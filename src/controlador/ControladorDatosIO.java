@@ -54,15 +54,11 @@ public class ControladorDatosIO {
 	/**
 	 * Función general para guardar datos en formato texto en el disco.
 	 * @param datos Tipo de datos a guardar. Pueden ser de configuración, datos, etc.
-	 * @param ruta Ruta completa incluyendo nombre con extensión al fichero.
-	 * @param name Nombre del fichero donde se almacenará.
-	 * @param ext Extensión del fichero.
+	 * @param Conjuntos de atributos del archivo en un array de cadenas de texto: {Ruta,Directorio,nombre,extensión}.
+	 * 	Donde la ruta es la ruta completa al archivo, con su nombre completo.
 	 * @return Ruta completa al fichero donde se han almacenado los datos. Null en otro caso.
 	 */
-	public boolean guardarArchivo2(String datos, String[] fileAttr) {
-		//TODO: Mal como en IO. Hay que restructurarlo del todo.
-		return io.saveFile2(datos,fileAttr);
-	}
+	public boolean saveFile(String datos, String[] fileAttr) {return io.saveFile(datos,fileAttr);}
 	
 	/**
 	 * Selecciona un archivo del disco, o establece su nombre. Puede recibir un

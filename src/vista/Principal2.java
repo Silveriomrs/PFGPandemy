@@ -35,7 +35,7 @@ import java.awt.Toolkit;
  * @version 2.9
  *
  */
-public class Principal extends JFrame {
+public class Principal2 extends JFrame {
 
 	private static final long serialVersionUID = -1830456885294124447L;
 	/** FRAME Configuración del tamaño en pixels de la aplicación con el marco.*/
@@ -52,8 +52,8 @@ public class Principal extends JFrame {
 	 * Crea el módulo principal de la aplicación.
 	 * @param cm Controlador de las vistas y módulos.
 	 */
-	public Principal(ControladorModulos cm) {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource(ImagesList.P_LOGO)));
+	public Principal2(ControladorModulos cm) {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal2.class.getResource(ImagesList.P_LOGO)));
 		int w = 1024;
 		int h = 768;
 		this.cm = cm;

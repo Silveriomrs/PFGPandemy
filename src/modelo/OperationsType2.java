@@ -14,7 +14,7 @@ package modelo;
  * @date 17 oct. 2023
  * @version versión 1.2
  */
-public enum OperationsType {
+public enum OperationsType2 {
 	//TODO: Añadir comentarios JavaDOC a las nuevas entradas.
 	/** Acción de aplicar un cambio*/
 	APPLY(Labels_GUI.APPLY),
@@ -78,7 +78,7 @@ public enum OperationsType {
 	END("Final");
 
     private final String display;
-    private OperationsType(String s) { display = s; }
+    private OperationsType2(String s) { display = s; }
 
     @Override
     public String toString() { return display; }
@@ -88,9 +88,9 @@ public enum OperationsType {
      * @param value Valor del enúmerado (descripción)
      * @return Enumerado. Null en otro caso.
      */
-    public static OperationsType getNum(String value) {
-    	OperationsType[] values = values();
-    	OperationsType op = null;
+    public static OperationsType2 getNum(String value) {
+    	OperationsType2[] values = values();
+    	OperationsType2 op = null;
     	boolean done = false;	
     	int max = values.length;
     	int i = 0;

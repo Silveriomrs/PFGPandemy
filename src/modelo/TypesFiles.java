@@ -13,7 +13,8 @@ import java.util.HashMap;
 /**
  * Clase coordinadora de los tipos de archivos, módulos, 
  * extensiones y cualquie otra vicisitud que sea requerida por el sistema.
- * Usa etiquetas para la relación con extensiones y archivos.
+ * Usa etiquetas para la relación con extensiones de los archivos, en el momento de acceder
+ *  al sistema de almacenamiento.
  * @author Silverio Manuel Rosales Santana
  * @date 17 nov. 2021
  * @version versión 1.0
