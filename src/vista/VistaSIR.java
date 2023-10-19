@@ -332,7 +332,20 @@ public class VistaSIR extends JPanel{
 		else btnExecute.setBackground(Color.GRAY);
 	}
 
-	//TODO: Las funciones CHECK deben ser comprobadas y revisadas.
+	/**
+	 * Realiza un chequeo de todos los campos.
+	 * <p>En caso de que uno de los campos contenga un valor incorrecto retornará
+	 *  FALSE.</p>
+	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
+	 */
+	private boolean checkFields() {
+		boolean done = true;
+		for (String clave:mapaFields.keySet()) {
+		    if(!checkValue(clave)) done = false;
+		}
+
+		return done;
+	}
 	
 	/**
 	 * <p>Comprueba si un valor es un dato númerico correcto. </p>
@@ -340,6 +353,8 @@ public class VistaSIR extends JPanel{
 	 *  no númericos. Tampoco admite números negativos.
 	 * @param label Etiqueta del campo a evaluar
 	 * @return TRUE si cumple las condiciones. FALSE en otro caso.
+	 * @exception ArithmeticException en caso de un valor negativo.
+	 * @exception Exception en caso de error al ejecutar parseDouble(num).
 	 */
 	private boolean checkValue(String label) {
 		boolean resultado = true;
@@ -356,33 +371,18 @@ public class VistaSIR extends JPanel{
 		return resultado;
 	}
 
-	/**
-	 * <p>Realiza un chequeo de todos los campos.</p>
-	 * En caso de que uno de los campos contenga un valor incorrecto retornará
-	 *  FALSE.
-	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
-	 */
-	private boolean checkFields() {
-		boolean done = true;
-		for (String clave:mapaFields.keySet()) {
-		    if(!checkValue(clave)) done = false;
-		}
-
-		return done;
-	}
 
 
 	/* Clases privadas */
 
 	/**
-	 * <p>Clase encargada de detectar la pulsación del botón aplicar</p>
-	 * Cuando es pulsado, intercambia la información necesaria con el controlador.
+	 * Clase encargada de detectar la pulsación del botón aplicar
+	 * <p>Cuando es pulsado, intercambia la información necesaria con el controlador.</p>
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 19 nov. 2021
-	 * @version versión 1.0
+	 * @version versión 1.2
 	 */
 	private class BotonL extends MouseAdapter {
-//TODO: Está acoplado en cierto modo. Quitar esos toString para OpeartionsType
 		private OperationsType op;
 		private boolean btnActivo;
 		
@@ -403,10 +403,9 @@ public class VistaSIR extends JPanel{
 			btnActivo = ((Component) evt.getSource()).isEnabled();
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
 			//Avisa al controlador de cambios.
-			//TODO: No funciona el seleccionador IP.
 			switch(op) {
 			case APPLY: checkEmptyFields(); break;
-			case CHANGES: IP = !IP; break;  //chckbxIP.isSelected()
+			case CHANGES: IP = chckbxIP.isSelected();break;
 			case EXECUTE: break;
 			default:
 			}
@@ -417,7 +416,12 @@ public class VistaSIR extends JPanel{
 			refresh();
 		}
 		
-		//TODO: Comentar correctamente
+		/**
+		 * Realiza un recorrido por los diferentes campos de la vista, comprobando que no contiene
+		 *  valores nulos o espacios en blanco.
+		 *  <P>También comprueba que los valores númericos sean correctos y mayores que cero.</P>
+		 *  En caso de error, muestra un mensaje acorde al valor erroneo encontrado.
+		 */
 		private void checkEmptyFields() {
 			mapaFields.forEach((label,field) ->{
 				String valor = getLabel(label);

@@ -1228,20 +1228,16 @@ public class ControladorModulos {
 		//extraer datos de los fields y actualizar con los mismos el módulo.
 		boolean done = true;	
 		System.out.println(op);
-		
+		done = updateMSIR();
 		switch(op) {
 		case APPLY: 
-			done = updateMSIR();
 			//Solo es la vista de las zonas => solo puede haber ocurrido cambios a guardar.
 			archivos.enableBotonesGuardado(TypesFiles.DEF, true);
 			break;
 		case EXECUTE:
-			//TODO: Aquí este update no tiene sentido. Repensar.
-			done = updateMSIR();
-			//Checar si valores OK
-			// Si valores OK. Ejecutar motorSIR
+			//Comprobar si valores OK. Si valores OK. Ejecutar motorSIR
 			// runSIR(double pte, double dme, boolean ip, double dmi) 
-			runSIR();
+			if(done) runSIR();
 			break;
 		default:
 		}
