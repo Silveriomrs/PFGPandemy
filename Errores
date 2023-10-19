@@ -68,4 +68,9 @@ General
 > a usar, carga desde un HashMap el idioma que se ha seleccionado entre los disponibles.
 > Separar en dos ramas como se comenzó en su momento y no se terminó... textos y operaciones.
 
-
+General
+--------
+JavaDOC no funciona, comprobar en el ordenador donde si:
+? si existe una carpeta DOC en el proyecto con el JavaDO
+? Versión JDK usada
+? Configuración del BuildPath para comparar.
