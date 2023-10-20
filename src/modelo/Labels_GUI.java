@@ -6,6 +6,8 @@
 */  
 package modelo;
 
+import java.util.HashMap;
+
 /**
  * Contenedor de todas los textos que componen la interfaz gráfica.
  * Idioma usado: Español
@@ -14,9 +16,6 @@ package modelo;
  * @version versión 1.0
  */
 public class Labels_GUI {
-	//TODO: Desacoplar si es necesario, para poder usar multiples idiomas.
-	//Opción 1... cargar desde exterior fichero de idioma y adjuntar a un HashMap.
-	//Opción 2... cargar desde exterior fichero de idioma y asígnar leyendo etiqueta > dato asignado.
 	
 	/*Archivos*/
 	public static String W_FILES_TITLE = "Módulo de Archivos";
@@ -284,4 +283,21 @@ public class Labels_GUI {
 	public static String MODEL_A = "Archivo Modelo A";
 	public static String MODEL_B = "Archivo Modelo B";
 	public static String PLAYER = "Player";
+	
+	//TODO: para aplicar la solución del idioma vamos a proceder: Cargar en un HashMap los valores.
+	// cargar desde exterior fichero de idioma y adjuntar a un HashMap del que se iniciaran los valores.
+	
+	//Usa un HashMap con la idea de que en el futuro, el cambio de idioma sea en caliente.
+	private static HashMap<String,String> mapLang;
+	
+	
+	public Labels_GUI() {
+		mapLang = new HashMap();
+		updateLANG();
+		this.REL = mapLang.get(REL);
+	}
+	
+	private static void updateLANG() {
+		mapLang.put(REL, "Arco iris");
+	}
 }

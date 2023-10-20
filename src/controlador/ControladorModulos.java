@@ -41,8 +41,12 @@ import vista.VistaSIR;
  */
 public class ControladorModulos {
  
+	//Necesario iniciarlo al menos una vez en el proyecto y ambas deben ser las primeras en ejecutarse.
 	@SuppressWarnings("unused")
-	private Labels labels;														//Necesario iniciarlo al menos una vez en el proyecto.
+	private Labels labels;														
+	private Labels_GUI labels_gui;
+	
+	
 	private Paleta paleta;
 	private ControladorDatosIO cio;
 	//Vistas
@@ -82,6 +86,7 @@ public class ControladorModulos {
 	 */
 	public ControladorModulos() {
 		labels = new Labels();
+		labels_gui = new Labels_GUI();
 		//Inicio del mapa de módulos.
 		modulos = new HashMap<String, DCVS>();
 		zonas = new HashMap<Integer,Zona>();
