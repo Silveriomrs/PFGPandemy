@@ -60,15 +60,15 @@ public class ControladorModulos {
 	private HashMap<Integer,Zona> zonas;
 	//
 	private ParserPoly parserPoly;
-	//Obtener dimensiones de la pantalla para controlar donde aparecen los módulos.
-	Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
-
+	
+	/** Obtener dimensiones de la pantalla para controlar donde aparecen los módulos. */
+	public static Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
 	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/  
-	public final static Dimension FrameDim = new Dimension(1024, 768);
+	public static Dimension FrameDim = new Dimension(1024, 768);
 	/** PanelCentralDim Dimensión del panel central para estandarizar el aspecto de los diferentes paneles de toda la aplicación */  
-	public final static Dimension PanelCentralDim = new Dimension(1024, 768);
+	public static Dimension PanelCentralDim = new Dimension(1024, 768);
 	/** MinDim damaño mínimo para todo marco o panel de la aplicación*/  
-	public final static Dimension MinDim = new Dimension(800, 600);
+	public static Dimension MinDim = new Dimension(800, 600);
 
 	private final String separador = System.getProperty("file.separator");
 	
@@ -783,7 +783,6 @@ public class ControladorModulos {
 	 */
 	public boolean doActionPizarra(OperationsType op) {
 		boolean done = true;
-//TODO: Eliminar después de que funcione  OperationsType opr = OperationsType.getNum(op);
 		switch(op) {
 		case CHANGES:
 			//Actualiza el mapa.
@@ -1227,7 +1226,6 @@ public class ControladorModulos {
 	public boolean doActionVistaSIR(OperationsType op) {
 		//extraer datos de los fields y actualizar con los mismos el módulo.
 		boolean done = true;	
-		System.out.println(op);
 		done = updateMSIR();
 		switch(op) {
 		case APPLY: 

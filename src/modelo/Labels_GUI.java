@@ -205,7 +205,7 @@ public class Labels_GUI {
 	public static String BTN_RUN_SIMULATION = "Ejecutar simulación";
 	public static String NAME_PANEL_SIR = "Vista parámetros SIR";
 	public static String VALUE_FIELD = "El valor del campo ";
-	public static String VALUE_WRONG = "  es incorrecto: ";
+	public static String VALUE_WRONG = " es incorrecto ";
 	public static String WRONG_VALUE = "Valor incorrecto";
 	public static String NO_ASSIGNED = "No asignado";
 	public static String NAME = "Nombre:";

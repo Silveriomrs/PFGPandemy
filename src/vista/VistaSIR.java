@@ -87,7 +87,6 @@ public class VistaSIR extends JPanel{
 	 * Función general para crear la vista y sus controles.
 	 */
 	private void configurar() {
-		//TODO: Aquí también desacoplar mensajes
 		//Botón aplicar.
 		btnAplicar = new JButton(Labels_GUI.APPLY);
 		btnAplicar.addMouseListener(new BotonL(OperationsType.APPLY));
@@ -340,21 +339,23 @@ public class VistaSIR extends JPanel{
 	 */
 	private boolean checkFields() {
 		boolean done = true;
+		int count = 0;
 		for (String clave:mapaFields.keySet()) {
-		    if(!checkValue(clave)) done = false;
+		    if(!checkValue(clave)) { count++; }
 		}
+		//Si hay uno o más campos mal formados, devolverá false. 
+		done = count == 0;
 
 		return done;
 	}
 	
 	/**
-	 * <p>Comprueba si un valor es un dato númerico correcto. </p>
-	 * Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
-	 *  no númericos. Tampoco admite números negativos.
+	 * Comprueba si un valor es un dato númerico correcto.
+	 * <p>Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
+	 *  no númericos. Tampoco admite números negativos.</p>
 	 * @param label Etiqueta del campo a evaluar
 	 * @return TRUE si cumple las condiciones. FALSE en otro caso.
-	 * @exception ArithmeticException en caso de un valor negativo.
-	 * @exception Exception en caso de error al ejecutar parseDouble(num).
+	 * @exception ArithmeticException en caso de un valor negativo. Exception general en caso de carácter incorrecto.
 	 */
 	private boolean checkValue(String label) {
 		boolean resultado = true;
@@ -383,12 +384,16 @@ public class VistaSIR extends JPanel{
 	 * @version versión 1.2
 	 */
 	private class BotonL extends MouseAdapter {
+		/** Operación asociada a la instancia de la clase.*/
 		private OperationsType op;
-		private boolean btnActivo;
 		
+		/**
+		 * El constructor recibe el tipo ded operación al que se asocia la clase.
+		 *  Esta tipo, será el que se envíe al modulo controlador para identificar la acción a realizar.
+		 * @param op Tipo de operación asociada.
+		 */
 		public BotonL(OperationsType op) {
 			this.op = op;
-			btnActivo = false;
 		}
 		
 		/**
@@ -400,13 +405,17 @@ public class VistaSIR extends JPanel{
 		 */
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			btnActivo = ((Component) evt.getSource()).isEnabled();
+			boolean btnActivo = ((Component) evt.getSource()).isEnabled();
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
 			//Avisa al controlador de cambios.
 			switch(op) {
 			case APPLY: checkEmptyFields(); break;
 			case CHANGES: IP = chckbxIP.isSelected();break;
-			case EXECUTE: break;
+			case EXECUTE: 
+				btnActivo = checkFields();
+				//En caso de un error, desactivar botón de ejecutar.
+				((Component) evt.getSource()).setEnabled(btnActivo);
+				break;
 			default:
 			}
 			
@@ -427,7 +436,7 @@ public class VistaSIR extends JPanel{
 				String valor = getLabel(label);
 				if(valor != null && !valor.equals("") && !checkValue(label)) {
 					setLabel(label,null);
-					cm.showMessage(Labels_GUI.VALUE_FIELD + Labels.getWord(label) + Labels_GUI.VALUE_WRONG + valor, 0);
+					cm.showMessage(Labels_GUI.WRONG_VALUE + " (" + valor + ")\n" + Labels_GUI.VALUE_FIELD  +  Labels.getWord(label) + Labels_GUI.VALUE_WRONG , 0);
 				}
 			});
 		}

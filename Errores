@@ -1,44 +1,12 @@
 [actualizado 17/10/2023]
 
 ======================================================================================================
-Corregir
-=========
+Corregir (PRIORITARIO)
+======================
 
 
-General
---------
-+El archivo PRJ puede contener referencias nulas o erróneas.
-++¿Cómo manejarlas? Avisar, en caso de ser un dato crítico, no continuar con la carga u ofrecer corrección
-	a través del TableEditor.
-++¿Qué política aplicar? Ignorar, no cargar.
-
-+Al cargar un MAP (grupo de población) desde Archivos, da warning (si NG != NGprevio), indica que no lo cargará, 
-	pero lo carga y no modifica el NG del proyecto, tampoco genera el REL adecuado.
-	
-	> NG == NGPrevio > avisar de modificaciones en el proyecto y proceder generando REL en concordancia y
-		eliminando (si existe) el HST correspondiente.
-	> NG != NGPrevio && NGPRevio == 0 > lo mismo que el punto anterior.
-	> NG != NGPrevio > Avisar de incompatibilidad, interrogar sobre si continuar.
-		>Continuar > modificar etiqueta NG de PRJ, eliminar HST y regenerar REL.
-		>No Continuar > no cargar.
-ejemplo:
-Mapas
-CM > OpenModule > Tipo: map, NG: 0 / filas de datos: 4
-CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2
 
 
-Modulo Enfermedad
-------------------
-Cuando se cargan todos los módulos y se genera un HST, si luego se dejan campos en blanco, 
-	el botón de generar HST sigue activo y al pulsarse se produce un error.
-
-
-CM
-------------------
-Al importar un proyecto en ParametrosProyecto se llama demasiadas veces al parser. ¿por qué?
-	Para detectarlo se reproduce un error que hace saltar el parser y de esa forma detectar el excesivo número de llamadas.
-	ParametrosProyecto > Error de parser de fechas: 
-	> ¿Por qué repite el error tantas veces si sólo hay dos fechas? 12 veces se repite => 6 llamadas al cargar.
 
 
 ======================================================================================================
@@ -71,6 +39,35 @@ General
 General
 --------
 JavaDOC no funciona, comprobar en el ordenador donde si:
-? si existe una carpeta DOC en el proyecto con el JavaDO
-? Versión JDK usada
-? Configuración del BuildPath para comparar.
+? si existe una carpeta DOC en el proyecto con el JavaDO ? NO
+? Versión JDK usada ? >JRE 11 y JDK 11 en proyecto, JDK 17 en configuración general.
+? Configuración del BuildPath para comparar. ? parecen identicas.
+? En sistema alguna librería instalada y no en las otras? Default-jdk, headless
+
+CM
+------------------
+Al importar un proyecto en ParametrosProyecto se llama demasiadas veces al parser. ¿por qué?
+	Para detectarlo se reproduce un error que hace saltar el parser y de esa forma detectar el excesivo número de llamadas.
+	ParametrosProyecto > Error de parser de fechas: 
+	> ¿Por qué repite el error tantas veces si sólo hay dos fechas? 12 veces se repite => 6 llamadas al cargar.
+	
+General
+--------
++El archivo PRJ puede contener referencias nulas o erróneas.
+++¿Cómo manejarlas? Avisar, en caso de ser un dato crítico, no continuar con la carga u ofrecer corrección
+	a través del TableEditor.
+++¿Qué política aplicar? Ignorar, no cargar.
+
++Al cargar un MAP (grupo de población) desde Archivos, da warning (si NG != NGprevio), indica que no lo cargará, 
+	pero lo carga y no modifica el NG del proyecto, tampoco genera el REL adecuado.
+	
+	> NG == NGPrevio > avisar de modificaciones en el proyecto y proceder generando REL en concordancia y
+		eliminando (si existe) el HST correspondiente.
+	> NG != NGPrevio && NGPRevio == 0 > lo mismo que el punto anterior.
+	> NG != NGPrevio > Avisar de incompatibilidad, interrogar sobre si continuar.
+		>Continuar > modificar etiqueta NG de PRJ, eliminar HST y regenerar REL.
+		>No Continuar > no cargar.
+ejemplo:
+Mapas
+CM > OpenModule > Tipo: map, NG: 0 / filas de datos: 4
+CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2
