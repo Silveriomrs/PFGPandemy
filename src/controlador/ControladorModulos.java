@@ -987,7 +987,7 @@ public class ControladorModulos {
 	
 	/**
 	 * Realizas las acciones oportundas pertenecientes al módulo editor de tablas.
-	 * @param modulo Módulo con los datos que esperan ser guardados tras modificación.
+	 * @param op Tipo de operación a realizar por parte del controlador de módulos.
 	 * @return TRUE si la operación ha tenido exito, FALSE en otro caso.
 	 */
 	public boolean doActionTableEditor(OperationsType op) {

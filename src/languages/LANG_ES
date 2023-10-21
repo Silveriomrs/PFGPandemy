@@ -1,0 +1,210 @@
+W_FILES_TITLE,Módulo de Archivos
+W_MODULES_TITLE,Modulos
+FILES_PANEL_NAME,Vista de módulos cargados
+TT_FILES_PANEL,Selección archivos asignados a los módulos.
+TT_W_FILES,Visulación de los ficheros asignados a cada módulo.
+TT_FILE_SELECTED,Archivo seleccionado
+TT_L_PRJ,Archivo con los parámetros del modelo.
+TT_L_DEF,Archivo con la definición propia de la enfermedad.
+TT_L_REL,Matriz de contactos. Refleja las relaciones entre los grupos
+TT_L_PAL,Paleta de colores personalizada.
+TT_L_HST,Histórico de evolución con los datos de la simulación.
+PATH_NO_DEFINED,Datos sin destino definido.
+ERR_FILE_UNKNOWN,Archivo seleccionado no reconocido.
+ERR_MSG_1_CM,Archivo de proyecto incorrecto. \nReferencia un módulo que no está contenido en la misma carpeta:\n 
+WARNING_1_DATA_LOSS,Los cambios no guardados se perderán
+REQUEST_EXIT_CONFIRM,¿Desea salir del programa?
+ERR,Error
+INF,Información
+WARN,¡Antención!
+QST,Consulta
+WARNING_2_OVERWRITE,Se escribirán los datos en disco\n¿continuar?
+ERR_LOAD_MODULE,No se puede cargar el módulo: 
+ERR_MODULE_LESS_NG,dicho módulo no tiene definido suficientes parámetros para\nel número de grupos de población indicados en el modelo
+L_BORDER_PANEL_TE,Editor General
+L_BORDER_PANEL_MAP,Visor de Mapa
+L_BORDER_PANEL_GRP,Visor Grupos de Poblaci\u00F3n
+L_BORDER_PANEL_PRJ,Parámetros del Modelo
+L_BORDER_PANEL_DEF,Configuraci\u00F3n SIR
+TE_TITLE_EXTERNAL,Editando modulo: 
+DEFAULT_NAME_GRP,Grupo
+M_VER,Ver
+M_CASOS,Casos
+M_TASAS,Tasas
+M_TASA,Tasa
+L_X,Nivel
+L_Y,Tiempo  = días)
+L_TITLE,Zona: 
+L_TITLE_FRAME,Evolución pandemica.
+SEL_COLOR,Seleccione nuevo color
+PROJECT_NAME,Propiedades Proyecto
+WARNING_1,El siguiente paso eliminará parcial o toltamente los datos almacenados previamente ¿desea continuar?
+WARNING_2,Número de grupos de estudio incorrecto: 
+WARNING_3,El número de grupos debe ser mayor de cero.
+WARNING_EMPTY_FIELD,El campo nombre no puede estar vacio.
+VERSION_TITLE,Versi\u00F3n 
+VERSION_NUMBER,1.2
+NAME_MODULES,Módulos
+L_AUTHOR,Autor/a:
+L_DATE_MODIFIED,Fecha modificación:
+L_DATE_CREATION,Fecha de creación: 
+L_MANDATORY_FIELD,Campo obligatorio
+L_DESCRIPTION_MODEL,Descripción del modelo:
+L_NG,Número de Grupos de estudio:
+L_FILES,Archivos del modelo:
+TT_DESCRIPTION,Introduzca cualquier texto descriptivo que crea necesario acerca del modelo.
+TT_DATE_MODIFIED,Indica la última fecha de modificación.
+TT_DATE_CREATION,Indica la fecha de creación.
+TT_BTN_APPLY,Guarda los cambios efectuados.
+TT_MODEL_NAME,Nombre del modelo, se usará para dar nombre a los archivos que lo componen.
+TT_AUTHOR,Autor del modelo.
+TT_VERSION_MODEL,Número de versión del modelo.
+TT_NG,Número de grupos de población que componen el modelo.
+BTN_APPLY,Aplicar Cambios
+PRJ_TITLE,Título del Proyecto:
+L_DELETE,Eliminar
+L_ADD_TO,Asignar a
+BTN_CLEAR,Limpiar
+BTN_COMPOSE,Componer
+TT_COMPOSE,Cierra la figura y crea el poligono.\nUna vez creado debe asignarse a una zona.
+TT_APPLY,Aplica las asignaciones seleccionadas.
+TT_CLEAR,Limpiar la pizarra y redibujar las zonas.
+TT_OPEN,Abre una imagen para establecer de papel de fondo.
+TT_SAVE,Guardar los cambios realizados.
+TT_SELECT_ZONE,Seleccionar una zona para asignar la figura.
+TT_REMOVE_ZONE,Seleccionar una zona a reasignar.
+NAME_CANVAS,pizarra
+SAMPLE_TEXT,Zona: XX
+W_PLAYER_TITLE,Reproductor
+L_PROGRESS,Barra de progresión
+L_TIME_SCALE,Escala de tiempos:
+L_TIME_SCALE2, mSec/día
+L_SPEED,x 50 mSec/día
+L_DATE,Fecha:
+L_TIME,Hora:
+L_TIME2,Hora Minuto
+TT_BTNPLAY,Reproduce o Pausa la animación.
+TT_DATECHOOSER1,Fecha representada
+TT_BTN_DATECHOOSER,Introducción de fecha concreta
+TT_SLIDER,Escala de tiempo en horas/segundo
+TT_PROGRESS,Porcentaje de progreso de la reproducción del registro.
+TT_GO_DATE,Ir a una fecha concreta
+TT_TIME1,Hora de la representación
+TT_TIME2,Saltar a una hora concreta
+W_MAIN_TITLE,Simulación de enfermedades transmisibles en varios grupos de población
+W_DEF_TITLE,Parámetros Enfermedad
+W_GRP_TITLE,Grupos de Población
+W_REL_TITLE,Matriz de Contactos
+W_MAP_TITLE,Mapa
+W_PAL_TITLE,Leyenda
+W_TE_TITLE,Editor de Tablas
+W_GE_TITLE,Editor Gráfico
+W_PE_TITLE,Editor Paleta
+M_NEW_PRJ,Nuevo Proyecto
+M_OPEN_PRJ,Abrir Proyecto
+M_IMPORT_PA,Importar Modelo A
+M_IMPORT_PB,Importar Modelo B
+M_SAVE_PRJ,Guardar Proyecto
+M_EXIT,Salir
+MVER_PRJ,Proyecto
+MM_MODELO,Parámetros modelo
+MM_FILES,Archivo
+MM_TOOLS,Herramientas
+MM_PREFERENCES,Preferencias
+MM_HELP,Ayuda
+MHELP_TABLES,Formato Tablas
+MHELP_USER_GUIDE,Manual de Usuario
+MHELP_ABOUT,Acerca de...
+MPREFERENCES_ES,Español
+MPREFERENCES_EN,English
+MPREFERENCES_FR,Français
+MPREFERENCES_DE,Deutsch
+MPREFERENCES_UR,Українська
+PANEL_NAME_TE,panel_tabla
+COMBO_NAME_TE,Asignar tabla
+TOOLBAR_NAME_TE,Barra Herramientas
+TT_SELECT_TYPE_TE,Seleccione el tipo de tabla.
+TT_NEW_TABLE_TE,Crea una nueva tabla desde una plantilla
+TT_NEW_ROW,Crear fila nueva
+TT_NEW_COL,Crear columna nueva
+TT_DEL_ROW,Elimina las filas marcadas
+TT_DEL_COL,Elimina las columnas indicas
+TT_DEL_TABLE,Borrar tabla
+TT_SAVE_TABLE,Guardar tabla
+TT_LOAD_TABLE,Cargar tabla
+TT_PRINT,Imprimir
+BTN_APPLY_TYPE_TE,Aplicar tipo
+BTN_SET_TO_TE,Asignar a modulo:
+WARNING_1_TE,Atención, esta acción sobreescribe los datos existentes en el módulo 
+NOTIFY_1_TE,Datos aplicados al módulo: 
+QUESTION_NEW_COL,¿Nombre de la nueva columna?
+WARNING_2_TE,Debe añadir alguna columna.
+NOTIFY_FILE_LOADED,Archivo Cargado
+NOTIFY_FILED_SAVED,Archivo guardado
+NOTIFY_NO_DATA_TO_SAVE,No hay datos que guardar
+WARNING_3_TE,¿Desea eliminar la tabla actual con sus datos?
+WARNING_4_TE,Eliminará la tabla actual con sus datos
+REQUEST_CONFIRM,¿Desea continuar?
+MSG_CHOOSE_TEMPLATE_1,Escoja una plantilla
+MSG_CHOOSE_TEMPLATE_2,Selección de plantilla
+BTN_RUN_SIMULATION,Ejecutar simulación
+NAME_PANEL_SIR,Vista parámetros SIR
+VALUE_FIELD,El valor del campo 
+VALUE_WRONG, es incorrecto 
+WRONG_VALUE,Valor incorrecto
+NO_ASSIGNED,No asignado
+NAME,Nombre:
+POPULATON,Población:
+AREA,Superficie:
+L_GRAPHIC_THUMB,Representación Gráfica
+L_NAME_Z,Nombre del grupo de población
+L_AREA,Superficie en kilomentros cuadrados
+L_S0,Número de personas susceptibles inicial
+L_I0,Número de personas infectadas incial
+L_R0,Número de personas recuperadas incialmente
+L_P0,Prevalencia obtenida
+TT_APPLY_CHANGES,Aplica los cambios efectuados.
+TT_RUN_SIMULATION,Ejecuta el cálculo del modelo.
+TT_PANEL_SIR,Visulación de los parámetros particulares de la enfermedad.
+TXT_1_ABOUT,<html><p style=\text-align:center\>Simulación de Enfermedades Transmisibles
+TXT_2_ABOUT,<br>en
+TXT_3_ABOUT,<br>Varios Grupos de Población</p></html>
+NAME_DIRECTOR_INITIAL,Dr. Fernando Morilla García
+NAME_SILVERIO,Silverio M.R.S.
+TXT_5_ABOUT,Dirección:
+TXT_6_ABOUT,Acerca de esta aplicación
+UPDATE,Actualizar
+OPEN,Abrir
+SAVE,Guardar
+SAVE_AS,Guardar como
+DELETE,Borrar
+EDIT,Editar
+EXECUTE,Ejecutar
+PLAY,Reproducir
+PAUSE,Pausar
+REPLAY,Repetir
+CHANGES,Cambios
+APPLY,Aplicar
+CLOSE,Cerrar
+MDL,Modelo
+PAL,Paleta
+DEF,Enfermedad
+DEF_2,Definición
+CSV,Archivo general
+CSV_2,General
+HST,Histórico
+MAP,Mapas
+GRP,Poblaciones
+GRP_2,Grupos
+PRJ,Proyecto
+REL,Relaciones
+ANY,Cualquiera
+PNG,Archivos de imagen PNG
+JPG,Archivos de imagen JPG
+JPEG,Archivos de imagen JPEG
+GIF,Archivos de imagen GIF
+IMG,Archivos de imagen PNG, JPG, JPEG o GIF
+PDF,Archivo de manual PDF
+MODEL_A,Archivo Modelo A
+MODEL_B,Archivo Modelo B
+PLAYER,Player
