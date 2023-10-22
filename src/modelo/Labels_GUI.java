@@ -308,6 +308,5 @@ public class Labels_GUI {
 			k = "test2";
 		});
 		
-		
 	}
 }
