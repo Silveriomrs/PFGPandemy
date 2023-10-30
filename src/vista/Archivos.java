@@ -102,7 +102,7 @@ public class Archivos extends JPanel {
 	 * Todo elemento que se desea agregar se añade aquí, basado en los elementos
 	 * añadidos en este punto se generarán tantos los botones como los controles
 	 * que sean necerios para el funcionamiento de este módulo.
-	 * @see #generateControls(String ext, int posX)
+	 * @see #generateControls
 	 */
 	private void createFieldsInMap() {
 		// Generación de sus nombres e iconos particulares.

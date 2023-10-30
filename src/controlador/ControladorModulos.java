@@ -67,7 +67,7 @@ public class ControladorModulos {
 	
 	/** Obtener dimensiones de la pantalla para controlar donde aparecen los módulos. */
 	public static Dimension dimScreen = Toolkit.getDefaultToolkit().getScreenSize();
-	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/  
+	/** FrameDim Dimensión preferible del marco para todo módulo de la aplicación*/
 	public static Dimension FrameDim = new Dimension(1024, 768);
 	/** PanelCentralDim Dimensión del panel central para estandarizar el aspecto de los diferentes paneles de toda la aplicación */  
 	public static Dimension PanelCentralDim = new Dimension(1024, 768);
