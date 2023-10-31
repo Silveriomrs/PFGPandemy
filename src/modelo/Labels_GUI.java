@@ -293,11 +293,20 @@ public class Labels_GUI {
 	
 	public Labels_GUI() {
 		mapLang = new HashMap();
-		updateLANG();
-		this.REL = mapLang.get(REL);
+		setLANG();
+		loadLang();
+		System.out.println("final: " + REL);
 	}
 	
-	private static void updateLANG() {
+	private static void setLANG() {
 		mapLang.put(REL, "Arco iris");
+	}
+	
+	private static void loadLang() {
+		mapLang.forEach((k,v) -> {
+			System.out.println(mapLang.get(k));
+			k = "test2";
+		});
+		
 	}
 }
