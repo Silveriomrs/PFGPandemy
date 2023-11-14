@@ -641,6 +641,7 @@ public class ControladorModulos {
 	 * @param op Nombre de la acción.
 	 */
 	public void doActionPrincipal(OperationsType op) {
+		String path = null;
 		//
 		switch(op){
 			case PLAY:
@@ -671,7 +672,7 @@ public class ControladorModulos {
 				break;
 			case VIEW_REL: editModule(TypesFiles.REL); break;					//Abrir el editor de tablas con la matriz de contactos.
 			case OPEN:
-				String path = cio.selFile(1, TypesFiles.PRJ)[0];
+				path = cio.selFile(1, TypesFiles.PRJ)[0];
 				DCVS prj = cio.abrirArchivo(path,TypesFiles.PRJ);
 				if(prj != null) {
 					clearProject();
@@ -679,7 +680,8 @@ public class ControladorModulos {
 				}
 				break;
 			case IMPORT_A:
-				DCVS pVS = cio.abrirArchivo(null,TypesFiles.CSV);
+				path = cio.selFile(1, TypesFiles.CSV)[0];
+				DCVS pVS = cio.abrirArchivo(path,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo.
 				if(pVS != null && pVS.getValueAt(0,0).equals("0")) {
 					clearProject();
@@ -689,7 +691,8 @@ public class ControladorModulos {
 				break;
 			case IMPORT_B:	
 				//Formato de importación CSV
-				DCVS hVS = cio.abrirArchivo(null,TypesFiles.CSV);
+				path = cio.selFile(1, TypesFiles.CSV)[0];
+				DCVS hVS = cio.abrirArchivo(path,TypesFiles.CSV);
 				//Si se ha abierto el archivo, procesarlo..
 				if(hVS != null && hVS.getColumnName(1).equals("0")) {
 					clearProject();

@@ -4,8 +4,13 @@
 Corregir (PRIORITARIO)
 ======================
 
-
-
+Parametros de la enfermedad
+---------------------------
++Permite generar histórico cuando no están definidos los grupos de población (S,R,I, población inicial, etc), 
+con lo que genera una tabla con muchos nulls y valores erróneos.
+	Crear comprobación antes de habilitar.
+	++ Si error > mensaje.
+	++ OK > genera HST.
 
 
 
