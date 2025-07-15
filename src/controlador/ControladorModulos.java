@@ -571,7 +571,7 @@ public class ControladorModulos {
 		//En caso de que no exista uno, genera y almacena sin atributos de ningún tipo.
 		if(!hasModule(TypesFiles.DEF)) generarModuloDEF(); 
 		if(!hasModule(TypesFiles.PAL)) generarModuloPAL();
-		// Los siguientes módulos están comentados porque su generación implica conocer el valor de NG, y puede producir errores
+		//TODO: Los siguientes módulos están comentados porque su generación implica conocer el valor de NG, y puede producir errores
 		//if(!hasModule(TypesFiles.MAP)) generarModuloMAP();
 		//if(!hasModule(TypesFiles.REL)) generarModuloREL();
 
