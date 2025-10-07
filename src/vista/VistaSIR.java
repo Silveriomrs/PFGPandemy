@@ -7,7 +7,6 @@
 */
 package vista;
 
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -89,21 +88,19 @@ public class VistaSIR extends JPanel{
 	 */
 	private void configurar() {
 		//Botón aplicar.
-		btnAplicar = new JButton(OperationsType.APPLY.toString());
-		btnAplicar.addMouseListener(new BotonL());
+		btnAplicar = new JButton(Labels_GUI.APPLY);
+		btnAplicar.addMouseListener(new BotonL(OperationsType.APPLY));
 		btnAplicar.setIcon(IO.getIcon( ImagesList.OK,64,64));
 		btnAplicar.setToolTipText(Labels_GUI.TT_APPLY_CHANGES);
 		btnAplicar.setBounds(334, 252, 150, 87);
-		btnAplicar.setActionCommand(OperationsType.APPLY.toString());
 		panelCentral.add(btnAplicar);
 		//Botón ejecutar simulación
 		btnExecute = new JButton(Labels_GUI.BTN_RUN_SIMULATION);
 		btnExecute.setBounds(44, 302, 207, 37);
 		btnExecute.setVisible(true);
 		btnExecute.setEnabled(false);
-		btnExecute.setActionCommand(OperationsType.EXECUTE.toString());
 		btnExecute.setToolTipText(Labels_GUI.TT_RUN_SIMULATION);
-		btnExecute.addMouseListener(new BotonL());
+		btnExecute.addMouseListener(new BotonL(OperationsType.EXECUTE));
 		panelCentral.add(btnExecute);
 
 		//Configuración básica del panelCentral superior
@@ -301,7 +298,7 @@ public class VistaSIR extends JPanel{
 		chckbxIP.setHorizontalAlignment(SwingConstants.LEFT);
 		chckbxIP.setBounds(55, posY, 196, 23);
 		chckbxIP.setHorizontalTextPosition(SwingConstants.LEFT);
-		chckbxIP.addMouseListener(new BotonL());
+		chckbxIP.addMouseListener(new BotonL(OperationsType.CHANGES));
 		chckbxIP.setActionCommand(Labels.IP);
 		panelCentral.add(chckbxIP);
 	}
@@ -326,21 +323,39 @@ public class VistaSIR extends JPanel{
 	 * Actualiza los controles de la vista.
 	 */
 	private void refreshControls() {
+		boolean ready = checkFields() && cm.hasZonas() && cm.hasModule(TypesFiles.REL);
 		mapaFields.get(Labels.DMI).setEnabled(!IP);
 		chckbxIP.setSelected(IP);
-
-		if( checkFields() && cm.hasZonas() && cm.hasModule(TypesFiles.REL)){
-			btnExecute.setEnabled(true);
-			btnExecute.setBackground(Color.GREEN);
-		}
+		btnExecute.setEnabled(ready);
+		if(ready)btnExecute.setBackground(Color.GREEN);
+		else btnExecute.setBackground(Color.GRAY);
 	}
 
 	/**
-	 * <p>Comprueba si un valor es un dato númerico correcto. </p>
-	 * Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
-	 *  no númericos. Tampoco admite números negativos.
+	 * Realiza un chequeo de todos los campos.
+	 * <p>En caso de que uno de los campos contenga un valor incorrecto retornará
+	 *  FALSE.</p>
+	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
+	 */
+	private boolean checkFields() {
+		boolean done = true;
+		int count = 0;
+		for (String clave:mapaFields.keySet()) {
+		    if(!checkValue(clave)) { count++; }
+		}
+		//Si hay uno o más campos mal formados, devolverá false. 
+		done = count == 0;
+
+		return done;
+	}
+	
+	/**
+	 * Comprueba si un valor es un dato númerico correcto.
+	 * <p>Admite valores del tipo entero o doble, no admite ',' (comas), ni otros carácters
+	 *  no númericos. Tampoco admite números negativos.</p>
 	 * @param label Etiqueta del campo a evaluar
 	 * @return TRUE si cumple las condiciones. FALSE en otro caso.
+	 * @exception ArithmeticException en caso de un valor negativo. Exception general en caso de carácter incorrecto.
 	 */
 	private boolean checkValue(String label) {
 		boolean resultado = true;
@@ -357,33 +372,30 @@ public class VistaSIR extends JPanel{
 		return resultado;
 	}
 
-	/**
-	 * <p>Realiza un chequeo de todos los campos.</p>
-	 * En caso de que uno de los campos contenga un valor incorrecto retornará
-	 *  FALSE.
-	 * @return TRUE si los valores de todos los campos son correctos. FALSE en otro caso.
-	 */
-	private boolean checkFields() {
-		boolean done = true;
-		for (String clave:mapaFields.keySet()) {
-		    if(!checkValue(clave)) done = false;
-		}
-
-		return done;
-	}
 
 
 	/* Clases privadas */
 
 	/**
-	 * <p>Clase encargada de detectar la pulsación del botón aplicar</p>
-	 * Cuando es pulsado, intercambia la información necesaria con el controlador.
+	 * Clase encargada de detectar la pulsación del botón aplicar
+	 * <p>Cuando es pulsado, intercambia la información necesaria con el controlador.</p>
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 19 nov. 2021
-	 * @version versión 1.0
+	 * @version versión 1.2
 	 */
 	private class BotonL extends MouseAdapter {
-
+		/** Operación asociada a la instancia de la clase.*/
+		private OperationsType op;
+		
+		/**
+		 * El constructor recibe el tipo ded operación al que se asocia la clase.
+		 *  Esta tipo, será el que se envíe al modulo controlador para identificar la acción a realizar.
+		 * @param op Tipo de operación asociada.
+		 */
+		public BotonL(OperationsType op) {
+			this.op = op;
+		}
+		
 		/**
 		 * Sobrescribe la función heredada. Comprueba el operador asociado al
 		 *  botón al que ha sido agregado el observador y en función del control
@@ -393,24 +405,40 @@ public class VistaSIR extends JPanel{
 		 */
 		@Override
 		public void mouseClicked(MouseEvent evt) {
-			String op = ((AbstractButton) evt.getSource()).getActionCommand();
-			OperationsType opt = OperationsType.UPDATE;
+			boolean btnActivo = ((Component) evt.getSource()).isEnabled();
 			//Si se ha pulsado sobre el selector, se actualiza su vista.
 			//Avisa al controlador de cambios.
-			if(op.equals(OperationsType.APPLY.toString())){
-				mapaFields.forEach((label,field) ->{
-					String valor = getLabel(label);
-					if(valor != null && !valor.equals("") && !checkValue(label)) {
-						setLabel(label,null);
-						cm.showMessage(Labels_GUI.VALUE_FIELD + Labels.getWord(label) + Labels_GUI.VALUE_WRONG + valor, 0);
-					}
-				});
-			}else if(op.equals(Labels.IP)) {IP = chckbxIP.isSelected();}
-			else if(((Component) evt.getSource()).isEnabled() ) opt = OperationsType.EXECUTE;
+			switch(op) {
+			case APPLY: checkEmptyFields(); break;
+			case CHANGES: IP = chckbxIP.isSelected();break;
+			case EXECUTE: 
+				btnActivo = checkFields();
+				//En caso de un error, desactivar botón de ejecutar.
+				((Component) evt.getSource()).setEnabled(btnActivo);
+				break;
+			default:
+			}
+			
 			//Llamada al controlador para ejectuar la acción de la opción elegida.
-			cm.doActionVistaSIR(opt);
+			if(btnActivo) cm.doActionVistaSIR(op);
 			//Actualiza los controles.
 			refresh();
+		}
+		
+		/**
+		 * Realiza un recorrido por los diferentes campos de la vista, comprobando que no contiene
+		 *  valores nulos o espacios en blanco.
+		 *  <P>También comprueba que los valores númericos sean correctos y mayores que cero.</P>
+		 *  En caso de error, muestra un mensaje acorde al valor erroneo encontrado.
+		 */
+		private void checkEmptyFields() {
+			mapaFields.forEach((label,field) ->{
+				String valor = getLabel(label);
+				if(valor != null && !valor.equals("") && !checkValue(label)) {
+					setLabel(label,null);
+					cm.showMessage(Labels_GUI.WRONG_VALUE + " (" + valor + ")\n" + Labels_GUI.VALUE_FIELD  +  Labels.getWord(label) + Labels_GUI.VALUE_WRONG , 0);
+				}
+			});
 		}
 	}
 

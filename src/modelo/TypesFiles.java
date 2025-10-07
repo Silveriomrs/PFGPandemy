@@ -13,7 +13,8 @@ import java.util.HashMap;
 /**
  * Clase coordinadora de los tipos de archivos, módulos, 
  * extensiones y cualquie otra vicisitud que sea requerida por el sistema.
- * Usa etiquetas para la relación con extensiones y archivos.
+ * Usa etiquetas para la relación con extensiones de los archivos, en el momento de acceder
+ *  al sistema de almacenamiento.
  * @author Silverio Manuel Rosales Santana
  * @date 17 nov. 2021
  * @version versión 1.0
@@ -22,6 +23,8 @@ public class TypesFiles {
 	
 	private static HashMap<String,String> tipos;
     
+	/** Cualquier tipo de fichero. Útil para cargar desde el TableEditor.*/
+	public final static String ANY = ".";
     /** Archivos generales formato CSV*/  
     public final static String CSV = "csv";
     /** Archivo de proyecto PRJ*/  
@@ -61,6 +64,7 @@ public class TypesFiles {
 	
     private static void configurar() {
     	tipos = new HashMap<String,String>();
+    	tipos.put(ANY, Labels_GUI.ANY);
     	tipos.put(PAL, Labels_GUI.PAL);
 		tipos.put(DEF, Labels_GUI.DEF);
 		tipos.put(CSV, Labels_GUI.CSV);

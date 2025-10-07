@@ -145,6 +145,13 @@ public class TablaEditor extends JPanel{
 	 * Reinicia todos los datos del módulo.
 	 */
 	public void reset() {nuevaTabla();}
+	
+	/**
+	 * Devuelve la tabla actual del editor.
+	 * @return Tabla con los datos actuales. Null en otro caso.
+	 */
+	public DCVS getDCVS() {return this.dcvs;}
+	
 
 	/**
 	 * Configuración del JComboBox con las opciones posibles.
@@ -181,18 +188,18 @@ public class TablaEditor extends JPanel{
 		jtoolBar.setOpaque(false);
 
 		//Añadir los botones
-		btnNuevaTabla = addBotonToolBar(Labels_GUI.TT_NEW_TABLE_TE, ImagesList.TE_NEW_TABLE,new BtnNuevaTablaML(),Color.GREEN);
+		btnNuevaTabla = addBotonToolBar(Labels_GUI.TT_NEW_TABLE_TE, ImagesList.TE_NEW_TABLE,new BtnNewTableML(),Color.GREEN);
 		btnAddRow= addBotonToolBar(Labels_GUI.TT_NEW_ROW, ImagesList.TE_NEW_ROW,new BtnAddRowML(),null);
 		btnAddCol = addBotonToolBar(Labels_GUI.TT_NEW_COL, ImagesList.TE_NEW_COL,new BtnAddColML(),null);
 		jtoolBar.addSeparator();
-		btnBorrarFila = addBotonToolBar(Labels_GUI.TT_DEL_ROW, ImagesList.TE_DEL_ROW,new BtnBorrarFilaML(),Color.ORANGE);
-		btnBorrarColumna = addBotonToolBar(Labels_GUI.TT_DEL_COL, ImagesList.TE_DEL_COL,new BtnBorrarColumnaML(),Color.ORANGE);
-		btnBorrarTabla = addBotonToolBar(Labels_GUI.TT_DEL_TABLE, ImagesList.TE_DEL_TABLE,new BtnBorrarTablaML(),Color.ORANGE);
+		btnBorrarFila = addBotonToolBar(Labels_GUI.TT_DEL_ROW, ImagesList.TE_DEL_ROW,new BtnRemoveRowML(),Color.ORANGE);
+		btnBorrarColumna = addBotonToolBar(Labels_GUI.TT_DEL_COL, ImagesList.TE_DEL_COL,new BtnRemoveColumnML(),Color.ORANGE);
+		btnBorrarTabla = addBotonToolBar(Labels_GUI.TT_DEL_TABLE, ImagesList.TE_DEL_TABLE,new BtnDeleteTableML(),Color.ORANGE);
 		jtoolBar.add(Box.createHorizontalGlue());
 		jtoolBar.addSeparator();
-		btnGuardarCambios = addBotonToolBar(Labels_GUI.TT_SAVE, ImagesList.DISK_2, new BtnGuardarCambiosML(),null);
-		btnGuardarArchivo = addBotonToolBar(Labels_GUI.TT_SAVE_TABLE, ImagesList.DISK_1, new BtnGuardarArchivoML(),null);
-		addBotonToolBar(Labels_GUI.TT_LOAD_TABLE, ImagesList.FOLDER,new BtnAbrirArchivoML(), null);
+		btnGuardarCambios = addBotonToolBar(Labels_GUI.TT_SAVE, ImagesList.DISK_2, new BtnSaveChangesML(),null);
+		btnGuardarArchivo = addBotonToolBar(Labels_GUI.TT_SAVE_TABLE, ImagesList.DISK_1, new BtnSaveFileML(),null);
+		addBotonToolBar(Labels_GUI.TT_LOAD_TABLE, ImagesList.FOLDER,new BtnOpenFileML(), null);
 		jtoolBar.addSeparator();
 		btnPrintTable = addBotonToolBar(Labels_GUI.TT_PRINT, ImagesList.PRINTER,new BtnImprimirML(),null);
 
@@ -206,7 +213,7 @@ public class TablaEditor extends JPanel{
 		
 		btnAsignarTabla = new JButton(Labels_GUI.BTN_APPLY_TYPE_TE);
 		btnAsignarTabla.setHorizontalAlignment(SwingConstants.LEFT);
-		btnAsignarTabla.addMouseListener(new BtnAplicarTablaML());
+		btnAsignarTabla.addMouseListener(new BtnSetTableML());
 		
 		lblAsignarTablaA = new JLabel(Labels_GUI.BTN_SET_TO_TE);
 		lblAsignarTablaA.setForeground(UIManager.getColor("Button.highlight"));
@@ -254,7 +261,7 @@ public class TablaEditor extends JPanel{
 		boolean tieneFila = dcvs.getRowCount() > 0;
 		//Botones de guardado.
 		btnGuardarArchivo.setEnabled(modificado);
-		btnGuardarCambios.setEnabled(modificado && dcvs.getRuta() != null && dcvs.getTipo() != null);
+		btnGuardarCambios.setEnabled(modificado && dcvs.getPath() != null && dcvs.getType() != null);
 		//Por ser primer boton en ejecutarse por defecto aparece activo,
 		//Colocado fuera del condicional permite que se desactive al primer cambio
 		//en caso de no estar habilitada la opción de edición.
@@ -339,7 +346,7 @@ public class TablaEditor extends JPanel{
 		this.editable = editable;
 		this.dcvs = dcvsIn;
 		//Obtener valor Enúmerado.
-		String tipo = dcvs.getTipo();
+		String tipo = dcvs.getType();
 		ModuleType mt = ModuleType.valueOf(tipo.toUpperCase());
 		//Establecer en el selector el tipo.
 		comboBox.setSelectedItem(mt);
@@ -349,6 +356,8 @@ public class TablaEditor extends JPanel{
 		dcvs.addTableModelListener(new TableUpdateListener());
 		tabla.setDefaultRenderer(Object.class,new CellRenderTableEditor(editable));
 		tabla.setModel(dcvs);
+		//Desactivar el registro de modificado.
+		modificado = false;
 		estadoBotones();
 	}
 	
@@ -361,7 +370,7 @@ public class TablaEditor extends JPanel{
 		//Cabecera de datos.		
 		String[] cabecera = new String[] {};
 		dcvs = new DCVS();
-		dcvs.setTipo(TypesFiles.CSV);
+		dcvs.setType(TypesFiles.CSV);
 		dcvs.setModelo(new DefaultTableModel(datos,cabecera){
 			private static final long serialVersionUID = 5615251971828569240L;
 		});
@@ -416,22 +425,24 @@ public class TablaEditor extends JPanel{
 		return tipo;
 	}
 	
+	/* CLASES PRIVADAS */
+	
 	/**
-	 * <p>Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
-	 *  comunicación con el módulo controlador.</p> 
-	 * Esta clase además está implicada en el mantenimiento de la coherencia respecto al contexto de la aplicación
-	 *  de los diferentes controles implicados en esta vista.
+	 * Clase dedicada al establecimiento de los datos en los apartados o módulos oportunos, mediante la
+	 *  comunicación con el módulo controlador.
+	 * <p>Esta clase además está implicada en el mantenimiento de la coherencia respecto al contexto de la aplicación
+	 *  de los diferentes controles implicados en esta vista.</p> 
 	 * @author Silverio Manuel Rosales Santana
 	 * @date 10 ago. 2021
 	 * @version versión 1.2
 	 */
-	private class BtnAplicarTablaML extends MouseAdapter {
+	private class BtnSetTableML extends MouseAdapter {
 
 		/**
 		 * Sobrescritura del método que detecta la pulsación del ratón sobre el elemento asociado.
 		 * Esta función tiene asignada la asignación de la tabla al módulo que esté seleccionado en el
 		 *  combobox.
-		 *  <p>Antes de aplicar la selección avisa de la sobrescritura de los dantos anteriores y en caso
+		 *  <p>Antes de aplicar la selección avisa de la sobrescritura de los datos anteriores y en caso
 		 *   de aceptar, ejecuta la acción mediante el paso de la tabla al controlador a través de su
 		 *    doAction.</p>
 		 *  Esta función fuerza la revisión del estado de los botones con el nuevo contexto de la aplicación.
@@ -449,14 +460,14 @@ public class TablaEditor extends JPanel{
 					respuesta = cm.showMessage(Labels_GUI.WARNING_1_TE + seleccion, 3);
 				}
 				
-				System.out.println(seleccion);
+				System.out.println("TableEditor > BtnSetTableML > Selected: " + seleccion);
 				
 				// Si se acepta ...
 				if(respuesta == JOptionPane.OK_OPTION) {
 					// Establecer tipo.
-					dcvs.setTipo(setTipo(seleccion));
+					dcvs.setType(setTipo(seleccion));
 					// Mandarlo a procesar al CM.	
-					actuar = cm.doActionTableEditor(dcvs);			
+					actuar = cm.doActionTableEditor(OperationsType.APPLY);			
 				}
 				//En caso de haber aceptado, mensaje al usuario y actualizar estado de los controles.
 				if(actuar) {
@@ -555,7 +566,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnAbrirArchivoML extends MouseAdapter {
+	private class BtnOpenFileML extends MouseAdapter {
 		
 		/**
 		 * Sobrescritura de pulsación de botón del ratón sobre el control.
@@ -566,17 +577,11 @@ public class TablaEditor extends JPanel{
 		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			boolean ok = false;
 			if(((JButton) e.getSource()).isEnabled()) {
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);
-				DCVS dcvs2 = cio.abrirArchivo(null,dcvs.getTipo());				//Abre la nueva tabla en una variable temporal.
-				//En caso de ser una tabla no nula...
-				if(dcvs2 != null) {
-					dcvs = dcvs2;												//Establecer la nueva tabla como tabla activa.
-					modificado = false;											//Desactivar el registro de modificado.
-					tabla.setModel(dcvs);										//Estabece el nuevo modelo en el scroll tabla.
-					cm.showMessage(Labels_GUI.NOTIFY_FILE_LOADED, 1);
-					estadoBotones();											//Actualiza el estado de los botones.
-				}
+				ok = cm.doActionTableEditor(OperationsType.OPEN);
+				//En caso de operación realizada correctamente.
+				if(ok) { cm.showMessage(Labels_GUI.NOTIFY_FILE_LOADED, 1);}
 			}
 		}
 	}
@@ -587,7 +592,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnGuardarCambiosML extends MouseAdapter {
+	private class BtnSaveChangesML extends MouseAdapter {
 		
 		/**
 		 *  Sobrescritura de pulsación de botón del ratón sobre el control.
@@ -603,7 +608,7 @@ public class TablaEditor extends JPanel{
 			if(((JButton) e.getSource()).isEnabled() && modificado) {
 				if(dcvs.getRowCount() >0) {
 					// Sistema que era identico al de la clase BtnGuardarArchivoML.
-					cio.guardarArchivo(dcvs);
+					cio.guardarModulo(dcvs);
 					cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
 					modificado = false;
 					estadoBotones();
@@ -618,7 +623,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnGuardarArchivoML extends MouseAdapter {
+	private class BtnSaveFileML extends MouseAdapter {
 		
 		/**
 		 * Sobrescritura de pulsación de botón del ratón sobre el control.
@@ -629,15 +634,15 @@ public class TablaEditor extends JPanel{
 		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			boolean ok = false;
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Sino tiene de un tipo se le asigna el tipo general.
-				if(dcvs.getTipo() == null) dcvs.setTipo(TypesFiles.CSV);	
+				if(dcvs.getType() == null) dcvs.setType(TypesFiles.CSV);	
 				if(dcvs.getRowCount() >0) {										//Comprobación de número de filas mínimo.
-					String rutaF = cio.guardarArchivo(dcvs);							//Obtención de la ruta de guardado.
+					ok = cio.guardarModulo(dcvs);							//Obtención de la ruta de guardado.
 					//En caso de guardado correcto, proceder...
-					if(rutaF != null) {
+					if(ok) {
 						cm.showMessage(Labels_GUI.NOTIFY_FILED_SAVED, 1);
-						dcvs.setRuta(rutaF);									//Establecimiento de la nueva ruta al módulo.
 						modificado = false;										//Activación flag modificado.
 						estadoBotones();										//Actualización del estado de los botones.
 					}					
@@ -651,7 +656,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnBorrarFilaML extends MouseAdapter {
+	private class BtnRemoveRowML extends MouseAdapter {
 		
 		/**
 		 * Sobrescritura de pulsación de botón del ratón sobre el control con el objetivo
@@ -674,7 +679,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnBorrarColumnaML extends MouseAdapter {
+	private class BtnRemoveColumnML extends MouseAdapter {
 		
 		/**
 		 * Sobrescritura de pulsación de botón del ratón sobre el control.
@@ -698,7 +703,7 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnBorrarTablaML extends MouseAdapter {
+	private class BtnDeleteTableML extends MouseAdapter {
 		
 		/**
 		 * Sobrescrita la función de detección de pulsación de la tecla del ratón.
@@ -709,17 +714,17 @@ public class TablaEditor extends JPanel{
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
 				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage(Labels_GUI.WARNING_2_TE,3);
+				int opt = cm.showMessage(Labels_GUI.WARNING_3_TE,3);
 				//Caso afirmativo borrar el modelo y crear uno nuevo.
 				if(opt == JOptionPane.YES_OPTION) {	
 					//Obtener atributos previos de la tabla anterior.
 					DCVS temp = dcvs;
 					nuevaTabla();
 					dcvs.setDirectorio(temp.getDirectorio());
-					dcvs.setTipo(temp.getTipo());
-					dcvs.setName(temp.getNombre());
+					dcvs.setType(temp.getType());
+					dcvs.setName(temp.getName());
 					dcvs.setDate(temp.getDate());
-					dcvs.setRuta(temp.getRuta());
+					dcvs.setPath(temp.getPath());
 				}
 			}
 		}
@@ -731,8 +736,11 @@ public class TablaEditor extends JPanel{
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
-	private class BtnNuevaTablaML extends MouseAdapter {
+	private class BtnNewTableML extends MouseAdapter {
 		
+		//Tipos de tablas predefinidas
+		ModuleType[] options = new ModuleType[] {ModuleType.CSV,ModuleType.PRJ,ModuleType.DEF,ModuleType.PAL,ModuleType.MAP};
+
 		/**
 		 * Sobrescritura del método heredado de la pulsación de un botón del ratón,
 		 *  Ofrece una lista de opciones entre las que elegir el tipo de plantilla a cargar.
@@ -743,26 +751,80 @@ public class TablaEditor extends JPanel{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(((JButton) e.getSource()).isEnabled()) {
-				//Mostrar dialogo de confirmación
-				int opt = cm.showMessage(Labels_GUI.WARNING_4_TE + " " + Labels_GUI.REQUEST_CONFIRM, 3);
-				//Caso afirmativo borrar el modelo y crear uno nuevo.
-				if(opt == JOptionPane.YES_OPTION) {
-					ModuleType[] options = new ModuleType[] {ModuleType.CSV,ModuleType.PRJ,ModuleType.DEF,ModuleType.PAL,ModuleType.MAP};
-					ModuleType opt2 = (ModuleType) JOptionPane.showInputDialog(getParent(),
-							Labels_GUI.MSG_CHOOSE_TEMPLATE_1,					//Mensaje de solicitud
-							Labels_GUI.MSG_CHOOSE_TEMPLATE_2,					//Mensaje de ventana
-							JOptionPane.QUESTION_MESSAGE,						//Tipo de mensaje (pregunta selección)
-							null,												//Icono personalizado
-							options,											//Array de opciones.
-							options[0]);										//Opción por defecto, la primera.
-					if(opt2 == ModuleType.CSV) nuevaTabla();					//Caso rápido de tabla general.
-					else if(opt2 != null) {										//Para otros casos correctos procesar.
-						dcvs = DCVSFactory.newModule(setTipo(opt2));			//Obtención de la tabla y asignación.
-						tabla.setModel(dcvs);									//Establecimiento en el módelo actual.
-					}
+				//Mostrar dialogo de confirmación (si procede).
+				//en caso afirmativo borrar el modelo y crear uno nuevo.
+				if(showWarning() == JOptionPane.YES_OPTION) {
+					//Interrogar por el tipo de tabla a crear.
+					ModuleType opt2 = askType();
+					//Crear tabla adecuada con atributos de modificación (si requerido).
+					if(opt2 != null) generateTable(opt2);
 				}
 			}
 		}
+		
+		/**
+		 * Asegura que el mensaje de advertencia sólo sea mostrado en caso necesario.
+		 *  Para ello, evalua si la tabla actual tiene alguna fila o columna, en caso
+		 *  de tener una fila o columna muestra una advertencia, en otro caso devuelve el 
+		 *  equivalente a una confirmación del usuario para eliminar tabla actual.
+		 * 
+		 * @return YES_OPTION en caso de aceptación de eliminación, opciones de CANCEL/NO en otro caso.
+		 */
+		private int showWarning() {
+			boolean tieneColumna = dcvs.getColumnCount() > 0;
+			boolean tieneFila = dcvs.getRowCount() > 0;
+			int opt = JOptionPane.YES_OPTION;
+			if(tieneColumna || tieneFila) {
+				opt = cm.showMessage(Labels_GUI.WARNING_4_TE + " " + Labels_GUI.REQUEST_CONFIRM, 3);
+			}
+			return opt;
+		}
+		
+		/**
+		 * Interroga por el tipo de tabla a generar.
+		 * @return Devuelve el tipo de tabla seleccionado en el desplegable, null en otro caso.
+		 */
+		private ModuleType askType() {
+			ModuleType mt = null;
+			mt = (ModuleType) JOptionPane.showInputDialog(getParent(),
+					Labels_GUI.MSG_CHOOSE_TEMPLATE_1,					//Mensaje de solicitud
+					Labels_GUI.MSG_CHOOSE_TEMPLATE_2,					//Mensaje de ventana
+					JOptionPane.QUESTION_MESSAGE,						//Tipo de mensaje (pregunta selección)
+					null,												//Icono personalizado
+					options,											//Array de opciones establecidas en el campo de esta clase.
+					options[0]);										//Opción por defecto, la primera.
+			return mt;
+		}
+		
+		/**
+		 * Recibe un tipo opcional de módulo elegido y dependiendo del tipo de 
+		 * módulo, genera el DCVS correcto y lo establece en el editor de tablas.
+		 * @see #modelo.ModuleType para conocer los tipos aceptados.
+		 * @param mt Tipo de módulo elegido
+		 */
+		private void generateTable(ModuleType mt) {
+			DCVS dcvs= null;
+			switch(mt) {
+			//Tabla general
+			case CSV: nuevaTabla(); break;
+			//Tablas de etiquetas fijas. => no modificables etiquetas.
+			case PRJ:
+			case DEF:
+			case PAL: 
+				dcvs = DCVSFactory.newModule(setTipo(mt));			//Obtención de la tabla y asignación.
+				setModelo(dcvs,false);								//Establecimiento en el módelo actual.
+				break;
+			//Tablas de etiquetas variables => modificación de etiquetas y número de filas/columnas permitida.
+			case MAP:
+			case REL:
+			case HST:
+				dcvs = DCVSFactory.newModule(setTipo(mt));
+				setModelo(dcvs,true);
+				break;
+			default:			
+			}
+		}
+		
 	}
 	
 	/**

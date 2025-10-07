@@ -1,0 +1,78 @@
+[actualizado 17/10/2023]
+
+======================================================================================================
+Corregir (PRIORITARIO)
+======================
+
+Parametros de la enfermedad
+---------------------------
++Permite generar histórico cuando no están definidos los grupos de población (S,R,I, población inicial, etc), 
+con lo que genera una tabla con muchos nulls y valores erróneos.
+	Crear comprobación antes de habilitar.
+	++ Si error > mensaje.
+	++ OK > genera HST.
+
+
+
+======================================================================================================
+Modificar
+=========
+
+TableEditor
+------------
++ Para crear tablas tipo REL, MAP o HST, es necesario conocer datos de otros módulos primero,
+	por tanto, se hace prioritario determinar políticas.
+	>HST es un resultado de un motor, no para definir un contexto => no generable.
+	>REL, requiere conocer el número y nombre (por las cabeceras) de los grupos de población previamente.
+	>MAP, requiere coincidir el número de grupos de población con los del proyecto (en caso de querer aplicar).
+
++ Al aplicar un MAP al Controlador, este aplica sin comprobar restricciones previas del proyecto (como el NG),
+	resultando en incoherencia grave. Es necesario comprobaciones antes de aplicar y aviso de intervención al usuario
+	para actuar coherentemente.
+
+** Al seleccionar abrir, se podría dejar que el selector permitiera abrir cualquier archivo o uno de los archivos conocidos
+	mediante el desplegable => pasar un array con los tipos compatibles. (Poco importante)
+
+
+General
+--------	
++Para poder usar multiples idiomas hace falta desacoplar las etiquetas usadas para el idioma de la clase usada para ello. 
+>Una manera de hacerlo es crear una clase que sea independiente del tipo de idioma (su nombre) y según el CM indica el idioma 
+> a usar, carga desde un HashMap el idioma que se ha seleccionado entre los disponibles.
+> Separar en dos ramas como se comenzó en su momento y no se terminó... textos y operaciones.
+
+General
+--------
+JavaDOC no funciona, comprobar en el ordenador donde si:
+? si existe una carpeta DOC en el proyecto con el JavaDO ? NO
+? Versión JDK usada ? >JRE 11 y JDK 11 en proyecto, JDK 17 en configuración general.
+? Configuración del BuildPath para comparar. ? parecen identicas.
+? En sistema alguna librería instalada y no en las otras? Default-jdk, headless
+
+CM
+------------------
+Al importar un proyecto en ParametrosProyecto se llama demasiadas veces al parser. ¿por qué?
+	Para detectarlo se reproduce un error que hace saltar el parser y de esa forma detectar el excesivo número de llamadas.
+	ParametrosProyecto > Error de parser de fechas: 
+	> ¿Por qué repite el error tantas veces si sólo hay dos fechas? 12 veces se repite => 6 llamadas al cargar.
+	
+General
+--------
++El archivo PRJ puede contener referencias nulas o erróneas.
+++¿Cómo manejarlas? Avisar, en caso de ser un dato crítico, no continuar con la carga u ofrecer corrección
+	a través del TableEditor.
+++¿Qué política aplicar? Ignorar, no cargar.
+
++Al cargar un MAP (grupo de población) desde Archivos, da warning (si NG != NGprevio), indica que no lo cargará, 
+	pero lo carga y no modifica el NG del proyecto, tampoco genera el REL adecuado.
+	
+	> NG == NGPrevio > avisar de modificaciones en el proyecto y proceder generando REL en concordancia y
+		eliminando (si existe) el HST correspondiente.
+	> NG != NGPrevio && NGPRevio == 0 > lo mismo que el punto anterior.
+	> NG != NGPrevio > Avisar de incompatibilidad, interrogar sobre si continuar.
+		>Continuar > modificar etiqueta NG de PRJ, eliminar HST y regenerar REL.
+		>No Continuar > no cargar.
+ejemplo:
+Mapas
+CM > OpenModule > Tipo: map, NG: 0 / filas de datos: 4
+CM > OpenModule > Tipo: map, NG: 4 / filas de datos: 2

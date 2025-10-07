@@ -9,7 +9,7 @@
 * <p>Aplication: UNED</p>
 * @author Silverio Manuel Rosales Santana
 * @date 22 sept. 2021
-* @version 3.6
+* @version 3.7
 */
 package vista;
 
@@ -43,7 +43,6 @@ import java.awt.event.MouseAdapter;
 import modelo.ImagesList;
 import modelo.Labels_GUI;
 import modelo.OperationsType;
-import modelo.TypesFiles;
 import modelo.Zona;
 
 /**
@@ -132,6 +131,18 @@ public class Pizarra extends JFrame {
 	}
 	
 	/**
+	 * Establece un fondo para el panel, el cual servirá como calco para dibujar las
+	 *  zonas que sean necesarias.
+	 * @param ruta Ruta a la imagen de fondo a establecer en la pizarra.
+	 */
+	public void setFondo(String ruta) {
+		if(ruta != null) {
+			fondo = new ImageIcon(ruta).getImage();
+			dibujarZonas();
+		}
+	}
+	
+	/**
 	 * Configura las propiedades del marco contenedor, altura
 	 *  ancho, desactivación de redimensionabilidad y propiedad de ocultar en vez
 	 *   de cierre.
@@ -206,6 +217,7 @@ public class Pizarra extends JFrame {
 		return pol;
     }
 
+   
     /**
      * Description: Indica si el punto actual definido es el primer punto de la
      *  lista que contiene el módulo. 
@@ -224,6 +236,7 @@ public class Pizarra extends JFrame {
 		listaP.add(new Point(5,c.getHeight() - 5));	
 		this.marco = generaPoligono(listaP);
 	}
+	
     
 	/**
 	 * Crea la barra de herramientas y añade los todos los 
@@ -240,6 +253,7 @@ public class Pizarra extends JFrame {
 	    toolBar.add(comboBoxAsignados);
 	    add(toolBar, BorderLayout.NORTH);
 	}
+
 
 	/**
 	 * <p>Crear los elementos (botones) de la barra de herramientas.</p>
@@ -267,6 +281,7 @@ public class Pizarra extends JFrame {
 	    bBoxAplicar.setToolTipText(Labels_GUI.TT_APPLY);
 	}
 
+	
 	/**
 	 * <p>Realiza una comprobación para averiguar el nombre del item
 	 *  más largo del desplegable, ajustando hasta un límite el ancho mínimo del mismo.</p>
@@ -288,6 +303,7 @@ public class Pizarra extends JFrame {
 		return item;
 	}
 
+
 	/**
 	 * <p>Establece los elementos a colocar en cada ComboBox.</p>
 	 * Recorre todos los grupos de población (zonas) y situa los nombres de cada
@@ -302,6 +318,7 @@ public class Pizarra extends JFrame {
 			});
 		}
 	}
+
 
 	/**
 	 * <p>Crea los controles de los ComboBox</p>
@@ -328,6 +345,7 @@ public class Pizarra extends JFrame {
 		zonasToCombo();
 	}
 
+	
 	/**
 	 * <p>Actualiza los controles propios del módulo</p>
 	 * Detecta el estado en que se encuentra la aplicación y configura la activación
@@ -355,6 +373,7 @@ public class Pizarra extends JFrame {
         c.setEnabled(!hayPoligono && hasItemC1);
 	}
 	
+	
 	/**
 	 * Inicializa el Canvas o zona de dibujo.
 	 */
@@ -365,6 +384,7 @@ public class Pizarra extends JFrame {
 		c.addMouseListener(new SelectPointListener());
 	}
 
+	
 	/**
 	 * Dibuja un polígono en la zona de la pizarra (canvas). 
 	 * @param poligono Figura que debe ser dibujada.
@@ -384,6 +404,7 @@ public class Pizarra extends JFrame {
 		} else {System.out.println("Pizarra > Poligono nulo");}
 	}
 	
+
 	/**
 	 * <p>Dibuja una línea entre dos puntos.</p>
 	 * Considerar el origen de coordenadas (0.0) está en la
@@ -401,6 +422,7 @@ public class Pizarra extends JFrame {
     	);
 	}
 
+
 	/**
 	 * <p>Dibuja una marca de cruz en las coordenadas indicadas</p>
 	 * Considerar el origen de coordenadas (0.0) está en la
@@ -415,6 +437,7 @@ public class Pizarra extends JFrame {
         g.drawLine(posX -5,posY, posX +5, posY);							// Línea horizontal
         g.drawLine(posX, posY -5, posX, posY +5);							// Línea vertical
 	}
+
 
 	/**
 	 * <p>Realiza una lectura de las figuras gráficas y las dibuja</p>
@@ -470,6 +493,9 @@ public class Pizarra extends JFrame {
 	 * @author Silverio Manuel Rosales Santana
 	 * @version versión 1.0
 	 */
+
+	/* ZONA DE CLASES Internas*/
+	
 	private class MiCanvas extends Canvas {
 		/** serialVersionUID */
 		private static final long serialVersionUID = 5398261596293519343L;
@@ -479,6 +505,7 @@ public class Pizarra extends JFrame {
 			dibujarZonas();														//Redibujado de las zonas.
 		}
 	}
+	
 
 	/**
 	 * <p>Clase específica para el botón componer</p>
@@ -500,6 +527,7 @@ public class Pizarra extends JFrame {
         }
     }
 
+ 
     /**
      * <p>Efectua los cambios de cada combo box cuando es activado
      *  el control correspondiente.</p>
@@ -515,7 +543,6 @@ public class Pizarra extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Activamos el botón de guardado en cuanto ha habido un cambio.
-			String op = OperationsType.CHANGES.toString();
 			modificado = true;
 			//Obtener los nombres de los items seleccionados en los ComboBox
 			String item1 = comboBoxAsignar.getSelectedItem().toString();
@@ -531,7 +558,7 @@ public class Pizarra extends JFrame {
 			//Actualización de los controles en función del nuevo contexto.
 			updateControls();
 			//Avisar al controlador de que se ha producido un cambio.
-			cm.doActionPizarra(op);
+			cm.doActionPizarra(OperationsType.CHANGES);
 		}
 
 		/**
@@ -564,6 +591,7 @@ public class Pizarra extends JFrame {
 		}
     }
 
+ 
     /**
      * <p>Limpia la pizarra.</p>
      * Los datos de poligonos o líneas pendientes serán borrados. Los datos de
@@ -582,6 +610,7 @@ public class Pizarra extends JFrame {
 		}
     }
 
+ 
     /**
      * <p>Realiza un seguimiento de los puntos que son seleccionados para
      * conformar el Poligono posteriormente</p>
@@ -619,6 +648,7 @@ public class Pizarra extends JFrame {
         }
     }
 
+ 
     /**
      * <p>Realiza la acción de cargar una imagen de fondo que sirva
      *  como guía para el dibujado de los poligonos.</p> 
@@ -631,21 +661,11 @@ public class Pizarra extends JFrame {
     	/**
     	 * La sobrescritura de este método permite controlar las acciones para
     	 *  abrir un fichero al activar el control mediante la pulsación con el ratón.
-    	 * <p>Para alcanzar su objetivo hace uso de las funciones de la clase IO.</p>
-    	 * @see controlador#IO 
     	 */
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Selección de imagen de fondo.
-    		@SuppressWarnings("unused")
-			IO io = new IO();													//Sin esta ininicialización previa, no es posible cargar una imagen de fondo.
-    		String ruta = IO.selFile(1, TypesFiles.IMG);
-    		// En caso de tener una ruta correcta se procede a la carga.
-    		if(ruta != null && !ruta.equals("")) {
-    			fondo = new ImageIcon(ruta).getImage();
-//    			fondo = IO.getImagen(ruta,false, 0, 0);
-    			dibujarZonas();
-    		}
+    		cm.doActionPizarra(OperationsType.OPEN);
     	}
     }
     
@@ -666,7 +686,7 @@ public class Pizarra extends JFrame {
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		// Llamada al controlador para efectuar la acción pertinente.
-    		boolean resultado = cm.doActionPizarra(OperationsType.SAVE.toString());
+    		boolean resultado = cm.doActionPizarra(OperationsType.SAVE);
     		if(resultado) {
     			//Si se ha guardado, desactivar modificado => desactivar botón guardado.
     			modificado = !resultado;

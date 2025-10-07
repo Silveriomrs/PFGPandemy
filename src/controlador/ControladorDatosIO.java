@@ -35,7 +35,7 @@ public class ControladorDatosIO {
 	 * Ejecuta la acción de abrir un archivo de extensión CVS.
 	 * @param ruta Ruta y nombre completo del archivo.
 	 * @param ext Extensión del archivo.
-	 * @return DefaultTableModel modelo con los datos del archivo abierto.
+	 * @return DefaultTableModel modelo con los datos del archivo abierto. Null en otro caso.
 	 */
 	public DCVS abrirArchivo(String ruta, String ext) {
 		DCVS dcvs = null;
@@ -47,11 +47,18 @@ public class ControladorDatosIO {
 	/**
 	 * Guarda los datos correspondientes en un archivo del disco duro.
 	 * @param modulo Modulo a guardar en el disco.
-	 * @return La ruta al archivo guardado. Null en otro caso.
+	 * @return Boolean True en caso de operación realizada. False en otro caso.
 	 */
-	public String guardarArchivo(DCVS modulo) {
-		return io.grabarArchivo(modulo.toString(),modulo.getRuta(),modulo.getTipo());
-	}
+	public boolean guardarModulo(DCVS modulo) {	return io.saveModule(modulo);	}
+	
+	/**
+	 * Función general para guardar datos en formato texto en el disco.
+	 * @param datos Tipo de datos a guardar. Pueden ser de configuración, datos, etc.
+	 * @param Conjuntos de atributos del archivo en un array de cadenas de texto: {Ruta,Directorio,nombre,extensión}.
+	 * 	Donde la ruta es la ruta completa al archivo, con su nombre completo.
+	 * @return Ruta completa al fichero donde se han almacenado los datos. Null en otro caso.
+	 */
+	public boolean saveFile(String datos, String[] fileAttr) {return io.saveFile(datos,fileAttr);}
 	
 	/**
 	 * Selecciona un archivo del disco, o establece su nombre. Puede recibir un
@@ -60,11 +67,11 @@ public class ControladorDatosIO {
 	 * @param sel Selecciona el tipo de dialogo 1: Leer, 2: Grabar.
 	 * desea que muestre dialogo de selección.
 	 * @param ext extensión del archivo a modo de filtro.
-	 * @return Ruta del archivo seleccionado, null en otro caso.
+	 * @return Un array de Strings con los atributos de ubicación del fichero:
+	 * 		[ruta,directorio,nombre].
+	 * 		La ruta contiene todo el nombre, incluyendo la extensión.
 	 */
-	public String selFile(int sel, String ext) {
-		return IO.selFile(sel, ext);
-	}
+	public String[] selFile(int sel, String ext) {	return IO.selFile(sel, ext);}
 	
 	/**
 	 * Abre un fichero PDF del sistema.
@@ -76,9 +83,9 @@ public class ControladorDatosIO {
 		String pathPDF = "Manuales" + separador + man + "." + TypesFiles.PDF;
 		//Apertura del PDF desde la propia aplicación del sistema.
 		try {
-			String r2 = IO.getFile(1, pathPDF, TypesFiles.PDF).getPath();			/* FUNCIONA */
+			String r2 = IO.getFile(pathPDF, TypesFiles.PDF).getPath();			/* FUNCIONA */
 			pathPDF = r2;
-			Desktop.getDesktop().open(IO.getFile(1, pathPDF, TypesFiles.PDF));
+			Desktop.getDesktop().open(IO.getFile(pathPDF, TypesFiles.PDF));
 		}catch (Exception ex) {
 			System.out.println("ControladorDatosIO > openPDF > Error, No encontrado fichero: " + pathPDF);
 		}

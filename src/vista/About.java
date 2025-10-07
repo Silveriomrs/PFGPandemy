@@ -98,7 +98,7 @@ public class About extends JPanel {
 		
 		JPanel panel_datos = new JPanel();
 		panel_datos.setOpaque(false);
-		panel_datos.setBorder(new TitledBorder(new CompoundBorder(new LineBorder(new Color(138, 43, 226), 2, true), new LineBorder(new Color(0, 128, 0), 1, true)), "Versi\u00F3n 1.0", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 128)));
+		panel_datos.setBorder(new TitledBorder(new CompoundBorder(new LineBorder(new Color(138, 43, 226), 2, true), new LineBorder(new Color(0, 128, 0), 1, true)), Labels_GUI.VERSION_TITLE + Labels_GUI.VERSION_NUMBER, TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 128)));
 		panel_datos.setBounds(12, 338, 447, 150);
 		add(panel_datos);
 		panel_datos.setLayout(null);

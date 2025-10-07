@@ -15,6 +15,7 @@ import controlador.ControladorModulos;
 import controlador.IO;
 import modelo.ImagesList;
 import modelo.Labels_GUI;
+import modelo.OperationsType;
 import modelo.TypesFiles;
 
 import java.awt.BorderLayout;
@@ -107,57 +108,55 @@ public class Principal extends JFrame {
 		this.mBar = new JMenuBar();
 		//Menu Archivo
 		JMenu mnArchivo = new JMenu(Labels_GUI.MM_FILES);
-		addJMenuItem(mnArchivo, Labels_GUI.M_NEW_PRJ, ImagesList.CLIPBOARD );
+		addJMenuItem(mnArchivo, Labels_GUI.M_NEW_PRJ, OperationsType.NEW, ImagesList.CLIPBOARD );
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo,Labels_GUI.M_OPEN_PRJ, ImagesList.FOLDER);
+		addJMenuItem(mnArchivo,Labels_GUI.M_OPEN_PRJ, OperationsType.OPEN, ImagesList.FOLDER);
 		//SubMenu VenSIM
-		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PA,ImagesList.CLIPBOARD);
-		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PB,ImagesList.CLIPBOARD);
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PA,OperationsType.IMPORT_A, ImagesList.CLIPBOARD);
+		addJMenuItem(mnArchivo,Labels_GUI.M_IMPORT_PB,OperationsType.IMPORT_B, ImagesList.CLIPBOARD);
 		mnArchivo.addSeparator();
 		//
-		addJMenuItem(mnArchivo,Labels_GUI.M_SAVE_PRJ, ImagesList.DISK_1);
+		addJMenuItem(mnArchivo,Labels_GUI.M_SAVE_PRJ, OperationsType.SAVE, ImagesList.DISK_1);
 		mnArchivo.addSeparator();
-		addJMenuItem(mnArchivo,Labels_GUI.M_EXIT, ImagesList.EXIT);
+		addJMenuItem(mnArchivo,Labels_GUI.M_EXIT, OperationsType.EXIT, ImagesList.EXIT);
 
 		//Menu Ver
 		JMenu mnVer = new JMenu(Labels_GUI.MM_MODELO);
-		addJMenuItem(mnVer,Labels_GUI.MVER_PRJ ,ImagesList.CLIPBOARD );
-		addJMenuItem(mnVer,Labels_GUI.W_DEF_TITLE ,ImagesList.CLIPBOARD );
-		addJMenuItem(mnVer,Labels_GUI.W_GRP_TITLE ,ImagesList.CLIPBOARD );
-		addJMenuItem(mnVer,Labels_GUI.W_REL_TITLE , ImagesList.NODES);
+		addJMenuItem(mnVer,Labels_GUI.MVER_PRJ ,OperationsType.VIEW_PRJ, ImagesList.CLIPBOARD );
+		addJMenuItem(mnVer,Labels_GUI.W_DEF_TITLE ,OperationsType.VIEW_DEF, ImagesList.CLIPBOARD );
+		addJMenuItem(mnVer,Labels_GUI.W_GRP_TITLE ,OperationsType.VIEW_GRP, ImagesList.CLIPBOARD );
+		addJMenuItem(mnVer,Labels_GUI.W_REL_TITLE , OperationsType.VIEW_REL, ImagesList.NODES);
 		mnVer.addSeparator();
-		addJMenuItem(mnVer,Labels_GUI.W_MAP_TITLE , ImagesList.MAP);
-		addJMenuItem(mnVer,Labels_GUI.W_PAL_TITLE, ImagesList.PAL);
-		addJMenuItem(mnVer,Labels_GUI.W_PLAYER_TITLE , ImagesList.PLAYER);
+		addJMenuItem(mnVer,Labels_GUI.W_MAP_TITLE , OperationsType.VIEW_MAP, ImagesList.MAP);
+		addJMenuItem(mnVer,Labels_GUI.W_PAL_TITLE, OperationsType.VIEW_PAL, ImagesList.PAL);
+		addJMenuItem(mnVer,Labels_GUI.W_PLAYER_TITLE , OperationsType.PLAY, ImagesList.PLAYER);
 
 
 		//Menu Herramientas
 		JMenu mnHerramientas = new JMenu(Labels_GUI.MM_TOOLS);
-		addJMenuItem(mnHerramientas,Labels_GUI.W_TE_TITLE , ImagesList.TABLE);
+		addJMenuItem(mnHerramientas,Labels_GUI.W_TE_TITLE , OperationsType.EDIT, ImagesList.TABLE);
 		mnHerramientas.addSeparator();
-		addJMenuItem(mnHerramientas,Labels_GUI.W_GE_TITLE , ImagesList.PIZARRA);
-		addJMenuItem(mnHerramientas,Labels_GUI.W_PE_TITLE, ImagesList.PAL);
+		addJMenuItem(mnHerramientas,Labels_GUI.W_GE_TITLE , OperationsType.EDIT_GRAPHIC, ImagesList.PIZARRA);
+		addJMenuItem(mnHerramientas,Labels_GUI.W_PE_TITLE, OperationsType.EDIT_PAL, ImagesList.PAL);
 
 		//Menu Preferencias
 		JMenu mnPreferencias = new JMenu(Labels_GUI.MM_PREFERENCES);
-		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_ES, ImagesList.FLAG_ES);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_ES, OperationsType.LANG_ES, ImagesList.FLAG_ES);
 		mnPreferencias.addSeparator();
-		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_EN, ImagesList.FLAG_EN);
-		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_FR, ImagesList.FLAG_FR);
-		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_DE, ImagesList.FLAG_DE);
-		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_UR, ImagesList.FLAG_UR);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_EN, OperationsType.LANG_EN, ImagesList.FLAG_EN);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_FR, OperationsType.LANG_FR, ImagesList.FLAG_FR);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_DE, OperationsType.LANG_DE, ImagesList.FLAG_DE);
+		addJMenuItem(mnPreferencias,Labels_GUI.MPREFERENCES_UR, OperationsType.LANG_UR, ImagesList.FLAG_UR);
 		jmitems.get(Labels_GUI.MPREFERENCES_EN).setEnabled(false);
 		jmitems.get(Labels_GUI.MPREFERENCES_FR).setEnabled(false);
 		jmitems.get(Labels_GUI.MPREFERENCES_DE).setEnabled(false);
 		jmitems.get(Labels_GUI.MPREFERENCES_UR).setEnabled(false);
 
-
-
 		//Menu Ayuda
 		JMenu mnAyuda = new JMenu(Labels_GUI.MM_HELP);
-		addJMenuItem(mnAyuda,Labels_GUI.MHELP_TABLES , ImagesList.BOOKS);
-		addJMenuItem(mnAyuda,Labels_GUI.MHELP_USER_GUIDE , ImagesList.BOOKS);
-		addJMenuItem(mnAyuda,Labels_GUI.MHELP_ABOUT , ImagesList.P_LOGO);
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_TABLES , OperationsType.HELP_TABLES, ImagesList.BOOKS);
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_USER_GUIDE , OperationsType.HELP_USER_GUIDE, ImagesList.BOOKS);
+		addJMenuItem(mnAyuda,Labels_GUI.MHELP_ABOUT , OperationsType.HELP_ABOUT, ImagesList.P_LOGO);
 
 		//Añadir sub-menus a la barra de menus.
 		mBar.add(mnArchivo);
@@ -212,8 +211,9 @@ public class Principal extends JFrame {
 	 * @param nombre Nombre con el que aparecerá en el menú.
 	 * @param rutaIcon Ruta a un icono que será añadido a la opción.
 	 */
-	private void addJMenuItem(JMenu padre, String nombre, String rutaIcon) {
-		JMenuItem item = new JMenuItem(new VerMenuListener(nombre));
+	private void addJMenuItem(JMenu padre, String nombre, OperationsType op, String rutaIcon) {
+		//JMenuItem requiere como parámetro un nombre (texto a mostrar) y en este caso también una clase.
+		JMenuItem item = new JMenuItem(new VerMenuListener(nombre,op));
 		if(rutaIcon != null)  item.setIcon(IO.getIcon(rutaIcon,20,20));
 		jmitems.put(nombre, item);
 		padre.add(item);
@@ -228,17 +228,19 @@ public class Principal extends JFrame {
 	private class VerMenuListener extends AbstractAction {
 		/** serialVersionUID*/
 		private static final long serialVersionUID = -5103462996882781094L;
-		private String name;
+		private OperationsType op;
 
 		/**
-		 * Esstablece como propiedad el nombre de la clase con el que se
+		 * Establece como propiedad el nombre de la clase con el que se
 		 *  identificará ante el controlador de módulos y así identificar la acción
 		 *   requerida.
-		 * @param name Nombre del control al que se asocia.
+		 * @param nameIn Nombre del control al que se asocia.
+		 * @param op es la operación asociada a la función de esta clase.
+		 * @see modelo#OperationsType
 		 */
-		public VerMenuListener(String name) {
-			super(name);
-			this.name = name;
+		public VerMenuListener(String nameIn, OperationsType op) {
+			super(nameIn);
+			this.op = op;
 		}
 
 		/**
@@ -249,7 +251,7 @@ public class Principal extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Si se ha seleccionado módulo ->
-			cm.doActionPrincipal(name);
+			cm.doActionPrincipal(op);
 			actualizarJMItems();
 		}
 	}
@@ -272,7 +274,7 @@ public class Principal extends JFrame {
 			 */
 			@Override
 			public void windowClosing(WindowEvent e) {
-				cm.doActionPrincipal(Labels_GUI.M_EXIT);
+				cm.doActionPrincipal(OperationsType.EXIT);
 		    }
 	}
 }

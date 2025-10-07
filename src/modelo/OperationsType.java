@@ -4,74 +4,88 @@
 *   como permitir desacoplar las accionos del idioma.
 * <p>Aplication: UNED</p>  
 * @author Silverio Manuel Rosales Santana
-* @date 7 dic. 2021  
-* @version 1.0  
+* @date 17 oct. 2023  
+* @version 1.2  
 */  
 package modelo;
 
-/**  
+/** 
+ * Esta clase enumerada contiene todas las operaciones que pueda usar la aplicación y cada una de sus partes.
+ *  Las acciones tienen caracter general evitando redundancias, aunque en aquellas acciones donde sea necesario
+ *  especificar el receptor o el disparador de la acción, tendrá creada una entrada específica (ej. los idiomas).
  * @author Silverio Manuel Rosales Santana
- * @date 7 dic. 2021
- * @version versión 1.0
+ * @date 17 oct. 2023
+ * @version versión 2.0
  */
 public enum OperationsType {
-	/** Operación de actualizar datos o vista.*/ 
-	UPDATE(Labels_GUI.UPDATE),
-	/** Operación de abrir un componente o un fichero*/
-	OPEN(Labels_GUI.OPEN),
-	/** Guardar un fichero*/
-	SAVE(Labels_GUI.SAVE),
-	/** Guardar como un fichero en donde se especifique*/
-	SAVE_AS(Labels_GUI.SAVE_AS),
-	/** Eliminar un dato o fichero*/
-	DELETE(Labels_GUI.DELETE),
-	/** Editar un dato o fichero*/
-	EDIT(Labels_GUI.EDIT),
-	/** Ejecutar una acción*/  
-	EXECUTE(Labels_GUI.EXECUTE),
-	/** Acción de reproducir en el player*/
-	PLAY(Labels_GUI.PLAY),
-	/** Acción de pausar la reproducción en el player*/
-	PAUSE(Labels_GUI.PAUSE),
-	/** Acción de repetir la reproducción del player*/
-	REPLAY(Labels_GUI.REPLAY),
-	/** Acción de notificación de cambios*/
-	CHANGES(Labels_GUI.CHANGES),
 	/** Acción de aplicar un cambio*/
-	APPLY(Labels_GUI.APPLY),
+	APPLY,
+	/** Acción de notificación de cambios*/
+	CHANGES,
 	/** Acción de cerrar una ventana*/
-	CLOSE(Labels_GUI.CLOSE),
+	CLOSE,
+	/** Eliminar un dato o fichero*/
+	DELETE,
+	/** Editar un dato o fichero*/
+	EDIT,
+	/** Editar gráfico*/
+	EDIT_GRAPHIC,
+	/** Editar Paleta de colores / Escala de valores*/
+	EDIT_PAL,
+	/** Ejecutar una acción*/  
+	EXECUTE,
+	/** Acción de salir*/
+	EXIT,
+	/** Instanciar a la ventana Acerca de.*/
+	HELP_ABOUT,
+	/** Instanciar al manual de ayuda de las tablas.*/
+	HELP_TABLES,
+	/** Instanciar el manual de usuario.*/
+	HELP_USER_GUIDE,
+	/** Importar tabla Vensim tipo A*/
+	IMPORT_A,
+	/** Importar tabla Vensim tipo B*/
+	IMPORT_B,
+	/** Selección idioma Español*/
+	LANG_ES,
+	/** Selección idioma Inglés*/
+	LANG_EN,
+	/** Selección idioma Francés*/
+	LANG_FR,
+	/** Selección idioma Alemán*/
+	LANG_DE,
+	/** Selección idioma Ucraniano*/
+	LANG_UR,
+	/** Nuevo elemento (Módulo u otro)*/
+	NEW,
+	/** Operación de abrir un componente o un fichero*/
+	OPEN,
+	/** Acción de reproducir en el player*/
+	PLAY,
+	/** Acción de pausar la reproducción en el player*/
+	PAUSE,
+	/** Acción de repetir la reproducción del player*/
+	REPLAY,
+	/** Guardar un fichero*/
+	SAVE,
+	/** Guardar como un fichero en donde se especifique*/
+	SAVE_AS,
+	/** Operación de actualizar datos o vista.*/ 
+	UPDATE,
+	/** Instanciar a la vista del proyecto.*/
+	VIEW_PRJ,
+	/** Instancia a la vista de definición de la enfermedad.*/
+	VIEW_DEF,
+	/** Instancia a la vista de los grupos de población.*/
+	VIEW_GRP,
+	/** Instancia a la vista del mapa.*/
+	VIEW_MAP,
+	/** Instancia a la vista de la paleta de colores/escala.*/
+	VIEW_PAL,
+	/** Instancia a la vista de relaciones entre los grupos de población.*/
+	VIEW_REL,
 	/** Etiqueta final a eliminar cuando este todo hecho*/
-	END("Final");
-
-    private final String display;
-    private OperationsType(String s) { display = s; }
-
-    @Override
-    public String toString() { return display; }
+	END;
     
-    /**
-     * Devuelve el enumerado al que pertenece la descripción.
-     * @param value Valor del enúmerado (descripción)
-     * @return Enumerado. Null en otro caso.
-     */
-    public static OperationsType getNum(String value) {
-    	OperationsType[] values = values();
-    	OperationsType op = null;
-    	boolean done = false;	
-    	int max = values.length;
-    	int i = 0;
-    	//Bucle para recorrer el array hasta encontrar la coincidencia.
-    	while(!done && i < max) {
-    		String aux = values[i].toString();
-    		if(value.equals(aux)){
-    			op = values[i];
-    			done = true;
-    		}		
-    		i++;
-    	}
-    	if(op == null) System.out.println("OperationsType > getNum > Error, valor no encontrado para: " + value);
-    	return op;
-    }
 
 }

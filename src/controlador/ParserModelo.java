@@ -135,9 +135,9 @@ public abstract class ParserModelo {
 	 */
 	private void setTypeAndName(DCVS modulo, String type){
 		//Establecer atributos propios del módulo.
-		modulo.setTipo(type);
+		modulo.setType(type);
 		//Crear nombre con extensión DEF a partir del nombre del archivo original.
-		String newName = dcvs.getNombre();
+		String newName = dcvs.getName();
 		//Quitamos la extensión.
 		newName = newName.substring(0, newName.length() -3);
 		//Guardar dato con nueva extensión.
@@ -280,7 +280,7 @@ public abstract class ParserModelo {
 		//Añadir tipo y nombre
 		setTypeAndName(mPRJ,TypesFiles.PRJ);
 		//Añadir etiquetas generales.
-		mPRJ.setDataToLabel(Labels.NAME, dcvs.getNombre());
+		mPRJ.setDataToLabel(Labels.NAME, dcvs.getName());
 		mPRJ.setDataToLabel(Labels.NG,"" + getNG());
 		mPRJ.setDataToLabel(Labels.DESCRIPTION,"Modelo de enfermedad de transmisión.");		
 	}
